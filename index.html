@@ -39,7 +39,7 @@
     }
 
     .container {
-      max-width: 800px;
+      max-width: 900px;
       margin: auto;
       padding: 30px 20px;
     }
@@ -65,6 +65,7 @@
 
   <header>
     <nav>
+      <a href="#estrategia">Estratégias</a>
       <a href="#diario">Plano Diário</a>
       <a href="#risco">Gestão de Risco</a>
       <a href="#rotina">Plano Semanal</a>
@@ -76,6 +77,42 @@
 
   <div class="container">
     <h1>Plano de Trading Diário</h1>
+
+    <section id="estrategia">
+      <h2>1. Estratégia – Duplo Timeframe (4H + 15min)</h2>
+
+      <h3>Timeframe Maior (4H) – Confirmação de Contexto</h3>
+      <ul>
+        <li>RSI cruza o RSI-Based MA de baixo para cima</li>
+        <li>RSI faz um pullback para testar o MA</li>
+        <li>Durante o pullback, o Estocástico faz um novo cruzamento</li>
+        <li>Este novo cruzamento deve ser num valor mais alto que o anterior</li>
+      </ul>
+
+      <h3>Timeframe Menor (15min) – Execução</h3>
+      <ul>
+        <li>Identificar suporte/resistência locais (usar Fixed Range Volume Profile)</li>
+        <li>Confirmar resistência com zona 0.382 de Fibonacci</li>
+        <li>Traçar linha de tendência no RSI → o RSI deve quebrar essa linha</li>
+        <li><strong>Entrada 1:</strong> Após quebra da linha de tendência do RSI:
+          <ul>
+            <li>Entrada no suporte</li>
+            <li>Entrada no breakout (com atenção ao pullback)</li>
+          </ul>
+        </li>
+        <li><strong>Entrada 2:</strong> Reteste da zona 0.382:
+          <ul>
+            <li>Estocástico fez reset (valores baixos) e cruza novamente</li>
+            <li>RSI volta a cruzar o RSI-Based MA</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>Confirmação externa</h3>
+      <ul>
+        <li>Verificar comportamento do BTC – evitar operar durante correções</li>
+      </ul>
+    </section>
 
     <section id="diario">
       <h2>2. Plano de Trading Diário</h2>
