@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt">
 <head>
@@ -10,7 +11,7 @@
       color: #333;
       margin: 0;
       padding: 20px;
-      max-width: 800px;
+      max-width: 900px;
       margin: auto;
     }
 
@@ -64,68 +65,106 @@
   <button class="accordion">1. Estratégia – Duplo Timeframe (4H + 15min)</button>
   <div class="panel">
     <ul>
-      <li><strong>4H – Confirmação:</strong> RSI cruza o MA, faz pullback, Stochastic cruza mais alto.</li>
-      <li><strong>15min – Execução:</strong> Quebra da linha de tendência no RSI ou reteste .382 com confirmação.</li>
-      <li>Volume Profile para S/R, Fibonacci para resistência, Estocástico para reset.</li>
-      <li>Confirmar condições do BTC antes de entrar.</li>
+      <li><strong>Timeframe Maior (4H):</strong></li>
+      <ul>
+        <li>RSI cruza o RSI-Based MA de baixo para cima</li>
+        <li>O RSI faz um pullback e testa o RSI-Based MA</li>
+        <li>Durante o pullback, o Estocástico faz um novo cruzamento</li>
+        <li>O cruzamento actual tem de ser em valor mais alto do que o cruzamento anterior</li>
+      </ul>
+      <li><strong>Timeframe Menor (15min):</strong></li>
+      <ul>
+        <li>Identificar zonas de Suporte e Resistência locais com Fixed Range Volume Profile</li>
+        <li>Usar retração de Fibonacci para consolidar a zona de resistência em torno da retração 0.382</li>
+        <li>Traçar uma linha de tendência no RSI e aguardar que o RSI a quebre</li>
+        <li><em>Entrada 1:</em> Após quebra da linha de tendência do RSI:
+          <ul>
+            <li>Entrada no suporte ou</li>
+            <li>Entrada acima da resistência (consoante o local da quebra)</li>
+          </ul>
+        </li>
+        <li><em>Entrada 2:</em> No reteste da zona 0.382:
+          <ul>
+            <li>Estocástico fez reset e cruza novamente</li>
+            <li>RSI cruza novamente o RSI-Based MA</li>
+          </ul>
+        </li>
+      </ul>
+      <li><strong>Confirmar sempre com o comportamento do BTC</strong></li>
     </ul>
   </div>
 
   <button class="accordion">2. Plano de Trading Diário</button>
   <div class="panel">
     <ul>
-      <li>Revisar 3–5 pares</li>
-      <li>Marcar zonas S/R, EMAs</li>
-      <li>Alarmes no TradingView</li>
-      <li>Verificar BTC</li>
+      <li>Revisa os pares que vais acompanhar (3 a 5 pares no máximo).</li>
+      <li>Marca zonas importantes (S/R, EMAs, etc.).</li>
+      <li>Define alarmes no TradingView para zonas-chave.</li>
+      <li>Verifica o comportamento do BTC.</li>
     </ul>
   </div>
 
   <button class="accordion">3. Gestão de Risco</button>
   <div class="panel">
     <ul>
-      <li>Risco fixo</li>
-      <li>SL técnico, tamanho proporcional</li>
-      <li>Após 5 perdas, manter plano – risco controlado</li>
+      <li>Baseia as tuas entradas em risco fixo: 1% a 2% do capital.</li>
+      <li>Define o stop loss técnico e calcula o tamanho da posição proporcionalmente.</li>
+      <li>Se falhares 5 trades seguidos, não é o fim — estás protegido pela gestão de risco.</li>
     </ul>
   </div>
 
   <button class="accordion">4. Plano Semanal e Diário</button>
   <div class="panel">
     <ul>
-      <li>9h–10h: análise</li>
-      <li>10h–16h: execuções</li>
-      <li>16h30–17h: revisão</li>
-      <li>Evitar operar fora deste horário</li>
+      <li>Criar rotina com horário fixo:</li>
+      <ul>
+        <li>Análise: 9h às 10h</li>
+        <li>Entrada em trades: 10h às 16h</li>
+        <li>Revisão dos trades: 16h30 às 17h</li>
+      </ul>
+      <li>Pausa total fora destas horas. Evita overtrading.</li>
     </ul>
   </div>
 
   <button class="accordion">5. Diário de Trading</button>
   <div class="panel">
     <ul>
-      <li>Data/hora, par, TF, entrada, SL, TP</li>
-      <li>Motivo da entrada com base na estratégia</li>
-      <li>Resultado e emoções</li>
-      <li>Rever semanalmente para padrões</li>
+      <li>Começa hoje. Um ficheiro simples onde registas:</li>
+      <ul>
+        <li>Data e hora</li>
+        <li>Par operado</li>
+        <li>Timeframe</li>
+        <li>Entrada, SL, TP</li>
+        <li>Motivo da entrada (com base no plano)</li>
+        <li>Resultado (+% ou -%)</li>
+        <li>Emoções antes, durante e depois</li>
+      </ul>
+      <li>A cada semana, revê os trades e procura padrões: onde acertas mais? Quando erras?</li>
     </ul>
   </div>
 
   <button class="accordion">6. Painel de Performance</button>
   <div class="panel">
     <ul>
-      <li>Gráfico de evolução</li>
-      <li>Taxa de acerto</li>
-      <li>Média de lucro por trade</li>
-      <li>Drawdowns</li>
+      <li>Mais tarde automatizar num Excel ou Google Sheets com:</li>
+      <ul>
+        <li>Gráfico de crescimento da conta</li>
+        <li>Taxa de acerto</li>
+        <li>Média de lucro por trade</li>
+        <li>Drawdowns</li>
+      </ul>
     </ul>
   </div>
 
   <button class="accordion">7. Gestão Emocional</button>
   <div class="panel">
     <ul>
-      <li>Processo claro → segurança</li>
-      <li>Aceitar perdas como parte do jogo</li>
-      <li>Focar em execução perfeita, não lucro imediato</li>
+      <li>O medo vem da incerteza e da pressão para acertar. O teu antídoto é:</li>
+      <ul>
+        <li>Ter um processo claro (como este plano).</li>
+        <li>Aceitar as perdas como parte do jogo.</li>
+        <li>Focar em execução perfeita, não em ganhar dinheiro.</li>
+      </ul>
     </ul>
   </div>
 
