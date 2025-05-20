@@ -6,188 +6,139 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      line-height: 1.6;
-      background-color: #f7f7f7;
+      background: #f7f7f7;
       color: #333;
       margin: 0;
-      padding: 0;
-    }
-
-    header {
-      background-color: #005a9c;
-      padding: 15px 20px;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
-
-    nav {
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    nav a {
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    nav a:hover {
-      text-decoration: underline;
-    }
-
-    .container {
-      max-width: 900px;
+      padding: 20px;
+      max-width: 800px;
       margin: auto;
-      padding: 30px 20px;
     }
 
-    h1, h2 {
+    h1 {
       color: #005a9c;
+      text-align: center;
+    }
+
+    .accordion {
+      background-color: #005a9c;
+      color: white;
+      cursor: pointer;
+      padding: 14px 20px;
+      width: 100%;
+      text-align: left;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      transition: 0.3s;
+      margin-top: 10px;
+    }
+
+    .accordion:hover,
+    .active {
+      background-color: #003f6d;
+    }
+
+    .panel {
+      padding: 0 20px;
+      background-color: white;
+      display: none;
+      overflow: hidden;
+      border-left: 3px solid #005a9c;
+      border-right: 3px solid #005a9c;
+      border-bottom: 3px solid #005a9c;
     }
 
     ul {
-      padding-left: 20px;
+      margin-top: 10px;
     }
 
     li {
       margin-bottom: 8px;
     }
-
-    section {
-      margin-bottom: 50px;
-    }
   </style>
 </head>
 <body>
 
-  <header>
-    <nav>
-      <a href="#estrategia">Estratégias</a>
-      <a href="#diario">Plano Diário</a>
-      <a href="#risco">Gestão de Risco</a>
-      <a href="#rotina">Plano Semanal</a>
-      <a href="#registo">Diário de Trading</a>
-      <a href="#painel">Painel de Performance</a>
-      <a href="#emocional">Gestão Emocional</a>
-    </nav>
-  </header>
+  <h1>Plano de Trading Diário</h1>
 
-  <div class="container">
-    <h1>Plano de Trading Diário</h1>
-
-    <section id="estrategia">
-      <h2>1. Estratégia – Duplo Timeframe (4H + 15min)</h2>
-
-      <h3>Timeframe Maior (4H) – Confirmação de Contexto</h3>
-      <ul>
-        <li>RSI cruza o RSI-Based MA de baixo para cima</li>
-        <li>RSI faz um pullback para testar o MA</li>
-        <li>Durante o pullback, o Estocástico faz um novo cruzamento</li>
-        <li>Este novo cruzamento deve ser num valor mais alto que o anterior</li>
-      </ul>
-
-      <h3>Timeframe Menor (15min) – Execução</h3>
-      <ul>
-        <li>Identificar suporte/resistência locais (usar Fixed Range Volume Profile)</li>
-        <li>Confirmar resistência com zona 0.382 de Fibonacci</li>
-        <li>Traçar linha de tendência no RSI → o RSI deve quebrar essa linha</li>
-        <li><strong>Entrada 1:</strong> Após quebra da linha de tendência do RSI:
-          <ul>
-            <li>Entrada no suporte</li>
-            <li>Entrada no breakout (com atenção ao pullback)</li>
-          </ul>
-        </li>
-        <li><strong>Entrada 2:</strong> Reteste da zona 0.382:
-          <ul>
-            <li>Estocástico fez reset (valores baixos) e cruza novamente</li>
-            <li>RSI volta a cruzar o RSI-Based MA</li>
-          </ul>
-        </li>
-      </ul>
-
-      <h3>Confirmação externa</h3>
-      <ul>
-        <li>Verificar comportamento do BTC – evitar operar durante correções</li>
-      </ul>
-    </section>
-
-    <section id="diario">
-      <h2>2. Plano de Trading Diário</h2>
-      <ul>
-        <li>Revisa os pares que vais acompanhar (3 a 5 pares no máximo).</li>
-        <li>Marca zonas importantes (S/R, EMAs, etc.).</li>
-        <li>Define alarmes no TradingView para zonas-chave.</li>
-        <li>Verifica o comportamento do BTC.</li>
-      </ul>
-    </section>
-
-    <section id="risco">
-      <h2>3. Gestão de Risco</h2>
-      <ul>
-        <li>Baseia as tuas entradas em risco fixo: 1% a 2% do capital.</li>
-        <li>Define o stop loss técnico e calcula o tamanho da posição proporcionalmente.</li>
-        <li>Se falhares 5 trades seguidos, não é o fim — estás protegido pela gestão de risco.</li>
-      </ul>
-    </section>
-
-    <section id="rotina">
-      <h2>4. Plano Semanal e Diário</h2>
-      <ul>
-        <li>Criar rotina com horário fixo:</li>
-        <ul>
-          <li>Análise: 9h às 10h</li>
-          <li>Entrada em trades: 10h às 16h</li>
-          <li>Revisão dos trades: 16h30 às 17h</li>
-        </ul>
-        <li>Pausa total fora destas horas. Evita overtrading.</li>
-      </ul>
-    </section>
-
-    <section id="registo">
-      <h2>5. Diário de Trading (OBRIGATÓRIO)</h2>
-      <ul>
-        <li>Começa hoje. Um ficheiro simples onde registas:</li>
-        <ul>
-          <li>Data e hora</li>
-          <li>Par operado</li>
-          <li>Timeframe</li>
-          <li>Entrada, SL, TP</li>
-          <li>Motivo da entrada (com base no plano)</li>
-          <li>Resultado (+% ou -%)</li>
-          <li>Emoções antes, durante e depois</li>
-        </ul>
-        <li>Revisão semanal para encontrar padrões: onde acertas mais? Quando erras?</li>
-      </ul>
-    </section>
-
-    <section id="painel">
-      <h2>6. Painel de Performance</h2>
-      <ul>
-        <li>Mais tarde automatizar num Excel ou Google Sheets:</li>
-        <ul>
-          <li>Gráfico de crescimento da conta</li>
-          <li>Taxa de acerto</li>
-          <li>Média de lucro por trade</li>
-          <li>Drawdowns</li>
-        </ul>
-      </ul>
-    </section>
-
-    <section id="emocional">
-      <h2>7. Gestão Emocional</h2>
-      <ul>
-        <li>O medo vem da incerteza e da pressão para acertar. O teu antídoto é:</li>
-        <ul>
-          <li>Ter um processo claro (como este plano).</li>
-          <li>Aceitar as perdas como parte do jogo.</li>
-          <li>Focar em execução perfeita, não em ganhar dinheiro.</li>
-        </ul>
-      </ul>
-    </section>
+  <button class="accordion">1. Estratégia – Duplo Timeframe (4H + 15min)</button>
+  <div class="panel">
+    <ul>
+      <li><strong>4H – Confirmação:</strong> RSI cruza o MA, faz pullback, Stochastic cruza mais alto.</li>
+      <li><strong>15min – Execução:</strong> Quebra da linha de tendência no RSI ou reteste .382 com confirmação.</li>
+      <li>Volume Profile para S/R, Fibonacci para resistência, Estocástico para reset.</li>
+      <li>Confirmar condições do BTC antes de entrar.</li>
+    </ul>
   </div>
+
+  <button class="accordion">2. Plano de Trading Diário</button>
+  <div class="panel">
+    <ul>
+      <li>Revisar 3–5 pares</li>
+      <li>Marcar zonas S/R, EMAs</li>
+      <li>Alarmes no TradingView</li>
+      <li>Verificar BTC</li>
+    </ul>
+  </div>
+
+  <button class="accordion">3. Gestão de Risco</button>
+  <div class="panel">
+    <ul>
+      <li>Risco fixo: 1% a 2%</li>
+      <li>SL técnico, tamanho proporcional</li>
+      <li>Após 5 perdas, manter plano – risco controlado</li>
+    </ul>
+  </div>
+
+  <button class="accordion">4. Plano Semanal e Diário</button>
+  <div class="panel">
+    <ul>
+      <li>9h–10h: análise</li>
+      <li>10h–16h: execuções</li>
+      <li>16h30–17h: revisão</li>
+      <li>Evitar operar fora deste horário</li>
+    </ul>
+  </div>
+
+  <button class="accordion">5. Diário de Trading</button>
+  <div class="panel">
+    <ul>
+      <li>Data/hora, par, TF, entrada, SL, TP</li>
+      <li>Motivo da entrada com base na estratégia</li>
+      <li>Resultado e emoções</li>
+      <li>Rever semanalmente para padrões</li>
+    </ul>
+  </div>
+
+  <button class="accordion">6. Painel de Performance</button>
+  <div class="panel">
+    <ul>
+      <li>Gráfico de evolução</li>
+      <li>Taxa de acerto</li>
+      <li>Média de lucro por trade</li>
+      <li>Drawdowns</li>
+    </ul>
+  </div>
+
+  <button class="accordion">7. Gestão Emocional</button>
+  <div class="panel">
+    <ul>
+      <li>Processo claro → segurança</li>
+      <li>Aceitar perdas como parte do jogo</li>
+      <li>Focar em execução perfeita, não lucro imediato</li>
+    </ul>
+  </div>
+
+  <script>
+    const acc = document.querySelectorAll(".accordion");
+    acc.forEach(btn => {
+      btn.addEventListener("click", function () {
+        this.classList.toggle("active");
+        const panel = this.nextElementSibling;
+        panel.style.display = (panel.style.display === "block") ? "none" : "block";
+      });
+    });
+  </script>
 
 </body>
 </html>
