@@ -1,1 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>Plano de Trading Diário</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #1e1e1e;
+      color: #ddd;
+      margin: 0;
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    h1 {
+      color: #4fc3f7;
+      text-align: center;
+    }
+
+    .accordion {
+      background-color: #333;
+      color: #fff;
+      cursor: pointer;
+      padding: 14px 20px;
+      width: 100%;
+      text-align: left;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      transition: 0.3s;
+      margin-top: 10px;
+    }
+
+    .accordion:hover,
+    .active {
+      background-color: #555;
+    }
+
+    .panel {
+      padding: 0 20px 10px 20px;
+      background-color: #2b2b2b;
+      display: none;
+      overflow: hidden;
+      border-left: 3px solid #4fc3f7;
+      border-right: 3px solid #4fc3f7;
+      border-bottom: 3px solid #4fc3f7;
+    }
+
+    ul {
+      margin-top: 10px;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    .button-bar {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .toggle-button {
+      background-color: #4fc3f7;
+      border: none;
+      color: #000;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+
+    .toggle-button:hover {
+      background-color: #42a5f5;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📘 Plano de Trading Diário</h1>
+
+  <div class="button-bar">
+    <button class="toggle-button" onclick="toggleAll()">Expandir/Recolher Tudo</button>
+  </div>
+
+  <button class="accordion">📊 1. Estratégia – Duplo Timeframe (4H + 15min)</button>
+  <div class="panel">
+    <ul>
+      <li><strong>Timeframe Maior (4H):</strong></li>
+      <ul>
+        <li>RSI cruza o RSI-Based MA de baixo para cima</li>
+        <li>O RSI faz um pullback e testa o RSI-Based MA</li>
+        <li>Durante o pullback, o Estocástico faz um novo cruzamento</li>
+        <li>O cruzamento actual tem de ser em valor mais alto do que o cruzamento anterior</li>
+      </ul>
+      <li><strong>Timeframe Menor (15min):</strong></li>
+      <ul>
+        <li>Identificar zonas de Suporte e Resistência locais com Fixed Range Volume Profile</li>
+        <li>Usar retração de Fibonacci para consolidar a zona de resistência em torno da retração 0.382</li>
+        <li>Traçar uma linha de tendência no RSI e aguardar que o RSI a quebre</li>
+        <li><em>Entrada 1:</em> Após quebra da linha de tendência do RSI:
+          <ul>
+            <li>Entrada no suporte ou</li>
+            <li>Entrada acima da resistência (consoante o local da quebra)</li>
+          </ul>
+        </li>
+        <li><em>Entrada 2:</em> No reteste da zona 0.382:
+          <ul>
+            <li>Estocástico fez reset e cruza novamente</li>
+            <li>RSI cruza novamente o RSI-Based MA</li>
+          </ul>
+        </li>
+      </ul>
+      <li><strong>Confirmar sempre com o comportamento do BTC</strong></li>
+    </ul>
+  </div>
+
+  <button class="accordion">📅 2. Plano de Trading Diário</button>
+  <div class="panel">
+    <ul>
+      <li>Revisa os pares que vais acompanhar (3 a 5 pares no máximo).</li>
+      <li>Marca zonas importantes (S/R, EMAs, etc.).</li>
+      <li>Define alarmes no TradingView para zonas-chave.</li>
+      <li>Verifica o comportamento do BTC.</li>
+    </ul>
+  </div>
+
+  <button class="accordion">🛡️ 3. Gestão de Risco</button>
+  <div class="panel">
+    <ul>
+      <li>Baseia as tuas entradas em risco fixo: 1% a 2% do capital.</li>
+      <li>Define o stop loss técnico e calcula o tamanho da posição proporcionalmente.</li>
+      <li>Se falhares 5 trades seguidos, não é o fim — estás protegido pela gestão de risco.</li>
+    </ul>
+  </div>
+
+  <button class="accordion">🗓️ 4. Plano Semanal e Diário</button>
+  <div class="panel">
+    <ul>
+      <li>Criar rotina com horário fixo:</li>
+      <ul>
+        <li>Análise: 9h às 10h</li>
+        <li>Entrada em trades: 10h às 16h</li>
+        <li>Revisão dos trades: 16h30 às 17h</li>
+      </ul>
+      <li>Pausa total fora destas horas. Evita overtrading.</li>
+    </ul>
+  </div>
+
+  <button class="accordion">📝 5. Diário de Trading</button>
+  <div class="panel">
+    <ul>
+      <li>Começa hoje. Um ficheiro simples onde registas:</li>
+      <ul>
+        <li>Data e hora</li>
+        <li>Par operado</li>
+        <li>Timeframe</li>
+        <li>Entrada, SL, TP</li>
+        <li>Motivo da entrada (com base no plano)</li>
+        <li>Resultado (+% ou -%)</li>
+        <li>Emoções antes, durante e depois</li>
+      </ul>
+      <li>A cada semana, revê os trades e procura padrões: onde acertas mais? Quando erras?</li>
+    </ul>
+  </div>
+
+  <button class="accordion">📈 6. Painel de Performance</button>
+  <div class="panel">
+    <ul>
+      <li>Mais tarde automatizar num Excel ou Google Sheets com:</li>
+      <ul>
+        <li>Gráfico de crescimento da conta</li>
+        <li>Taxa de acerto</li>
+        <li>Média de lucro por trade</li>
+        <li>Drawdowns</li>
+      </ul>
+    </ul>
+  </div>
+
+  <button class="accordion">🧠 7. Gestão Emocional</button>
+  <div class="panel">
+    <ul>
+      <li>O medo vem da incerteza e da pressão para acertar. O teu antídoto é:</li>
+      <ul>
+        <li>Ter um processo claro (como este plano).</li>
+        <li>Aceitar as perdas como parte do jogo.</li>
+        <li>Focar em execução perfeita, não em ganhar dinheiro.</li>
+      </ul>
+    </ul>
+  </div>
+
+  <script>
+    const acc = document.querySelectorAll(".accordion");
+    let expanded = false;
+
+    acc.forEach(btn => {
+      btn.addEventListener("click", function () {
+        this.classList.toggle("active");
+        const panel = this.nextElementSibling;
+        panel.style.display = (panel.style.display === "block") ? "none" : "block";
+      });
+    });
+
+    function toggleAll() {
+      expanded = !expanded;
+      acc.forEach(btn => {
+        const panel = btn.nextElementSibling;
+        if (expanded) {
+          panel.style.display = "block";
+          btn.classList.add("active");
+        } else {
+          panel.style.display = "none";
+          btn.classList.remove("active");
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>
 
