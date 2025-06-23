@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt">
 <head>
@@ -20,6 +21,26 @@
             <label for="asset">Ativo a Analisar:</label>
             <input type="text" id="asset" name="asset" placeholder="Ex: EUR/USD, BTC/USDT">
         </section>
+
+
+<!-- FILTRO DE CONTEXTO CRIPTO -->
+   <section id="crypto-context">
+        <h2>FASE 0: Filtro de Contexto Cripto</h2>
+        <div class="checklist-item">
+            <input type="checkbox" id="check-btc" name="check-btc">
+            <label for="check-btc">A direção do Bitcoin (BTC) está favorável/neutra?</label>
+        </div>
+        <div class="checklist-item">
+            <input type="checkbox" id="check-vol" name="check-vol">
+            <label for="check-vol">O ativo tem volume e liquidez adequados?</label>
+        </div>
+        <div class="checklist-item">
+            <input type="checkbox" id="check-narrative" name="check-narrative">
+            <label for="check-narrative">Sentimento/Notícias verificados? (Sem FUD/Hype extremo?)</label>
+        </div>
+    </section>
+
+
 
         <!-- FASE 1: FILTRO MACRO (4H) -->
         <section id="fase1">
