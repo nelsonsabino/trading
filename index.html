@@ -15,84 +15,55 @@
 
     <main>
         <section class="actions">
-            <!-- Este botão abrirá o formulário para adicionar uma nova oportunidade -->
             <button id="add-opportunity-btn">Adicionar Nova Oportunidade</button>
         </section>
 
         <section class="watchlist">
             <h2>A Monitorizar (Setups de 4h/Diário)</h2>
-            <div id="watchlist-container">
-                <!-- Os cards das oportunidades serão inseridos aqui pelo JavaScript -->
-                <p>A carregar oportunidades do Firebase...</p>
-            </div>
+            <div id="watchlist-container"></div>
         </section>
 
-
- <!-- Operações Ativas -->
         <section class="live-trades">
             <h2>Operações Ativas (Live)</h2>
-            <div id="live-trades-container">
-                <p>Nenhuma operação ativa no momento.</p>
-            </div>
+            <div id="live-trades-container"></div>
         </section>
-
-
-        
     </main>
 
-    
-<!-- FORMULÁRIO MODAL  -->
-<div id="modal-container" class="hidden">
-    <div id="modal-content">
-        <span id="close-modal-btn">×</span>
-        <h3>Adicionar Ativo à Watchlist</h3>
-
-        <form id="add-opportunity-form">
-            <!-- 1. Selecionar a Estratégia -->
-            <label for="strategy-select">Escolha a Estratégia:</label>
-            <select id="strategy-select" name="strategy-select" required>
-                <option value="">-- Selecione --</option>
-                <!-- Opções serão adicionadas aqui pelo JS -->
-            </select>
-
-            <!-- 2. Detalhes do Ativo -->
-            <label for="asset">Ativo:</label>
-            <input type="text" id="asset" name="asset" required placeholder="Ex: SOL/USDT">
-            
-            <!-- 3. O Checklist será gerado e inserido aqui -->
-            <div id="dynamic-checklist-container"></div>
-
-            <!-- 4. Notas e Botão de Submissão -->
-            <label for="notes">Notas Iniciais:</label>
-            <textarea id="notes" placeholder="Ex: A formar fundo duplo no diário, perto da EMA 200."></textarea>
-            
-            <button type="submit">Guardar na Watchlist</button>
-        </form>
+    <!-- MUDANÇA: id="modal-container" passou para id="add-opportunity-modal" e ganhou a classe "modal-overlay" -->
+    <div id="add-opportunity-modal" class="modal-overlay">
+        <!-- MUDANÇA: a div interior ganhou a classe "modal-content" -->
+        <div class="modal-content">
+            <span id="close-modal-btn">×</span>
+            <form id="add-opportunity-form">
+                <h3>Adicionar Ativo à Watchlist</h3>
+                <label for="strategy-select">Escolha a Estratégia:</label>
+                <select id="strategy-select" name="strategy-select" required>
+                    <option value="">-- Selecione --</option>
+                </select>
+                <label for="asset">Ativo:</label>
+                <input type="text" id="asset" name="asset" required placeholder="Ex: SOL/USDT">
+                <div id="dynamic-checklist-container"></div>
+                <label for="notes">Notas Iniciais:</label>
+                <textarea id="notes" placeholder="Ex: A formar fundo duplo..."></textarea>
+                <button type="submit">Guardar na Watchlist</button>
+            </form>
+        </div>
     </div>
-</div>
 
-
-
-<!-- NOVO MODAL PARA EXECUÇÃO DO TRADE -->
-<div id="execution-modal-container" class="hidden">
-    <div id="modal-content">
-        <span id="close-execution-modal-btn">×</span>
-        <h3>Executar Trade: <span id="execution-asset-name"></span></h3>
-        <p>Estratégia: <span id="execution-strategy-name"></span></p>
-
-        <form id="execution-form">
-            <!-- O checklist de execução será gerado e inserido aqui -->
-            <div id="execution-checklist-container"></div>
-            
-            <button type="submit">EXECUTAR TRADE</button>
-        </form>
+    <!-- MUDANÇA: id="execution-modal-container" passou para id="execution-modal" e ganhou a classe "modal-overlay" -->
+    <div id="execution-modal" class="modal-overlay">
+        <!-- MUDANÇA: a div interior ganhou a classe "modal-content" -->
+        <div class="modal-content">
+            <span id="close-execution-modal-btn">×</span>
+            <h3>Executar Trade: <span id="execution-asset-name"></span></h3>
+            <p>Estratégia: <span id="execution-strategy-name"></span></p>
+            <form id="execution-form">
+                <div id="execution-checklist-container"></div>
+                <button type="submit">EXECUTAR TRADE</button>
+            </form>
+        </div>
     </div>
-</div>
 
-    
-    
-    <!-- Scripts do Firebase e da aplicação -->
-<script type="module" src="app.js"></script>
-
+    <script type="module" src="app.js"></script>
 </body>
 </html>
