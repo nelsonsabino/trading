@@ -39,15 +39,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const addOpportunityForm = document.getElementById('add-opportunity-form');
     const watchlistContainer = document.getElementById('watchlist-container');
 
-    // --- Lógica do Modal ---
-    addOpportunityBtn.addEventListener('click', () => {
-        modalContainer.classList.remove('hidden');
-    });
+    
+// --- Lógica do Modal ---
+addOpportunityBtn.addEventListener('click', () => {
+    modalContainer.classList.remove('hidden');
+});
 
-    closeModalBtn.addEventListener('click', () => {
+closeModalBtn.addEventListener('click', () => {
+    modalContainer.classList.add('hidden');
+});
+
+// NOVO - Fecha o modal se clicar no fundo cinzento
+modalContainer.addEventListener('click', (e) => {
+    if (e.target === modalContainer) {
         modalContainer.classList.add('hidden');
-    });
+    }
+});
 
+
+    
     // --- Submeter o formulário de nova oportunidade ---
     addOpportunityForm.addEventListener('submit', async (e) => {
         e.preventDefault();
