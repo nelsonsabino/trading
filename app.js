@@ -3,138 +3,116 @@
 // firebase.initializeApp(firebaseConfig);
 // const db = firebase.firestore();
 
-// --- LÓGICA DO CHECKLIST ---
 document.addEventListener('DOMContentLoaded', () => {
-    
-    // Selecionar os elementos do DOM
-    const tradeTypeRadios = document.querySelectorAll('input[name="trade_type"]');
-    const typeAChecksDiv = document.getElementById('typeA-checks');
-    const typeBChecksDiv = document.getElementById('typeB-checks');
-    const authButton = document.getElementById('auth-button');
-    const form = document.getElementById('checklist-form');
 
-    // Função para mostrar/esconder sub-checks do Tipo A ou B
-    tradeTypeRadios.forEach(radio => {
-        radio.addEventListener('change', () => {
-            if (radio.value === 'A' && radio.checked) {
-                typeAChecksDiv.classList.remove('hidden');
-                typeBChecksDiv.classList.add('hidden');
-            } else if (radio.value === 'B' && radio.checked) {
-                typeBChecksDiv.classList.remove('hidden');
-                typeAChecksDiv.classList.add('hidden');
-            }
-            validateForm(); // Revalida o formulário sempre que o tipo de trade muda
-        });
+    // --- Seletores do DOM ---
+    const addOpportunityBtn = document.getElementById('add-opportunity-btn');
+    const modalContainer = document.getElementById('modal-container');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const addOpportunityForm = document.getElementById('add-opportunity-form');
+    const watchlistContainer = document.getElementById('watchlist-container');
+
+    // --- Lógica do Modal ---
+    addOpportunityBtn.addEventListener('click', () => {
+        modalContainer.classList.remove('hidden');
     });
 
-    // Função para verificar se o formulário está todo preenchido
-    function validateForm() {
-        let isValid = true;
+    closeModalBtn.addEventListener('click', () => {
+        modalContainer.classList.add('hidden');
+    });
 
-        // Verifica checks da Fase 0 (NOVO)
-        if (!document.getElementById('check-btc').checked || !document.getElementById('check-vol').checked || !document.getElementById('check-narrative').checked) {
-            isValid = false;
-        }
+    // --- Submeter o formulário de nova oportunidade ---
+    addOpportunityForm.addEventListener('submit', (e) => {
+        e.preventDefault();
 
-        // Verifica checks da Fase 1
-        if (!document.getElementById('check1').checked || !document.getElementById('check2').checked) {
-            isValid = false;
-        }
-
-        // Verifica qual tipo de trade foi selecionado
-        const selectedType = document.querySelector('input[name="trade_type"]:checked');
-        if (!selectedType) {
-            isValid = false;
-        } else {
-            if (selectedType.value === 'A') {
-                if (!document.getElementById('checkA1').checked || !document.getElementById('checkA2').checked) {
-                    isValid = false;
-                }
-            } else if (selectedType.value === 'B') {
-                if (!document.getElementById('checkB1').checked || !document.getElementById('checkB2').checked || !document.getElementById('checkB3').checked) {
-                    isValid = false;
-                }
-            }
-        }
-
-        // Verifica check da Fase 3
-        if (!document.getElementById('check-trigger').checked) {
-            isValid = false;
-        }
-        
-        // Ativa ou desativa o botão
-        authButton.disabled = !isValid;
-    }
-
-    // Adiciona um listener a todo o formulário para revalidar a cada mudança
-    form.addEventListener('change', validateForm);
-
-    // --- LÓGICA DO FIREBASE (quando o botão for clicado) ---
-    authButton.addEventListener('click', (event) => { // Adicionado 'event'
-        // Prevenir o envio padrão do formulário
-        event.preventDefault();
-
-        // 1. Desativar o botão para prevenir cliques duplos
-        authButton.textContent = 'A GUARDAR...';
-        authButton.disabled = true;
-
-        // 2. Coletar todos os dados do formulário
-        const tradeData = {
+        const newOpportunity = {
             asset: document.getElementById('asset').value,
-            strategy: "Impulso Pós-Reset (Cripto)",
-            timestamp: new Date(),
-            fase0_context: { // NOVO
-                btc_check: document.getElementById('check-btc').checked,
-                vol_check: document.getElementById('check-vol').checked,
-                narrative_check: document.getElementById('check-narrative').checked,
-            },
-            fase1_macro: {
-                check1: document.getElementById('check1').checked,
-                check2: document.getElementById('check2').checked,
-            },
-            fase2_type: document.querySelector('input[name="trade_type"]:checked').value,
-            fase2_A_setup: {
-                checkA1: document.getElementById('checkA1').checked,
-                checkA2: document.getElementById('checkA2').checked,
-            },
-            fase2_B_setup: {
-                checkB1: document.getElementById('checkB1').checked,
-                checkB2: document.getElementById('checkB2').checked,
-                checkB3: document.getElementById('checkB3').checked,
-            },
-            fase3_trigger: document.getElementById('check-trigger').checked,
-            management: {
-                entry: document.getElementById('entry-price').value,
-                sl: document.getElementById('sl-price').value,
-                tp: document.getElementById('tp-price').value,
-                risk: document.getElementById('risk-value').value,
-            },
-            status: 'PLANNED' // Estado inicial do trade
+            notes: document.getElementById('notes').value,
+            status: "WATCHING", // Status inicial
+            dateAdded: new Date(),
+            macroSetup: { // Guardamos o estado do checklist macro
+                btcFavorable: document.getElementById('check-btc').checked,
+                volumeOk: document.getElementById('check-vol').checked,
+                stochReset: document.getElementById('check-macro-stoch').checked,
+                structureOk: document.getElementById('check-macro-structure').checked
+            }
         };
 
-        // 3. Enviar para o Firebase
-        /*
-        db.collection("planned_trades").add(tradeData)
-            .then((docRef) => {
-                console.log("Plano de trade guardado com ID: ", docRef.id);
-                authButton.textContent = 'PLANO GUARDADO COM SUCESSO!';
-                authButton.style.backgroundColor = '#0056b3';
+        // Simulação do Firebase:
+        console.log("A guardar nova oportunidade:", newOpportunity);
+        alert("Oportunidade guardada na watchlist!");
+        
+        /* CÓDIGO REAL DO FIREBASE
+        db.collection('trades').add(newOpportunity)
+            .then(() => {
+                console.log("Oportunidade guardada com sucesso!");
+                addOpportunityForm.reset();
+                modalContainer.classList.add('hidden');
             })
-            .catch((error) => {
-                console.error("Erro ao guardar o plano: ", error);
-                authButton.textContent = 'ERRO! TENTE NOVAMENTE';
-                authButton.style.backgroundColor = '#dc3545';
-                authButton.disabled = false;
-            });
+            .catch(err => console.error("Erro:", err));
         */
-       
-       // Por agora, sem Firebase, vamos apenas simular
-       console.log("Dados do Plano de Trade:", tradeData);
-       alert("AUTORIZAÇÃO CONCEDIDA! Plano de trade registado na consola.");
-       authButton.textContent = 'EXECUTAR TRADE AGORA!';
 
+       addOpportunityForm.reset();
+       modalContainer.classList.add('hidden');
+       // Idealmente, a lista atualiza-se automaticamente com o listener do Firebase
     });
 
-    // Chamar a validação uma vez no início para definir o estado inicial do botão
-    validateForm();
+    // --- Carregar e mostrar as oportunidades do Firebase ---
+    function fetchAndDisplayTrades() {
+        watchlistContainer.innerHTML = ''; // Limpa a lista atual
+
+        // Simulação de dados do Firebase
+        const mockData = [
+            { id: "1", data: () => ({ asset: 'SOL/USDT', status: 'WATCHING', notes: 'A formar fundo no diário.'}) },
+            { id: "2", data: () => ({ asset: 'ADA/USDT', status: 'WATCHING', notes: 'Testando EMA 200 como suporte.'}) }
+        ];
+
+        mockData.forEach(doc => {
+            const trade = doc.data();
+            const card = createTradeCard(trade, doc.id);
+            watchlistContainer.appendChild(card);
+        });
+
+        /* CÓDIGO REAL DO FIREBASE com listener em tempo real
+        db.collection('trades').where('status', '==', 'WATCHING').onSnapshot(snapshot => {
+            watchlistContainer.innerHTML = ''; // Limpa sempre antes de redesenhar
+            if (snapshot.empty) {
+                watchlistContainer.innerHTML = '<p>Nenhuma oportunidade a ser monitorizada. Adicione uma!</p>';
+                return;
+            }
+            snapshot.forEach(doc => {
+                const trade = doc.data();
+                const card = createTradeCard(trade, doc.id);
+                watchlistContainer.appendChild(card);
+            });
+        });
+        */
+    }
+
+    // --- Função para criar um "Card" de trade ---
+    function createTradeCard(trade, id) {
+        const card = document.createElement('div');
+        card.className = 'trade-card';
+        card.setAttribute('data-id', id);
+
+        card.innerHTML = `
+            <h3>${trade.asset}</h3>
+            <p><strong>Status:</strong> ${trade.status}</p>
+            <p><strong>Notas:</strong> ${trade.notes}</p>
+            <button class="trigger-btn">Procurar Gatilho de Entrada</button>
+        `;
+
+        // Lógica do botão de gatilho (para o próximo passo)
+        card.querySelector('.trigger-btn').addEventListener('click', () => {
+            alert(`A abrir checklist de execução para ${trade.asset} (ID: ${id}). Esta será a próxima funcionalidade a implementar!`);
+            // Aqui, no futuro, você abriria o checklist de execução (Fase 2 e 3)
+            // passando o ID do documento para saber qual trade atualizar.
+            // Ex: window.location.href = `execution.html?id=${id}`;
+        });
+
+        return card;
+    }
+
+    // Iniciar a aplicação
+    fetchAndDisplayTrades();
 });
