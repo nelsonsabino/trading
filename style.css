@@ -1,9 +1,7 @@
 /* ... (estilos anteriores) ... */
 
 /* Estilos para o Modal */
-.hidden {
-    display: none;
-}
+
 
 #modal-container {
     position: fixed;
@@ -12,9 +10,11 @@
     width: 100%;
     height: 100%;
     background-color: rgba(0,0,0,0.6);
-    display: flex;
+    /* display: flex;  <-- REMOVA ESTA LINHA DAQUI */
     justify-content: center;
     align-items: center;
+    /* ADICIONE ESTA LINHA para o estado inicial */
+    display: none; 
 }
 
 #modal-content {
