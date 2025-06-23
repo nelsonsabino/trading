@@ -1,134 +1,101 @@
-// --- INICIALIZAÇÃO DO FIREBASE (coloque aqui a sua configuração) ---
-// const firebaseConfig = { ... };
-// firebase.initializeApp(firebaseConfig);
-// const db = firebase.firestore();
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #f4f4f4;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+}
 
-// --- LÓGICA DO CHECKLIST ---
-document.addEventListener('DOMContentLoaded', () => {
-    
-    // Selecionar os elementos do DOM
-    const tradeTypeRadios = document.querySelectorAll('input[name="trade_type"]');
-    const typeAChecksDiv = document.getElementById('typeA-checks');
-    const typeBChecksDiv = document.getElementById('typeB-checks');
-    const authButton = document.getElementById('auth-button');
-    const form = document.getElementById('checklist-form');
+header {
+    text-align: center;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 1rem;
+}
 
-    // Função para mostrar/esconder sub-checks do Tipo A ou B
-    tradeTypeRadios.forEach(radio => {
-        radio.addEventListener('change', () => {
-            if (radio.value === 'A' && radio.checked) {
-                typeAChecksDiv.classList.remove('hidden');
-                typeBChecksDiv.classList.add('hidden');
-            } else if (radio.value === 'B' && radio.checked) {
-                typeBChecksDiv.classList.remove('hidden');
-                typeAChecksDiv.classList.add('hidden');
-            }
-            validateForm(); // Revalida o formulário sempre que o tipo de trade muda
-        });
-    });
+.mantra {
+    font-style: italic;
+    color: #555;
+    font-size: 1.1em;
+}
 
-    // Função para verificar se o formulário está todo preenchido
-    function validateForm() {
-        let isValid = true;
+main {
+    max-width: 800px;
+    margin: auto;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
 
-        // Verifica checks da Fase 1
-        if (!document.getElementById('check1').checked || !document.getElementById('check2').checked) {
-            isValid = false;
-        }
+section {
+    margin-bottom: 2rem;
+}
 
-        // Verifica qual tipo de trade foi selecionado
-        const selectedType = document.querySelector('input[name="trade_type"]:checked');
-        if (!selectedType) {
-            isValid = false;
-        } else {
-            if (selectedType.value === 'A') {
-                if (!document.getElementById('checkA1').checked || !document.getElementById('checkA2').checked) {
-                    isValid = false;
-                }
-            } else if (selectedType.value === 'B') {
-                if (!document.getElementById('checkB1').checked || !document.getElementById('checkB2').checked || !document.getElementById('checkB3').checked) {
-                    isValid = false;
-                }
-            }
-        }
+h2 {
+    color: #0056b3;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
 
-        // Verifica check da Fase 3
-        if (!document.getElementById('check-trigger').checked) {
-            isValid = false;
-        }
-        
-        // Verifica se os campos de gestão estão preenchidos (opcional, pode querer preencher depois)
-        // if(document.getElementById('entry-price').value === '') isValid = false;
-        
-        // Ativa ou desativa o botão
-        authButton.disabled = !isValid;
-    }
+.checklist-item, .trade-type-selector {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
 
-    // Adiciona um listener a todo o formulário para revalidar a cada mudança
-    form.addEventListener('change', validateForm);
+.checklist-item input[type="checkbox"], 
+.trade-type-selector input[type="radio"] {
+    margin-right: 10px;
+    transform: scale(1.2);
+}
 
-    // --- LÓGICA DO FIREBASE (quando o botão for clicado) ---
-    authButton.addEventListener('click', () => {
-        // Prevenir o envio padrão do formulário
-        event.preventDefault();
+.sub-checks {
+    padding-left: 30px;
+    border-left: 2px solid #007bff;
+    margin-top: 10px;
+}
 
-        // 1. Desativar o botão para prevenir cliques duplos
-        authButton.textContent = 'A GUARDAR...';
-        authButton.disabled = true;
+.hidden {
+    display: none;
+}
 
-        // 2. Coletar todos os dados do formulário
-        const tradeData = {
-            asset: document.getElementById('asset').value,
-            strategy: "Impulso Pós-Reset",
-            timestamp: new Date(),
-            fase1: {
-                check1: document.getElementById('check1').checked,
-                check2: document.getElementById('check2').checked,
-            },
-            fase2_type: document.querySelector('input[name="trade_type"]:checked').value,
-            fase2_A: {
-                checkA1: document.getElementById('checkA1').checked,
-                checkA2: document.getElementById('checkA2').checked,
-            },
-            fase2_B: {
-                checkB1: document.getElementById('checkB1').checked,
-                checkB2: document.getElementById('checkB2').checked,
-                checkB3: document.getElementById('checkB3').checked,
-            },
-            fase3_trigger: document.getElementById('check-trigger').checked,
-            management: {
-                entry: document.getElementById('entry-price').value,
-                sl: document.getElementById('sl-price').value,
-                tp: document.getElementById('tp-price').value,
-                risk: document.getElementById('risk-value').value,
-            },
-            status: 'PLANNED' // Estado inicial do trade
-        };
+.management-plan {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
 
-        // 3. Enviar para o Firebase
-        /*
-        db.collection("planned_trades").add(tradeData)
-            .then((docRef) => {
-                console.log("Plano de trade guardado com ID: ", docRef.id);
-                authButton.textContent = 'PLANO GUARDADO COM SUCESSO!';
-                authButton.style.backgroundColor = '#0056b3'; // Mudar cor para feedback
-                // Poderia redirecionar ou limpar o formulário aqui
-            })
-            .catch((error) => {
-                console.error("Erro ao guardar o plano: ", error);
-                authButton.textContent = 'ERRO! TENTE NOVAMENTE';
-                authButton.style.backgroundColor = '#dc3545'; // Mudar cor para erro
-                authButton.disabled = false; // Reativar para tentar de novo
-            });
-        */
-       
-       // Por agora, sem Firebase, vamos apenas simular
-       console.log("Dados do Plano de Trade:", tradeData);
-       alert("AUTORIZAÇÃO CONCEDIDA! Plano de trade registado na consola.");
-       authButton.textContent = 'EXECUTAR TRADE AGORA!';
+.management-plan label {
+    font-weight: bold;
+}
 
-    });
+input[type="text"], input[type="number"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
 
-    // Chamar a validação uma vez no início
-    validateForm();
-});
+.authorization {
+    text-align: center;
+}
+
+#auth-button {
+    background-color: #28a745;
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#auth-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
