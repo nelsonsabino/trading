@@ -32,186 +32,163 @@ const db = getFirestore(app);
 
 
 
-
-
-
-// --- CONFIGURAÇÃO DAS ESTRATÉGIAS ---
 const STRATEGIES = {
     'impulso-pos-reset': {
         name: "Impulso Pós-Reset",
         phases: [
-            {
-                title: "Fase 0: Filtro de Contexto Cripto",
-                id: "fase0",
-                checks: [
-                    { id: "check-btc", label: "Direção do BTC favorável?" },
-                    { id: "check-vol", label: "Volume/Liquidez OK?" }
-                ]
-            },
-            {
-                title: "Fase 1: Filtro Macro (4h/Diário)",
-                id: "fase1",
-                checks: [
-                    { id: "check-macro-stoch", label: "Estocástico a resetar?" },
-                    { id: "check-macro-structure", label: "Estrutura de preço favorável?" }
-                ]
-            }
+            { title: "Fase 0: Filtro de Contexto Cripto", id: "fase0", checks: [
+                { id: "check-btc", label: "Direção do BTC favorável?" },
+                { id: "check-vol", label: "Volume/Liquidez OK?" }
+            ]},
+            { title: "Fase 1: Filtro Macro (4h/Diário)", id: "fase1", checks: [
+                { id: "check-macro-stoch", label: "Estocástico a resetar?" },
+                { id: "check-macro-structure", label: "Estrutura de preço favorável?" }
+            ]}
         ]
     },
     'reversao-media': {
         name: "Reversão à Média",
         phases: [
-            {
-                title: "Fase A: Contexto de Mercado",
-                id: "faseA",
-                checks: [
-                    { id: "check-btc-reversao", label: "BTC em range ou estável?" },
-                    { id: "check-distancia-ema", label: "Preço muito afastado da EMA 21?" }
-                ]
-            },
-            {
-                title: "Fase B: Sinal de Exaustão",
-                id: "faseB",
-                checks: [
-                    { id: "check-rsi-extremo", label: "RSI em zona extrema (>70 ou <30)?" },
-                    { id: "check-candle-reversao", label: "Candle de reversão claro no 1H?" }
-                ]
-            }
+            { title: "Fase A: Contexto de Mercado", id: "faseA", checks: [
+                { id: "check-btc-reversao", label: "BTC em range ou estável?" },
+                { id: "check-distancia-ema", label: "Preço muito afastado da EMA 21?" }
+            ]},
+            { title: "Fase B: Sinal de Exaustão", id: "faseB", checks: [
+                { id: "check-rsi-extremo", label: "RSI em zona extrema (>70 ou <30)?" },
+                { id: "check-candle-reversao", label: "Candle de reversão claro no 1H?" }
+            ]}
         ]
     }
-    // No futuro, para adicionar uma nova estratégia, basta adicionar um novo objeto aqui.
 };
-
-// --- O resto do app.js continua abaixo ---
-function runApp() {
-    // ...
-}
-
-
-
-
-
-
-
-
 
 // --- LÓGICA DA APLICAÇÃO ---
 
 function runApp() {
-    console.log("runApp() iniciada.");
-
-    // --- Seletores do DOM ---
     const addOpportunityBtn = document.getElementById('add-opportunity-btn');
     const modalContainer = document.getElementById('modal-container');
     const closeModalBtn = document.getElementById('close-modal-btn');
     const addOpportunityForm = document.getElementById('add-opportunity-form');
     const watchlistContainer = document.getElementById('watchlist-container');
+    const strategySelect = document.getElementById('strategy-select');
+    const dynamicChecklistContainer = document.getElementById('dynamic-checklist-container');
 
-    if (!addOpportunityBtn || !modalContainer || !closeModalBtn || !addOpportunityForm) {
-        console.error("ERRO CRÍTICO: Um ou mais elementos do DOM não foram encontrados. Verifique os IDs no HTML.");
-        return;
+    // --- Popular o menu de seleção de estratégias ---
+    function populateStrategySelect() {
+        for (const strategyId in STRATEGIES) {
+            const option = document.createElement('option');
+            option.value = strategyId;
+            option.textContent = STRATEGIES[strategyId].name;
+            strategySelect.appendChild(option);
+        }
     }
 
-    // --- LÓGICA DO MODAL (MODIFICADA PARA USAR 'display') ---
-    function openModal() {
-        console.log("A abrir modal...");
-        if (modalContainer) modalContainer.style.display = 'flex';
-    }
+    // --- Gerar o HTML do checklist dinamicamente ---
+    strategySelect.addEventListener('change', () => {
+        const selectedStrategyId = strategySelect.value;
+        dynamicChecklistContainer.innerHTML = ''; // Limpa o anterior
+        if (!selectedStrategyId) return;
 
-    function closeModal() {
-        console.log("A fechar modal...");
-        if (modalContainer) modalContainer.style.display = 'none';
-    }
-
+        const strategy = STRATEGIES[selectedStrategyId];
+        strategy.phases.forEach(phase => {
+            const phaseDiv = document.createElement('div');
+            phaseDiv.innerHTML = `<h4>${phase.title}</h4>`;
+            phase.checks.forEach(check => {
+                const checkDiv = document.createElement('div');
+                checkDiv.className = 'checklist-item';
+                checkDiv.innerHTML = `<input type="checkbox" id="${check.id}" name="${check.id}" required><label for="${check.id}">${check.label}</label>`;
+                phaseDiv.appendChild(checkDiv);
+            });
+            dynamicChecklistContainer.appendChild(phaseDiv);
+        });
+    });
+    
+    // --- Lógica do Modal ---
+    function openModal() { modalContainer.style.display = 'flex'; }
+    function closeModal() { modalContainer.style.display = 'none'; }
     addOpportunityBtn.addEventListener('click', openModal);
     closeModalBtn.addEventListener('click', closeModal);
-    modalContainer.addEventListener('click', (e) => {
-        if (e.target === modalContainer) {
-            closeModal();
-        }
-    });
+    modalContainer.addEventListener('click', (e) => { if (e.target === modalContainer) closeModal(); });
 
-    // --- Submeter o formulário de nova oportunidade ---
+    // --- Submeter o formulário ---
     addOpportunityForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const submitButton = addOpportunityForm.querySelector('button[type="submit"]');
-        submitButton.textContent = "A Guardar...";
         submitButton.disabled = true;
+        submitButton.textContent = "A Guardar...";
+
+        const selectedStrategyId = strategySelect.value;
+        const strategy = STRATEGIES[selectedStrategyId];
+        const checklistData = {};
+
+        // Recolher os dados do checklist dinâmico
+        strategy.phases.forEach(phase => {
+            phase.checks.forEach(check => {
+                const checkbox = document.getElementById(check.id);
+                checklistData[check.id] = checkbox.checked;
+            });
+        });
 
         const newOpportunity = {
             asset: document.getElementById('asset').value,
             notes: document.getElementById('notes').value,
+            strategyId: selectedStrategyId,
+            strategyName: strategy.name,
             status: "WATCHING",
             dateAdded: new Date(),
-            macroSetup: {
-                btcFavorable: document.getElementById('check-btc').checked,
-                volumeOk: document.getElementById('check-vol').checked,
-                stochReset: document.getElementById('check-macro-stoch').checked,
-                structureOk: document.getElementById('check-macro-structure').checked
-            }
+            macroSetup: checklistData
         };
 
         try {
-            const docRef = await addDoc(collection(db, 'trades'), newOpportunity);
-            console.log("Oportunidade guardada com sucesso! ID:", docRef.id);
+            await addDoc(collection(db, 'trades'), newOpportunity);
             addOpportunityForm.reset();
-            closeModal(); // Usa a nossa nova função para fechar
+            dynamicChecklistContainer.innerHTML = ''; // Limpa o formulário
+            closeModal();
         } catch (err) {
             console.error("Erro ao guardar:", err);
-            alert("Ocorreu um erro ao guardar. Verifique a consola.");
         } finally {
-            submitButton.textContent = "Guardar na Watchlist";
             submitButton.disabled = false;
+            submitButton.textContent = "Guardar na Watchlist";
         }
     });
 
-    // --- Carregar e mostrar as oportunidades do Firebase ---
+    // --- Funções de display (modificada para mostrar o nome da estratégia) ---
     function fetchAndDisplayTrades() {
-        const tradesCollection = collection(db, 'trades');
-        const q = query(tradesCollection, where('status', '==', 'WATCHING'), orderBy('dateAdded', 'desc'));
-
+        const q = query(collection(db, 'trades'), where('status', '==', 'WATCHING'), orderBy('dateAdded', 'desc'));
         onSnapshot(q, (snapshot) => {
-            if (!watchlistContainer) return;
             watchlistContainer.innerHTML = '';
             if (snapshot.empty) {
-                watchlistContainer.innerHTML = '<p>Nenhuma oportunidade a ser monitorizada. Adicione uma!</p>';
+                watchlistContainer.innerHTML = '<p>Nenhuma oportunidade a ser monitorizada.</p>';
                 return;
             }
             snapshot.forEach(doc => {
                 const trade = doc.data();
-                const card = createTradeCard(trade, doc.id);
-                watchlistContainer.appendChild(card);
+                watchlistContainer.appendChild(createTradeCard(trade, doc.id));
             });
-        }, (error) => {
-            console.error("Erro ao buscar trades:", error);
-            if (watchlistContainer) {
-                watchlistContainer.innerHTML = '<p style="color: red;">Erro ao carregar os dados. Verifique a consola.</p>';
-            }
         });
     }
 
-    // --- Função para criar um "Card" de trade ---
     function createTradeCard(trade, id) {
         const card = document.createElement('div');
         card.className = 'trade-card';
         card.setAttribute('data-id', id);
         card.innerHTML = `
             <h3>${trade.asset}</h3>
+            <p style="color: #0056b3; font-weight: bold;">Estratégia: ${trade.strategyName || 'N/A'}</p>
             <p><strong>Status:</strong> ${trade.status}</p>
             <p><strong>Notas:</strong> ${trade.notes}</p>
             <button class="trigger-btn">Procurar Gatilho de Entrada</button>
         `;
         card.querySelector('.trigger-btn').addEventListener('click', () => {
-            alert(`A abrir checklist de execução para ${trade.asset} (ID: ${id}). Próximo passo!`);
+            alert(`A abrir checklist de execução para ${trade.asset}`);
         });
         return card;
     }
 
-    // Iniciar a busca de dados
+    // --- Iniciar a aplicação ---
+    populateStrategySelect();
     fetchAndDisplayTrades();
 }
 
-// O ponto de entrada da nossa aplicação.
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', runApp);
 } else {
