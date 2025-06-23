@@ -13,7 +13,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 
 
-// A sua configuração da web app do Firebase - SUBSTITUA PELAS SUAS CHAVES REAIS NO SEU FICHEIRO LOCAL
+// A sua configuração da web app do Firebase
 const firebaseConfig = {
   apiKey: "AIzaSy...xxxxxxxxxxxx", // A SUA API KEY REAL AQUI
   authDomain: "trading-89c13.firebaseapp.com",
@@ -30,38 +30,41 @@ const db = getFirestore(app);
 
 // --- LÓGICA DA APLICAÇÃO ---
 
-document.addEventListener('DOMContentLoaded', () => {
+// Função principal que só corre depois de o DOM estar completamente carregado
+function runApp() {
 
-    // --- Seletores do DOM ---
+    // --- Seletores do DOM (declarados aqui dentro para garantir que existem) ---
     const addOpportunityBtn = document.getElementById('add-opportunity-btn');
     const modalContainer = document.getElementById('modal-container');
     const closeModalBtn = document.getElementById('close-modal-btn');
     const addOpportunityForm = document.getElementById('add-opportunity-form');
     const watchlistContainer = document.getElementById('watchlist-container');
 
-    
-// --- Lógica do Modal ---
-addOpportunityBtn.addEventListener('click', () => {
-    modalContainer.classList.remove('hidden');
-});
-
-closeModalBtn.addEventListener('click', () => {
-    modalContainer.classList.add('hidden');
-});
-
-// NOVO - Fecha o modal se clicar no fundo cinzento
-modalContainer.addEventListener('click', (e) => {
-    if (e.target === modalContainer) {
-        modalContainer.classList.add('hidden');
+    // Verifica se todos os elementos essenciais foram encontrados. Se não, pára e avisa.
+    if (!addOpportunityBtn || !modalContainer || !closeModalBtn || !addOpportunityForm) {
+        console.error("ERRO CRÍTICO: Um ou mais elementos do DOM não foram encontrados. Verifique os IDs no HTML.");
+        return; // Pára a execução se algo estiver em falta
     }
-});
 
+    // --- Lógica do Modal ---
+    addOpportunityBtn.addEventListener('click', () => {
+        modalContainer.classList.remove('hidden');
+    });
 
-    
+    closeModalBtn.addEventListener('click', () => {
+        modalContainer.classList.add('hidden');
+    });
+
+    modalContainer.addEventListener('click', (e) => {
+        // Fecha o modal APENAS se o clique for no container de fundo (e não nos filhos)
+        if (e.target === modalContainer) {
+            modalContainer.classList.add('hidden');
+        }
+    });
+
     // --- Submeter o formulário de nova oportunidade ---
     addOpportunityForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-
         const submitButton = addOpportunityForm.querySelector('button[type="submit"]');
         submitButton.textContent = "A Guardar...";
         submitButton.disabled = true;
@@ -80,7 +83,6 @@ modalContainer.addEventListener('click', (e) => {
         };
 
         try {
-            // ADICIONAR um documento usando a sintaxe v9
             const docRef = await addDoc(collection(db, 'trades'), newOpportunity);
             console.log("Oportunidade guardada com sucesso! ID:", docRef.id);
             addOpportunityForm.reset();
@@ -96,13 +98,12 @@ modalContainer.addEventListener('click', (e) => {
 
     // --- Carregar e mostrar as oportunidades do Firebase ---
     function fetchAndDisplayTrades() {
-        // Cria a query usando a sintaxe v9
         const tradesCollection = collection(db, 'trades');
         const q = query(tradesCollection, where('status', '==', 'WATCHING'), orderBy('dateAdded', 'desc'));
 
-        // Ouve as alterações em tempo real com onSnapshot
         onSnapshot(q, (snapshot) => {
-            watchlistContainer.innerHTML = ''; // Limpa sempre antes de redesenhar
+            if (!watchlistContainer) return; // Segurança extra
+            watchlistContainer.innerHTML = '';
             if (snapshot.empty) {
                 watchlistContainer.innerHTML = '<p>Nenhuma oportunidade a ser monitorizada. Adicione uma!</p>';
                 return;
@@ -114,7 +115,9 @@ modalContainer.addEventListener('click', (e) => {
             });
         }, (error) => {
             console.error("Erro ao buscar trades:", error);
-            watchlistContainer.innerHTML = '<p style="color: red;">Erro ao carregar os dados. Verifique a consola.</p>';
+            if (watchlistContainer) {
+                watchlistContainer.innerHTML = '<p style="color: red;">Erro ao carregar os dados. Verifique a consola.</p>';
+            }
         });
     }
 
@@ -123,22 +126,26 @@ modalContainer.addEventListener('click', (e) => {
         const card = document.createElement('div');
         card.className = 'trade-card';
         card.setAttribute('data-id', id);
-
         card.innerHTML = `
             <h3>${trade.asset}</h3>
             <p><strong>Status:</strong> ${trade.status}</p>
             <p><strong>Notas:</strong> ${trade.notes}</p>
             <button class="trigger-btn">Procurar Gatilho de Entrada</button>
         `;
-
         card.querySelector('.trigger-btn').addEventListener('click', () => {
             alert(`A abrir checklist de execução para ${trade.asset} (ID: ${id}). Próximo passo!`);
-            // Futuramente: window.location.href = `execution.html?id=${id}`;
         });
-
         return card;
     }
 
-    // Iniciar a aplicação
+    // Iniciar a busca de dados
     fetchAndDisplayTrades();
-});
+}
+
+// O ponto de entrada da nossa aplicação.
+// Verifica se o DOM já está pronto. Se sim, corre a app. Se não, espera pelo evento.
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', runApp);
+} else {
+    runApp();
+}
