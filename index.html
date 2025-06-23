@@ -71,6 +71,25 @@
     </div>
 </div>
 
+
+
+<!-- NOVO MODAL PARA EXECUÇÃO DO TRADE -->
+<div id="execution-modal-container" class="hidden">
+    <div id="modal-content">
+        <span id="close-execution-modal-btn">×</span>
+        <h3>Executar Trade: <span id="execution-asset-name"></span></h3>
+        <p>Estratégia: <span id="execution-strategy-name"></span></p>
+
+        <form id="execution-form">
+            <!-- O checklist de execução será gerado e inserido aqui -->
+            <div id="execution-checklist-container"></div>
+            
+            <button type="submit">EXECUTAR TRADE</button>
+        </form>
+    </div>
+</div>
+
+    
     
     <!-- Scripts do Firebase e da aplicação -->
 <script type="module" src="app.js"></script>
