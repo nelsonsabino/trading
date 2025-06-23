@@ -31,6 +31,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function validateForm() {
         let isValid = true;
 
+        // Verifica checks da Fase 0 (NOVO)
+        if (!document.getElementById('check-btc').checked || !document.getElementById('check-vol').checked || !document.getElementById('check-narrative').checked) {
+            isValid = false;
+        }
+
         // Verifica checks da Fase 1
         if (!document.getElementById('check1').checked || !document.getElementById('check2').checked) {
             isValid = false;
@@ -57,9 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
             isValid = false;
         }
         
-        // Verifica se os campos de gestão estão preenchidos (opcional, pode querer preencher depois)
-        // if(document.getElementById('entry-price').value === '') isValid = false;
-        
         // Ativa ou desativa o botão
         authButton.disabled = !isValid;
     }
@@ -68,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('change', validateForm);
 
     // --- LÓGICA DO FIREBASE (quando o botão for clicado) ---
-    authButton.addEventListener('click', () => {
+    authButton.addEventListener('click', (event) => { // Adicionado 'event'
         // Prevenir o envio padrão do formulário
         event.preventDefault();
 
@@ -79,18 +81,23 @@ document.addEventListener('DOMContentLoaded', () => {
         // 2. Coletar todos os dados do formulário
         const tradeData = {
             asset: document.getElementById('asset').value,
-            strategy: "Impulso Pós-Reset",
+            strategy: "Impulso Pós-Reset (Cripto)",
             timestamp: new Date(),
-            fase1: {
+            fase0_context: { // NOVO
+                btc_check: document.getElementById('check-btc').checked,
+                vol_check: document.getElementById('check-vol').checked,
+                narrative_check: document.getElementById('check-narrative').checked,
+            },
+            fase1_macro: {
                 check1: document.getElementById('check1').checked,
                 check2: document.getElementById('check2').checked,
             },
             fase2_type: document.querySelector('input[name="trade_type"]:checked').value,
-            fase2_A: {
+            fase2_A_setup: {
                 checkA1: document.getElementById('checkA1').checked,
                 checkA2: document.getElementById('checkA2').checked,
             },
-            fase2_B: {
+            fase2_B_setup: {
                 checkB1: document.getElementById('checkB1').checked,
                 checkB2: document.getElementById('checkB2').checked,
                 checkB3: document.getElementById('checkB3').checked,
@@ -111,14 +118,13 @@ document.addEventListener('DOMContentLoaded', () => {
             .then((docRef) => {
                 console.log("Plano de trade guardado com ID: ", docRef.id);
                 authButton.textContent = 'PLANO GUARDADO COM SUCESSO!';
-                authButton.style.backgroundColor = '#0056b3'; // Mudar cor para feedback
-                // Poderia redirecionar ou limpar o formulário aqui
+                authButton.style.backgroundColor = '#0056b3';
             })
             .catch((error) => {
                 console.error("Erro ao guardar o plano: ", error);
                 authButton.textContent = 'ERRO! TENTE NOVAMENTE';
-                authButton.style.backgroundColor = '#dc3545'; // Mudar cor para erro
-                authButton.disabled = false; // Reativar para tentar de novo
+                authButton.style.backgroundColor = '#dc3545';
+                authButton.disabled = false;
             });
         */
        
@@ -129,6 +135,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     });
 
-    // Chamar a validação uma vez no início
+    // Chamar a validação uma vez no início para definir o estado inicial do botão
     validateForm();
 });
