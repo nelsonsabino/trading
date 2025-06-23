@@ -32,7 +32,6 @@ const db = getFirestore(app);
 
 
 
-
 const STRATEGIES = {
     'impulso-pos-reset': {
         name: "Impulso Pós-Reset",
@@ -49,53 +48,43 @@ const STRATEGIES = {
                 { id: "take-profit", label: "Take-Profit:", type: "number" }
             ]}
         ]
-    } // Adicione outras estratégias aqui
+    } 
 };
 
-// --- FUNÇÃO PRINCIPAL DA APLICAÇÃO ---
 function runApp() {
-    // Seletores do DOM
     const addOpportunityBtn = document.getElementById('add-opportunity-btn');
     const watchlistContainer = document.getElementById('watchlist-container');
     const liveTradesContainer = document.getElementById('live-trades-container');
-    
-    // Variável de estado para saber qual trade estamos a executar
     let currentExecutingTrade = { id: null, strategyId: null };
 
-    // --- LÓGICA DO MODAL DE "ADICIONAR OPORTUNIDADE" ---
     const addModal = {
-        container: document.getElementById('modal-container'),
+        container: document.getElementById('add-opportunity-modal'),
         form: document.getElementById('add-opportunity-form'),
         closeBtn: document.getElementById('close-modal-btn'),
         strategySelect: document.getElementById('strategy-select'),
         checklistContainer: document.getElementById('dynamic-checklist-container'),
-
-        open: () => addModal.container.style.display = 'flex',
-        close: () => addModal.container.style.display = 'none',
-        
-        init: () => {
-            addOpportunityBtn.addEventListener('click', addModal.open);
-            addModal.closeBtn.addEventListener('click', addModal.close);
-            addModal.container.addEventListener('click', (e) => { if (e.target === addModal.container) addModal.close(); });
-            addModal.form.addEventListener('submit', addModal.handleSubmit);
-            addModal.strategySelect.addEventListener('change', addModal.generateChecklist);
-            addModal.populateSelect();
+        open: function() { if (this.container) this.container.style.display = 'flex'; },
+        close: function() { if (this.container) this.container.style.display = 'none'; },
+        init: function() {
+            addOpportunityBtn.addEventListener('click', this.open.bind(this));
+            this.closeBtn.addEventListener('click', this.close.bind(this));
+            this.container.addEventListener('click', (e) => { if (e.target === this.container) this.close(); });
+            this.form.addEventListener('submit', this.handleSubmit.bind(this));
+            this.strategySelect.addEventListener('change', this.generateChecklist.bind(this));
+            this.populateSelect();
         },
-
-        populateSelect: () => {
+        populateSelect: function() {
             for (const id in STRATEGIES) {
                 const option = document.createElement('option');
                 option.value = id;
                 option.textContent = STRATEGIES[id].name;
-                addModal.strategySelect.appendChild(option);
+                this.strategySelect.appendChild(option);
             }
         },
-
-        generateChecklist: () => {
-            const strategyId = addModal.strategySelect.value;
-            addModal.checklistContainer.innerHTML = '';
+        generateChecklist: function() {
+            const strategyId = this.strategySelect.value;
+            this.checklistContainer.innerHTML = '';
             if (!strategyId) return;
-
             const strategy = STRATEGIES[strategyId];
             strategy.watchlistPhases.forEach(phase => {
                 const phaseDiv = document.createElement('div');
@@ -106,18 +95,16 @@ function runApp() {
                     checkDiv.innerHTML = `<input type="checkbox" id="${check.id}" required><label for="${check.id}">${check.label}</label>`;
                     phaseDiv.appendChild(checkDiv);
                 });
-                addModal.checklistContainer.appendChild(phaseDiv);
+                this.checklistContainer.appendChild(phaseDiv);
             });
         },
-        
-        handleSubmit: async (e) => {
+        handleSubmit: async function(e) {
             e.preventDefault();
-            const strategyId = addModal.strategySelect.value;
+            const strategyId = this.strategySelect.value;
             const checklistData = {};
             STRATEGIES[strategyId].watchlistPhases.forEach(p => p.checks.forEach(c => {
                 checklistData[c.id] = document.getElementById(c.id).checked;
             }));
-            
             const newOpportunity = {
                 asset: document.getElementById('asset').value,
                 notes: document.getElementById('notes').value,
@@ -127,44 +114,38 @@ function runApp() {
                 dateAdded: new Date(),
                 watchlistSetup: checklistData
             };
-            
             try {
                 await addDoc(collection(db, 'trades'), newOpportunity);
-                addModal.form.reset();
-                addModal.checklistContainer.innerHTML = '';
-                addModal.close();
+                this.form.reset();
+                this.checklistContainer.innerHTML = '';
+                this.close();
             } catch (err) { console.error("Erro ao guardar:", err); }
         }
     };
 
-    // --- LÓGICA DO MODAL DE "EXECUÇÃO DE TRADE" ---
     const execModal = {
-        container: document.getElementById('execution-modal-container'),
+        container: document.getElementById('execution-modal'),
         form: document.getElementById('execution-form'),
         closeBtn: document.getElementById('close-execution-modal-btn'),
         assetNameSpan: document.getElementById('execution-asset-name'),
         strategyNameSpan: document.getElementById('execution-strategy-name'),
         checklistContainer: document.getElementById('execution-checklist-container'),
-        
-        open: (trade) => {
+        open: function(trade) {
             currentExecutingTrade = { id: trade.id, strategyId: trade.data.strategyId };
-            execModal.assetNameSpan.textContent = trade.data.asset;
-            execModal.strategyNameSpan.textContent = trade.data.strategyName;
-            execModal.generateChecklist(trade.data.strategyId);
-            execModal.container.style.display = 'flex';
+            this.assetNameSpan.textContent = trade.data.asset;
+            this.strategyNameSpan.textContent = trade.data.strategyName;
+            this.generateChecklist(trade.data.strategyId);
+            if (this.container) this.container.style.display = 'flex';
         },
-        close: () => execModal.container.style.display = 'none',
-        
-        init: () => {
-            execModal.closeBtn.addEventListener('click', execModal.close);
-            execModal.container.addEventListener('click', (e) => { if (e.target === execModal.container) execModal.close(); });
-            execModal.form.addEventListener('submit', execModal.handleSubmit);
+        close: function() { if (this.container) this.container.style.display = 'none'; },
+        init: function() {
+            this.closeBtn.addEventListener('click', this.close.bind(this));
+            this.container.addEventListener('click', (e) => { if (e.target === this.container) this.close(); });
+            this.form.addEventListener('submit', this.handleSubmit.bind(this));
         },
-
-        generateChecklist: (strategyId) => {
-            execModal.checklistContainer.innerHTML = '';
+        generateChecklist: function(strategyId) {
+            this.checklistContainer.innerHTML = '';
             if (!strategyId || !STRATEGIES[strategyId]) return;
-
             const strategy = STRATEGIES[strategyId];
             strategy.executionPhases.forEach(phase => {
                 const phaseDiv = document.createElement('div');
@@ -185,11 +166,10 @@ function runApp() {
                         phaseDiv.appendChild(inputDiv);
                     });
                 }
-                execModal.checklistContainer.appendChild(phaseDiv);
+                this.checklistContainer.appendChild(phaseDiv);
             });
         },
-        
-        handleSubmit: async (e) => {
+        handleSubmit: async function(e) {
             e.preventDefault();
             const strategy = STRATEGIES[currentExecutingTrade.strategyId];
             const executionData = {};
@@ -197,42 +177,39 @@ function runApp() {
                 if (p.checks) p.checks.forEach(c => executionData[c.id] = document.getElementById(c.id).checked);
                 if (p.inputs) p.inputs.forEach(i => executionData[i.id] = document.getElementById(i.id).value);
             });
-            
             const updatedTrade = {
                 status: "LIVE",
                 executionDetails: executionData,
                 dateExecuted: new Date()
             };
-
             const tradeRef = doc(db, 'trades', currentExecutingTrade.id);
             try {
                 await updateDoc(tradeRef, updatedTrade);
-                execModal.form.reset();
-                execModal.checklistContainer.innerHTML = '';
-                execModal.close();
+                this.form.reset();
+                this.checklistContainer.innerHTML = '';
+                this.close();
             } catch (err) { console.error("Erro ao atualizar:", err); }
         }
     };
     
-    // --- Funções de Display no Dashboard ---
     function fetchAndDisplayTrades() {
         const q = query(collection(db, 'trades'), orderBy('dateAdded', 'desc'));
         onSnapshot(q, (snapshot) => {
             watchlistContainer.innerHTML = '';
             liveTradesContainer.innerHTML = '';
-
             if (snapshot.empty) {
                 watchlistContainer.innerHTML = '<p>Nenhuma oportunidade a ser monitorizada.</p>';
                 liveTradesContainer.innerHTML = '<p>Nenhuma operação ativa no momento.</p>';
+                return;
             }
-            
             snapshot.forEach(doc => {
                 const trade = { id: doc.id, data: doc.data() };
                 const card = createTradeCard(trade);
-                
                 if (trade.data.status === 'WATCHING') {
+                    if(watchlistContainer.innerHTML === '<p>Nenhuma oportunidade a ser monitorizada.</p>') watchlistContainer.innerHTML = '';
                     watchlistContainer.appendChild(card);
                 } else if (trade.data.status === 'LIVE') {
+                    if(liveTradesContainer.innerHTML === '<p>Nenhuma operação ativa no momento.</p>') liveTradesContainer.innerHTML = '';
                     liveTradesContainer.appendChild(card);
                 }
             });
@@ -243,14 +220,12 @@ function runApp() {
         const card = document.createElement('div');
         card.className = 'trade-card';
         card.setAttribute('data-id', trade.id);
-
         card.innerHTML = `
             <h3>${trade.data.asset}</h3>
             <p style="color: #0056b3; font-weight: bold;">Estratégia: ${trade.data.strategyName || 'N/A'}</p>
             <p><strong>Status:</strong> ${trade.data.status}</p>
             <p><strong>Notas:</strong> ${trade.data.notes || ''}</p>
         `;
-        
         if (trade.data.status === 'WATCHING') {
             const button = document.createElement('button');
             button.className = 'trigger-btn';
@@ -260,16 +235,16 @@ function runApp() {
         } else if (trade.data.status === 'LIVE') {
             card.classList.add('live');
             const details = trade.data.executionDetails;
-            card.innerHTML += `<p><strong>Entrada:</strong> ${details['entry-price']} | <strong>SL:</strong> ${details['stop-loss']}</p>`;
+            if (details) {
+                card.innerHTML += `<p><strong>Entrada:</strong> ${details['entry-price'] || 'N/A'} | <strong>SL:</strong> ${details['stop-loss'] || 'N/A'}</p>`;
+            }
         }
         return card;
     }
 
-    // --- INICIALIZAR TUDO ---
     addModal.init();
     execModal.init();
     fetchAndDisplayTrades();
 }
 
-// Iniciar a aplicação
 runApp();
