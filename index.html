@@ -28,25 +28,29 @@
         </section>
     </main>
 
-    <!-- FORMULÁRIO MODAL PARA ADICIONAR OPORTUNIDADE (inicialmente escondido) -->
+    
+<!-- FORMULÁRIO MODAL  -->
 <div id="modal-container" class="hidden">
     <div id="modal-content">
-        <!-- O BOTÃO DE FECHAR ESTÁ AGORA AQUI, FORA DO FORMULÁRIO -->
         <span id="close-modal-btn">×</span>
+        <h3>Adicionar Ativo à Watchlist</h3>
+
         <form id="add-opportunity-form">
-            <h3>Adicionar Ativo à Watchlist</h3>
-            <!-- O resto do seu formulário continua igual -->
+            <!-- 1. Selecionar a Estratégia -->
+            <label for="strategy-select">Escolha a Estratégia:</label>
+            <select id="strategy-select" name="strategy-select" required>
+                <option value="">-- Selecione --</option>
+                <!-- Opções serão adicionadas aqui pelo JS -->
+            </select>
+
+            <!-- 2. Detalhes do Ativo -->
             <label for="asset">Ativo:</label>
             <input type="text" id="asset" name="asset" required placeholder="Ex: SOL/USDT">
+            
+            <!-- 3. O Checklist será gerado e inserido aqui -->
+            <div id="dynamic-checklist-container"></div>
 
-            <h4>Fase 0: Filtro de Contexto Cripto</h4>
-            <div class="checklist-item"><input type="checkbox" id="check-btc" required><label>Direção do BTC favorável?</label></div>
-            <div class="checklist-item"><input type="checkbox" id="check-vol" required><label>Volume/Liquidez OK?</label></div>
-            
-            <h4>Fase 1: Filtro Macro (4h/Diário)</h4>
-            <div class="checklist-item"><input type="checkbox" id="check-macro-stoch" required><label>Estocástico a resetar?</label></div>
-            <div class="checklist-item"><input type="checkbox" id="check-macro-structure" required><label>Estrutura de preço favorável?</label></div>
-            
+            <!-- 4. Notas e Botão de Submissão -->
             <label for="notes">Notas Iniciais:</label>
             <textarea id="notes" placeholder="Ex: A formar fundo duplo no diário, perto da EMA 200."></textarea>
             
