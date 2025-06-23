@@ -1,19 +1,10 @@
 // --- INICIALIZAÇÃO DO FIREBASE (Sintaxe v9 Modular) ---
-
-// Importa as funções necessárias do Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
 import { 
-    getFirestore, 
-    collection, 
-    addDoc, 
-    query, 
-    where, 
-    orderBy, 
-    onSnapshot 
+    getFirestore, collection, addDoc, query, 
+    where, orderBy, onSnapshot 
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 
-
-// A sua configuração da web app do Firebase
 const firebaseConfig = {
   apiKey: "AIzaSy...xxxxxxxxxxxx", // A SUA API KEY REAL AQUI
   authDomain: "trading-89c13.firebaseapp.com",
@@ -23,47 +14,56 @@ const firebaseConfig = {
   appId: "1:782074719077:web:05c07a2b81b0047ef5cf8c"
 };
 
-
-// Inicializa o Firebase e o Firestore
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 // --- LÓGICA DA APLICAÇÃO ---
 
-// Função principal que só corre depois de o DOM estar completamente carregado
 function runApp() {
+    console.log("runApp() iniciada. O DOM está pronto.");
 
-    // --- Seletores do DOM (declarados aqui dentro para garantir que existem) ---
+    // --- Seletores do DOM ---
     const addOpportunityBtn = document.getElementById('add-opportunity-btn');
     const modalContainer = document.getElementById('modal-container');
     const closeModalBtn = document.getElementById('close-modal-btn');
     const addOpportunityForm = document.getElementById('add-opportunity-form');
     const watchlistContainer = document.getElementById('watchlist-container');
 
-    // Verifica se todos os elementos essenciais foram encontrados. Se não, pára e avisa.
+    // --- DIAGNÓSTICO: VERIFICA SE OS ELEMENTOS FORAM ENCONTRADOS ---
+    console.log("Elemento addOpportunityBtn:", addOpportunityBtn);
+    console.log("Elemento modalContainer:", modalContainer);
+    console.log("Elemento closeModalBtn:", closeModalBtn); // <<<<<< IMPORTANTE
+
     if (!addOpportunityBtn || !modalContainer || !closeModalBtn || !addOpportunityForm) {
         console.error("ERRO CRÍTICO: Um ou mais elementos do DOM não foram encontrados. Verifique os IDs no HTML.");
-        return; // Pára a execução se algo estiver em falta
+        return;
     }
 
     // --- Lógica do Modal ---
     addOpportunityBtn.addEventListener('click', () => {
+        console.log("Botão 'Adicionar' clicado. A abrir modal.");
         modalContainer.classList.remove('hidden');
     });
 
     closeModalBtn.addEventListener('click', () => {
+        // <<<<<< ESTA MENSAGEM É A CHAVE. ELA APARECE QUANDO CLICA NO "X"?
+        console.log("Botão 'X' de fechar foi CLICADO! A tentar fechar o modal."); 
         modalContainer.classList.add('hidden');
     });
 
     modalContainer.addEventListener('click', (e) => {
-        // Fecha o modal APENAS se o clique for no container de fundo (e não nos filhos)
+        console.log("Clique detetado na área do modal.");
         if (e.target === modalContainer) {
+            console.log("O clique foi no fundo cinzento. A fechar o modal.");
             modalContainer.classList.add('hidden');
+        } else {
+            console.log("O clique foi num elemento filho do modal, não no fundo.");
         }
     });
 
     // --- Submeter o formulário de nova oportunidade ---
     addOpportunityForm.addEventListener('submit', async (e) => {
+        //... (o resto desta função pode permanecer igual, não é relevante para o bug de fecho)
         e.preventDefault();
         const submitButton = addOpportunityForm.querySelector('button[type="submit"]');
         submitButton.textContent = "A Guardar...";
@@ -84,7 +84,6 @@ function runApp() {
 
         try {
             const docRef = await addDoc(collection(db, 'trades'), newOpportunity);
-            console.log("Oportunidade guardada com sucesso! ID:", docRef.id);
             addOpportunityForm.reset();
             modalContainer.classList.add('hidden');
         } catch (err) {
@@ -96,13 +95,13 @@ function runApp() {
         }
     });
 
-    // --- Carregar e mostrar as oportunidades do Firebase ---
+    // Função fetchAndDisplayTrades pode permanecer igual
     function fetchAndDisplayTrades() {
         const tradesCollection = collection(db, 'trades');
         const q = query(tradesCollection, where('status', '==', 'WATCHING'), orderBy('dateAdded', 'desc'));
 
         onSnapshot(q, (snapshot) => {
-            if (!watchlistContainer) return; // Segurança extra
+            if (!watchlistContainer) return;
             watchlistContainer.innerHTML = '';
             if (snapshot.empty) {
                 watchlistContainer.innerHTML = '<p>Nenhuma oportunidade a ser monitorizada. Adicione uma!</p>';
@@ -121,7 +120,6 @@ function runApp() {
         });
     }
 
-    // --- Função para criar um "Card" de trade ---
     function createTradeCard(trade, id) {
         const card = document.createElement('div');
         card.className = 'trade-card';
@@ -137,13 +135,10 @@ function runApp() {
         });
         return card;
     }
-
-    // Iniciar a busca de dados
+    
     fetchAndDisplayTrades();
 }
 
-// O ponto de entrada da nossa aplicação.
-// Verifica se o DOM já está pronto. Se sim, corre a app. Se não, espera pelo evento.
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', runApp);
 } else {
