@@ -1,12 +1,19 @@
 // --- INICIALIZAÇÃO DO FIREBASE (Sintaxe v9 Modular) ---
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
 import { 
-    getFirestore, collection, addDoc, query, 
-    where, orderBy, onSnapshot 
+    getFirestore, 
+    collection, 
+    addDoc, 
+    query, 
+    where, 
+    orderBy, 
+    onSnapshot 
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 
+
+// A sua configuração da web app do Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSy...xxxxxxxxxxxx", // A SUA API KEY REAL AQUI
+  apiKey: "AIzaSy...xxxxxxxxxxxx", // SUBSTITUA PELA SUA API KEY REAL
   authDomain: "trading-89c13.firebaseapp.com",
   projectId: "trading-89c13",
   storageBucket: "trading-89c13.appspot.com",
@@ -14,13 +21,16 @@ const firebaseConfig = {
   appId: "1:782074719077:web:05c07a2b81b0047ef5cf8c"
 };
 
+
+// Inicializa o Firebase e o Firestore
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
 
 // --- LÓGICA DA APLICAÇÃO ---
 
 function runApp() {
-    console.log("runApp() iniciada. O DOM está pronto.");
+    console.log("runApp() iniciada.");
 
     // --- Seletores do DOM ---
     const addOpportunityBtn = document.getElementById('add-opportunity-btn');
@@ -29,41 +39,32 @@ function runApp() {
     const addOpportunityForm = document.getElementById('add-opportunity-form');
     const watchlistContainer = document.getElementById('watchlist-container');
 
-    // --- DIAGNÓSTICO: VERIFICA SE OS ELEMENTOS FORAM ENCONTRADOS ---
-    console.log("Elemento addOpportunityBtn:", addOpportunityBtn);
-    console.log("Elemento modalContainer:", modalContainer);
-    console.log("Elemento closeModalBtn:", closeModalBtn); // <<<<<< IMPORTANTE
-
     if (!addOpportunityBtn || !modalContainer || !closeModalBtn || !addOpportunityForm) {
         console.error("ERRO CRÍTICO: Um ou mais elementos do DOM não foram encontrados. Verifique os IDs no HTML.");
         return;
     }
 
-    // --- Lógica do Modal ---
-    addOpportunityBtn.addEventListener('click', () => {
-        console.log("Botão 'Adicionar' clicado. A abrir modal.");
-        modalContainer.classList.remove('hidden');
-    });
+    // --- LÓGICA DO MODAL (MODIFICADA PARA USAR 'display') ---
+    function openModal() {
+        console.log("A abrir modal...");
+        if (modalContainer) modalContainer.style.display = 'flex';
+    }
 
-    closeModalBtn.addEventListener('click', () => {
-        // <<<<<< ESTA MENSAGEM É A CHAVE. ELA APARECE QUANDO CLICA NO "X"?
-        console.log("Botão 'X' de fechar foi CLICADO! A tentar fechar o modal."); 
-        modalContainer.classList.add('hidden');
-    });
+    function closeModal() {
+        console.log("A fechar modal...");
+        if (modalContainer) modalContainer.style.display = 'none';
+    }
 
+    addOpportunityBtn.addEventListener('click', openModal);
+    closeModalBtn.addEventListener('click', closeModal);
     modalContainer.addEventListener('click', (e) => {
-        console.log("Clique detetado na área do modal.");
         if (e.target === modalContainer) {
-            console.log("O clique foi no fundo cinzento. A fechar o modal.");
-            modalContainer.classList.add('hidden');
-        } else {
-            console.log("O clique foi num elemento filho do modal, não no fundo.");
+            closeModal();
         }
     });
 
     // --- Submeter o formulário de nova oportunidade ---
     addOpportunityForm.addEventListener('submit', async (e) => {
-        //... (o resto desta função pode permanecer igual, não é relevante para o bug de fecho)
         e.preventDefault();
         const submitButton = addOpportunityForm.querySelector('button[type="submit"]');
         submitButton.textContent = "A Guardar...";
@@ -84,8 +85,9 @@ function runApp() {
 
         try {
             const docRef = await addDoc(collection(db, 'trades'), newOpportunity);
+            console.log("Oportunidade guardada com sucesso! ID:", docRef.id);
             addOpportunityForm.reset();
-            modalContainer.classList.add('hidden');
+            closeModal(); // Usa a nossa nova função para fechar
         } catch (err) {
             console.error("Erro ao guardar:", err);
             alert("Ocorreu um erro ao guardar. Verifique a consola.");
@@ -95,7 +97,7 @@ function runApp() {
         }
     });
 
-    // Função fetchAndDisplayTrades pode permanecer igual
+    // --- Carregar e mostrar as oportunidades do Firebase ---
     function fetchAndDisplayTrades() {
         const tradesCollection = collection(db, 'trades');
         const q = query(tradesCollection, where('status', '==', 'WATCHING'), orderBy('dateAdded', 'desc'));
@@ -120,6 +122,7 @@ function runApp() {
         });
     }
 
+    // --- Função para criar um "Card" de trade ---
     function createTradeCard(trade, id) {
         const card = document.createElement('div');
         card.className = 'trade-card';
@@ -135,10 +138,12 @@ function runApp() {
         });
         return card;
     }
-    
+
+    // Iniciar a busca de dados
     fetchAndDisplayTrades();
 }
 
+// O ponto de entrada da nossa aplicação.
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', runApp);
 } else {
