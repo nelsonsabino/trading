@@ -1,7 +1,22 @@
-// --- INICIALIZAÇÃO DO FIREBASE (coloque aqui a sua configuração) ---
-// const firebaseConfig = { ... };
-// firebase.initializeApp(firebaseConfig);
-// const db = firebase.firestore();
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyAoKtcIsVOcvI5O6gH_14AXL3bF2I6X8Qc",
+  authDomain: "trading-89c13.firebaseapp.com",
+  projectId: "trading-89c13",
+  storageBucket: "trading-89c13.firebasestorage.app",
+  messagingSenderId: "782074719077",
+  appId: "1:782074719077:web:05c07a2b81b0047ef5cf8c"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+
 
 document.addEventListener('DOMContentLoaded', () => {
 
