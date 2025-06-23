@@ -27,6 +27,74 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 
+
+
+
+
+
+
+
+
+// --- CONFIGURAÇÃO DAS ESTRATÉGIAS ---
+const STRATEGIES = {
+    'impulso-pos-reset': {
+        name: "Impulso Pós-Reset",
+        phases: [
+            {
+                title: "Fase 0: Filtro de Contexto Cripto",
+                id: "fase0",
+                checks: [
+                    { id: "check-btc", label: "Direção do BTC favorável?" },
+                    { id: "check-vol", label: "Volume/Liquidez OK?" }
+                ]
+            },
+            {
+                title: "Fase 1: Filtro Macro (4h/Diário)",
+                id: "fase1",
+                checks: [
+                    { id: "check-macro-stoch", label: "Estocástico a resetar?" },
+                    { id: "check-macro-structure", label: "Estrutura de preço favorável?" }
+                ]
+            }
+        ]
+    },
+    'reversao-media': {
+        name: "Reversão à Média",
+        phases: [
+            {
+                title: "Fase A: Contexto de Mercado",
+                id: "faseA",
+                checks: [
+                    { id: "check-btc-reversao", label: "BTC em range ou estável?" },
+                    { id: "check-distancia-ema", label: "Preço muito afastado da EMA 21?" }
+                ]
+            },
+            {
+                title: "Fase B: Sinal de Exaustão",
+                id: "faseB",
+                checks: [
+                    { id: "check-rsi-extremo", label: "RSI em zona extrema (>70 ou <30)?" },
+                    { id: "check-candle-reversao", label: "Candle de reversão claro no 1H?" }
+                ]
+            }
+        ]
+    }
+    // No futuro, para adicionar uma nova estratégia, basta adicionar um novo objeto aqui.
+};
+
+// --- O resto do app.js continua abaixo ---
+function runApp() {
+    // ...
+}
+
+
+
+
+
+
+
+
+
 // --- LÓGICA DA APLICAÇÃO ---
 
 function runApp() {
