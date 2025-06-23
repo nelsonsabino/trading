@@ -59,6 +59,16 @@
     padding: 1rem;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border-left: 5px solid #007bff; /* Azul para "A Monitorizar" */
+}
+
+/* NOVO: Estilo para o card de um trade ativo */
+.trade-card.live {
+    border-left-color: #28a745; /* Verde para "Live" */
+}
+
+.live-trades {
+    margin-top: 2rem;
 }
 
 .trade-card h3 {
