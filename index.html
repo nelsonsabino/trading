@@ -1,136 +1,61 @@
-
 <!DOCTYPE html>
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checklist de Trading - Impulso Pós-Reset</title>
-    <!-- Adicione aqui o seu ficheiro CSS para o estilo -->
-    <link rel="stylesheet" href="style.css"> 
+    <title>Dashboard de Oportunidades Cripto</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <header>
-        <h1>Checklist: Estratégia "Impulso Pós-Reset"</h1>
-        <p class="mantra">O meu trabalho hoje é executar o meu plano na perfeição.</p>
+        <h1>Painel de Oportunidades</h1>
+        <p class="mantra">A paciência paga. Eu espero que os melhores setups venham até mim.</p>
     </header>
 
-    <main id="checklist-form">
-        <section class="trade-info">
-            <h2>Informação do Trade</h2>
-            <label for="asset">Ativo a Analisar:</label>
-            <input type="text" id="asset" name="asset" placeholder="Ex: EUR/USD, BTC/USDT">
+    <main>
+        <section class="actions">
+            <!-- Este botão abrirá o formulário para adicionar uma nova oportunidade -->
+            <button id="add-opportunity-btn">Adicionar Nova Oportunidade</button>
         </section>
 
-
-<!-- FILTRO DE CONTEXTO CRIPTO -->
-   <section id="crypto-context">
-        <h2>FASE 0: Filtro de Contexto Cripto</h2>
-        <div class="checklist-item">
-            <input type="checkbox" id="check-btc" name="check-btc">
-            <label for="check-btc">A direção do Bitcoin (BTC) está favorável/neutra?</label>
-        </div>
-        <div class="checklist-item">
-            <input type="checkbox" id="check-vol" name="check-vol">
-            <label for="check-vol">O ativo tem volume e liquidez adequados?</label>
-        </div>
-        <div class="checklist-item">
-            <input type="checkbox" id="check-narrative" name="check-narrative">
-            <label for="check-narrative">Sentimento/Notícias verificados? (Sem FUD/Hype extremo?)</label>
-        </div>
-    </section>
-
-
-
-        <!-- FASE 1: FILTRO MACRO (4H) -->
-        <section id="fase1">
-            <h2>FASE 1: Filtro Macro (4H)</h2>
-            <div class="checklist-item">
-                <input type="checkbox" id="check1" name="check1">
-                <label for="check1">Estocástico cruzou para cima vindo de sobrevenda (<20).</label>
+        <section class="watchlist">
+            <h2>A Monitorizar (Setups de 4h/Diário)</h2>
+            <div id="watchlist-container">
+                <!-- Os cards das oportunidades serão inseridos aqui pelo JavaScript -->
+                <p>A carregar oportunidades do Firebase...</p>
             </div>
-            <div class="checklist-item">
-                <input type="checkbox" id="check2" name="check2">
-                <label for="check2">Resistência do RSI (4H) identificada para alvo final.</label>
-            </div>
-        </section>
-
-        <!-- FASE 2: SETUP (1H) -->
-        <section id="fase2">
-            <h2>FASE 2: Setup (1H) - Selecione o Tipo</h2>
-            <div class="trade-type-selector">
-                <input type="radio" id="typeA" name="trade_type" value="A">
-                <label for="typeA">Tipo A: Entrada em Suporte de Confluência</label>
-            </div>
-            <div id="typeA-checks" class="sub-checks hidden">
-                <div class="checklist-item">
-                    <input type="checkbox" id="checkA1" name="checkA1">
-                    <label for="checkA1">Preço na zona de confluência (Fib + EMA).</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="checkA2" name="checkA2">
-                    <label for="checkA2">Espaço visual claro para subir.</label>
-                </div>
-            </div>
-
-            <div class="trade-type-selector">
-                <input type="radio" id="typeB" name="trade_type" value="B">
-                <label for="typeB">Tipo B: Entrada em Quebra de Estrutura</label>
-            </div>
-            <div id="typeB-checks" class="sub-checks hidden">
-                <div class="checklist-item">
-                    <input type="checkbox" id="checkB1" name="checkB1">
-                    <label for="checkB1">Estrutura de contração clara (triângulo/cunha).</label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" id="checkB2" name="checkB2">
-                    <label for="checkB2"><strong>Confirmação de Força:</strong> RSI já quebrou a sua resistência.</label>
-                </div>
-                 <div class="checklist-item">
-                    <input type="checkbox" id="checkB3" name="checkB3">
-                    <label for="checkB3">Potencial de >5% até à próxima resistência.</label>
-                </div>
-            </div>
-        </section>
-
-        <!-- FASE 3: GATILHO (1H) -->
-        <section id="fase3">
-            <h2>FASE 3: Gatilho (1H)</h2>
-            <div class="checklist-item">
-                <input type="checkbox" id="check-trigger" name="check-trigger">
-                <label for="check-trigger">Candle de confirmação (reversão ou quebra) <strong>FECHADO</strong>.</label>
-            </div>
-        </section>
-
-        <!-- FASE 4: PLANO DE GESTÃO -->
-        <section id="fase4">
-            <h2>FASE 4: Plano de Gestão (Preencher ANTES de entrar)</h2>
-            <div class="management-plan">
-                <label for="entry-price">Preço de Entrada Planeado:</label>
-                <input type="number" id="entry-price" name="entry-price" step="any">
-                
-                <label for="sl-price">Preço do Stop-Loss:</label>
-                <input type="number" id="sl-price" name="sl-price" step="any">
-                
-                <label for="tp-price">Preço do Take-Profit Final:</label>
-                <input type="number" id="tp-price" name="tp-price" step="any">
-
-                <label for="risk-value">Risco em € (Ex: 1%):</label>
-                <input type="number" id="risk-value" name="risk-value" step="any">
-            </div>
-        </section>
-        
-        <!-- BOTÃO DE AUTORIZAÇÃO -->
-        <section class="authorization">
-            <button id="auth-button" disabled>AUTORIZAÇÃO PARA EXECUTAR TRADE</button>
         </section>
     </main>
 
-    <!-- Adicione aqui os scripts do Firebase e o seu script principal -->
-    <!-- Exemplo:
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <!-- FORMULÁRIO MODAL PARA ADICIONAR OPORTUNIDADE (inicialmente escondido) -->
+    <div id="modal-container" class="hidden">
+        <div id="modal-content">
+            <form id="add-opportunity-form">
+                <span id="close-modal-btn">×</span>
+                <h3>Adicionar Ativo à Watchlist</h3>
+                <label for="asset">Ativo:</label>
+                <input type="text" id="asset" name="asset" required placeholder="Ex: SOL/USDT">
+
+                <h4>Fase 0: Filtro de Contexto Cripto</h4>
+                <div class="checklist-item"><input type="checkbox" id="check-btc" required><label>Direção do BTC favorável?</label></div>
+                <div class="checklist-item"><input type="checkbox" id="check-vol" required><label>Volume/Liquidez OK?</label></div>
+                
+                <h4>Fase 1: Filtro Macro (4h/Diário)</h4>
+                <div class="checklist-item"><input type="checkbox" id="check-macro-stoch" required><label>Estocástico a resetar?</label></div>
+                <div class="checklist-item"><input type="checkbox" id="check-macro-structure" required><label>Estrutura de preço favorável?</label></div>
+                
+                <label for="notes">Notas Iniciais:</label>
+                <textarea id="notes" placeholder="Ex: A formar fundo duplo no diário, perto da EMA 200."></textarea>
+                
+                <button type="submit">Guardar na Watchlist</button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Scripts do Firebase e da aplicação -->
     <script src="app.js"></script>
-    -->
+
 </body>
 </html>
