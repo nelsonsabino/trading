@@ -32,10 +32,13 @@ const db = getFirestore(app);
 
 
 
+// ... (imports do firebase) ...
+
 const STRATEGIES = {
     'impulso-pos-reset': {
         name: "Impulso Pós-Reset",
-        phases: [
+        // Fases para adicionar à watchlist 
+        watchlistPhases: [
             { title: "Fase 0: Filtro de Contexto Cripto", id: "fase0", checks: [
                 { id: "check-btc", label: "Direção do BTC favorável?" },
                 { id: "check-vol", label: "Volume/Liquidez OK?" }
@@ -44,22 +47,55 @@ const STRATEGIES = {
                 { id: "check-macro-stoch", label: "Estocástico a resetar?" },
                 { id: "check-macro-structure", label: "Estrutura de preço favorável?" }
             ]}
+        ],
+        // NOVO: Fases para a execução do trade
+        executionPhases: [
+            { title: "Fase 2: Setup de Entrada (1H)", id: "fase2", checks: [
+                { id: "exec-check-structure-break", label: "Estrutura de curto prazo quebrada (ex: LTB)?" },
+                { id: "exec-check-volume-increase", label: "Volume a confirmar a quebra?" }
+            ]},
+            { title: "Fase 3: Gatilho de Precisão (5m/15m)", id: "fase3", checks: [
+                { id: "exec-check-candle-confirm", label: "Candle de confirmação fechado?" },
+            ]},
+            { title: "Fase 4: Plano de Gestão", id: "fase4", inputs: [
+                { id: "entry-price", label: "Preço de Entrada:", type: "number" },
+                { id: "stop-loss", label: "Stop-Loss:", type: "number" },
+                { id: "take-profit", label: "Take-Profit:", type: "number" }
+            ]}
         ]
     },
+    // A outra estratégia também seguiria esta estrutura
     'reversao-media': {
         name: "Reversão à Média",
-        phases: [
-            { title: "Fase A: Contexto de Mercado", id: "faseA", checks: [
-                { id: "check-btc-reversao", label: "BTC em range ou estável?" },
-                { id: "check-distancia-ema", label: "Preço muito afastado da EMA 21?" }
+  watchlistPhases: [
+            { title: "Fase 0: Filtro de Contexto Cripto", id: "fase0", checks: [
+                { id: "check-btc", label: "Direção do BTC favorável?" },
+                { id: "check-vol", label: "Volume/Liquidez OK?" }
             ]},
-            { title: "Fase B: Sinal de Exaustão", id: "faseB", checks: [
-                { id: "check-rsi-extremo", label: "RSI em zona extrema (>70 ou <30)?" },
-                { id: "check-candle-reversao", label: "Candle de reversão claro no 1H?" }
+            { title: "Fase 1: Filtro Macro (4h/Diário)", id: "fase1", checks: [
+                { id: "check-macro-stoch", label: "Estocástico a resetar?" },
+                { id: "check-macro-structure", label: "Estrutura de preço favorável?" }
+            ]}
+        ],
+        // NOVO: Fases para a execução do trade
+        executionPhases: [
+            { title: "Fase 2: Setup de Entrada (1H)", id: "fase2", checks: [
+                { id: "exec-check-structure-break", label: "Estrutura de curto prazo quebrada (ex: LTB)?" },
+                { id: "exec-check-volume-increase", label: "Volume a confirmar a quebra?" }
+            ]},
+            { title: "Fase 3: Gatilho de Precisão (5m/15m)", id: "fase3", checks: [
+                { id: "exec-check-candle-confirm", label: "Candle de confirmação fechado?" },
+            ]},
+            { title: "Fase 4: Plano de Gestão", id: "fase4", inputs: [
+                { id: "entry-price", label: "Preço de Entrada:", type: "number" },
+                { id: "stop-loss", label: "Stop-Loss:", type: "number" },
+                { id: "take-profit", label: "Take-Profit:", type: "number" }
             ]}
         ]
     }
 };
+
+
 
 // --- LÓGICA DA APLICAÇÃO ---
 
