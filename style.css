@@ -145,24 +145,29 @@ header nav {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(33, 37, 41, 0.6); /* Um preto um pouco mais suave */
-    display: none; /* Começam escondidos */
+    background-color: rgba(33, 37, 41, 0.6);
+    display: none;
     justify-content: center;
-    align-items: center;
-    padding: 1rem; /* Padding para evitar que o modal cole nas bordas em ecrãs pequenos */
+    align-items: center; /* Mantém a centragem para modais pequenos */
     z-index: 1000;
     box-sizing: border-box;
+    /* Adicionado para permitir scroll no ecrã inteiro se o modal for muito alto */
+    overflow-y: auto; 
+    padding: 2rem 1rem; /* Padding vertical para dar espaço em cima e em baixo */
 }
+
 
 .modal-content {
     background: #fff;
-    padding: 2rem 2.5rem; /* Mais padding horizontal */
-    border-radius: 12px; /* Bordas mais arredondadas */
+    padding: 2rem 2.5rem;
+    border-radius: 12px;
     width: 100%;
     max-width: 550px;
     position: relative;
     box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    animation: fadeIn 0.3s ease-out; /* Efeito de entrada suave */
+    animation: fadeIn 0.3s ease-out;
+    /* Adicionado para garantir que o modal não fica "colado" ao topo */
+    margin: auto; 
 }
 
 /* Animação para o modal aparecer */
