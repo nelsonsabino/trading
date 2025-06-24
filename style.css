@@ -88,3 +88,71 @@ h2 { color: #0056b3; }
     background-color: #dc3545; /* Vermelho para ação de fecho */
     margin-top: 5px;
 }
+
+
+
+
+
+
+
+/* ----------------------------------------------------------------*/
+/* Estilos para a página de gestão */
+nav .nav-link {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+nav .nav-link:hover {
+    background-color: #0056b3;
+}
+
+#trades-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+#trades-table th, #trades-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+
+#trades-table th {
+    background-color: #f2f2f2;
+    color: #333;
+}
+
+#trades-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+#trades-table .delete-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+#trades-table .delete-btn:hover {
+    background-color: #c82333;
+}
+
+/* Badges de Status para a tabela */
+.status-badge {
+    padding: 3px 8px;
+    border-radius: 12px;
+    color: white;
+    font-size: 0.8em;
+    font-weight: bold;
+}
+.status-badge.status-watching { background-color: #007bff; }
+.status-badge.status-live { background-color: #28a745; }
+.status-badge.status-closed { background-color: #6c757d; }
