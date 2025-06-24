@@ -239,28 +239,40 @@ function generateWatchlistChecklist(strategyId, data = {}) {
         }
     }
 
+
+    
     // --- Lógica de Display do Dashboard ---
-    function fetchAndDisplayTrades() {
-        const q = query(collection(db, 'trades'), orderBy('dateAdded', 'desc'));
-        onSnapshot(q, (snapshot) => {
-            watchlistContainer.innerHTML = '<p>Nenhuma oportunidade a ser monitorizada.</p>';
-            liveTradesContainer.innerHTML = '<p>Nenhuma operação ativa no momento.</p>';
-            let watchingCount = 0, liveCount = 0;
-            snapshot.forEach(docSnapshot => {
-                const trade = { id: docSnapshot.id, data: docSnapshot.data() };
-                const card = createTradeCard(trade);
-                if (trade.data.status === 'WATCHING') {
-                    if (watchingCount === 0) watchlistContainer.innerHTML = '';
-                    watchlistContainer.appendChild(card);
-                    watchingCount++;
-                } else if (trade.data.status === 'LIVE') {
-                    if (liveCount === 0) liveTradesContainer.innerHTML = '';
-                    liveTradesContainer.appendChild(card);
-                    liveCount++;
-                }
-            });
+function fetchAndDisplayTrades() {
+    const q = query(collection(db, 'trades'), orderBy('dateAdded', 'desc'));
+    onSnapshot(q, (snapshot) => {
+        // Limpa todos os contentores
+        potentialTradesContainer.innerHTML = '<p>Nenhuma oportunidade potencial encontrada.</p>';
+        liveTradesContainer.innerHTML = '<p>Nenhuma operação ativa no momento.</p>';
+        // (No futuro, adicionaremos o armedTradesContainer aqui)
+
+        let potentialCount = 0;
+        let liveCount = 0;
+
+        snapshot.forEach(docSnapshot => {
+            const trade = { id: docSnapshot.id, data: docSnapshot.data() };
+            const card = createTradeCard(trade);
+            
+            if (trade.data.status === 'POTENTIAL') {
+                if (potentialCount === 0) potentialTradesContainer.innerHTML = '';
+                potentialTradesContainer.appendChild(card);
+                potentialCount++;
+            } else if (trade.data.status === 'LIVE') {
+                if (liveCount === 0) liveTradesContainer.innerHTML = '';
+                liveTradesContainer.appendChild(card);
+                liveCount++;
+            } 
+            // (No futuro, adicionaremos o status ARMED aqui)
         });
-    }
+    });
+}
+
+
+    
 
     function createTradeCard(trade) {
         const card = document.createElement('div');
