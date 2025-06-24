@@ -229,3 +229,24 @@ nav .nav-link:hover {
 }
 .detailed-stats .positive-pnl { color: #28a745; font-weight: bold; }
 .detailed-stats .negative-pnl { color: #dc3545; font-weight: bold; }
+
+
+
+/* ... */
+/* Negrito para labels obrigatórios */
+.checklist-item label strong, .input-item label strong {
+    font-weight: 600; 
+}
+
+/* Estilos para o grupo de radio buttons */
+.radio-group {
+    margin-top: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #eee;
+    border-radius: 4px;
+}
+.radio-group > label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 0.5rem;
+}
