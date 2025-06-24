@@ -62,6 +62,9 @@ h2 { color: #0056b3; }
 .trade-card.live {
     border-left-color: #28a745; /* Verde para "Live" */
 }
+.trade-card.armed {
+    border-left-color: #ffc107; /* Amarelo para "Armed" */
+}
 
 
 /* Estilo genérico para os items de input nos modais */
