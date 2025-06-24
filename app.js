@@ -36,11 +36,11 @@ const STRATEGIES = {
     'impulso-pos-reset': {
         name: "Impulso Pós-Reset",
         watchlistPhases: [
-            { title: "Fase 0: Filtro de Contexto Cripto", checks: [{ id: "check-btc", label: "Direção do BTC favorável?" },{ id: "check-vol", label: "Volume/Liquidez OK?" }] },
-            { title: "Fase 1: Filtro Macro (4h/Diário)", checks: [{ id: "check-macro-stoch", label: "Estocástico a resetar?" },{ id: "check-macro-structure", label: "Estrutura de preço favorável?" }] }
+            { title: "Fase 0: Filtro de Contexto Cripto", checks: [{ id: "check-btc", label: "Direção do BTC favorável?" }, { id: "check-vol", label: "Volume/Liquidez OK?" }] },
+            { title: "Fase 1: Filtro Macro (4h/Diário)", checks: [{ id: "check-macro-stoch", label: "Estocástico a resetar?" }, { id: "check-macro-structure", label: "Estrutura de preço favorável?" }] }
         ],
         executionPhases: [
-            { title: "Fase 2: Setup de Entrada (1H)", checks: [{ id: "exec-check-structure-break", label: "Estrutura de curto prazo quebrada?" },{ id: "exec-check-volume-increase", label: "Volume a confirmar?" }] },
+            { title: "Fase 2: Setup de Entrada (1H)", checks: [{ id: "exec-check-structure-break", label: "Estrutura de curto prazo quebrada?" }, { id: "exec-check-volume-increase", label: "Volume a confirmar?" }] },
             { title: "Fase 3: Gatilho (5m/15m)", checks: [{ id: "exec-check-candle-confirm", label: "Candle de confirmação fechado?" }] },
             { title: "Fase 4: Plano de Gestão", inputs: [
                 { id: "entry-price", label: "Preço de Entrada:", type: "number" },
@@ -49,27 +49,40 @@ const STRATEGIES = {
                 { id: "quantity", label: "Quantidade:", type: "number" }
             ]}
         ]
-    } 
+    }
 };
 
 function runApp() {
-    // --- SELETORES GLOBAIS ---
+    let currentTrade = {};
+    
+    // --- Seletores do DOM ---
+    const addModal = { container: document.getElementById('add-opportunity-modal'), form: document.getElementById('add-opportunity-form'), closeBtn: document.getElementById('close-modal-btn'), strategySelect: document.getElementById('strategy-select'), checklistContainer: document.getElementById('dynamic-checklist-container') };
+    const execModal = { container: document.getElementById('execution-modal'), form: document.getElementById('execution-form'), closeBtn: document.getElementById('close-execution-modal-btn'), assetNameSpan: document.getElementById('execution-asset-name'), strategyNameSpan: document.getElementById('execution-strategy-name'), checklistContainer: document.getElementById('execution-checklist-container') };
+    const closeModalObj = { container: document.getElementById('close-trade-modal'), form: document.getElementById('close-trade-form'), closeBtn: document.getElementById('close-close-trade-modal-btn'), assetNameSpan: document.getElementById('close-trade-asset-name'), exitPriceInput: document.getElementById('exit-price'), pnlInput: document.getElementById('final-pnl') };
     const watchlistContainer = document.getElementById('watchlist-container');
     const liveTradesContainer = document.getElementById('live-trades-container');
-    let currentTrade = {}; // Guarda o estado do trade em edição
 
-    // --- LÓGICA DO MODAL "ADICIONAR OPORTUNIDADE" ---
-    const addModal = {
-        container: document.getElementById('add-opportunity-modal'),
-        form: document.getElementById('add-opportunity-form'),
-        closeBtn: document.getElementById('close-modal-btn'),
-        strategySelect: document.getElementById('strategy-select'),
-        checklistContainer: document.getElementById('dynamic-checklist-container')
-    };
+    // --- Funções de Controlo dos Modais ---
+    function openAddModal() { if(addModal.container) addModal.container.style.display = 'flex'; }
+    function closeAddModal() { if(addModal.container) { addModal.container.style.display = 'none'; addModal.form.reset(); addModal.checklistContainer.innerHTML = ''; currentTrade = {}; } }
+    
+    function openExecModal(trade) {
+        currentTrade = { id: trade.id, data: trade.data };
+        execModal.assetNameSpan.textContent = trade.data.asset;
+        execModal.strategyNameSpan.textContent = trade.data.strategyName;
+        generateExecutionChecklist(trade.data.strategyId, trade.data.executionDetails);
+        if(execModal.container) execModal.container.style.display = 'flex';
+    }
+    function closeExecModal() { if(execModal.container) { execModal.container.style.display = 'none'; execModal.form.reset(); currentTrade = {}; } }
 
-    function openAddModal() { addModal.container.style.display = 'flex'; }
-    function closeAddModal() { addModal.container.style.display = 'none'; }
+    function openCloseTradeModal(trade) {
+        currentTrade = { id: trade.id, data: trade.data };
+        closeModalObj.assetNameSpan.textContent = trade.data.asset;
+        if(closeModalObj.container) closeModalObj.container.style.display = 'flex';
+    }
+    function closeCloseTradeModal() { if(closeModalObj.container) { closeModalObj.container.style.display = 'none'; closeModalObj.form.reset(); currentTrade = {}; } }
 
+    // --- Geradores de Checklist Dinâmicos ---
     function populateStrategySelect() {
         addModal.strategySelect.innerHTML = '<option value="">-- Selecione --</option>';
         for (const id in STRATEGIES) {
@@ -79,69 +92,26 @@ function runApp() {
             addModal.strategySelect.appendChild(option);
         }
     }
-
-    function generateWatchlistChecklist() {
-        const strategyId = addModal.strategySelect.value;
+    
+    function generateWatchlistChecklist(strategyId, data = {}) {
         addModal.checklistContainer.innerHTML = '';
-        if (!strategyId) return;
+        if (!strategyId || !STRATEGIES[strategyId]) return;
         const strategy = STRATEGIES[strategyId];
         strategy.watchlistPhases.forEach(phase => {
             const phaseDiv = document.createElement('div');
             phaseDiv.innerHTML = `<h4>${phase.title}</h4>`;
             phase.checks.forEach(check => {
-                const checkDiv = document.createElement('div');
-                checkDiv.className = 'checklist-item';
-                checkDiv.innerHTML = `<input type="checkbox" id="${check.id}" required><label for="${check.id}">${check.label}</label>`;
-                phaseDiv.appendChild(checkDiv);
+                const isChecked = data[check.id] ? 'checked' : '';
+                const item = document.createElement('div');
+                item.className = 'checklist-item';
+                item.innerHTML = `<input type="checkbox" id="${check.id}" ${isChecked} required><label for="${check.id}">${check.label}</label>`;
+                phaseDiv.appendChild(item);
             });
             addModal.checklistContainer.appendChild(phaseDiv);
         });
     }
 
-    async function handleAddSubmit(e) {
-        e.preventDefault();
-        const strategyId = addModal.strategySelect.value;
-        const checklistData = {};
-        STRATEGIES[strategyId].watchlistPhases.forEach(p => p.checks.forEach(c => {
-            checklistData[c.id] = document.getElementById(c.id).checked;
-        }));
-        const newOpportunity = {
-            asset: document.getElementById('asset').value,
-            notes: document.getElementById('notes').value,
-            strategyId: strategyId,
-            strategyName: STRATEGIES[strategyId].name,
-            status: "WATCHING",
-            dateAdded: new Date(),
-            watchlistSetup: checklistData
-        };
-        try {
-            await addDoc(collection(db, 'trades'), newOpportunity);
-            addModal.form.reset();
-            addModal.checklistContainer.innerHTML = '';
-            closeAddModal();
-        } catch (err) { console.error("Erro ao guardar:", err); }
-    }
-
-    // --- LÓGICA DO MODAL "EXECUÇÃO DE TRADE" ---
-    const execModal = {
-        container: document.getElementById('execution-modal'),
-        form: document.getElementById('execution-form'),
-        closeBtn: document.getElementById('close-execution-modal-btn'),
-        assetNameSpan: document.getElementById('execution-asset-name'),
-        strategyNameSpan: document.getElementById('execution-strategy-name'),
-        checklistContainer: document.getElementById('execution-checklist-container'),
-    };
-
-    function openExecModal(trade) {
-        currentTrade = { id: trade.id, strategyId: trade.data.strategyId };
-        execModal.assetNameSpan.textContent = trade.data.asset;
-        execModal.strategyNameSpan.textContent = trade.data.strategyName;
-        generateExecutionChecklist(trade.data.strategyId);
-        execModal.container.style.display = 'flex';
-    }
-    function closeExecModal() { execModal.container.style.display = 'none'; }
-    
-    function generateExecutionChecklist(strategyId) {
+    function generateExecutionChecklist(strategyId, data = {}) {
         execModal.checklistContainer.innerHTML = '';
         if (!strategyId || !STRATEGIES[strategyId]) return;
         const strategy = STRATEGIES[strategyId];
@@ -149,26 +119,53 @@ function runApp() {
             const phaseDiv = document.createElement('div');
             phaseDiv.innerHTML = `<h4>${phase.title}</h4>`;
             if (phase.checks) phase.checks.forEach(check => {
-                const checkDiv = document.createElement('div');
-                checkDiv.className = 'checklist-item';
-                checkDiv.innerHTML = `<input type="checkbox" id="${check.id}" required><label for="${check.id}">${check.label}</label>`;
-                phaseDiv.appendChild(checkDiv);
+                const isChecked = data && data[check.id] ? 'checked' : '';
+                const item = document.createElement('div');
+                item.className = 'checklist-item';
+                item.innerHTML = `<input type="checkbox" id="${check.id}" ${isChecked} required><label for="${check.id}">${check.label}</label>`;
+                phaseDiv.appendChild(item);
             });
             if (phase.inputs) phase.inputs.forEach(input => {
-                const inputDiv = document.createElement('div');
-                inputDiv.className = 'input-item';
-                inputDiv.innerHTML = `<label for="${input.id}">${input.label}</label><input type="${input.type}" id="${input.id}" step="any" required>`;
-                phaseDiv.appendChild(inputDiv);
+                const value = data && data[input.id] ? data[input.id] : '';
+                const item = document.createElement('div');
+                item.className = 'input-item';
+                item.innerHTML = `<label for="${input.id}">${input.label}</label><input type="${input.type}" id="${input.id}" value="${value}" step="any" required>`;
+                phaseDiv.appendChild(item);
             });
             execModal.checklistContainer.appendChild(phaseDiv);
         });
     }
 
+    // --- Handlers de Submissão de Formulários ---
+    async function handleAddSubmit(e) {
+        e.preventDefault();
+        const strategyId = addModal.strategySelect.value;
+        const checklistData = {};
+        STRATEGIES[strategyId].watchlistPhases.forEach(p => p.checks.forEach(c => checklistData[c.id] = document.getElementById(c.id).checked));
+        const tradeData = {
+            asset: document.getElementById('asset').value,
+            notes: document.getElementById('notes').value,
+            strategyId: strategyId,
+            strategyName: STRATEGIES[strategyId].name,
+            status: "WATCHING",
+            watchlistSetup: checklistData
+        };
+        try {
+            if (currentTrade.id) {
+                tradeData.dateAdded = currentTrade.data.dateAdded;
+                await updateDoc(doc(db, 'trades', currentTrade.id), tradeData);
+            } else {
+                tradeData.dateAdded = new Date();
+                await addDoc(collection(db, 'trades'), tradeData);
+            }
+            closeAddModal();
+        } catch (err) { console.error("Erro ao guardar/atualizar oportunidade:", err); }
+    }
+
     async function handleExecSubmit(e) {
         e.preventDefault();
-        const strategy = STRATEGIES[currentTrade.strategyId];
         const executionData = {};
-        strategy.executionPhases.forEach(p => {
+        STRATEGIES[currentTrade.data.strategyId].executionPhases.forEach(p => {
             if (p.checks) p.checks.forEach(c => executionData[c.id] = document.getElementById(c.id).checked);
             if (p.inputs) p.inputs.forEach(i => executionData[i.id] = document.getElementById(i.id).value);
         });
@@ -177,53 +174,12 @@ function runApp() {
             executionDetails: executionData,
             dateExecuted: new Date()
         };
-        const tradeRef = doc(db, 'trades', currentTrade.id);
         try {
-            await updateDoc(tradeRef, updatedTrade);
-            execModal.form.reset();
+            await updateDoc(doc(db, 'trades', currentTrade.id), updatedTrade);
             closeExecModal();
-        } catch (err) { console.error("Erro ao atualizar:", err); }
+        } catch (err) { console.error("Erro ao executar trade:", err); }
     }
 
-    // --- LÓGICA DO MODAL "FECHAR TRADE" ---
-    const closeModalObj = {
-        container: document.getElementById('close-trade-modal'),
-        form: document.getElementById('close-trade-form'),
-        closeBtn: document.getElementById('close-close-trade-modal-btn'),
-        assetNameSpan: document.getElementById('close-trade-asset-name'),
-        exitPriceInput: document.getElementById('exit-price'),
-        pnlInput: document.getElementById('final-pnl'),
-    };
-
-    function openCloseTradeModal(trade) {
-        const details = trade.data.executionDetails;
-        if (!details || !details['entry-price'] || !details['quantity']) {
-            alert("Erro: Faltam detalhes de execução para este trade.");
-            return;
-        }
-        currentTrade = {
-            id: trade.id,
-            entryPrice: parseFloat(details['entry-price']),
-            quantity: parseFloat(details['quantity'])
-        };
-        closeModalObj.assetNameSpan.textContent = trade.data.asset;
-        closeModalObj.container.style.display = 'flex';
-    }
-    function closeCloseTradeModal() {
-        closeModalObj.form.reset();
-        closeModalObj.container.style.display = 'none';
-    }
-    
-    function calculatePnL() {
-        const exitPrice = parseFloat(closeModalObj.exitPriceInput.value);
-        if (!isNaN(exitPrice) && !isNaN(currentTrade.entryPrice) && !isNaN(currentTrade.quantity)) {
-            const pnl = (exitPrice - currentTrade.entryPrice) * currentTrade.quantity;
-            closeModalObj.pnlInput.value = pnl.toFixed(2);
-        } else {
-            closeModalObj.pnlInput.value = '';
-        }
-    }
-    
     async function handleCloseSubmit(e) {
         e.preventDefault();
         const closeDetails = {
@@ -237,22 +193,31 @@ function runApp() {
             closeDetails: closeDetails,
             dateClosed: new Date()
         };
-        const tradeRef = doc(db, 'trades', currentTrade.id);
         try {
-            await updateDoc(tradeRef, updatedTrade);
+            await updateDoc(doc(db, 'trades', currentTrade.id), updatedTrade);
             closeCloseTradeModal();
-        } catch (err) { console.error("Erro ao fechar o trade:", err); }
+        } catch (err) { console.error("Erro ao fechar trade:", err); }
     }
 
-    // --- LÓGICA DE DISPLAY NO DASHBOARD ---
+    // --- Lógica de Cálculo de P&L ---
+    function calculatePnL() {
+        const exitPrice = parseFloat(closeModalObj.exitPriceInput.value);
+        const entryPrice = parseFloat(currentTrade.data?.executionDetails?.['entry-price']);
+        const quantity = parseFloat(currentTrade.data?.executionDetails?.['quantity']);
+        if (!isNaN(exitPrice) && !isNaN(entryPrice) && !isNaN(quantity)) {
+            closeModalObj.pnlInput.value = ((exitPrice - entryPrice) * quantity).toFixed(2);
+        }
+    }
+
+    // --- Lógica de Display do Dashboard ---
     function fetchAndDisplayTrades() {
         const q = query(collection(db, 'trades'), orderBy('dateAdded', 'desc'));
         onSnapshot(q, (snapshot) => {
             watchlistContainer.innerHTML = '<p>Nenhuma oportunidade a ser monitorizada.</p>';
             liveTradesContainer.innerHTML = '<p>Nenhuma operação ativa no momento.</p>';
             let watchingCount = 0, liveCount = 0;
-            snapshot.forEach(doc => {
-                const trade = { id: doc.id, data: doc.data() };
+            snapshot.forEach(docSnapshot => {
+                const trade = { id: docSnapshot.id, data: docSnapshot.data() };
                 const card = createTradeCard(trade);
                 if (trade.data.status === 'WATCHING') {
                     if (watchingCount === 0) watchlistContainer.innerHTML = '';
@@ -270,7 +235,8 @@ function runApp() {
     function createTradeCard(trade) {
         const card = document.createElement('div');
         card.className = 'trade-card';
-        card.innerHTML = `<h3>${trade.data.asset}</h3><p>Estratégia: ${trade.data.strategyName}</p><p>Status: ${trade.data.status}</p><p>Notas: ${trade.data.notes || ''}</p>`;
+        card.innerHTML = `<h3>${trade.data.asset}</h3><p style="color: #0056b3; font-weight: bold;">Estratégia: ${trade.data.strategyName || 'N/A'}</p><p><strong>Status:</strong> ${trade.data.status}</p><p><strong>Notas:</strong> ${trade.data.notes || ''}</p>`;
+        
         if (trade.data.status === 'WATCHING') {
             const button = document.createElement('button');
             button.className = 'trigger-btn';
@@ -280,7 +246,7 @@ function runApp() {
         } else if (trade.data.status === 'LIVE') {
             card.classList.add('live');
             const details = trade.data.executionDetails;
-            if (details) card.innerHTML += `<p>Entrada: ${details['entry-price']} | SL: ${details['stop-loss']}</p>`;
+            if (details) card.innerHTML += `<p><strong>Entrada:</strong> ${details['entry-price'] || 'N/A'} | <strong>Quantidade:</strong> ${details['quantity'] || 'N/A'}</p>`;
             const closeButton = document.createElement('button');
             closeButton.className = 'trigger-btn close-trade-btn';
             closeButton.textContent = 'Fechar Trade';
@@ -290,12 +256,35 @@ function runApp() {
         return card;
     }
 
-    // --- INICIALIZAÇÃO DOS EVENTOS ---
+    // --- Lógica para Edição vinda da página de gestão ---
+    async function loadTradeForEditing() {
+        const tradeId = localStorage.getItem('tradeToEdit');
+        if (!tradeId) return;
+        localStorage.removeItem('tradeToEdit');
+
+        const docSnap = await getDoc(doc(db, 'trades', tradeId));
+        if (docSnap.exists()) {
+            const tradeData = docSnap.data();
+            currentTrade = { id: tradeId, data: tradeData };
+            
+            if (tradeData.status === 'WATCHING') {
+                openAddModal();
+                addModal.strategySelect.value = tradeData.strategyId;
+                generateWatchlistChecklist(tradeData.strategyId, tradeData.watchlistSetup);
+                document.getElementById('asset').value = tradeData.asset;
+                document.getElementById('notes').value = tradeData.notes;
+            } else if (tradeData.status === 'LIVE') {
+                openExecModal({ id: tradeId, data: tradeData });
+            }
+        }
+    }
+
+    // --- Ponto de Entrada: Inicializar Eventos e Funções ---
     document.getElementById('add-opportunity-btn').addEventListener('click', openAddModal);
     addModal.closeBtn.addEventListener('click', closeAddModal);
     addModal.container.addEventListener('click', e => { if (e.target === addModal.container) closeAddModal(); });
     addModal.form.addEventListener('submit', handleAddSubmit);
-    addModal.strategySelect.addEventListener('change', generateWatchlistChecklist);
+    addModal.strategySelect.addEventListener('change', () => generateWatchlistChecklist(addModal.strategySelect.value));
     
     execModal.closeBtn.addEventListener('click', closeExecModal);
     execModal.container.addEventListener('click', e => { if (e.target === execModal.container) closeExecModal(); });
@@ -308,6 +297,7 @@ function runApp() {
     
     populateStrategySelect();
     fetchAndDisplayTrades();
+    loadTradeForEditing();
 }
 
 runApp();
