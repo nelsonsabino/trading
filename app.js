@@ -85,6 +85,7 @@ function runApp() {
     const closeModalObj = { container: document.getElementById('close-trade-modal'), form: document.getElementById('close-trade-form'), closeBtn: document.getElementById('close-close-trade-modal-btn'), assetNameSpan: document.getElementById('close-trade-asset-name'), exitPriceInput: document.getElementById('exit-price'), pnlInput: document.getElementById('final-pnl') };
     const potentialTradesContainer = document.getElementById('potential-trades-container');
     const liveTradesContainer = document.getElementById('live-trades-container');
+    const armedTradesContainer = document.getElementById('armed-trades-container'); 
 
     // --- Funções de Controlo dos Modais ---
     function openAddModal() { if(addModal.container) addModal.container.style.display = 'flex'; }
