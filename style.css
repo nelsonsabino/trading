@@ -250,3 +250,29 @@ nav .nav-link:hover {
     display: block;
     margin-bottom: 0.5rem;
 }
+
+/* ... (estilos existentes) ... */
+
+/* NOVO: Estilos para o layout de 3 colunas do dashboard */
+.dashboard-columns {
+    display: grid;
+    /* Cria 3 colunas com o mesmo tamanho (1fr = 1 fração do espaço disponível) */
+    grid-template-columns: 1fr 1fr 1fr; 
+    gap: 2rem; /* Espaço entre as colunas */
+}
+
+/* Os cards dentro de cada coluna continuarão a ser uma grelha, mas agora vertical */
+#potential-trades-container,
+#armed-trades-container,
+#live-trades-container {
+    display: grid;
+    grid-template-columns: 1fr; /* Força os cards a ficarem um por baixo do outro */
+    gap: 1rem; /* Espaço entre os cards na mesma coluna */
+}
+
+/* Pequeno ajuste no título das colunas */
+.dashboard-columns h2 {
+    border-bottom: 2px solid #eee;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
