@@ -4,8 +4,9 @@ import {
     getFirestore, 
     collection, 
     addDoc, 
-    doc,        // <<< ADICIONADO
-    updateDoc,  // <<< ADICIONADO
+    doc,
+    updateDoc,
+    getDoc,  
     query, 
     where, 
     orderBy, 
