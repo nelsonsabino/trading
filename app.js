@@ -295,9 +295,33 @@ function runApp() {
     closeModalObj.form.addEventListener('submit', handleCloseSubmit);
     closeModalObj.exitPriceInput.addEventListener('input', calculatePnL);
     
+
+    // --- Ponto de Entrada: Inicializar Eventos e Funções ---
+
+    // 1. Inicializa os "ouvintes" de eventos para todos os modais
+    document.getElementById('add-opportunity-btn').addEventListener('click', openAddModal);
+    addModal.closeBtn.addEventListener('click', closeAddModal);
+    addModal.container.addEventListener('click', e => { if (e.target === addModal.container) closeAddModal(); });
+    addModal.form.addEventListener('submit', handleAddSubmit);
+    addModal.strategySelect.addEventListener('change', () => generateWatchlistChecklist(addModal.strategySelect.value));
+    
+    execModal.closeBtn.addEventListener('click', closeExecModal);
+    execModal.container.addEventListener('click', e => { if (e.target === execModal.container) closeExecModal(); });
+    execModal.form.addEventListener('submit', handleExecSubmit);
+
+    closeModalObj.closeBtn.addEventListener('click', closeCloseTradeModal);
+    closeModalObj.container.addEventListener('click', e => { if (e.target === closeModalObj.container) closeCloseTradeModal(); });
+    closeModalObj.form.addEventListener('submit', handleCloseSubmit);
+    closeModalObj.exitPriceInput.addEventListener('input', calculatePnL);
+    
+    // 2. Prepara o formulário de "Adicionar"
     populateStrategySelect();
-    fetchAndDisplayTrades();
-    loadTradeForEditing();
+
+    // 3. Verifica PRIMEIRO se há um pedido de edição
+    loadTradeForEditing().then(() => {
+        // 4. SÓ DEPOIS de a edição ter sido tratada, carrega o resto dos trades
+        fetchAndDisplayTrades();
+    });
 }
 
 runApp();
