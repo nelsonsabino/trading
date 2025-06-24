@@ -50,6 +50,8 @@
         </div>
     </div>
 
+<!-- ... Execution-modal ... -->
+    
     <!-- MUDANÇA: id="execution-modal-container" passou para id="execution-modal" e ganhou a classe "modal-overlay" -->
     <div id="execution-modal" class="modal-overlay">
         <!-- MUDANÇA: a div interior ganhou a classe "modal-content" -->
@@ -64,6 +66,48 @@
         </div>
     </div>
 
-    <script type="module" src="app.js"></script>
+
+
+<!-- NOVO MODAL PARA FECHAR O TRADE -->
+<div id="close-trade-modal" class="modal-overlay">
+    <div class="modal-content">
+        <span id="close-close-trade-modal-btn">×</span>
+        <h3>Fechar Operação: <span id="close-trade-asset-name"></span></h3>
+
+        <form id="close-trade-form">
+            <div class="input-item">
+                <label for="exit-price">Preço de Saída:</label>
+                <input type="number" id="exit-price" step="any" required>
+            </div>
+            <div class="input-item">
+                <label for="final-pnl">Resultado Final (P&L em €):</label>
+                <input type="number" id="final-pnl" step="any" required placeholder="Ex: 150 ou -50">
+            </div>
+            <div class="input-item">
+                <label for="close-reason">Motivo do Fecho:</label>
+                <select id="close-reason" required>
+                    <option value="">-- Selecione o motivo --</option>
+                    <option value="take-profit">Atingiu Take Profit</option>
+                    <option value="stop-loss">Atingiu Stop Loss</option>
+                    <option value="manual-profit">Saída Manual (Lucro)</option>
+                    <option value="manual-loss">Saída Manual (Prejuízo)</option>
+                    <option value="breakeven">Saída no Ponto de Entrada (Break-Even)</option>
+                </select>
+            </div>
+            <div class="input-item">
+                <label for="final-notes">Notas Finais / Lição Aprendida:</label>
+                <textarea id="final-notes" placeholder="Ex: Gestão de risco correta. Deixei o lucro correr até ao alvo."></textarea>
+            </div>
+            
+            <button type="submit">CONFIRMAR E FECHAR TRADE</button>
+        </form>
+    </div>
+</div>
+
+
+<script type="module" src="app.js"></script>
 </body>
 </html>
+
+    
+
