@@ -256,28 +256,80 @@ function runApp() {
         return card;
     }
 
+    
     // --- Lógica para Edição vinda da página de gestão ---
     async function loadTradeForEditing() {
         const tradeId = localStorage.getItem('tradeToEdit');
-        if (!tradeId) return;
+        if (!tradeId) {
+            console.log("Nenhum trade para editar.");
+            return;
+        }
+
+        console.log(`Encontrado pedido para editar o trade com ID: ${tradeId}`);
+        // Limpa o item para não editar novamente por engano
         localStorage.removeItem('tradeToEdit');
 
-        const docSnap = await getDoc(doc(db, 'trades', tradeId));
-        if (docSnap.exists()) {
-            const tradeData = docSnap.data();
-            currentTrade = { id: tradeId, data: tradeData };
-            
-            if (tradeData.status === 'WATCHING') {
-                openAddModal();
-                addModal.strategySelect.value = tradeData.strategyId;
-                generateWatchlistChecklist(tradeData.strategyId, tradeData.watchlistSetup);
-                document.getElementById('asset').value = tradeData.asset;
-                document.getElementById('notes').value = tradeData.notes;
-            } else if (tradeData.status === 'LIVE') {
-                openExecModal({ id: tradeId, data: tradeData });
+        try {
+            const tradeRef = doc(db, 'trades', tradeId);
+            const docSnap = await getDoc(tradeRef);
+
+            if (docSnap.exists()) {
+                const tradeData = docSnap.data();
+                console.log("Dados do trade a editar:", tradeData);
+                
+                // Define o trade atual para que a função de submissão saiba que está a editar
+                currentTrade = { id: tradeId, data: tradeData }; 
+                
+                if (tradeData.status === 'WATCHING') {
+                    console.log("Status é WATCHING. A abrir modal de adição/edição.");
+                    
+                    // 1. Abre o modal
+                    openAddModal();
+
+                    // 2. Pré-seleciona a estratégia no menu dropdown
+                    addModal.strategySelect.value = tradeData.strategyId;
+
+                    // 3. Gera o checklist correspondente a essa estratégia
+                    // O 'dispatchEvent' simula uma mudança manual para garantir que o 'ouvinte' corre
+                    addModal.strategySelect.dispatchEvent(new Event('change'));
+
+                    // 4. Preenche os campos de texto
+                    document.getElementById('asset').value = tradeData.asset;
+                    document.getElementById('notes').value = tradeData.notes;
+
+                    // 5. DEPOIS de o checklist ser gerado, marca os checkboxes
+                    // Usamos um pequeno timeout para garantir que o DOM foi atualizado
+                    setTimeout(() => {
+                        if (tradeData.watchlistSetup) {
+                            Object.keys(tradeData.watchlistSetup).forEach(key => {
+                                const checkbox = document.getElementById(key);
+                                if (checkbox) {
+                                    checkbox.checked = tradeData.watchlistSetup[key];
+                                    console.log(`Checkbox '${key}' marcado como ${checkbox.checked}`);
+                                } else {
+                                    console.warn(`Checkbox com id '${key}' não encontrado.`);
+                                }
+                            });
+                        }
+                    }, 100); // 100ms é geralmente mais que suficiente
+
+                } else if (tradeData.status === 'LIVE') {
+                    console.log("Status é LIVE. A abrir modal de execução.");
+                    openExecModal({ id: tradeId, data: tradeData });
+                }
+
+            } else {
+                console.error("Trade para editar não encontrado na base de dados:", tradeId);
+                alert("O trade que tentou editar não foi encontrado.");
             }
+        } catch (error) {
+            console.error("Erro ao carregar o trade para edição:", error);
+            alert("Ocorreu um erro ao carregar os dados para edição.");
         }
     }
+
+
+    
 
     // --- Ponto de Entrada: Inicializar Eventos e Funções ---
     document.getElementById('add-opportunity-btn').addEventListener('click', openAddModal);
