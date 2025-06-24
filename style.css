@@ -136,69 +136,148 @@ header nav {
 .btn-armed { background-color: #28a745; } /* Botão Executar */
 .btn-live { background-color: #dc3545; } /* Botão Fechar */
 
-/* --- MODAIS - SECÇÃO CORRIGIDA E COMPLETA --- */
+
+
+/* --- MODAIS - SECÇÃO COM RESTYLING COMPLETO --- */
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(33, 37, 41, 0.6); /* Um preto um pouco mais suave */
+    display: none; /* Começam escondidos */
     justify-content: center;
     align-items: center;
-    display: none; /* Começam escondidos */
-    z-index: 1000; /* Garante que fica por cima de tudo */
+    padding: 1rem; /* Padding para evitar que o modal cole nas bordas em ecrãs pequenos */
+    z-index: 1000;
+    box-sizing: border-box;
 }
+
 .modal-content {
     background: #fff;
-    padding: 2rem;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 500px;
+    padding: 2rem 2.5rem; /* Mais padding horizontal */
+    border-radius: 12px; /* Bordas mais arredondadas */
+    width: 100%;
+    max-width: 550px;
     position: relative;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    animation: fadeIn 0.3s ease-out; /* Efeito de entrada suave */
 }
-.modal-content > span { /* Seletor para os botões 'X' */
+
+/* Animação para o modal aparecer */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Botão de fechar 'X' */
+.modal-content > span[id^="close-"] { /* Seletor mais específico para todos os 'X' */
     position: absolute;
-    top: 10px;
-    right: 20px;
-    font-size: 2em;
-    font-weight: bold;
+    top: 15px;
+    right: 25px;
+    font-size: 2.5rem;
+    color: #adb5bd;
+    font-weight: 300;
     cursor: pointer;
     line-height: 1;
+    transition: color 0.2s;
+}
+.modal-content > span[id^="close-"]:hover {
+    color: #495057;
+}
+
+/* Títulos dentro do modal */
+.modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: #212529;
+}
+
+/* Sub-títulos/parágrafos (como o nome da estratégia) */
+.modal-content p {
+    margin-top: 0;
+    margin-bottom: 2rem;
+    color: #6c757d;
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 1rem;
+}
+
+/* Fases do Checklist */
+.modal-content h4 {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    color: #007bff;
 }
 
 /* Estilos para os items dentro dos formulários dos modais */
 .input-item {
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
 }
 .input-item label, .radio-group > label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     font-weight: 500;
+    color: #495057;
 }
 .input-item input, .input-item select, .input-item textarea {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
+    font-size: 1rem;
     border: 1px solid #ced4da;
-    border-radius: 4px;
+    border-radius: 6px;
     box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
+.input-item input:focus, .input-item select:focus, .input-item textarea:focus {
+    outline: none;
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
 .checklist-item {
     display: flex;
     align-items: center;
-    margin-bottom: 0.75rem;
+    margin-bottom: 1rem;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
 }
 .checklist-item input {
-    margin-right: 10px;
-    transform: scale(1.1);
+    margin-right: 12px;
+    transform: scale(1.2);
+    flex-shrink: 0;
 }
+.checklist-item label {
+    line-height: 1.4;
+}
+
 .radio-group {
-    margin-top: 1rem;
+    margin-top: 1.5rem;
     padding: 1rem;
     border: 1px solid #e9ecef;
-    border-radius: 4px;
+    border-radius: 6px;
 }
+
+/* Botão de submissão do formulário do modal */
+.modal-content form button[type="submit"] {
+    width: 100%;
+    padding: 14px;
+    margin-top: 1.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    background-color: #28a745; /* Verde para ação positiva */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.modal-content form button[type="submit"]:hover {
+    background-color: #218838;
+}
+
 
 /* --- RESPONSIVIDADE --- */
 @media (max-width: 992px) {
