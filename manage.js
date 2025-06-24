@@ -3,15 +3,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebas
 import { 
     getFirestore, 
     collection, 
-    addDoc, 
-    doc,        // <<< ADICIONADO
-    updateDoc,  // <<< ADICIONADO
+    doc, 
+    deleteDoc, 
     query, 
-    where, 
     orderBy, 
-    onSnapshot 
+    onSnapshot
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
-
 
 // A sua configuração da web app do Firebase
 const firebaseConfig = {
@@ -23,7 +20,6 @@ const firebaseConfig = {
   appId: "1:782074719077:web:05c07a2b81b0047ef5cf8c"
 };
 
-
 // Inicializa o Firebase e o Firestore
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -32,20 +28,22 @@ const db = getFirestore(app);
 
 
 
+
+
 function runManagePage() {
     const tableBody = document.getElementById('trades-table-body');
-    if (!tableBody) return;
+    if (!tableBody) {
+        console.error("Elemento 'trades-table-body' não encontrado. Verifique o seu HTML.");
+        return;
+    }
 
     // Função para apagar um trade
     async function deleteTrade(tradeId) {
-        // CONFIRMAÇÃO ESSENCIAL PARA EVITAR ERROS
         if (!confirm("Tem a certeza que quer apagar este trade? Esta ação é irreversível.")) {
             return;
         }
-
         try {
-            const tradeRef = doc(db, 'trades', tradeId);
-            await deleteDoc(tradeRef);
+            await deleteDoc(doc(db, 'trades', tradeId));
             console.log("Trade apagado com sucesso:", tradeId);
         } catch (error) {
             console.error("Erro ao apagar o trade:", error);
@@ -53,14 +51,16 @@ function runManagePage() {
         }
     }
 
-    // Função para buscar e mostrar todos os trades
+    // Função para buscar e mostrar todos os trades (MAIS ROBUSTA)
     function fetchAndDisplayAllTrades() {
         const q = query(collection(db, 'trades'), orderBy('dateAdded', 'desc'));
 
         onSnapshot(q, (snapshot) => {
-            tableBody.innerHTML = ''; // Limpa a tabela
+            console.log(`Recebidos ${snapshot.size} documentos do Firebase.`); // Diagnóstico
+            tableBody.innerHTML = ''; 
+            
             if (snapshot.empty) {
-                tableBody.innerHTML = '<tr><td colspan="6">Nenhum trade encontrado.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="6">Nenhum trade encontrado na base de dados.</td></tr>';
                 return;
             }
 
@@ -69,32 +69,58 @@ function runManagePage() {
                 const tr = document.createElement('tr');
                 tr.setAttribute('data-id', doc.id);
 
-                // Formatar a data para ser mais legível
-                const date = trade.dateAdded.toDate().toLocaleString('pt-PT');
+                // --- Verificações de segurança para cada campo ---
+                const asset = trade.asset || 'N/A';
+                const strategyName = trade.strategyName || 'N/A';
+                const status = trade.status || 'UNKNOWN';
                 
-                // Obter o P&L se o trade estiver fechado
-                const pnl = trade.status === 'CLOSED' ? (trade.closeDetails?.pnl || 'N/A') : '-';
+                // Verificação segura para a data
+                let dateStr = 'Data inválida';
+                if (trade.dateAdded && typeof trade.dateAdded.toDate === 'function') {
+                    dateStr = trade.dateAdded.toDate().toLocaleString('pt-PT', { 
+                        day: '2-digit', 
+                        month: '2-digit', 
+                        year: 'numeric', 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                    });
+                }
+                
+                // Verificação segura para o P&L
+                const pnl = trade.status === 'CLOSED' ? (trade.closeDetails?.pnl || '0.00') : '-';
 
                 tr.innerHTML = `
-                    <td>${trade.asset}</td>
-                    <td>${trade.strategyName || 'N/A'}</td>
-                    <td><span class="status-badge status-${trade.status.toLowerCase()}">${trade.status}</span></td>
-                    <td>${date}</td>
+                    <td>${asset}</td>
+                    <td>${strategyName}</td>
+                    <td><span class="status-badge status-${status.toLowerCase()}">${status}</span></td>
+                    <td>${dateStr}</td>
                     <td>${pnl}</td>
                     <td><button class="delete-btn">Apagar</button></td>
                 `;
 
                 // Adicionar o evento de clique ao botão de apagar
                 const deleteButton = tr.querySelector('.delete-btn');
-                deleteButton.addEventListener('click', () => deleteTrade(doc.id));
-
+                if (deleteButton) {
+                    deleteButton.addEventListener('click', (e) => {
+                        e.stopPropagation(); // Previne outros eventos
+                        deleteTrade(doc.id);
+                    });
+                }
+                
                 tableBody.appendChild(tr);
             });
+        }, (error) => {
+            // Este bloco corre se houver um erro na ligação com o Firebase (ex: regras, índices)
+            console.error("Erro no onSnapshot do Firebase:", error);
+            tableBody.innerHTML = `<tr><td colspan="6" style="color: red;">Erro ao carregar os dados. Verifique a consola para mais detalhes.</td></tr>`;
         });
     }
 
     // Iniciar a página
     fetchAndDisplayAllTrades();
+}
+
+runManagePage();
 }
 
 runManagePage();
