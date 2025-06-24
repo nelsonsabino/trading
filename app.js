@@ -117,23 +117,24 @@ function runApp() {
         }
     }
     
-    function generateWatchlistChecklist(strategyId, data = {}) {
-        addModal.checklistContainer.innerHTML = '';
-        if (!strategyId || !STRATEGIES[strategyId]) return;
-        const strategy = STRATEGIES[strategyId];
-        strategy.watchlistPhases.forEach(phase => {
-            const phaseDiv = document.createElement('div');
-            phaseDiv.innerHTML = `<h4>${phase.title}</h4>`;
-            phase.checks.forEach(check => {
-                const isChecked = data[check.id] ? 'checked' : '';
-                const item = document.createElement('div');
-                item.className = 'checklist-item';
-                item.innerHTML = `<input type="checkbox" id="${check.id}" ${isChecked} required><label for="${check.id}">${check.label}</label>`;
-                phaseDiv.appendChild(item);
-            });
-            addModal.checklistContainer.appendChild(phaseDiv);
+function generateWatchlistChecklist(strategyId, data = {}) {
+    addModal.checklistContainer.innerHTML = '';
+    if (!strategyId || !STRATEGIES[strategyId]) return;
+    const strategy = STRATEGIES[strategyId];
+    // ALTERAÇÃO AQUI: Usa potentialPhases
+    strategy.potentialPhases.forEach(phase => { 
+        const phaseDiv = document.createElement('div');
+        phaseDiv.innerHTML = `<h4>${phase.title}</h4>`;
+        phase.checks.forEach(check => {
+            const isChecked = data[check.id] ? 'checked' : '';
+            const item = document.createElement('div');
+            item.className = 'checklist-item';
+            item.innerHTML = `<input type="checkbox" id="${check.id}" ${isChecked} required><label for="${check.id}">${check.label}</label>`;
+            phaseDiv.appendChild(item);
         });
-    }
+        addModal.checklistContainer.appendChild(phaseDiv);
+    });
+}
 
     function generateExecutionChecklist(strategyId, data = {}) {
         execModal.checklistContainer.innerHTML = '';
@@ -161,30 +162,35 @@ function runApp() {
     }
 
     // --- Handlers de Submissão de Formulários ---
-    async function handleAddSubmit(e) {
-        e.preventDefault();
-        const strategyId = addModal.strategySelect.value;
-        const checklistData = {};
-        STRATEGIES[strategyId].watchlistPhases.forEach(p => p.checks.forEach(c => checklistData[c.id] = document.getElementById(c.id).checked));
-        const tradeData = {
-            asset: document.getElementById('asset').value,
-            notes: document.getElementById('notes').value,
-            strategyId: strategyId,
-            strategyName: STRATEGIES[strategyId].name,
-            status: "WATCHING",
-            watchlistSetup: checklistData
-        };
-        try {
-            if (currentTrade.id) {
-                tradeData.dateAdded = currentTrade.data.dateAdded;
-                await updateDoc(doc(db, 'trades', currentTrade.id), tradeData);
-            } else {
-                tradeData.dateAdded = new Date();
-                await addDoc(collection(db, 'trades'), tradeData);
-            }
-            closeAddModal();
-        } catch (err) { console.error("Erro ao guardar/atualizar oportunidade:", err); }
-    }
+ async function handleAddSubmit(e) {
+    e.preventDefault();
+    const strategyId = addModal.strategySelect.value;
+    const checklistData = {};
+    // ALTERAÇÃO AQUI: Usa potentialPhases
+    STRATEGIES[strategyId].potentialPhases.forEach(p => p.checks.forEach(c => checklistData[c.id] = document.getElementById(c.id).checked));
+    
+    const tradeData = {
+        asset: document.getElementById('asset').value,
+        notes: document.getElementById('notes').value,
+        strategyId: strategyId,
+        strategyName: STRATEGIES[strategyId].name,
+        status: "POTENTIAL", // ALTERAÇÃO AQUI
+        potentialSetup: checklistData, // ALTERAÇÃO AQUI
+    };
+    try {
+        if (currentTrade.id) {
+            // Manter a data original ao editar
+            tradeData.dateAdded = currentTrade.data.dateAdded; 
+            await updateDoc(doc(db, 'trades', currentTrade.id), tradeData);
+        } else {
+            tradeData.dateAdded = new Date();
+            await addDoc(collection(db, 'trades'), tradeData);
+        }
+        closeAddModal();
+    } catch (err) { console.error("Erro ao guardar/atualizar oportunidade:", err); }
+}
+
+    
 
     async function handleExecSubmit(e) {
         e.preventDefault();
