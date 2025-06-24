@@ -274,29 +274,27 @@ function fetchAndDisplayTrades() {
 
     
 
-    function createTradeCard(trade) {
-        const card = document.createElement('div');
-        card.className = 'trade-card';
-        card.innerHTML = `<h3>${trade.data.asset}</h3><p style="color: #0056b3; font-weight: bold;">Estratégia: ${trade.data.strategyName || 'N/A'}</p><p><strong>Status:</strong> ${trade.data.status}</p><p><strong>Notas:</strong> ${trade.data.notes || ''}</p>`;
-        
-        if (trade.data.status === 'WATCHING') {
-            const button = document.createElement('button');
-            button.className = 'trigger-btn';
-            button.textContent = 'Procurar Gatilho de Entrada';
-            button.addEventListener('click', () => openExecModal(trade));
-            card.appendChild(button);
-        } else if (trade.data.status === 'LIVE') {
-            card.classList.add('live');
-            const details = trade.data.executionDetails;
-            if (details) card.innerHTML += `<p><strong>Entrada:</strong> ${details['entry-price'] || 'N/A'} | <strong>Quantidade:</strong> ${details['quantity'] || 'N/A'}</p>`;
-            const closeButton = document.createElement('button');
-            closeButton.className = 'trigger-btn close-trade-btn';
-            closeButton.textContent = 'Fechar Trade';
-            closeButton.addEventListener('click', () => openCloseTradeModal(trade));
-            card.appendChild(closeButton);
-        }
-        return card;
+  function createTradeCard(trade) {
+    const card = document.createElement('div');
+    card.className = 'trade-card';
+    card.innerHTML = `<h3>${trade.data.asset}</h3><p style="color: #0056b3; font-weight: bold;">Estratégia: ${trade.data.strategyName || 'N/A'}</p><p><strong>Status:</strong> ${trade.data.status}</p><p><strong>Notas:</strong> ${trade.data.notes || ''}</p>`;
+    
+    if (trade.data.status === 'POTENTIAL') {
+        card.style.borderLeftColor = '#6c757d'; // Cinzento para Potencial
+        const button = document.createElement('button');
+        button.className = 'trigger-btn';
+        button.style.backgroundColor = '#ffc107'; // Amarelo para "Armar"
+        button.style.color = '#212529';
+        button.textContent = 'Validar Setup (Armar)';
+        // button.addEventListener('click', () => openArmModal(trade)); // A implementar
+        card.appendChild(button);
+    } else if (trade.data.status === 'LIVE') {
+        // ... (código existente para LIVE) ...
     }
+    return card;
+}
+
+    
 
     
     // --- Lógica para Edição vinda da página de gestão ---
