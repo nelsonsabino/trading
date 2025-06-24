@@ -63,4 +63,28 @@ h2 { color: #0056b3; }
     border-left-color: #28a745; /* Verde para "Live" */
 }
 
-/* Outros estilos ... */
+
+/* Estilo genérico para os items de input nos modais */
+.input-item {
+    margin-bottom: 1rem;
+}
+.input-item label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+.input-item input,
+.input-item select,
+.input-item textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box; /* Garante que o padding não aumenta a largura total */
+}
+
+/* Estilo para o botão de fechar nos cards */
+.trade-card .close-trade-btn {
+    background-color: #dc3545; /* Vermelho para ação de fecho */
+    margin-top: 5px;
+}
