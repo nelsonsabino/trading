@@ -291,37 +291,43 @@ function runApp() {
     }
     function createTradeCard(trade) {
         const card = document.createElement('div');
-        card.className = 'trade-card';
-        card.innerHTML = `<h3>${trade.data.asset}</h3><p style="color: #0056b3; font-weight: bold;">Estratégia: ${trade.data.strategyName || 'N/A'}</p><p><strong>Status:</strong> ${trade.data.status}</p><p><strong>Notas:</strong> ${trade.data.notes || ''}</p>`;
+        card.className = 'trade-card'; // Classe base
+        card.innerHTML = `<h3>${trade.data.asset}</h3><p style="color: #007bff; font-weight: 500;">Estratégia: ${trade.data.strategyName || 'N/A'}</p><p><strong>Status:</strong> ${trade.data.status}</p><p><strong>Notas:</strong> ${trade.data.notes || ''}</p>`;
         
+        let button; // Variável para o botão
+
         if (trade.data.status === 'POTENTIAL') {
-            card.style.borderLeftColor = '#6c757d';
-            const button = document.createElement('button');
-            button.className = 'trigger-btn';
-            button.style.backgroundColor = '#ffc107';
-            button.style.color = '#212529';
+            button = document.createElement('button');
+            // USA NOVAS CLASSES
+            button.className = 'trigger-btn btn-potential'; 
             button.textContent = 'Validar Setup (Armar)';
             button.addEventListener('click', () => openArmModal(trade));
-            card.appendChild(button);
         } else if (trade.data.status === 'ARMED') {
             card.classList.add('armed');
-            const button = document.createElement('button');
-            button.className = 'trigger-btn';
+            button = document.createElement('button');
+            // USA NOVAS CLASSES
+            button.className = 'trigger-btn btn-armed';
             button.textContent = 'Executar Gatilho';
             button.addEventListener('click', () => openExecModal(trade));
-            card.appendChild(button);
         } else if (trade.data.status === 'LIVE') {
             card.classList.add('live');
             const details = trade.data.executionDetails;
             if (details) card.innerHTML += `<p><strong>Entrada:</strong> ${details['entry-price'] || 'N/A'} | <strong>Quantidade:</strong> ${details['quantity'] || 'N/A'}</p>`;
-            const closeButton = document.createElement('button');
-            closeButton.className = 'trigger-btn close-trade-btn';
-            closeButton.textContent = 'Fechar Trade';
-            closeButton.addEventListener('click', () => openCloseTradeModal(trade));
-            card.appendChild(closeButton);
+            
+            button = document.createElement('button');
+            // USA NOVAS CLASSES
+            button.className = 'trigger-btn btn-live'; 
+            button.textContent = 'Fechar Trade';
+            button.addEventListener('click', () => openCloseTradeModal(trade));
         }
-        return card;
+        
+        if (button) {
+            card.appendChild(button);
+        }
+
+        return card;    
     }
+    
     async function loadTradeForEditing() {
         const tradeId = localStorage.getItem('tradeToEdit');
         if (!tradeId) return;
