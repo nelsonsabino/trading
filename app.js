@@ -114,15 +114,63 @@ function runApp() {
     const armedTradesContainer = document.getElementById('armed-trades-container');
     const liveTradesContainer = document.getElementById('live-trades-container');
 
-    // --- Funções de Controlo dos Modais ---
-    function openAddModal() { if(addModal.container) addModal.container.style.display = 'flex'; }
-    function closeAddModal() { if(addModal.container) { addModal.container.style.display = 'none'; addModal.form.reset(); addModal.checklistContainer.innerHTML = ''; currentTrade = {}; } }
-    function openArmModal(trade) { currentTrade = { id: trade.id, data: trade.data }; armModal.assetNameSpan.textContent = trade.data.asset; armModal.strategyNameSpan.textContent = trade.data.strategyName; generateDynamicChecklist(armModal.checklistContainer, STRATEGIES[trade.data.strategyId]?.armedPhases); if(armModal.container) armModal.container.style.display = 'flex'; }
-    function closeArmModal() { if(armModal.container) { armModal.container.style.display = 'none'; armModal.form.reset(); currentTrade = {}; } }
-    function openExecModal(trade) { currentTrade = { id: trade.id, data: trade.data }; execModal.assetNameSpan.textContent = trade.data.asset; execModal.strategyNameSpan.textContent = trade.data.strategyName; generateDynamicChecklist(execModal.checklistContainer, [...(STRATEGIES[trade.data.strategyId]?.executionPhases || []), GESTAO_PADRAO], trade.data.executionDetails); if(execModal.container) execModal.container.style.display = 'flex'; }
-    function closeExecModal() { if(execModal.container) { execModal.container.style.display = 'none'; execModal.form.reset(); currentTrade = {}; } }
-    function openCloseTradeModal(trade) { currentTrade = { id: trade.id, data: trade.data }; closeModalObj.assetNameSpan.textContent = trade.data.asset; if(closeModalObj.container) closeModalObj.container.style.display = 'flex'; }
-    function closeCloseTradeModal() { if(closeModalObj.container) { closeModalObj.container.style.display = 'none'; closeModalObj.form.reset(); currentTrade = {}; } }
+// --- Funções de Controlo dos Modais (Versão Corrigida) ---
+    function openAddModal() {
+        if(addModal.container) {
+            addModal.container.style.display = 'flex';
+        }
+    }
+    function closeAddModal() {
+        if(addModal.container) {
+            addModal.container.style.display = 'none';
+            addModal.form.reset();
+            addModal.checklistContainer.innerHTML = '';
+            currentTrade = {};
+        }
+    }
+    
+    function openArmModal(trade) {
+        currentTrade = { id: trade.id, data: trade.data };
+        armModal.assetNameSpan.textContent = trade.data.asset;
+        armModal.strategyNameSpan.textContent = trade.data.strategyName;
+        generateDynamicChecklist(armModal.checklistContainer, STRATEGIES[trade.data.strategyId]?.armedPhases, trade.data.armedSetup);
+        if(armModal.container) armModal.container.style.display = 'flex';
+    }
+    function closeArmModal() {
+        if(armModal.container) {
+            armModal.container.style.display = 'none';
+            armModal.form.reset();
+            currentTrade = {};
+        }
+    }
+
+    function openExecModal(trade) {
+        currentTrade = { id: trade.id, data: trade.data };
+        execModal.assetNameSpan.textContent = trade.data.asset;
+        execModal.strategyNameSpan.textContent = trade.data.strategyName;
+        generateDynamicChecklist(execModal.checklistContainer, [...(STRATEGIES[trade.data.strategyId]?.executionPhases || []), GESTAO_PADRAO], trade.data.executionDetails);
+        if(execModal.container) execModal.container.style.display = 'flex';
+    }
+    function closeExecModal() {
+        if(execModal.container) {
+            execModal.container.style.display = 'none';
+            execModal.form.reset();
+            currentTrade = {};
+        }
+    }
+
+    function openCloseTradeModal(trade) {
+        currentTrade = { id: trade.id, data: trade.data };
+        closeModalObj.assetNameSpan.textContent = trade.data.asset;
+        if(closeModalObj.container) closeModalObj.container.style.display = 'flex';
+    }
+    function closeCloseTradeModal() {
+        if(closeModalObj.container) {
+            closeModalObj.container.style.display = 'none';
+            closeModalObj.form.reset();
+            currentTrade = {};
+        }
+    }
 
     // --- Geradores de Checklist Dinâmicos ---
     function createChecklistItem(check, data) {
