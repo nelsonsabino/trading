@@ -28,6 +28,13 @@
     <div id="potential-trades-container"></div>
 </section>
 
+
+        <section class="armed-trades">
+    <h2>Setups Armados (Validação de 4h OK)</h2>
+    <div id="armed-trades-container"></div>
+</section>
+        
+
         <section class="live-trades">
             <h2>Operações Ativas (Live)</h2>
             <div id="live-trades-container"></div>
@@ -109,6 +116,23 @@
     </div>
 </div>
 
+
+
+<!-- MODAL PARA ARMAR O TRADE -->
+<div id="arm-trade-modal" class="modal-overlay">
+    <div class="modal-content">
+        <span id="close-arm-trade-modal-btn">×</span>
+        <h3>Validar e Armar Setup: <span id="arm-trade-asset-name"></span></h3>
+        <p>Estratégia: <span id="arm-trade-strategy-name"></span></p>
+
+        <form id="arm-trade-form">
+            <div id="arm-checklist-container"></div>
+            <button type="submit">ARMAR TRADE</button>
+        </form>
+    </div>
+</div>
+    
+    
 
 <script type="module" src="app.js"></script>
 </body>
