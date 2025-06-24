@@ -156,3 +156,24 @@ nav .nav-link:hover {
 .status-badge.status-watching { background-color: #007bff; }
 .status-badge.status-live { background-color: #28a745; }
 .status-badge.status-closed { background-color: #6c757d; }
+
+
+
+#trades-table .edit-btn {
+    background-color: #ffc107; /* Amarelo para edição */
+    color: #212529;
+    margin-right: 5px; /* Espaço entre os botões */
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+#trades-table .edit-btn:hover {
+    background-color: #e0a800;
+}
+
+/* Um wrapper para os botões de ação na tabela */
+.action-buttons {
+    display: flex;
+    gap: 5px;
+}
