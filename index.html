@@ -23,23 +23,31 @@
             <button id="add-opportunity-btn">Adicionar Nova Oportunidade</button>
         </section>
 
-<section class="potential-trades">
-    <h2>Trades Potenciais (Análise Macro)</h2>
-    <div id="potential-trades-container"></div>
-</section>
+        <!-- NOVO: Wrapper para as colunas do dashboard -->
+        <div class="dashboard-columns">
 
+            <section class="potential-trades">
+                <h2>Potencial</h2>
+                <div id="potential-trades-container">
+                    <p>A carregar...</p>
+                </div>
+            </section>
+    
+            <section class="armed-trades">
+                <h2>Armado</h2>
+                <div id="armed-trades-container">
+                    <p>A carregar...</p>
+                </div>
+            </section>
+    
+            <section class="live-trades">
+                <h2>Ativo</h2>
+                <div id="live-trades-container">
+                    <p>A carregar...</p>
+                </div>
+            </section>
 
-        <section class="armed-trades">
-    <h2>Setups Armados (Validação de 4h OK)</h2>
-    <div id="armed-trades-container"></div>
-</section>
-        
-
-        <section class="live-trades">
-            <h2>Operações Ativas (Live)</h2>
-            <div id="live-trades-container"></div>
-        </section>
-    </main>
+        </div> 
 
     <!-- MUDANÇA: id="modal-container" passou para id="add-opportunity-modal" e ganhou a classe "modal-overlay" -->
     <div id="add-opportunity-modal" class="modal-overlay">
