@@ -86,6 +86,7 @@ function runApp() {
     const potentialTradesContainer = document.getElementById('potential-trades-container');
     const liveTradesContainer = document.getElementById('live-trades-container');
     const armedTradesContainer = document.getElementById('armed-trades-container'); 
+    
 
     // --- Funções de Controlo dos Modais ---
     function openAddModal() { if(addModal.container) addModal.container.style.display = 'flex'; }
