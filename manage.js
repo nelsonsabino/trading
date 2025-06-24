@@ -30,6 +30,7 @@ const db = getFirestore(app);
 
 
 
+
 function runManagePage() {
     const tableBody = document.getElementById('trades-table-body');
     if (!tableBody) {
@@ -56,7 +57,7 @@ function runManagePage() {
         const q = query(collection(db, 'trades'), orderBy('dateAdded', 'desc'));
 
         onSnapshot(q, (snapshot) => {
-            console.log(`Recebidos ${snapshot.size} documentos do Firebase.`); // Diagnóstico
+            console.log(`Recebidos ${snapshot.size} documentos do Firebase.`);
             tableBody.innerHTML = ''; 
             
             if (snapshot.empty) {
@@ -64,29 +65,24 @@ function runManagePage() {
                 return;
             }
 
-            snapshot.forEach(doc => {
-                const trade = doc.data();
+            snapshot.forEach(docSnapshot => { // Renomeado para evitar conflito com a função 'doc'
+                const trade = docSnapshot.data();
                 const tr = document.createElement('tr');
-                tr.setAttribute('data-id', doc.id);
+                tr.setAttribute('data-id', docSnapshot.id);
 
                 // --- Verificações de segurança para cada campo ---
                 const asset = trade.asset || 'N/A';
                 const strategyName = trade.strategyName || 'N/A';
                 const status = trade.status || 'UNKNOWN';
                 
-                // Verificação segura para a data
                 let dateStr = 'Data inválida';
                 if (trade.dateAdded && typeof trade.dateAdded.toDate === 'function') {
                     dateStr = trade.dateAdded.toDate().toLocaleString('pt-PT', { 
-                        day: '2-digit', 
-                        month: '2-digit', 
-                        year: 'numeric', 
-                        hour: '2-digit', 
-                        minute: '2-digit' 
+                        day: '2-digit', month: '2-digit', year: 'numeric', 
+                        hour: '2-digit', minute: '2-digit' 
                     });
                 }
                 
-                // Verificação segura para o P&L
                 const pnl = trade.status === 'CLOSED' ? (trade.closeDetails?.pnl || '0.00') : '-';
 
                 tr.innerHTML = `
@@ -98,21 +94,19 @@ function runManagePage() {
                     <td><button class="delete-btn">Apagar</button></td>
                 `;
 
-                // Adicionar o evento de clique ao botão de apagar
                 const deleteButton = tr.querySelector('.delete-btn');
                 if (deleteButton) {
                     deleteButton.addEventListener('click', (e) => {
-                        e.stopPropagation(); // Previne outros eventos
-                        deleteTrade(doc.id);
+                        e.stopPropagation();
+                        deleteTrade(docSnapshot.id);
                     });
                 }
                 
                 tableBody.appendChild(tr);
             });
         }, (error) => {
-            // Este bloco corre se houver um erro na ligação com o Firebase (ex: regras, índices)
             console.error("Erro no onSnapshot do Firebase:", error);
-            tableBody.innerHTML = `<tr><td colspan="6" style="color: red;">Erro ao carregar os dados. Verifique a consola para mais detalhes.</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="6" style="color: red;">Erro ao carregar os dados. Verifique a consola.</td></tr>`;
         });
     }
 
@@ -120,7 +114,5 @@ function runManagePage() {
     fetchAndDisplayAllTrades();
 }
 
-runManagePage();
-}
-
+// Ponto de entrada da aplicação da página
 runManagePage();
