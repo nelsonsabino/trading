@@ -50,6 +50,7 @@ const STRATEGIES = {
             { title: "Fase 3: Gatilho (5m/15m)", checks: [{ id: "exec-check-candle-confirm", label: "Candle de confirmação fechado?", required: true }] }
         ]
     },
+    
     'zona-interesse': {
         name: "Preço em Zona de Interesse",
         potentialPhases: [
@@ -59,6 +60,8 @@ const STRATEGIES = {
                   { id: "pot-zi-suporte", label: "Preço está em zona de suporte?", required: true },
                   { id: "pot-zi-ema50", label: "EMA50 a suportar ou com espaço?", required: true },
                   { id: "pot-zi-divergencia", label: "Divergência bullish nos indicadores?", required: false }
+                  { id: "pot-zi-alarme", label: "Algum alarme foi colocado?", required: true }
+              ] 
               ]
             }
         ],
