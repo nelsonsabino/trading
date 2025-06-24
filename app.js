@@ -44,6 +44,7 @@ const STRATEGIES = {
                 { id: "entry-price", label: "Preço de Entrada:", type: "number" },
                 { id: "stop-loss", label: "Stop-Loss:", type: "number" },
                 { id: "take-profit", label: "Take-Profit:", type: "number" }
+                { id: "quantity", label: "Quantidade (Ex: 0.5 BTC, 100 ADA):", type: "number" }
             ]}
         ]
     } 
