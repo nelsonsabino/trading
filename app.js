@@ -33,45 +33,45 @@ const db = getFirestore(app);
 
 
 
+/* ------------ STRATEGIES ------------ */
+
 const STRATEGIES = {
-    'rsi-suporte-triplo': {
-        name: "3º Toque Suporte RSI",
+    'impulso-pos-reset': { // O ID da sua estratégia original
+        name: "Impulso Pós-Reset",
         
-        // Fases para passar de NADA -> POTENTIAL
+        // Fases para passar de NADA -> POTENTIAL (Análise Macro)
         potentialPhases: [
-            { title: "Análise Macro Inicial (4h/Diário)", checks: [
-                { id: "check-divergencia", label: "Existem divergências Bullish?" },
-                { id: "check-suporte-macro", label: "Preço em zona de suporte macro?" },
-                { id: "check-ema50", label: "EMA 50 a suportar ou com espaço para subir?" }
+            { title: "Fase 0: Filtro de Contexto Cripto", checks: [
+                { id: "check-btc", label: "Direção do BTC favorável?" },
+                { id: "check-vol", label: "Volume/Liquidez OK?" }
+            ]},
+            { title: "Fase 1: Filtro Macro (4h/Diário)", checks: [
+                { id: "check-macro-stoch", label: "Estocástico a resetar?" },
+                { id: "check-macro-structure", label: "Estrutura de preço favorável?" }
             ]}
         ],
         
-        // Fases para passar de POTENTIAL -> ARMED
+        // Fases para passar de POTENTIAL -> ARMED (a implementar no próximo passo)
         armedPhases: [
             { title: "Validação do Setup (4h)", checks: [
-                { id: "check-rsi-ma", label: "RSI > RSI-MA? (Obrigatório)" },
-                { id: "check-stoch-cross", label: "Stochastic baixo e a cruzar Bullish? (Obrigatório)" },
-                { id: "check-ltb", label: "Preço quebrou LTB ou tem espaço?" },
-                { id: "check-frvp-vah", label: "Preço NÃO está no limite do VAH?" },
-                { id: "check-frvp-val", label: "Preço está perto/na base do VAL? (Aumenta Prob.)" },
-                { id: "check-rsi-suporte", label: "RSI a fazer 3º toque no suporte? (Aumenta Prob.)" },
-                { id: "check-rsi-hh", label: "RSI está a fazer Higher Lows?" }
+                { id: "armed-check-rsi-ma", label: "RSI > RSI-MA? (Obrigatório)" },
+                { id: "armed-check-stoch-cross", label: "Stochastic baixo e a cruzar Bullish? (Obrigatório)" }
             ]}
         ],
         
-        // Fases para passar de ARMED -> LIVE
+        // Fases para passar de ARMED -> LIVE (já existentes, sem alterações na estrutura)
         executionPhases: [
-            { title: "Gatilho de Precisão (TF Inferior)", checks: [
-                { id: "exec-rsi-resistencia-break", label: "RSI quebrou a sua linha de resistência?" },
-                { id: "exec-frvp-stoch-reset", label: "Preço na base FRVP local + Stoch reset? (Comprar)" }
-            ]},
-            { title: "Plano de Gestão", inputs: [
+            { title: "Fase 2: Setup de Entrada (1H)", checks: [{ id: "exec-check-structure-break", label: "Estrutura de curto prazo quebrada?" },{ id: "exec-check-volume-increase", label: "Volume a confirmar?" }] },
+            { title: "Fase 3: Gatilho (5m/15m)", checks: [{ id: "exec-check-candle-confirm", label: "Candle de confirmação fechado?" }] },
+            { title: "Fase 4: Plano de Gestão", inputs: [
                 { id: "entry-price", label: "Preço de Entrada:", type: "number" },
-                { id: "quantity", label: "Quantidade:", type: "number" },
-                // ... etc
+                { id: "stop-loss", label: "Stop-Loss:", type: "number" },
+                { id: "take-profit", label: "Take-Profit:", type: "number" },
+                { id: "quantity", label: "Quantidade:", type: "number" }
             ]}
         ]
-    }
+    } 
+    // ... adicione outras estratégias aqui
 };
 
 
