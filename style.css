@@ -177,3 +177,52 @@ nav .nav-link:hover {
     display: flex;
     gap: 5px;
 }
+
+
+
+
+
+
+/* Estilos para a Página de Estatísticas */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.stat-card {
+    background-color: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    text-align: center;
+}
+
+.stat-card h4 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: #6c757d;
+    font-size: 1em;
+}
+
+.stat-card p {
+    margin: 0;
+    font-size: 2em;
+    font-weight: bold;
+    color: #343a40;
+}
+
+/* Cores para valores de P&L */
+.pnl-value.positive-pnl { color: #28a745; }
+.pnl-value.negative-pnl { color: #dc3545; }
+
+/* Tabelas de detalhes */
+.detailed-stats {
+    margin-top: 3rem;
+}
+.detailed-stats table {
+    width: 100%;
+    margin-top: 1rem;
+}
+.detailed-stats .positive-pnl { color: #28a745; font-weight: bold; }
+.detailed-stats .negative-pnl { color: #dc3545; font-weight: bold; }
