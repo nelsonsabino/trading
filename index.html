@@ -8,72 +8,67 @@
 </head>
 <body>
 
- <header>
+    <header>
         <h1>Painel de Oportunidades</h1>
         <p class="mantra">A paciência paga. Eu espero que os melhores setups venham até mim.</p>
-        
         <nav>
-            <!-- BOTÃO MOVIDO PARA AQUI E COM NOVO ESTILO -->
             <button id="add-opportunity-btn" class="btn btn-primary">Adicionar Nova Oportunidade</button>
             <a href="manage.html" class="nav-link">Gerir Todas as Operações</a>
             <a href="stats.html" class="nav-link">Ver Estatísticas</a>
         </nav>
+    </header>  
 
-</header>  
-
- <main>
-        <!-- NOVO: Wrapper para as colunas do dashboard -->
+    <main>
         <div class="dashboard-columns">
-
             <section class="potential-trades">
                 <h2>Potencial</h2>
-                <div id="potential-trades-container">
-                    <p>A carregar...</p>
-                </div>
+                <div id="potential-trades-container"><p>A carregar...</p></div>
             </section>
-    
             <section class="armed-trades">
                 <h2>Armado</h2>
-                <div id="armed-trades-container">
-                    <p>A carregar...</p>
-                </div>
+                <div id="armed-trades-container"><p>A carregar...</p></div>
             </section>
-    
             <section class="live-trades">
                 <h2>Ativo</h2>
-                <div id="live-trades-container">
-                    <p>A carregar...</p>
-                </div>
+                <div id="live-trades-container"><p>A carregar...</p></div>
             </section>
+        </div>
+    </main>
 
-        </div> 
-
-    <!-- MUDANÇA: id="modal-container" passou para id="add-opportunity-modal" e ganhou a classe "modal-overlay" -->
+    <!-- Modal de Adicionar Oportunidade -->
     <div id="add-opportunity-modal" class="modal-overlay">
-        <!-- MUDANÇA: a div interior ganhou a classe "modal-content" -->
         <div class="modal-content">
             <span id="close-modal-btn">×</span>
             <form id="add-opportunity-form">
                 <h3>Adicionar Ativo à Watchlist</h3>
-                <label for="strategy-select">Escolha a Estratégia:</label>
-                <select id="strategy-select" name="strategy-select" required>
-                    <option value="">-- Selecione --</option>
-                </select>
-                <label for="asset">Ativo:</label>
-                <input type="text" id="asset" name="asset" required placeholder="Ex: SOL/USDT">
+
+                <!-- ALTERAÇÕES AQUI PARA CONSISTÊNCIA -->
+                <div class="input-item">
+                    <label for="strategy-select">Escolha a Estratégia:</label>
+                    <select id="strategy-select" name="strategy-select" required>
+                        <option value="">-- Selecione --</option>
+                    </select>
+                </div>
+                
+                <div class="input-item">
+                    <label for="asset">Ativo:</label>
+                    <input type="text" id="asset" name="asset" required placeholder="Ex: SOL/USDT">
+                </div>
+                
                 <div id="dynamic-checklist-container"></div>
-                <label for="notes">Notas Iniciais:</label>
-                <textarea id="notes" placeholder="Ex: A formar fundo duplo..."></textarea>
+                
+                <div class="input-item">
+                    <label for="notes">Notas Iniciais:</label>
+                    <textarea id="notes" placeholder="Ex: A formar fundo duplo..."></textarea>
+                </div>
+                
                 <button type="submit">Guardar na Watchlist</button>
             </form>
         </div>
     </div>
 
-<!-- ... Execution-modal ... -->
-    
-    <!-- MUDANÇA: id="execution-modal-container" passou para id="execution-modal" e ganhou a classe "modal-overlay" -->
+    <!-- Modal de Execução -->
     <div id="execution-modal" class="modal-overlay">
-        <!-- MUDANÇA: a div interior ganhou a classe "modal-content" -->
         <div class="modal-content">
             <span id="close-execution-modal-btn">×</span>
             <h3>Executar Trade: <span id="execution-asset-name"></span></h3>
@@ -85,65 +80,53 @@
         </div>
     </div>
 
-
-
-<!-- NOVO MODAL PARA FECHAR O TRADE -->
-<div id="close-trade-modal" class="modal-overlay">
-    <div class="modal-content">
-        <span id="close-close-trade-modal-btn">×</span>
-        <h3>Fechar Operação: <span id="close-trade-asset-name"></span></h3>
-
-        <form id="close-trade-form">
-            <div class="input-item">
-                <label for="exit-price">Preço de Saída:</label>
-                <input type="number" id="exit-price" step="any" required>
-            </div>
-            <div class="input-item">
-                <label for="final-pnl">Resultado Final (P&L em €):</label>
-                <input type="number" id="final-pnl" step="any" required readonly placeholder="Calculado automaticamente...">
-            </div>
-            <div class="input-item">
-                <label for="close-reason">Motivo do Fecho:</label>
-                <select id="close-reason" required>
-                    <option value="">-- Selecione o motivo --</option>
-                    <option value="take-profit">Atingiu Take Profit</option>
-                    <option value="stop-loss">Atingiu Stop Loss</option>
-                    <option value="manual-profit">Saída Manual (Lucro)</option>
-                    <option value="manual-loss">Saída Manual (Prejuízo)</option>
-                    <option value="breakeven">Saída no Ponto de Entrada (Break-Even)</option>
-                </select>
-            </div>
-            <div class="input-item">
-                <label for="final-notes">Notas Finais / Lição Aprendida:</label>
-                <textarea id="final-notes" placeholder="Ex: Gestão de risco correta. Deixei o lucro correr até ao alvo."></textarea>
-            </div>
-            
-            <button type="submit">CONFIRMAR E FECHAR TRADE</button>
-        </form>
+    <!-- Modal de Fecho de Trade -->
+    <div id="close-trade-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span id="close-close-trade-modal-btn">×</span>
+            <h3>Fechar Operação: <span id="close-trade-asset-name"></span></h3>
+            <form id="close-trade-form">
+                <div class="input-item">
+                    <label for="exit-price">Preço de Saída:</label>
+                    <input type="number" id="exit-price" step="any" required>
+                </div>
+                <div class="input-item">
+                    <label for="final-pnl">Resultado Final (P&L em €):</label>
+                    <input type="number" id="final-pnl" step="any" required readonly placeholder="Calculado automaticamente...">
+                </div>
+                <div class="input-item">
+                    <label for="close-reason">Motivo do Fecho:</label>
+                    <select id="close-reason" required>
+                        <option value="">-- Selecione o motivo --</option>
+                        <option value="take-profit">Atingiu Take Profit</option>
+                        <option value="stop-loss">Atingiu Stop Loss</option>
+                        <option value="manual-profit">Saída Manual (Lucro)</option>
+                        <option value="manual-loss">Saída Manual (Prejuízo)</option>
+                        <option value="breakeven">Saída no Ponto de Entrada (Break-Even)</option>
+                    </select>
+                </div>
+                <div class="input-item">
+                    <label for="final-notes">Notas Finais / Lição Aprendida:</label>
+                    <textarea id="final-notes" placeholder="Ex: Gestão de risco correta..."></textarea>
+                </div>
+                <button type="submit">CONFIRMAR E FECHAR TRADE</button>
+            </form>
+        </div>
     </div>
-</div>
 
-
-
-<!-- MODAL PARA ARMAR O TRADE -->
-<div id="arm-trade-modal" class="modal-overlay">
-    <div class="modal-content">
-        <span id="close-arm-trade-modal-btn">×</span>
-        <h3>Validar e Armar Setup: <span id="arm-trade-asset-name"></span></h3>
-        <p>Estratégia: <span id="arm-trade-strategy-name"></span></p>
-
-        <form id="arm-trade-form">
-            <div id="arm-checklist-container"></div>
-            <button type="submit">ARMAR TRADE</button>
-        </form>
+    <!-- Modal de Armar Trade -->
+    <div id="arm-trade-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span id="close-arm-trade-modal-btn">×</span>
+            <h3>Validar e Armar Setup: <span id="arm-trade-asset-name"></span></h3>
+            <p>Estratégia: <span id="arm-trade-strategy-name"></span></p>
+            <form id="arm-trade-form">
+                <div id="arm-checklist-container"></div>
+                <button type="submit">ARMAR TRADE</button>
+            </form>
+        </div>
     </div>
-</div>
     
-    
-
-<script type="module" src="app.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>
-
-    
-
