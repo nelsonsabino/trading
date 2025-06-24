@@ -89,6 +89,33 @@ function runApp() {
     }
     function closeCloseTradeModal() { if(closeModalObj.container) { closeModalObj.container.style.display = 'none'; closeModalObj.form.reset(); currentTrade = {}; } }
 
+
+    //  Funções de controlo para o modal ARMED ---
+    const armModal = {
+        container: document.getElementById('arm-trade-modal'),
+        form: document.getElementById('arm-trade-form'),
+        closeBtn: document.getElementById('close-arm-trade-modal-btn'),
+        assetNameSpan: document.getElementById('arm-trade-asset-name'),
+        strategyNameSpan: document.getElementById('arm-trade-strategy-name'),
+        checklistContainer: document.getElementById('arm-checklist-container'),
+    };
+
+    function openArmModal(trade) {
+        currentTrade = { id: trade.id, data: trade.data };
+        armModal.assetNameSpan.textContent = trade.data.asset;
+        armModal.strategyNameSpan.textContent = trade.data.strategyName;
+        generateArmedChecklist(trade.data.strategyId);
+        if (armModal.container) armModal.container.style.display = 'flex';
+    }
+
+    function closeArmModal() {
+        if (armModal.container) {
+            armModal.container.style.display = 'none';
+            armModal.form.reset();
+        }
+    }
+
+    
     // --- Geradores de Checklist Dinâmicos ---
     function populateStrategySelect() {
         addModal.strategySelect.innerHTML = '<option value="">-- Selecione --</option>';
@@ -143,6 +170,28 @@ function runApp() {
         });
     }
 
+
+    function generateArmedChecklist(strategyId, data = {}) {
+        armModal.checklistContainer.innerHTML = '';
+        const strategy = STRATEGIES[strategyId];
+        if (!strategy || !strategy.armedPhases) return;
+
+        strategy.armedPhases.forEach(phase => {
+            const phaseDiv = document.createElement('div');
+            phaseDiv.innerHTML = `<h4>${phase.title}</h4>`;
+            phase.checks.forEach(check => {
+                const isChecked = data[check.id] ? 'checked' : '';
+                const item = document.createElement('div');
+                item.className = 'checklist-item';
+                item.innerHTML = `<input type="checkbox" id="${check.id}" ${isChecked} required><label for="${check.id}">${check.label}</label>`;
+                phaseDiv.appendChild(item);
+            });
+            armModal.checklistContainer.appendChild(phaseDiv);
+        });
+    }
+
+
+    
     // --- Handlers de Submissão de Formulários ---
     async function handleAddSubmit(e) {
         e.preventDefault();
@@ -205,6 +254,31 @@ function runApp() {
         } catch (err) { console.error("Erro ao fechar trade:", err); }
     }
 
+
+   async function handleArmSubmit(e) {
+        e.preventDefault();
+        const checklistData = {};
+        const strategy = STRATEGIES[currentTrade.data.strategyId];
+        strategy.armedPhases.forEach(p => p.checks.forEach(c => {
+            checklistData[c.id] = document.getElementById(c.id).checked;
+        }));
+
+        const updatedTrade = {
+            status: "ARMED",
+            armedSetup: checklistData,
+            dateArmed: new Date()
+        };
+
+        try {
+            await updateDoc(doc(db, 'trades', currentTrade.id), updatedTrade);
+            closeArmModal();
+        } catch (err) {
+            console.error("Erro ao armar o trade:", err);
+        }
+    }
+
+
+    
     // --- Lógica de Cálculo de P&L ---
     function calculatePnL() {
         const exitPrice = parseFloat(closeModalObj.exitPriceInput.value);
@@ -243,6 +317,7 @@ function runApp() {
         });
     }
 
+// ---  createTradeCard  ---
     function createTradeCard(trade) {
         const card = document.createElement('div');
         card.className = 'trade-card';
@@ -255,7 +330,14 @@ function runApp() {
             button.style.backgroundColor = '#ffc107';
             button.style.color = '#212529';
             button.textContent = 'Validar Setup (Armar)';
-            // button.addEventListener('click', () => openArmModal(trade)); // Será implementado
+            button.addEventListener('click', () => openArmModal(trade)); // <--- LIGAÇÃO FEITA
+            card.appendChild(button);
+        } else if (trade.data.status === 'ARMED') {
+            card.classList.add('armed');
+            const button = document.createElement('button');
+            button.className = 'trigger-btn';
+            button.textContent = 'Executar Gatilho';
+            button.addEventListener('click', () => openExecModal(trade)); // <--- LIGAÇÃO FEITA
             card.appendChild(button);
         } else if (trade.data.status === 'LIVE') {
             card.classList.add('live');
@@ -269,6 +351,7 @@ function runApp() {
         }
         return card;
     }
+    
 
     // --- Lógica para Edição ---
     async function loadTradeForEditing() {
@@ -299,27 +382,51 @@ function runApp() {
         }
     }
 
+
     // --- Ponto de Entrada da Aplicação ---
     document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('add-opportunity-btn').addEventListener('click', openAddModal);
-        addModal.closeBtn.addEventListener('click', closeAddModal);
-        addModal.container.addEventListener('click', e => { if (e.target === addModal.container) closeAddModal(); });
-        addModal.form.addEventListener('submit', handleAddSubmit);
-        addModal.strategySelect.addEventListener('change', () => generateWatchlistChecklist(addModal.strategySelect.value));
+        // Seletores locais para os botões e formulários dos modais
+        const addOpportunityBtn = document.getElementById('add-opportunity-btn');
+        const addModalForm = document.getElementById('add-opportunity-form');
+        const addModalStrategySelect = document.getElementById('strategy-select');
         
-        execModal.closeBtn.addEventListener('click', closeExecModal);
-        execModal.container.addEventListener('click', e => { if (e.target === execModal.container) closeExecModal(); });
-        execModal.form.addEventListener('submit', handleExecSubmit);
+        const execModalForm = document.getElementById('execution-form');
+        
+        const armModalForm = document.getElementById('arm-trade-form');
+        
+        const closeModalForm = document.getElementById('close-trade-form');
+        const closeModalExitPriceInput = document.getElementById('exit-price');
+        
+        // Eventos para o Modal de ADICIONAR
+        addOpportunityBtn.addEventListener('click', openAddModal);
+        document.getElementById('close-modal-btn').addEventListener('click', closeAddModal);
+        document.getElementById('add-opportunity-modal').addEventListener('click', e => { if (e.target.id === 'add-opportunity-modal') closeAddModal(); });
+        addModalForm.addEventListener('submit', handleAddSubmit);
+        addModalStrategySelect.addEventListener('change', () => generateWatchlistChecklist(addModalStrategySelect.value));
 
-        closeModalObj.closeBtn.addEventListener('click', closeCloseTradeModal);
-        closeModalObj.container.addEventListener('click', e => { if (e.target === closeModalObj.container) closeCloseTradeModal(); });
-        closeModalObj.form.addEventListener('submit', handleCloseSubmit);
-        closeModalObj.exitPriceInput.addEventListener('input', calculatePnL);
+        // Eventos para o Modal de EXECUTAR
+        document.getElementById('close-execution-modal-btn').addEventListener('click', closeExecModal);
+        document.getElementById('execution-modal').addEventListener('click', e => { if (e.target.id === 'execution-modal') closeExecModal(); });
+        execModalForm.addEventListener('submit', handleExecSubmit);
+
+        // Eventos para o Modal de ARMAR
+        document.getElementById('close-arm-trade-modal-btn').addEventListener('click', closeArmModal);
+        document.getElementById('arm-trade-modal').addEventListener('click', e => { if (e.target.id === 'arm-trade-modal') closeArmModal(); });
+        armModalForm.addEventListener('submit', handleArmSubmit);
         
+        // Eventos para o Modal de FECHAR
+        document.getElementById('close-close-trade-modal-btn').addEventListener('click', closeCloseTradeModal);
+        document.getElementById('close-trade-modal').addEventListener('click', e => { if (e.target.id === 'close-trade-modal') closeCloseTradeModal(); });
+        closeModalForm.addEventListener('submit', handleCloseSubmit);
+        closeModalExitPriceInput.addEventListener('input', calculatePnL);
+        
+        // Funções de arranque da página
         populateStrategySelect();
         fetchAndDisplayTrades();
         loadTradeForEditing();
     });
-}
 
+} // Fim da função runApp()
+
+// Executa a aplicação
 runApp();
