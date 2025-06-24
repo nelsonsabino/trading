@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Estatísticas</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>Dashboard de Estatísticas</h1>
+        <p class="mantra">Os dados não mentem. Analise os seus resultados para encontrar a sua vantagem.</p>
+        <nav>
+            <a href="index.html" class="nav-link">Voltar ao Dashboard Principal</a>
+            <a href="manage.html" class="nav-link">Gerir Operações</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h4>Total de Trades Fechados</h4>
+                <p id="total-trades">0</p>
+            </div>
+            <div class="stat-card">
+                <h4>Resultado Total (P&L)</h4>
+                <p id="total-pnl" class="pnl-value">€0.00</p>
+            </div>
+            <div class="stat-card">
+                <h4>Taxa de Acerto</h4>
+                <p id="win-rate">0%</p>
+            </div>
+            <div class="stat-card">
+                <h4>Nº de Trades com Lucro</h4>
+                <p id="win-count">0</p>
+            </div>
+            <div class="stat-card">
+                <h4>Nº de Trades com Prejuízo</h4>
+                <p id="loss-count">0</p>
+            </div>
+            <div class="stat-card">
+                <h4>Ganho Médio</h4>
+                <p id="avg-win" class="pnl-value">€0.00</p>
+            </div>
+            <div class="stat-card">
+                <h4>Prejuízo Médio</h4>
+                <p id="avg-loss" class="pnl-value">€0.00</p>
+            </div>
+            <div class="stat-card">
+                <h4>Rácio Risco/Retorno Médio</h4>
+                <p id="rr-ratio">0.00</p>
+            </div>
+        </div>
+
+        <section class="detailed-stats">
+            <h2>Análise por Estratégia</h2>
+            <div id="strategy-stats"></div>
+            
+            <h2>Análise por Motivo de Fecho</h2>
+            <div id="reason-stats"></div>
+        </section>
+    </main>
+
+    <script type="module" src="stats.js"></script>
+</body>
+</html>
