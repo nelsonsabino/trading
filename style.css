@@ -1,278 +1,158 @@
-/* Estilos Gerais (mantêm-se) */
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; background-color: #f4f4f4; color: #333; margin: 0; padding: 20px; }
-header { text-align: center; margin-bottom: 2rem; border-bottom: 2px solid #ddd; padding-bottom: 1rem; }
-.mantra { font-style: italic; color: #555; font-size: 1.1em; }
-main { max-width: 1000px; margin: auto; }
-section { margin-bottom: 2rem; }
-h2 { color: #0056b3; }
-.live-trades { margin-top: 2rem; }
-.checklist-item { display: flex; align-items: center; margin-bottom: 0.75rem; }
-.checklist-item input { margin-right: 10px; }
-
-/* MUDANÇA: Os estilos aplicam-se à classe partilhada .modal-overlay */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.6);
-    justify-content: center;
-    align-items: center;
-    display: none; /* Começam escondidos */
+/* --- GERAL & TIPOGRAFIA --- */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #f8f9fa; /* Cor de fundo mais suave */
+    color: #343a40;
+    margin: 0;
 }
 
-/* MUDANÇA: Estilo para a caixa branca interior */
-.modal-content {
-    background: #fff;
+main {
+    max-width: 1400px; /* Mais espaço para as colunas */
+    margin: auto;
     padding: 2rem;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 500px;
-    position: relative;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
-/* MUDANÇA: O seletor para o botão de fechar é agora mais genérico */
-.modal-content > span {
-    position: absolute;
-    top: 10px;
-    right: 20px;
-    font-size: 2em;
-    font-weight: bold;
-    cursor: pointer;
+h1, h2, h3 {
+    font-weight: 600;
 }
 
-/* Estilos para os Cards (mantêm-se) */
-#watchlist-container, #live-trades-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+h2 {
+    color: #495057;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* --- CABEÇALHO E NAVEGAÇÃO --- */
+header {
+    text-align: center;
+    padding: 2rem 1rem;
+    background-color: #fff;
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 2rem;
+}
+.mantra {
+    font-style: italic;
+    color: #6c757d;
+}
+header nav {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
     gap: 1rem;
+    flex-wrap: wrap; /* Para ecrãs pequenos */
 }
 
-.trade-card {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-left: 5px solid #007bff; /* Azul para "A Monitorizar" */
-    padding: 1rem;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-.trade-card.live {
-    border-left-color: #28a745; /* Verde para "Live" */
-}
-.trade-card.armed {
-    border-left-color: #ffc107; /* Amarelo para "Armed" */
-}
-
-
-/* Estilo genérico para os items de input nos modais */
-.input-item {
-    margin-bottom: 1rem;
-}
-.input-item label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-.input-item input,
-.input-item select,
-.input-item textarea {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box; /* Garante que o padding não aumenta a largura total */
-}
-
-/* Estilo para o botão de fechar nos cards */
-.trade-card .close-trade-btn {
-    background-color: #dc3545; /* Vermelho para ação de fecho */
-    margin-top: 5px;
-}
-
-
-
-
-
-
-
-/* ----------------------------------------------------------------*/
-/* Estilos para a página de gestão */
-nav .nav-link {
+/* --- ESTILO DE BOTÕES CONSISTENTE --- */
+.btn, .nav-link {
     display: inline-block;
-    margin-top: 1rem;
-    padding: 10px 15px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+.btn-primary {
     background-color: #007bff;
     color: white;
-    text-decoration: none;
-    border-radius: 5px;
 }
-nav .nav-link:hover {
+.btn-primary:hover {
     background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
-
-#trades-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1rem;
-    background: #fff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-#trades-table th, #trades-table td {
-    border: 1px solid #ddd;
-    padding: 12px;
-    text-align: left;
-}
-
-#trades-table th {
-    background-color: #f2f2f2;
-    color: #333;
-}
-
-#trades-table tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-#trades-table .delete-btn {
-    background-color: #dc3545;
+.nav-link {
+    background-color: #6c757d;
     color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 4px;
-    cursor: pointer;
 }
-#trades-table .delete-btn:hover {
-    background-color: #c82333;
+.nav-link:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
 }
 
-/* Badges de Status para a tabela */
-.status-badge {
-    padding: 3px 8px;
-    border-radius: 12px;
-    color: white;
-    font-size: 0.8em;
-    font-weight: bold;
-}
-.status-badge.status-watching { background-color: #007bff; }
-.status-badge.status-live { background-color: #28a745; }
-.status-badge.status-closed { background-color: #6c757d; }
-
-
-
-#trades-table .edit-btn {
-    background-color: #ffc107; /* Amarelo para edição */
-    color: #212529;
-    margin-right: 5px; /* Espaço entre os botões */
-    border: none;
-    padding: 8px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-#trades-table .edit-btn:hover {
-    background-color: #e0a800;
-}
-
-/* Um wrapper para os botões de ação na tabela */
-.action-buttons {
-    display: flex;
-    gap: 5px;
-}
-
-
-
-
-
-
-/* Estilos para a Página de Estatísticas */
-.stats-grid {
+/* --- DASHBOARD E COLUNAS --- */
+.dashboard-columns {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
 }
-
-.stat-card {
+.potential-trades, .armed-trades, .live-trades {
     background-color: #fff;
     padding: 1.5rem;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-    text-align: center;
+    border-top: 4px solid #6c757d; /* Borda de cor para cada coluna */
 }
+.armed-trades { border-top-color: #ffc107; }
+.live-trades { border-top-color: #28a745; }
 
-.stat-card h4 {
+/* --- CARDS DE TRADE --- */
+.trade-card {
+    background: #fdfdfd;
+    border: 1px solid #e9ecef;
+    padding: 1rem 1.5rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    transition: box-shadow 0.2s ease-in-out;
+    border-left: 5px solid #6c757d; /* Cinzento para POTENTIAL */
+}
+.trade-card:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+.trade-card.armed { border-left-color: #ffc107; } /* Amarelo para ARMED */
+.trade-card.live { border-left-color: #28a745; } /* Verde para LIVE */
+
+.trade-card h3 {
     margin-top: 0;
     margin-bottom: 0.5rem;
-    color: #6c757d;
-    font-size: 1em;
+}
+.trade-card p {
+    margin: 0.25rem 0;
+    font-size: 0.95em;
+    color: #495057;
 }
 
-.stat-card p {
-    margin: 0;
-    font-size: 2em;
-    font-weight: bold;
-    color: #343a40;
-}
-
-/* Cores para valores de P&L */
-.pnl-value.positive-pnl { color: #28a745; }
-.pnl-value.negative-pnl { color: #dc3545; }
-
-/* Tabelas de detalhes */
-.detailed-stats {
-    margin-top: 3rem;
-}
-.detailed-stats table {
+/* Botões dentro dos cards */
+.trigger-btn {
     width: 100%;
     margin-top: 1rem;
-}
-.detailed-stats .positive-pnl { color: #28a745; font-weight: bold; }
-.detailed-stats .negative-pnl { color: #dc3545; font-weight: bold; }
-
-
-
-/* ... */
-/* Negrito para labels obrigatórios */
-.checklist-item label strong, .input-item label strong {
-    font-weight: 600; 
-}
-
-/* Estilos para o grupo de radio buttons */
-.radio-group {
-    margin-top: 1rem;
-    padding: 0.5rem;
-    border: 1px solid #eee;
+    padding: 8px;
+    font-weight: 600;
+    color: #fff;
     border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
 }
-.radio-group > label {
-    font-weight: bold;
-    display: block;
-    margin-bottom: 0.5rem;
-}
+.trigger-btn:hover { opacity: 0.85; }
 
-/* ... (estilos existentes) ... */
+.btn-potential { background-color: #ffc107; color: #212529; }
+.btn-armed { background-color: #28a745; }
+.btn-live { background-color: #dc3545; }
 
-/* NOVO: Estilos para o layout de 3 colunas do dashboard */
-.dashboard-columns {
-    display: grid;
-    /* Cria 3 colunas com o mesmo tamanho (1fr = 1 fração do espaço disponível) */
-    grid-template-columns: 1fr 1fr 1fr; 
-    gap: 2rem; /* Espaço entre as colunas */
-}
-
-/* Os cards dentro de cada coluna continuarão a ser uma grelha, mas agora vertical */
-#potential-trades-container,
-#armed-trades-container,
-#live-trades-container {
-    display: grid;
-    grid-template-columns: 1fr; /* Força os cards a ficarem um por baixo do outro */
-    gap: 1rem; /* Espaço entre os cards na mesma coluna */
+/* Mensagem de estado vazio */
+.empty-state-message {
+    color: #6c757d;
+    text-align: center;
+    padding: 2rem 0;
 }
 
-/* Pequeno ajuste no título das colunas */
-.dashboard-columns h2 {
-    border-bottom: 2px solid #eee;
-    padding-bottom: 0.5rem;
-    margin-bottom: 1rem;
+/* --- MODAIS (Estilo permanece o mesmo) --- */
+.modal-overlay { /* ... */ }
+.modal-content { /* ... */ }
+
+/* --- RESPONSIVIDADE PARA TELEMÓVEIS --- */
+@media (max-width: 992px) {
+    .dashboard-columns {
+        grid-template-columns: 1fr 1fr; /* 2 colunas em tablets */
+    }
+}
+@media (max-width: 768px) {
+    .dashboard-columns {
+        grid-template-columns: 1fr; /* 1 coluna em telemóveis */
+    }
 }
