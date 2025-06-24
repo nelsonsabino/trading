@@ -320,39 +320,36 @@ function fetchAndDisplayTrades() {
                 // Define o trade atual para que a função de submissão saiba que está a editar
                 currentTrade = { id: tradeId, data: tradeData }; 
                 
-                if (tradeData.status === 'WATCHING') {
-                    console.log("Status é WATCHING. A abrir modal de adição/edição.");
-                    
-                    // 1. Abre o modal
-                    openAddModal();
+            if (tradeData.status === 'POTENTIAL') {
+                console.log("Status é POTENTIAL. A abrir modal de edição.");
+                
+                // Abre o modal de adição, que também serve para edição
+                openAddModal();
+                
+                // Pré-seleciona a estratégia e gera o checklist correspondente
+                addModal.strategySelect.value = tradeData.strategyId;
+                addModal.strategySelect.dispatchEvent(new Event('change'));
 
-                    // 2. Pré-seleciona a estratégia no menu dropdown
-                    addModal.strategySelect.value = tradeData.strategyId;
+                // Preenche os campos de texto
+                document.getElementById('asset').value = tradeData.asset;
+                document.getElementById('notes').value = tradeData.notes;
 
-                    // 3. Gera o checklist correspondente a essa estratégia
-                    // O 'dispatchEvent' simula uma mudança manual para garantir que o 'ouvinte' corre
-                    addModal.strategySelect.dispatchEvent(new Event('change'));
+                // Define o trade atual para que o 'submit' saiba que está a editar
+                currentTrade = { id: tradeId, data: tradeData }; 
 
-                    // 4. Preenche os campos de texto
-                    document.getElementById('asset').value = tradeData.asset;
-                    document.getElementById('notes').value = tradeData.notes;
+                // Usa um timeout para garantir que os checkboxes dinâmicos foram criados antes de os marcar
+                setTimeout(() => {
+                    if (tradeData.potentialSetup) {
+                        Object.keys(tradeData.potentialSetup).forEach(key => {
+                            const checkbox = document.getElementById(key);
+                            if (checkbox) {
+                                checkbox.checked = tradeData.potentialSetup[key];
+                            }
+                        });
+                    }
+                }, 100);
 
-                    // 5. DEPOIS de o checklist ser gerado, marca os checkboxes
-                    // Usamos um pequeno timeout para garantir que o DOM foi atualizado
-                    setTimeout(() => {
-                        if (tradeData.watchlistSetup) {
-                            Object.keys(tradeData.watchlistSetup).forEach(key => {
-                                const checkbox = document.getElementById(key);
-                                if (checkbox) {
-                                    checkbox.checked = tradeData.watchlistSetup[key];
-                                    console.log(`Checkbox '${key}' marcado como ${checkbox.checked}`);
-                                } else {
-                                    console.warn(`Checkbox com id '${key}' não encontrado.`);
-                                }
-                            });
-                        }
-                    }, 100); // 100ms é geralmente mais que suficiente
-
+                
                 } else if (tradeData.status === 'LIVE') {
                     console.log("Status é LIVE. A abrir modal de execução.");
                     openExecModal({ id: tradeId, data: tradeData });
