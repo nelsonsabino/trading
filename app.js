@@ -183,9 +183,10 @@ function runApp() {
     }
 
     // --- Geradores de Checklist Dinâmicos ---
-    function createChecklistItem(check, data) {
+function createChecklistItem(check, data) {
         const isRequired = check.required === false ? '' : 'required';
-        const labelText = check.required === false ? check.label : `<strong>${check.label}</strong>`;
+        // ALTERAÇÃO AQUI: Adiciona o asterisco se for obrigatório
+        const labelText = check.required === false ? check.label : `${check.label} <span class="required-asterisk">*</span>`;
         const isChecked = data && data[check.id] ? 'checked' : '';
         const item = document.createElement('div');
         item.className = 'checklist-item';
@@ -196,7 +197,8 @@ function runApp() {
         const item = document.createElement('div');
         item.className = 'input-item';
         const isRequired = input.required === false ? '' : 'required';
-        const labelText = input.required === false ? input.label : `<strong>${input.label}</strong>`;
+        // ALTERAÇÃO AQUI: Adiciona o asterisco se for obrigatório
+        const labelText = input.required === false ? input.label : `${input.label} <span class="required-asterisk">*</span>`;
         let inputHtml = `<label for="${input.id}">${labelText}</label>`;
         const value = data && data[input.id] ? data[input.id] : '';
         if (input.type === 'select') {
