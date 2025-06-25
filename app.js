@@ -62,7 +62,6 @@ const STRATEGIES = {
                   { id: "pot-zi-divergencia", label: "Divergência bullish nos indicadores?", required: false }
                   { id: "pot-zi-alarme", label: "Algum alarme foi colocado?", required: true }
               ] 
-              ]
             }
         ],
         armedPhases: [
