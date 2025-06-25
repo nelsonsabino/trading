@@ -55,7 +55,10 @@ const STRATEGIES = {
                   { id: "armed-id-rsi-ma", label: "RSI > RSI-MA? (Aumenta Prob.)", required: false }, 
                   { id: "armed-id-val", label: "Preço na base do VAL? (Aumenta Prob.)", required: false },
                   { id: "armed-id-toque3", label: "RSI a fazer 3º toque no suporte? (Aumenta Prob.)", required: false }
-              ]
+              ],
+
+                inputs: [
+                    { id: "armed-id-image-url", label: "Link da Imagem do Gráfico (Fase Armado):", type: "text", required: false } 
             }
         ],
         executionPhases: [
@@ -98,7 +101,10 @@ const STRATEGIES = {
                   { id: "armed-is-rsi-hl", label: "RSI continua com Higher Lows?", required: true },
                   { id: "armed-is-val", label: "Preço na base do VAL? (Aumenta Prob.)", required: false },
                   { id: "armed-is-rsi-toque3", label: "RSI a fazer 3º toque no suporte? (Aumenta Prob.)", required: false }
-              ]
+              ],
+
+          inputs: [
+                    { id: "armed-id-image-url", label: "Link da Imagem do Gráfico (Fase Armado):", type: "text", required: false }
             }
         ],
         executionPhases: [
