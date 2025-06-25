@@ -59,7 +59,7 @@ const STRATEGIES = {
               checks: [
                   { id: "pot-zi-suporte", label: "Preço está em zona de suporte?", required: true },
                   { id: "pot-zi-ema50", label: "EMA50 a suportar ou com espaço?", required: true },
-                  { id: "pot-zi-divergencia", label: "Divergência bullish nos indicadores?", required: false }
+                  { id: "pot-zi-divergencia", label: "Divergência bullish nos indicadores?", required: false },
                   { id: "pot-zi-alarme", label: "Algum alarme foi colocado?", required: true }
               ] 
             }
