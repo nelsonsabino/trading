@@ -37,70 +37,124 @@ const db = getFirestore(app);
 /* ------------------------------------------------------------------------ */
 
 const STRATEGIES = {
+
+    /* ------------ Inversão de direção (Bullish) ------------ */    
     
-    'zona-interesse': {
+    'inversao-direcao': {
         name: "Inversão de direção (Bullish)",
 
-/* ------------ FASE PONTENCIAL ------------ */
-
+        /* ------------ FASE POTENCIAL ------------ */
         potentialPhases: [
-            { title: "Análise Macro Inicial",
-              inputs: [{ id: "pot-zi-tf", label: "Timeframe de Análise:", type: "select", options: ["Diário", "4h"], required: true }],
-              checks: [
-                  { id: "pot-zi-suporte", label: "Preço está em zona de suporte?", required: true },
-                  { id: "pot-zi-ema50", label: "EMA50 a suportar ou com espaço?", required: true },
-                  { id: "pot-zi-divergencia", label: "Divergência bullish nos indicadores?", required: false },
-                  { id: "pot-zi-alarme", label: "Algum alarme foi colocado?", required: true }
-              ],
-
-              inputs: [
-                  { id: "exec-zi-RSI_LTB", label: "RSI furou LTB?", type: "select", options: ["Sim, com força", "Não, mas ainda tem espaço", "Não, está encostado"], required: true }
-              ]
-
+            { 
+                title: "Análise Macro Inicial",
+                // CORRIGIDO: Juntei os dois 'inputs' e o 'checks' num único objeto de fase
+                inputs: [
+                    { id: "pot-id-tf", label: "Timeframe de Análise:", type: "select", options: ["Diário", "4h"], required: true },
+                    { id: "pot-id-rsi-ltb", label: "RSI furou LTB?", type: "select", options: ["Sim, com força", "Não, mas ainda tem espaço", "Não, está encostado"], required: true }
+                ],
+                checks: [
+                    { id: "pot-id-suporte", label: "Preço está em zona de suporte?", required: true },
+                    { id: "pot-id-ema50", label: "EMA50 a suportar ou com espaço?", required: true },
+                    { id: "pot-id-divergencia", label: "Divergência bullish nos indicadores?", required: false },
+                    { id: "pot-id-alarme", label: "Algum alarme foi colocado?", required: true }
+                ]
             }
         ],
 
-/* ------------ FASE ARMAR ------------ */
+        /* ------------ FASE ARMAR ------------ */
+        armedPhases: [
+            { 
+                title: "Validação do Setup (no TF de Análise)",
+                checks: [
+                    { id: "armed-id-tendencia", label: "Preço quebrou LTB ou tem espaço?", required: true },
+                    { id: "armed-id-stoch", label: "Stochastic baixo e a cruzar Bullish?", required: true },
+                    { id: "armed-id-vah", label: "Preço NÃO está no limite do VAH?", required: true },
+                    { id: "armed-id-rhl", label: "RSI está a fazer Higher Lows?", required: true },
+                    // CORRIGIDO: Alterei para 'false' para refletir a sua descrição de "Aumenta Prob."
+                    { id: "armed-id-rsi-ma", label: "RSI > RSI-MA? (Aumenta Prob.)", required: false }, 
+                    { id: "armed-id-val", label: "Preço na base do VAL? (Aumenta Prob.)", required: false },
+                    { id: "armed-id-toque3", label: "RSI a fazer 3º toque no suporte? (Aumenta Prob.)", required: false }
+                ]
+            }
+        ],
+
+        /* ------------ FASE EXECUTAR ------------ */      
+        executionPhases: [
+            { 
+                title: "Gatilho de Precisão",
+                inputs: [
+                    { id: "exec-id-tf", label: "Timeframe de Execução:", type: "select", options: ["1h", "15min", "5min"], required: true }
+                ],
+                checks: [
+                    { id: "exec-id-rsi-break", label: "Quebra da linha de resistência do RSI?", required: true }
+                ],
+                radios: {
+                    name: "gatilho-final-id", // ID único para o grupo de rádios
+                    label: "Escolha o gatilho final:",
+                    options: [
+                        { id: "exec-id-gatilho-base", label: "Preço na base local do FRVP + Stoch reset?" },
+                        { id: "exec-id-gatilho-acima", label: "Preço acima da base local do FRVP + Stoch reset?" }
+                    ]
+                }
+            }
+        ]
+    }, // <-- Vírgula a separar as estratégias
+
+
+    /* ------------ Impulso após Suporte ------------ */
+
+    'impulso-suporte': {
+        name: "Impulso após Suporte (Diário/4h)",
+        
+        potentialPhases: [
+            {
+                title: "Critérios de Potencial (Diário/4h)",
+                checks: [
+                    { id: "pot-is-rsi-hl", label: "RSI com Higher Lows?", required: true },
+                    { id: "pot-is-fib", label: "Preço acima de Fibonacci 0.382?", required: true },
+                    { id: "pot-is-stoch-corr", label: "Stochastic já está a corrigir?", required: true },
+                    { id: "pot-is-ema50", label: "Preço acima da EMA50?", required: true },
+                    { id: "pot-is-alarm", label: "Alarme foi colocado?", required: true },
+                    { id: "pot-is-rsi-ma", label: "RSI acima da RSI-MA?", required: false }
+                ]
+            }
+        ],
         
         armedPhases: [
-            { title: "Validação do Setup (no TF de Análise)",
-             
-              checks: [
-                  { id: "armed-zi-tendencia", label: "Preço quebrou LTB ou tem espaço?", required: true },
-                  { id: "armed-zi-stoch", label: "Stochastic baixo e a cruzar Bullish?", required: true },
-                  { id: "armed-zi-vah", label: "Preço NÃO está no limite do VAH?", required: true },
-                  { id: "armed-zi-rhl", label: "RSI está a fazer Higher Lows?", required: true },
-                  { id: "armed-zi-rsi-ma", label: "RSI > RSI-MA? (Aumenta Prob.)", required: true },
-                  { id: "armed-zi-val", label: "Preço na base do VAL? (Aumenta Prob.)", required: false },
-                  { id: "armed-zi-toque3", label: "RSI a fazer 3º toque no suporte? (Aumenta Prob.)", required: false }
-              ]
+            {
+                title: "Critérios para Armar (TF Superior)",
+                checks: [
+                    { id: "armed-is-stoch-cross", label: "Stochastic TF superior está a cruzar bullish?", required: true },
+                    { id: "armed-is-rsi-hl", label: "RSI continua com Higher Lows?", required: true },
+                    { id: "armed-is-val", label: "Preço na base do VAL? (Aumenta Prob.)", required: false },
+                    { id: "armed-is-rsi-toque3", label: "RSI a fazer 3º toque no suporte? (Aumenta Prob.)", required: false }
+                ]
             }
         ],
-
-/* ------------ FASE EXECUTAR ------------ */      
         
         executionPhases: [
-            { title: "Gatilho de Precisão",
-              inputs: [
-                  { id: "exec-zi-tf", label: "Timeframe de Execução:", type: "select", options: ["1h", "15min", "5min"], required: true }
-              ],
-              
-             checks: [
-                 { id: "exec-zi-rsi-break", label: "Quebra da linha de resistência do RSI?", required: true }
-             ],
-              
-             radios: {
-                  name: "gatilho-final",
-                  label: "Escolha o gatilho final:",
-                  options: [
-                      { id: "exec-zi-gatilho-base", label: "Preço na base local do FRVP + Stoch reset?" },
-                      { id: "exec-zi-gatilho-acima", label: "Preço acima da base local do FRVP + Stoch reset?" }
-                  ]
-              }
+            {
+                title: "Gatilho de Precisão",
+                inputs: [
+                    { id: "exec-is-tf", label: "Timeframe de Execução:", type: "select", options: ["1h", "15min", "5min"], required: true }
+                ],
+                checks: [
+                    { id: "exec-is-rsi-break", label: "Quebra da linha de resistência do RSI?", required: true }
+                ],
+                radios: {
+                    name: "gatilho-final-is",
+                    label: "Escolha o gatilho final:",
+                    options: [
+                        { id: "exec-is-gatilho-base", label: "Preço na base local do FRVP + Stoch reset?" },
+                        { id: "exec-is-gatilho-acima", label: "Preço acima da base local do FRVP + Stoch reset?" } // Corrigido erro de formatação aqui
+                    ]
+                }
             }
         ]
     }
 };
+
+
 
 const GESTAO_PADRAO = {
     title: "Plano de Gestão", 
