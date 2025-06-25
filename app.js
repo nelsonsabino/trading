@@ -251,6 +251,8 @@ function runApp() {
         const strategy = STRATEGIES[currentTrade.data.strategyId];
         strategy.armedPhases.forEach(p => {
             if (p.checks) p.checks.forEach(c => checklistData[c.id] = document.getElementById(c.id).checked);
+            if (p.inputs) p.inputs.forEach(i => checklistData[i.id] = document.getElementById(i.id).value); 
+            if (p.checks) p.checks.forEach(c => checklistData[c.id] = document.getElementById(c.id).checked);
         });
         const updatedTrade = { status: "ARMED", armedSetup: checklistData, dateArmed: new Date() };
         try { await updateDoc(doc(db, 'trades', currentTrade.id), updatedTrade); closeArmModal(); }
@@ -321,7 +323,7 @@ function runApp() {
         });
     }
 
-    function createTradeCard(trade) {
+ function createTradeCard(trade) {
         const card = document.createElement('div');
         card.className = 'trade-card';
         card.innerHTML = `<button class="card-edit-btn">Editar</button>
@@ -330,12 +332,19 @@ function runApp() {
             <p><strong>Status:</strong> ${trade.data.status}</p>
             <p><strong>Notas:</strong> ${trade.data.notes || ''}</p>`;
 
-        if (trade.data.imageUrl) {
+        // Pega os URLs das imagens das fases POTENTIAL e ARMED
+        const potentialImageUrl = trade.data.potentialSetup?.imageUrl; // O seu campo antigo era imageUrl, vamos mantê-lo
+        const armedImageUrl = trade.data.armedSetup ? Object.values(trade.data.armedSetup).find(val => typeof val === 'string' && val.startsWith('http')) : null;
+
+        // Mostra a imagem mais recente disponível
+        const imageUrlToShow = armedImageUrl || potentialImageUrl;
+
+        if (imageUrlToShow) {
             const img = document.createElement('img');
-            img.src = trade.data.imageUrl;
+            img.src = imageUrlToShow;
             img.className = 'card-screenshot';
             img.alt = `Gráfico de ${trade.data.asset}`;
-            img.addEventListener('click', (e) => { e.stopPropagation(); openLightbox(trade.data.imageUrl); });
+            img.addEventListener('click', (e) => { e.stopPropagation(); openLightbox(imageUrlToShow); });
             card.appendChild(img);
         }
 
