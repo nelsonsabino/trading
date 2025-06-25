@@ -38,16 +38,18 @@ const db = getFirestore(app);
 
 const STRATEGIES = {
 
-    /* ------------ Inversão de direção (Bullish) ------------ */    
+/* ------------------------------------------------------------------------ */    
+    /* ------------ PREÇO EM SUPORTE COM CONFLUÊNCIAS ------------ */    
+/* ------------------------------------------------------------------------ */   
     
-    'inversao-direcao': {
-        name: "Inversão de direção (Bullish)",
+    'preco-suporte': {
+        name: "Preço em suporte com confluências",
 
         /* ------------ FASE POTENCIAL ------------ */
         potentialPhases: [
             { 
                 title: "Análise Macro Inicial",
-                // CORRIGIDO: Juntei os dois 'inputs' e o 'checks' num único objeto de fase
+                
                 inputs: [
                     { id: "pot-id-tf", label: "Timeframe de Análise:", type: "select", options: ["Diário", "4h"], required: true },
                     { id: "pot-id-rsi-ltb", label: "RSI furou LTB?", type: "select", options: ["Sim, com força", "Não, mas ainda tem espaço", "Não, está encostado"], required: true }
@@ -98,17 +100,23 @@ const STRATEGIES = {
                 }
             }
         ]
-    }, // <-- Vírgula a separar as estratégias
+    }, 
 
-
-    /* ------------ Impulso após Suporte ------------ */
+/* ------------------------------------------------------------------------ */    
+           /* ------------ APÓS IMPULSO DO SUPORTE ------------ */
+/* ------------------------------------------------------------------------ */    
 
     'impulso-suporte': {
-        name: "Impulso após Suporte (Diário/4h)",
+        name: "Após impulso do suporte",
         
         potentialPhases: [
             {
-                title: "Critérios de Potencial (Diário/4h)",
+                title: "Análise Macro Inicial",
+
+                inputs: [
+                    { id: "pot-id-tf-impulso", label: "Timeframe de Análise:", type: "select", options: ["Diário", "4h"], required: true },
+                    { id: "pot-id-rsi-ltb-impulso", label: "RSI furou LTB?", type: "select", options: ["Sim, com força", "Não, mas ainda tem espaço", "Não, está encostado"], required: true }
+                ],                
                 checks: [
                     { id: "pot-is-rsi-hl", label: "RSI com Higher Lows?", required: true },
                     { id: "pot-is-fib", label: "Preço acima de Fibonacci 0.382?", required: true },
