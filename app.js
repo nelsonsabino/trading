@@ -51,7 +51,12 @@ const STRATEGIES = {
                   { id: "pot-zi-ema50", label: "EMA50 a suportar ou com espaço?", required: true },
                   { id: "pot-zi-divergencia", label: "Divergência bullish nos indicadores?", required: false },
                   { id: "pot-zi-alarme", label: "Algum alarme foi colocado?", required: true }
-              ] 
+              ],
+
+              inputs: [
+                  { id: "exec-zi-RSI_LTB", label: "RSI furou LTB?", type: "select", options: ["Sim, com força", "Não, mas ainda tem espaço", "Não, está encostado"], required: true }
+              ]
+
             }
         ],
 
