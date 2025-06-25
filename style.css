@@ -156,6 +156,19 @@ header nav {
 .modal-content form button[type="submit"] { width: 100%; padding: 14px; margin-top: 1.5rem; font-size: 1.1rem; font-weight: 600; background-color: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; transition: background-color 0.2s; }
 .modal-content form button[type="submit"]:hover { background-color: #218838; }
 
+
+/* Estilo para a nota de rodapé nos formulários */
+.form-footnote {
+    font-size: 0.8em;
+    color: #6c757d;
+    text-align: right;
+    margin-top: -0.5rem; /* Puxa um pouco para cima */
+    margin-bottom: 1.5rem;
+}
+
+
+
+
 /* --- PÁGINA DE GESTÃO (manage.html) --- */
 #trades-table { width: 100%; border-collapse: collapse; margin-top: 2rem; background: #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: hidden; font-size: 0.95em; }
 #trades-table thead tr { background-color: #f8f9fa; border-bottom: 2px solid #dee2e6; }
