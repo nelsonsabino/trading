@@ -401,7 +401,7 @@ function runApp() {
                 document.getElementById('notes').value = tradeData.notes;
             } else if (tradeData.status === 'ARMED') {
                 openArmModal({ id: tradeId, data: tradeData });
-                generateDynamicChecklist(armModal.checklistContainer, STRATEGIES[tradeData.strategyId]?.armedPhases, tradeData.armedSetup);
+  generateDynamicChecklist(armModal.checklistContainer, STRATEGIES[tradeData.strategyId]?.armedPhases, tradeData.armedSetup);
             } else if (tradeData.status === 'LIVE') {
                 openExecModal({ id: tradeId, data: tradeData });
             }
