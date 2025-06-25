@@ -1,11 +1,7 @@
 // --- INICIALIZAÇÃO DO FIREBASE (Sintaxe v9 Modular) ---
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
 import { 
-    getFirestore, 
-    collection, 
-    query, 
-    where, 
-    onSnapshot
+   getFirestore, collection, addDoc, doc, updateDoc, getDoc, query, where, orderBy, onSnapshot
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 
 // A sua configuração da web app do Firebase
@@ -27,128 +23,347 @@ const db = getFirestore(app);
 
 
 
-function runStatsPage() {
-    // Função principal que corre quando a página carrega
-    function calculateAndDisplayStats() {
-        const q = query(collection(db, 'trades'), where('status', '==', 'CLOSED'));
+/* ------------------------------------------------------------------------ */
+/* ------------------------------ STRATEGIES ------------------------------ */
+/* ------------------------------------------------------------------------ */
 
-        onSnapshot(q, (snapshot) => {
-            let totalTrades = 0;
-            let totalPnl = 0;
-            let winCount = 0;
-            let lossCount = 0;
-            let totalWinAmount = 0;
-            let totalLossAmount = 0;
-            const statsByStrategy = {};
-            const statsByReason = {};
+const STRATEGIES = {
 
-            snapshot.forEach(doc => {
-                const trade = doc.data();
-                if (!trade.closeDetails || isNaN(parseFloat(trade.closeDetails.pnl))) {
-                    return; // Ignora trades fechados sem P&L válido
+/* ------------------------------------------------------------------------ */    
+    /* ------------ PREÇO EM SUPORTE COM CONFLUÊNCIAS ------------ */    
+/* ------------------------------------------------------------------------ */   
+    
+    'preco-suporte': {
+        name: "Preço em suporte com confluências",
+
+        /* ------------ FASE POTENCIAL ------------ */
+        potentialPhases: [
+            { 
+                title: "Análise Macro Inicial",
+                
+                inputs: [
+                    { id: "pot-id-tf", label: "Timeframe de Análise:", type: "select", options: ["Diário", "4h"], required: true },
+                    { id: "pot-id-rsi-ltb", label: "RSI furou LTB?", type: "select", options: ["Sim, com força", "Não, mas ainda tem espaço", "Não, está encostado"], required: true }
+                ],
+                checks: [
+                    { id: "pot-id-suporte", label: "Preço está em zona de suporte?", required: true },
+                    { id: "pot-id-ema50", label: "EMA50 a suportar ou com espaço?", required: true },
+                    { id: "pot-id-divergencia", label: "Divergência bullish nos indicadores?", required: false },
+                    { id: "pot-id-alarme", label: "Algum alarme foi colocado?", required: true }
+                ]
+            }
+        ],
+
+        /* ------------ FASE ARMAR ------------ */
+        armedPhases: [
+            { 
+                title: "Validação do Setup (no TF de Análise)",
+                checks: [
+                    { id: "armed-id-tendencia", label: "Preço quebrou LTB ou tem espaço?", required: true },
+                    { id: "armed-id-stoch", label: "Stochastic baixo e a cruzar Bullish?", required: true },
+                    { id: "armed-id-vah", label: "Preço NÃO está no limite do VAH?", required: true },
+                    { id: "armed-id-rhl", label: "RSI está a fazer Higher Lows?", required: true },
+                    // CORRIGIDO: Alterei para 'false' para refletir a sua descrição de "Aumenta Prob."
+                    { id: "armed-id-rsi-ma", label: "RSI > RSI-MA? (Aumenta Prob.)", required: false }, 
+                    { id: "armed-id-val", label: "Preço na base do VAL? (Aumenta Prob.)", required: false },
+                    { id: "armed-id-toque3", label: "RSI a fazer 3º toque no suporte? (Aumenta Prob.)", required: false }
+                ]
+            }
+        ],
+
+        /* ------------ FASE EXECUTAR ------------ */      
+        executionPhases: [
+            { 
+                title: "Gatilho de Precisão",
+                inputs: [
+                    { id: "exec-id-tf", label: "Timeframe de Execução:", type: "select", options: ["1h", "15min", "5min"], required: true }
+                ],
+                checks: [
+                    { id: "exec-id-rsi-break", label: "Quebra da linha de resistência do RSI?", required: true }
+                ],
+                radios: {
+                    name: "gatilho-final-id", // ID único para o grupo de rádios
+                    label: "Escolha o gatilho final:",
+                    options: [
+                        { id: "exec-id-gatilho-base", label: "Preço na base local do FRVP + Stoch reset?" },
+                        { id: "exec-id-gatilho-acima", label: "Preço acima da base local do FRVP + Stoch reset?" }
+                    ]
                 }
+            }
+        ]
+    }, 
 
-                totalTrades++;
-                const pnl = parseFloat(trade.closeDetails.pnl);
-                totalPnl += pnl;
+/* ------------------------------------------------------------------------ */    
+           /* ------------ APÓS IMPULSO DO SUPORTE ------------ */
+/* ------------------------------------------------------------------------ */    
 
-                // Contagem de Ganhos/Perdas
-                if (pnl > 0) {
-                    winCount++;
-                    totalWinAmount += pnl;
-                } else {
-                    lossCount++;
-                    totalLossAmount += pnl; // Mantém o valor negativo
+    'impulso-suporte': {
+        name: "Após impulso do suporte",
+        
+        potentialPhases: [
+            {
+                title: "Análise Macro Inicial",
+
+                inputs: [
+                    { id: "pot-id-tf-impulso", label: "Timeframe de Análise:", type: "select", options: ["Diário", "4h"], required: true },
+                    { id: "pot-id-rsi-ltb-impulso", label: "RSI furou LTB?", type: "select", options: ["Sim, com força", "Não, mas ainda tem espaço", "Não, está encostado"], required: true }
+                ],                
+                checks: [
+                    { id: "pot-is-rsi-hl", label: "RSI com Higher Lows?", required: true },
+                    { id: "pot-is-fib", label: "Preço acima de Fibonacci 0.382?", required: true },
+                    { id: "pot-is-stoch-corr", label: "Stochastic já está a corrigir?", required: true },
+                    { id: "pot-is-ema50", label: "Preço acima da EMA50?", required: true },
+                    { id: "pot-is-alarm", label: "Alarme foi colocado?", required: true },
+                    { id: "pot-is-rsi-ma", label: "RSI acima da RSI-MA?", required: false }
+                ]
+            }
+        ],
+        
+        armedPhases: [
+            {
+                title: "Critérios para Armar (TF Superior)",
+                checks: [
+                    { id: "armed-is-stoch-cross", label: "Stochastic TF superior está a cruzar bullish?", required: true },
+                    { id: "armed-is-rsi-hl", label: "RSI continua com Higher Lows?", required: true },
+                    { id: "armed-is-val", label: "Preço na base do VAL? (Aumenta Prob.)", required: false },
+                    { id: "armed-is-rsi-toque3", label: "RSI a fazer 3º toque no suporte? (Aumenta Prob.)", required: false }
+                ]
+            }
+        ],
+        
+        executionPhases: [
+            {
+                title: "Gatilho de Precisão",
+                inputs: [
+                    { id: "exec-is-tf", label: "Timeframe de Execução:", type: "select", options: ["1h", "15min", "5min"], required: true }
+                ],
+                checks: [
+                    { id: "exec-is-rsi-break", label: "Quebra da linha de resistência do RSI?", required: true }
+                ],
+                radios: {
+                    name: "gatilho-final-is",
+                    label: "Escolha o gatilho final:",
+                    options: [
+                        { id: "exec-is-gatilho-base", label: "Preço na base local do FRVP + Stoch reset?" },
+                        { id: "exec-is-gatilho-acima", label: "Preço acima da base local do FRVP + Stoch reset?" } // Corrigido erro de formatação aqui
+                    ]
                 }
+            }
+        ]
+    }
+};
 
-                // Estatísticas por Estratégia
-                const strategy = trade.strategyName || 'Sem Estratégia';
-                if (!statsByStrategy[strategy]) {
-                    statsByStrategy[strategy] = { count: 0, pnl: 0 };
-                }
-                statsByStrategy[strategy].count++;
-                statsByStrategy[strategy].pnl += pnl;
 
-                // Estatísticas por Motivo de Fecho
-                const reason = trade.closeDetails.closeReason || 'Não especificado';
-                if (!statsByReason[reason]) {
-                    statsByReason[reason] = { count: 0, pnl: 0 };
-                }
-                statsByReason[reason].count++;
-                statsByReason[reason].pnl += pnl;
-            });
 
-            // Cálculos Finais
-            const winRate = totalTrades > 0 ? (winCount / totalTrades) * 100 : 0;
-            const avgWin = winCount > 0 ? totalWinAmount / winCount : 0;
-            const avgLoss = lossCount > 0 ? totalLossAmount / lossCount : 0;
-            const rrRatio = (avgLoss !== 0) ? Math.abs(avgWin / avgLoss) : 0;
+const GESTAO_PADRAO = {
+    title: "Plano de Gestão", 
+    inputs: [
+        { id: "entry-price", label: "Preço de Entrada:", type: "number", required: true },
+        { id: "stop-loss", label: "Stop-Loss:", type: "number", required: true },
+        { id: "take-profit", label: "Take-Profit:", type: "number", required: true },
+        { id: "quantity", label: "Quantidade:", type: "number", required: true }
+    ]
+};
 
-            // Atualizar o DOM com os valores
-            updateElementText('total-trades', totalTrades);
-            updateElementText('total-pnl', `€${totalPnl.toFixed(2)}`, true);
-            updateElementText('win-rate', `${winRate.toFixed(1)}%`);
-            updateElementText('win-count', winCount);
-            updateElementText('loss-count', lossCount);
-            updateElementText('avg-win', `€${avgWin.toFixed(2)}`, true);
-            updateElementText('avg-loss', `€${avgLoss.toFixed(2)}`, true);
-            updateElementText('rr-ratio', rrRatio.toFixed(2));
-            
-            // Gerar tabelas de detalhes
-            generateDetailTable('strategy-stats', 'Estratégia', statsByStrategy);
-            generateDetailTable('reason-stats', 'Motivo', statsByReason);
+
+
+
+
+
+// --- FUNÇÃO PRINCIPAL ---
+function runApp() {
+    let currentTrade = {};
+    
+    // --- Seletores do DOM ---
+    const addModal = { container: document.getElementById('add-opportunity-modal'), form: document.getElementById('add-opportunity-form'), closeBtn: document.getElementById('close-modal-btn'), strategySelect: document.getElementById('strategy-select'), checklistContainer: document.getElementById('dynamic-checklist-container') };
+    const armModal = { container: document.getElementById('arm-trade-modal'), form: document.getElementById('arm-trade-form'), closeBtn: document.getElementById('close-arm-trade-modal-btn'), assetNameSpan: document.getElementById('arm-trade-asset-name'), strategyNameSpan: document.getElementById('arm-trade-strategy-name'), checklistContainer: document.getElementById('arm-checklist-container')};
+    const execModal = { container: document.getElementById('execution-modal'), form: document.getElementById('execution-form'), closeBtn: document.getElementById('close-execution-modal-btn'), assetNameSpan: document.getElementById('execution-asset-name'), strategyNameSpan: document.getElementById('execution-strategy-name'), checklistContainer: document.getElementById('execution-checklist-container') };
+    const closeModalObj = { container: document.getElementById('close-trade-modal'), form: document.getElementById('close-trade-form'), closeBtn: document.getElementById('close-close-trade-modal-btn'), assetNameSpan: document.getElementById('close-trade-asset-name'), exitPriceInput: document.getElementById('exit-price'), pnlInput: document.getElementById('final-pnl') };
+    const lightbox = { container: document.getElementById('image-lightbox'), image: document.getElementById('lightbox-image'), closeBtn: document.getElementById('close-lightbox-btn') }; // Adicionado seletor do lightbox
+    const potentialTradesContainer = document.getElementById('potential-trades-container');
+    const armedTradesContainer = document.getElementById('armed-trades-container');
+    const liveTradesContainer = document.getElementById('live-trades-container');
+
+    // --- Funções de Controlo dos Modais e Lightbox ---
+    function openAddModal() { if(addModal.container) addModal.container.style.display = 'flex'; }
+    function closeAddModal() { if(addModal.container) { addModal.container.style.display = 'none'; addModal.form.reset(); addModal.checklistContainer.innerHTML = ''; currentTrade = {}; } }
+    function openArmModal(trade) { currentTrade = { id: trade.id, data: trade.data }; armModal.assetNameSpan.textContent = trade.data.asset; armModal.strategyNameSpan.textContent = trade.data.strategyName; generateDynamicChecklist(armModal.checklistContainer, STRATEGIES[trade.data.strategyId]?.armedPhases, trade.data.armedSetup); if(armModal.container) armModal.container.style.display = 'flex'; }
+    function closeArmModal() { if(armModal.container) { armModal.container.style.display = 'none'; armModal.form.reset(); currentTrade = {}; } }
+    function openExecModal(trade) { currentTrade = { id: trade.id, data: trade.data }; execModal.assetNameSpan.textContent = trade.data.asset; execModal.strategyNameSpan.textContent = trade.data.strategyName; generateDynamicChecklist(execModal.checklistContainer, [...(STRATEGIES[trade.data.strategyId]?.executionPhases || []), GESTAO_PADRAO], trade.data.executionDetails); if(execModal.container) execModal.container.style.display = 'flex'; }
+    function closeExecModal() { if(execModal.container) { execModal.container.style.display = 'none'; execModal.form.reset(); currentTrade = {}; } }
+    function openCloseTradeModal(trade) { currentTrade = { id: trade.id, data: trade.data }; closeModalObj.assetNameSpan.textContent = trade.data.asset; if(closeModalObj.container) closeModalObj.container.style.display = 'flex'; }
+    function closeCloseTradeModal() { if(closeModalObj.container) { closeModalObj.container.style.display = 'none'; closeModalObj.form.reset(); currentTrade = {}; } }
+    function openLightbox(imageUrl) { if (lightbox.container && lightbox.image) { lightbox.image.src = imageUrl; lightbox.container.style.display = 'flex'; } }
+    function closeLightbox() { if (lightbox.container) lightbox.container.style.display = 'none'; }
+    
+    // --- Geradores de Checklist (o seu código está correto, não precisa de alterações) ---
+    function createChecklistItem(check, data) { /* ... */ }
+    function createInputItem(input, data) { /* ... */ }
+    function createRadioGroup(radioInfo, data) { /* ... */ }
+    function generateDynamicChecklist(container, phases, data = {}) { /* ... */ }
+    function populateStrategySelect() { /* ... */ }
+
+    // --- Handlers de Submissão de Formulários (MODIFICADO handleAddSubmit) ---
+    async function handleAddSubmit(e) {
+        e.preventDefault();
+        const strategyId = addModal.strategySelect.value;
+        const checklistData = {};
+        STRATEGIES[strategyId].potentialPhases.forEach(p => {
+            if (p.inputs) p.inputs.forEach(i => checklistData[i.id] = document.getElementById(i.id).value);
+            if (p.checks) p.checks.forEach(c => checklistData[c.id] = document.getElementById(c.id).checked);
         });
+        const tradeData = {
+            asset: document.getElementById('asset').value,
+            imageUrl: document.getElementById('image-url').value, // ADICIONADO
+            notes: document.getElementById('notes').value,
+            strategyId: strategyId,
+            strategyName: STRATEGIES[strategyId].name,
+            status: "POTENTIAL",
+            potentialSetup: checklistData
+        };
+        try {
+            if (currentTrade.id) {
+                tradeData.dateAdded = currentTrade.data.dateAdded;
+                await updateDoc(doc(db, 'trades', currentTrade.id), tradeData);
+            } else {
+                tradeData.dateAdded = new Date();
+                await addDoc(collection(db, 'trades'), tradeData);
+            }
+            closeAddModal();
+        } catch (err) { console.error("Erro ao guardar/atualizar:", err); }
+    }
+    async function handleArmSubmit(e) { /* ... (seu código existente) ... */ }
+    async function handleExecSubmit(e) { /* ... (seu código existente) ... */ }
+    async function handleCloseSubmit(e) {
+        e.preventDefault();
+        const closeDetails = {
+            exitPrice: closeModalObj.exitPriceInput.value,
+            pnl: closeModalObj.pnlInput.value,
+            closeReason: document.getElementById('close-reason').value,
+            finalNotes: document.getElementById('final-notes').value,
+            exitScreenshotUrl: document.getElementById('exit-screenshot-url').value // ADICIONADO
+        };
+        try { await updateDoc(doc(db, 'trades', currentTrade.id), { status: "CLOSED", closeDetails: closeDetails, dateClosed: new Date() }); closeCloseTradeModal(); }
+        catch (err) { console.error("Erro ao fechar trade:", err); }
+    }
+    
+    // --- Outras Funções ---
+    function calculatePnL() { /* ... (seu código existente) ... */ }
+    function fetchAndDisplayTrades() { /* ... (seu código existente) ... */ }
+
+    // --- createTradeCard (MODIFICADO) ---
+    function createTradeCard(trade) {
+        const card = document.createElement('div');
+        card.className = 'trade-card';
+        // Adiciona o botão de editar primeiro para o posicionamento funcionar
+        card.innerHTML = `<button class="card-edit-btn">Editar</button>`;
+        
+        const contentDiv = document.createElement('div');
+        contentDiv.innerHTML = `
+            <h3>${trade.data.asset}</h3>
+            <p style="color: #007bff; font-weight: 500;">Estratégia: ${trade.data.strategyName || 'N/A'}</p>
+            <p><strong>Status:</strong> ${trade.data.status}</p>
+            <p><strong>Notas:</strong> ${trade.data.notes || ''}</p>
+        `;
+
+        if (trade.data.imageUrl) {
+            const img = document.createElement('img');
+            img.src = trade.data.imageUrl;
+            img.className = 'card-screenshot';
+            img.alt = `Gráfico de ${trade.data.asset}`;
+            img.addEventListener('click', (e) => {
+                e.stopPropagation(); // Previne que o card receba o clique
+                openLightbox(trade.data.imageUrl);
+            });
+            contentDiv.appendChild(img);
+        }
+
+        let actionButton;
+        if (trade.data.status === 'POTENTIAL') {
+            actionButton = document.createElement('button');
+            actionButton.className = 'trigger-btn btn-potential';
+            actionButton.textContent = 'Validar Setup (Armar)';
+            actionButton.addEventListener('click', () => openArmModal(trade));
+        } else if (trade.data.status === 'ARMED') {
+            card.classList.add('armed');
+            actionButton = document.createElement('button');
+            actionButton.className = 'trigger-btn btn-armed';
+            actionButton.textContent = 'Executar Gatilho';
+            actionButton.addEventListener('click', () => openExecModal(trade));
+        } else if (trade.data.status === 'LIVE') {
+            card.classList.add('live');
+            const details = trade.data.executionDetails;
+            if (details) contentDiv.innerHTML += `<p><strong>Entrada:</strong> ${details['entry-price'] || 'N/A'} | <strong>Quantidade:</strong> ${details['quantity'] || 'N/A'}</p>`;
+            actionButton = document.createElement('button');
+            actionButton.className = 'trigger-btn btn-live';
+            actionButton.textContent = 'Fechar Trade';
+            actionButton.addEventListener('click', () => openCloseTradeModal(trade));
+        }
+        
+        if (actionButton) {
+            contentDiv.appendChild(actionButton);
+        }
+
+        card.appendChild(contentDiv);
+
+        card.querySelector('.card-edit-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            loadAndOpenForEditing(trade.id);
+        });
+
+        return card;
     }
 
-    // Função auxiliar para atualizar o texto e a cor dos elementos
-    function updateElementText(id, text, isPnl = false) {
-        const element = document.getElementById(id);
-        if (element) {
-            element.textContent = text;
-            if (isPnl) {
-                element.classList.remove('positive-pnl', 'negative-pnl');
-                if (parseFloat(text.replace('€', '')) > 0) {
-                    element.classList.add('positive-pnl');
-                } else if (parseFloat(text.replace('€', '')) < 0) {
-                    element.classList.add('negative-pnl');
-                }
+    // --- Lógica para Edição (MODIFICADA) ---
+    async function loadAndOpenForEditing(tradeId) {
+        if (!tradeId) return;
+        const docSnap = await getDoc(doc(db, 'trades', tradeId));
+        if (docSnap.exists()) {
+            const tradeData = docSnap.data();
+            currentTrade = { id: tradeId, data: tradeData };
+            
+            if (tradeData.status === 'POTENTIAL') {
+                openAddModal();
+                addModal.strategySelect.value = tradeData.strategyId;
+                // Usar a função genérica para gerar o checklist
+                generateDynamicChecklist(addModal.checklistContainer, STRATEGIES[tradeData.strategyId]?.potentialPhases, tradeData.potentialSetup);
+                document.getElementById('asset').value = tradeData.asset;
+                document.getElementById('image-url').value = tradeData.imageUrl || ''; // Preenche a URL da imagem
+                document.getElementById('notes').value = tradeData.notes;
+            } else if (tradeData.status === 'ARMED') {
+                openArmModal({ id: tradeId, data: tradeData });
+                generateDynamicChecklist(armModal.checklistContainer, STRATEGIES[tradeData.strategyId]?.armedPhases, tradeData.armedSetup);
+            } else if (tradeData.status === 'LIVE') {
+                openExecModal({ id: tradeId, data: tradeData });
             }
         }
     }
+    
+    // --- Ponto de Entrada da Aplicação ---
+    document.addEventListener('DOMContentLoaded', () => {
+        // ... (seu bloco de inicialização existente) ...
+        // Adicionar eventos do lightbox
+        lightbox.closeBtn.addEventListener('click', closeLightbox);
+        lightbox.container.addEventListener('click', (e) => {
+            if (e.target.id === 'image-lightbox') closeLightbox();
+        });
 
-    // Função para gerar as tabelas de detalhes
-    function generateDetailTable(containerId, header, data) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
-
-        let tableHtml = `
-            <table>
-                <thead>
-                    <tr>
-                        <th>${header}</th>
-                        <th>Nº Trades</th>
-                        <th>P&L Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-        `;
-        for (const key in data) {
-            const item = data[key];
-            const pnlClass = item.pnl > 0 ? 'positive-pnl' : (item.pnl < 0 ? 'negative-pnl' : '');
-            tableHtml += `
-                <tr>
-                    <td>${key}</td>
-                    <td>${item.count}</td>
-                    <td class="${pnlClass}">€${item.pnl.toFixed(2)}</td>
-                </tr>
-            `;
+        // Modificar a chamada de edição
+        async function checkLocalStorageAndInit() {
+            const tradeIdToEdit = localStorage.getItem('tradeToEdit');
+            if (tradeIdToEdit) {
+                localStorage.removeItem('tradeToEdit');
+                await loadAndOpenForEditing(tradeIdToEdit);
+            }
         }
-        tableHtml += `</tbody></table>`;
-        container.innerHTML = tableHtml;
-    }
-
-    // Iniciar
-    calculateAndDisplayStats();
+        
+        // Inicialização Principal
+        document.getElementById('add-opportunity-btn').addEventListener('click', openAddModal);
+        // ... (todos os outros addEventListeners) ...
+        
+        populateStrategySelect();
+        fetchAndDisplayTrades();
+        checkLocalStorageAndInit(); // Executa a verificação de edição
+    });
 }
-
-runStatsPage();
+runApp();
