@@ -166,6 +166,12 @@ header nav {
     margin-bottom: 1.5rem;
 }
 
+/* Estilo para o asterisco de campo obrigatório */
+.required-asterisk {
+    color: #dc3545; /* Vermelho */
+    font-weight: bold;
+    margin-left: 4px;
+}
 
 
 
