@@ -16,27 +16,14 @@ from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 
 
 // A sua configuração da web app do Firebase
-/*const firebaseConfig = {
+const firebaseConfig = {
   apiKey: "AIzaSyAoKtcIsVOcvI5O6gH_14AXL3bF2I6X8Qc",
   authDomain: "trading-89c13.firebaseapp.com",
   projectId: "trading-89c13",
   storageBucket: "trading-89c13.firebasestorage.app",
   messagingSenderId: "782074719077",
   appId: "1:782074719077:web:05c07a2b81b0047ef5cf8c"
-};*/
-
-const firebaseConfig = {
-  apiKey: "AIzaSyClK9Xdj1V8shoymxOdSPNq8yX0bTZJCpA",
-  authDomain: "trading-app-c10e3.firebaseapp.com",
-  projectId: "trading-app-c10e3",
-  storageBucket: "trading-app-c10e3.firebasestorage.app",
-  messagingSenderId: "1052873040471",
-  appId: "1:1052873040471:web:d6d1683b86e8b717243912"
 };
-
-
-
-
 
 // Inicializa o Firebase e o Firestore
 const app = initializeApp(firebaseConfig);
