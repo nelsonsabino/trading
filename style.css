@@ -66,6 +66,39 @@ header nav { margin-top: 1.5rem; display: flex; justify-content: center; align-i
 #lightbox-image { max-width: 90%; max-height: 90vh; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
 #close-lightbox-btn { color: #fff; font-size: 3rem; }
 
+/* --- PÁGINA DE GESTÃO (manage.html) --- */
+#trades-table { width: 100%; border-collapse: collapse; margin-top: 2rem; background: #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: hidden; font-size: 0.95em; }
+#trades-table thead tr { background-color: #f8f9fa; border-bottom: 2px solid #dee2e6; }
+#trades-table th { padding: 1rem; text-align: left; font-weight: 600; color: #495057; text-transform: uppercase; letter-spacing: 0.5px; }
+#trades-table td { padding: 1rem; border-bottom: 1px solid #e9ecef; vertical-align: middle; }
+#trades-table tbody tr:last-child td { border-bottom: none; }
+.action-buttons { display: flex; gap: 0.5rem; }
+.action-buttons .btn { padding: 6px 12px; font-size: 0.9em; font-weight: 500; }
+.action-buttons .edit-btn { background-color: #ffc107; color: #212529; }
+.action-buttons .edit-btn:hover { background-color: #e0a800; }
+.action-buttons .delete-btn { background-color: #dc3545; color: white; }
+.action-buttons .delete-btn:hover { background-color: #c82333; }
+.status-badge { padding: 4px 10px; border-radius: 16px; color: white; font-size: 0.85em; font-weight: 600; text-transform: uppercase; display: inline-block; }
+.status-badge.status-potential { background-color: #6c757d; }
+.status-badge.status-armed { background-color: #ffc107; color: #212529; }
+.status-badge.status-live { background-color: #28a745; }
+.status-badge.status-closed { background-color: #343a40; }
+.positive-pnl { color: #28a745; font-weight: bold; }
+.negative-pnl { color: #dc3545; font-weight: bold; }
+
+/* --- PÁGINA DE ESTATÍSTICAS (stats.html) --- */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem; }
+.stat-card { background-color: #fff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.08); text-align: center; }
+.stat-card h4 { margin-top: 0; margin-bottom: 0.5rem; color: #6c757d; font-size: 1em; }
+.stat-card p { margin: 0; font-size: 2em; font-weight: bold; color: #343a40; }
+.pnl-value.positive-pnl { color: #28a745; }
+.pnl-value.negative-pnl { color: #dc3545; }
+.detailed-stats { margin-top: 3rem; }
+.detailed-stats h2 { font-size: 1.5em; }
+.detailed-stats table { width: 100%; margin-top: 1rem; }
+.detailed-stats .positive-pnl { color: #28a745; font-weight: bold; }
+.detailed-stats .negative-pnl { color: #dc3545; font-weight: bold; }
+
 /* --- RESPONSIVIDADE --- */
 @media (max-width: 992px) { .dashboard-columns { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 768px) { .dashboard-columns { grid-template-columns: 1fr; } main { padding: 0 1rem 1rem 1rem; } }
