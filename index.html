@@ -41,29 +41,22 @@
             <span id="close-modal-btn">×</span>
             <form id="add-opportunity-form">
                 <h3>Adicionar Ativo à Watchlist</h3>
-
-                <!-- ALTERAÇÕES AQUI PARA CONSISTÊNCIA -->
                 <div class="input-item">
                     <label for="strategy-select">Escolha a Estratégia:</label>
                     <select id="strategy-select" name="strategy-select" required>
                         <option value="">-- Selecione --</option>
                     </select>
                 </div>
-                
                 <div class="input-item">
                     <label for="asset">Ativo:</label>
                     <input type="text" id="asset" name="asset" required placeholder="Ex: SOL/USDT">
                 </div>
-                
                 <div id="dynamic-checklist-container"></div>
-                
                 <div class="input-item">
                     <label for="notes">Notas Iniciais:</label>
                     <textarea id="notes" placeholder="Ex: A formar fundo duplo..."></textarea>
                 </div>
-
                 <p class="form-footnote">* Campos obrigatórios</p>
-                
                 <button type="submit">Guardar na Watchlist</button>
             </form>
         </div>
@@ -126,6 +119,14 @@
                 <div id="arm-checklist-container"></div>
                 <button type="submit">ARMAR TRADE</button>
             </form>
+        </div>
+    </div>
+    
+    <!-- NOVO: Modal para visualizar imagem grande -->
+    <div id="image-viewer-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span id="close-image-viewer-modal-btn">×</span>
+            <img id="viewer-image" src="" alt="Screenshot do Trade" style="max-width: 100%; height: auto; display: block; margin: auto;">
         </div>
     </div>
     
