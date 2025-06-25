@@ -27,7 +27,6 @@ const db = getFirestore(app);
 /* ------------------------------ STRATEGIES ---------------------------- */
 /* ---------------------------------------------------------------------- */
 
-
 const STRATEGIES = {
     'preco-suporte': {
         name: "Preço em suporte com confluências",
@@ -47,6 +46,10 @@ const STRATEGIES = {
         ],
         armedPhases: [
             { title: "Validação do Setup (no TF de Análise)",
+              // CORRIGIDO: 'inputs' e 'checks' estão agora corretamente estruturados
+              inputs: [
+                  { id: "armed-id-image-url", label: "Link da Imagem do Gráfico (Fase Armado):", type: "text", required: false }
+              ],
               checks: [
                   { id: "armed-id-tendencia", label: "Preço quebrou LTB ou tem espaço?", required: true },
                   { id: "armed-id-stoch", label: "Stochastic baixo e a cruzar Bullish?", required: true },
@@ -55,10 +58,7 @@ const STRATEGIES = {
                   { id: "armed-id-rsi-ma", label: "RSI > RSI-MA? (Aumenta Prob.)", required: false }, 
                   { id: "armed-id-val", label: "Preço na base do VAL? (Aumenta Prob.)", required: false },
                   { id: "armed-id-toque3", label: "RSI a fazer 3º toque no suporte? (Aumenta Prob.)", required: false }
-              ],
-
-                inputs: [
-                    { id: "armed-id-image-url", label: "Link da Imagem do Gráfico (Fase Armado):", type: "text", required: false } 
+              ]
             }
         ],
         executionPhases: [
@@ -96,15 +96,16 @@ const STRATEGIES = {
         ],
         armedPhases: [
             { title: "Critérios para Armar (TF Superior)",
+              // CORRIGIDO: 'inputs' e 'checks' estão agora corretamente estruturados
+              inputs: [
+                  { id: "armed-is-image-url", label: "Link da Imagem do Gráfico (Fase Armado):", type: "text", required: false }
+              ],
               checks: [
                   { id: "armed-is-stoch-cross", label: "Stochastic TF superior está a cruzar bullish?", required: true },
                   { id: "armed-is-rsi-hl", label: "RSI continua com Higher Lows?", required: true },
                   { id: "armed-is-val", label: "Preço na base do VAL? (Aumenta Prob.)", required: false },
                   { id: "armed-is-rsi-toque3", label: "RSI a fazer 3º toque no suporte? (Aumenta Prob.)", required: false }
-              ],
-
-          inputs: [
-                    { id: "armed-id-image-url", label: "Link da Imagem do Gráfico (Fase Armado):", type: "text", required: false }
+              ]
             }
         ],
         executionPhases: [
@@ -250,8 +251,7 @@ function runApp() {
         const checklistData = {};
         const strategy = STRATEGIES[currentTrade.data.strategyId];
         strategy.armedPhases.forEach(p => {
-            if (p.checks) p.checks.forEach(c => checklistData[c.id] = document.getElementById(c.id).checked);
-            if (p.inputs) p.inputs.forEach(i => checklistData[i.id] = document.getElementById(i.id).value); 
+            if (p.inputs) p.inputs.forEach(i => checklistData[i.id] = document.getElementById(i.id).value);
             if (p.checks) p.checks.forEach(c => checklistData[c.id] = document.getElementById(c.id).checked);
         });
         const updatedTrade = { status: "ARMED", armedSetup: checklistData, dateArmed: new Date() };
@@ -323,7 +323,7 @@ function runApp() {
         });
     }
 
- function createTradeCard(trade) {
+    function createTradeCard(trade) {
         const card = document.createElement('div');
         card.className = 'trade-card';
         card.innerHTML = `<button class="card-edit-btn">Editar</button>
@@ -332,11 +332,10 @@ function runApp() {
             <p><strong>Status:</strong> ${trade.data.status}</p>
             <p><strong>Notas:</strong> ${trade.data.notes || ''}</p>`;
 
-        // Pega os URLs das imagens das fases POTENTIAL e ARMED
-        const potentialImageUrl = trade.data.potentialSetup?.imageUrl; // O seu campo antigo era imageUrl, vamos mantê-lo
-        const armedImageUrl = trade.data.armedSetup ? Object.values(trade.data.armedSetup).find(val => typeof val === 'string' && val.startsWith('http')) : null;
+        // CORRIGIDO: Procura pelo URL da imagem no sítio certo
+        const potentialImageUrl = trade.data.potentialSetup?.['image-url']; // O campo que definimos no handleAddSubmit
+        const armedImageUrl = trade.data.armedSetup?.['armed-id-image-url'] || trade.data.armedSetup?.['armed-is-image-url'];
 
-        // Mostra a imagem mais recente disponível
         const imageUrlToShow = armedImageUrl || potentialImageUrl;
 
         if (imageUrlToShow) {
@@ -401,7 +400,7 @@ function runApp() {
                 document.getElementById('notes').value = tradeData.notes;
             } else if (tradeData.status === 'ARMED') {
                 openArmModal({ id: tradeId, data: tradeData });
-  generateDynamicChecklist(armModal.checklistContainer, STRATEGIES[tradeData.strategyId]?.armedPhases, tradeData.armedSetup);
+                generateDynamicChecklist(armModal.checklistContainer, STRATEGIES[tradeData.strategyId]?.armedPhases, tradeData.armedSetup);
             } else if (tradeData.status === 'LIVE') {
                 openExecModal({ id: tradeId, data: tradeData });
             }
