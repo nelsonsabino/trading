@@ -32,13 +32,17 @@ const db = getFirestore(app);
 
 
 
-
-/* ------------ STRATEGIES ------------ */
+/* ------------------------------------------------------------------------ */
+/* ------------------------------ STRATEGIES ------------------------------ */
+/* ------------------------------------------------------------------------ */
 
 const STRATEGIES = {
     
     'zona-interesse': {
-        name: "Preço em Zona de Interesse",
+        name: "Inversão de direção (Bullish)",
+
+/* ------------ FASE PONTENCIAL ------------ */
+
         potentialPhases: [
             { title: "Análise Macro Inicial",
               inputs: [{ id: "pot-zi-tf", label: "Timeframe de Análise:", type: "select", options: ["Diário", "4h"], required: true }],
@@ -50,8 +54,12 @@ const STRATEGIES = {
               ] 
             }
         ],
+
+/* ------------ FASE ARMAR ------------ */
+        
         armedPhases: [
             { title: "Validação do Setup (no TF de Análise)",
+             
               checks: [
                   { id: "armed-zi-tendencia", label: "Preço quebrou LTB ou tem espaço?", required: true },
                   { id: "armed-zi-stoch", label: "Stochastic baixo e a cruzar Bullish?", required: true },
@@ -63,11 +71,20 @@ const STRATEGIES = {
               ]
             }
         ],
+
+/* ------------ FASE EXECUTAR ------------ */      
+        
         executionPhases: [
             { title: "Gatilho de Precisão",
-              inputs: [{ id: "exec-zi-tf", label: "Timeframe de Execução:", type: "select", options: ["1h", "15min", "5min"], required: true }],
-              checks: [{ id: "exec-zi-rsi-break", label: "Quebra da linha de resistência do RSI?", required: true }],
-              radios: {
+              inputs: [
+                  { id: "exec-zi-tf", label: "Timeframe de Execução:", type: "select", options: ["1h", "15min", "5min"], required: true }
+              ],
+              
+             checks: [
+                 { id: "exec-zi-rsi-break", label: "Quebra da linha de resistência do RSI?", required: true }
+             ],
+              
+             radios: {
                   name: "gatilho-final",
                   label: "Escolha o gatilho final:",
                   options: [
