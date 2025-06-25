@@ -36,20 +36,6 @@ const db = getFirestore(app);
 /* ------------ STRATEGIES ------------ */
 
 const STRATEGIES = {
-    'impulso-pos-reset': {
-        name: "Impulso Pós-Reset",
-        potentialPhases: [
-            { title: "Fase 0: Filtro de Contexto Cripto", checks: [{ id: "check-btc", label: "Direção do BTC favorável?", required: true }, { id: "check-vol", label: "Volume/Liquidez OK?", required: true }] },
-            { title: "Fase 1: Filtro Macro (4h/Diário)", checks: [{ id: "check-macro-stoch", label: "Estocástico a resetar?", required: true }, { id: "check-macro-structure", label: "Estrutura de preço favorável?", required: true }] }
-        ],
-        armedPhases: [
-            { title: "Validação do Setup (4h)", checks: [{ id: "armed-check-rsi-ma", label: "RSI > RSI-MA?", required: true }, { id: "armed-check-stoch-cross", label: "Stochastic baixo e a cruzar Bullish?", required: true }] }
-        ],
-        executionPhases: [
-            { title: "Fase 2: Setup de Entrada (1H)", checks: [{ id: "exec-check-structure-break", label: "Estrutura de curto prazo quebrada?", required: true },{ id: "exec-check-volume-increase", label: "Volume a confirmar?", required: true }] },
-            { title: "Fase 3: Gatilho (5m/15m)", checks: [{ id: "exec-check-candle-confirm", label: "Candle de confirmação fechado?", required: true }] }
-        ]
-    },
     
     'zona-interesse': {
         name: "Preço em Zona de Interesse",
@@ -71,7 +57,7 @@ const STRATEGIES = {
                   { id: "armed-zi-stoch", label: "Stochastic baixo e a cruzar Bullish?", required: true },
                   { id: "armed-zi-vah", label: "Preço NÃO está no limite do VAH?", required: true },
                   { id: "armed-zi-rhl", label: "RSI está a fazer Higher Lows?", required: true },
-                  { id: "armed-zi-rsi-ma", label: "RSI > RSI-MA? (Aumenta Prob.)", required: false },
+                  { id: "armed-zi-rsi-ma", label: "RSI > RSI-MA? (Aumenta Prob.)", required: true },
                   { id: "armed-zi-val", label: "Preço na base do VAL? (Aumenta Prob.)", required: false },
                   { id: "armed-zi-toque3", label: "RSI a fazer 3º toque no suporte? (Aumenta Prob.)", required: false }
               ]
