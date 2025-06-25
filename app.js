@@ -46,7 +46,6 @@ const STRATEGIES = {
         ],
         armedPhases: [
             { title: "Validação do Setup (no TF de Análise)",
-              // CORRIGIDO: 'inputs' e 'checks' estão agora corretamente estruturados
               inputs: [
                   { id: "armed-id-image-url", label: "Link da Imagem do Gráfico (Fase Armado):", type: "text", required: false }
               ],
@@ -96,7 +95,6 @@ const STRATEGIES = {
         ],
         armedPhases: [
             { title: "Critérios para Armar (TF Superior)",
-              // CORRIGIDO: 'inputs' e 'checks' estão agora corretamente estruturados
               inputs: [
                   { id: "armed-is-image-url", label: "Link da Imagem do Gráfico (Fase Armado):", type: "text", required: false }
               ],
@@ -332,10 +330,17 @@ function runApp() {
             <p><strong>Status:</strong> ${trade.data.status}</p>
             <p><strong>Notas:</strong> ${trade.data.notes || ''}</p>`;
 
-        // CORRIGIDO: Procura pelo URL da imagem no sítio certo
-        const potentialImageUrl = trade.data.potentialSetup?.['image-url']; // O campo que definimos no handleAddSubmit
-        const armedImageUrl = trade.data.armedSetup?.['armed-id-image-url'] || trade.data.armedSetup?.['armed-is-image-url'];
-
+        // LÓGICA DE IMAGEM CORRIGIDA E FINAL
+        const potentialImageUrl = trade.data.imageUrl;
+        // Procura em armedSetup por um campo que tenha 'image-url' no seu ID.
+        let armedImageUrl = null;
+        if (trade.data.armedSetup) {
+            const key = Object.keys(trade.data.armedSetup).find(k => k.includes('image-url'));
+            if (key) {
+                armedImageUrl = trade.data.armedSetup[key];
+            }
+        }
+        
         const imageUrlToShow = armedImageUrl || potentialImageUrl;
 
         if (imageUrlToShow) {
