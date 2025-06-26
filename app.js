@@ -225,19 +225,23 @@ function runApp() {
         if (!phases) return;
         phases.forEach(phase => {
             const phaseDiv = document.createElement('div');
+            
+            // LÓGICA ATUALIZADA para mostrar a imagem de exemplo
             if (phase.exampleImageUrl) {
                 const exampleContainer = document.createElement('div');
                 exampleContainer.className = 'example-image-container';
                 exampleContainer.innerHTML = `<p>Exemplo Visual:</p><img src="${phase.exampleImageUrl}" alt="Exemplo para ${phase.title}">`;
                 exampleContainer.querySelector('img').addEventListener('click', (e) => {
-                    e.stopPropagation();
+                    e.stopPropagation(); // Evita que o clique feche o modal
                     openLightbox(phase.exampleImageUrl);
                 });
                 phaseDiv.appendChild(exampleContainer);
             }
+
             const titleEl = document.createElement('h4');
             titleEl.textContent = phase.title;
             phaseDiv.appendChild(titleEl);
+            
             if (phase.inputs) phase.inputs.forEach(input => phaseDiv.appendChild(createInputItem(input, data)));
             if (phase.checks) phase.checks.forEach(check => phaseDiv.appendChild(createChecklistItem(check, data)));
             if (phase.radios) phaseDiv.appendChild(createRadioGroup(phase.radios, data));
