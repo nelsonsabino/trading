@@ -40,10 +40,10 @@ const STRATEGIES = {
        
         potentialPhases: [
             { title: "Análise Macro Inicial",
-              inputs: [
+              inputs: [ { id: "armed-id-image-url", label: "Link da Imagem do Gráfico (Fase Armado):", type: "text", required: false }, 
                   { id: "pot-id-tf", label: "Timeframe de Análise:", type: "select", options: ["Diário", "4h"], required: true },
-                  { id: "pot-id-rsi-ltb", label: "RSI furou LTB?", type: "select", options: ["Sim, com força", "Não, mas ainda tem espaço", "Não, está encostado"], required: true }
-              ],
+                  { id: "pot-id-rsi-ltb", label: "RSI furou LTB?", type: "select", options: ["Sim, com força", "Não, mas ainda tem espaço", "Não, está encostado"], required: true }    
+                      ],
               checks: [
                   { id: "pot-id-suporte", label: "Preço está em zona de suporte?", required: true },
                   { id: "pot-id-ema50", label: "EMA50 a suportar ou com espaço?", required: true },
