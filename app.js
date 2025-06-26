@@ -37,6 +37,7 @@ const STRATEGIES = {
    
     'preco-suporte': {
         name: "Preço em suporte com confluências",
+       
         potentialPhases: [
             { title: "Análise Macro Inicial",
               inputs: [
@@ -51,6 +52,7 @@ const STRATEGIES = {
               ]
             }
         ],
+       
         armedPhases: [
             { title: "Validação do Setup (no TF de Análise)",
               inputs: [ { id: "armed-id-image-url", label: "Link da Imagem do Gráfico (Fase Armado):", type: "text", required: false } ],
@@ -65,6 +67,7 @@ const STRATEGIES = {
               ]
             }
         ],
+       
         executionPhases: [
             { title: "Gatilho de Precisão",
               inputs: [{ id: "exec-id-tf", label: "Timeframe de Execução:", type: "select", options: ["1h", "15min", "5min"], required: true }],
@@ -147,6 +150,7 @@ const STRATEGIES = {
    
     'convergencia-3tf': {
         name: "Convergência 3 TFs",
+       
         potentialPhases: [
             { 
                 title: "Fase Potencial (Análise 4h)",
@@ -157,6 +161,7 @@ const STRATEGIES = {
                 ]
             }
         ],
+       
         armedPhases: [
             {
                 title: "Fase Armar (Confirmação 1h)",
@@ -168,6 +173,7 @@ const STRATEGIES = {
                 ]
             }
         ],
+       
         executionPhases: [
             {
                 title: "Fase Executar (Gatilho 15min)",
@@ -179,44 +185,8 @@ const STRATEGIES = {
                 ]
             }
         ]
-    },
-
-    'convergencia-3tf': {
-        name: "Convergência 3 TFs",
-        potentialPhases: [
-            { 
-                title: "Fase Potencial (Análise 4h)",
-                // Link para a sua imagem de exemplo
-                exampleImageUrl: "URL_DA_SUA_IMAGEM_EXEMPLO_AQUI", 
-                checks: [
-                    { id: "pot-c3-stoch-reset", label: "Stochastic fez reset?", required: true },
-                    { id: "pot-c3-confluencia", label: "Confluência: Preço na EMA50 + Suporte LTA do RSI?", required: true }
-                ]
-            }
-        ],
-        armedPhases: [
-            {
-                title: "Fase Armar (Confirmação 1h)",
-                exampleImageUrl: "URL_DA_SUA_IMAGEM_EXEMPLO_AQUI",
-                checks: [
-                    { id: "armed-c3-rsi-ma", label: "RSI > RSI-MA?", required: true },
-                    { id: "armed-c3-stoch-subir", label: "Stochastic (1h) fez reset e está a subir?", required: true },
-                    { id: "armed-c3-ema200", label: "Preço > EMA200? (Aumenta Prob.)", required: false }
-                ]
-            }
-        ],
-        executionPhases: [
-            {
-                title: "Fase Executar (Gatilho 15min)",
-                exampleImageUrl: "URL_DA_SUA_IMAGEM_EXEMPLO_AQUI",
-                checks: [
-                    { id: "exec-c3-stoch-reset", label: "Entrar no próximo reset do Stochastic (15m)?", required: true },
-                    { id: "exec-c3-rsi-hl", label: "RSI fez um Higher Low neste reset?", required: true },
-                    { id: "exec-c3-rsi-toque3", label: "Este é o 3º toque no suporte do RSI? (Aumenta Prob.)", required: false }
-                ]
-            }
-        ]
     }
+
 };
 
 const GESTAO_PADRAO = {
