@@ -27,6 +27,7 @@ const db = getFirestore(app);
 /* ------------------------------ STRATEGIES ---------------------------- */
 /* ---------------------------------------------------------------------- */
 
+
 const STRATEGIES = {
     'preco-suporte': {
         name: "Preço em suporte com confluências",
@@ -199,7 +200,14 @@ function runApp() {
         if (!phases) return;
         phases.forEach(phase => {
             const phaseDiv = document.createElement('div');
-            phaseDiv.innerHTML = `<h4>${phase.title}</h4>`;
+            if (phase.exampleImageUrl) {
+                const exampleContainer = document.createElement('div');
+                exampleContainer.className = 'example-image-container';
+                exampleContainer.innerHTML = `<p>Exemplo Visual:</p><img src="${phase.exampleImageUrl}" alt="Exemplo para ${phase.title}">`;
+                exampleContainer.querySelector('img').addEventListener('click', (e) => { e.stopPropagation(); openLightbox(phase.exampleImageUrl); });
+                phaseDiv.appendChild(exampleContainer);
+            }
+            phaseDiv.innerHTML += `<h4>${phase.title}</h4>`;
             if (phase.inputs) phase.inputs.forEach(input => phaseDiv.appendChild(createInputItem(input, data)));
             if (phase.checks) phase.checks.forEach(check => phaseDiv.appendChild(createChecklistItem(check, data)));
             if (phase.radios) phaseDiv.appendChild(createRadioGroup(phase.radios, data));
@@ -330,15 +338,12 @@ function runApp() {
             <p><strong>Status:</strong> ${trade.data.status}</p>
             <p><strong>Notas:</strong> ${trade.data.notes || ''}</p>`;
 
-        // LÓGICA DE IMAGEM CORRIGIDA E FINAL
+        // LÓGICA DE IMAGEM CORRIGIDA
         const potentialImageUrl = trade.data.imageUrl;
-        // Procura em armedSetup por um campo que tenha 'image-url' no seu ID.
         let armedImageUrl = null;
         if (trade.data.armedSetup) {
             const key = Object.keys(trade.data.armedSetup).find(k => k.includes('image-url'));
-            if (key) {
-                armedImageUrl = trade.data.armedSetup[key];
-            }
+            if (key) armedImageUrl = trade.data.armedSetup[key];
         }
         
         const imageUrlToShow = armedImageUrl || potentialImageUrl;
