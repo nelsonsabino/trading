@@ -111,8 +111,6 @@ const STRATEGIES = {
         ]
     },
 
-   // --- DENTRO do seu objeto STRATEGIES, a seguir a 'impulso-suporte' ---
-    , // Não se esqueça da vírgula aqui
     'convergencia-3tf': {
         name: "Convergência 3 TFs",
         potentialPhases: [
