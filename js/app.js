@@ -1,6 +1,7 @@
 // js/app.js
 
-import { STRATEGIES, GESTAO_PADRAO } from './config.js';
+import { GESTAO_PADRAO } from './config.js';
+import { STRATEGIES } from './strategies.js';
 import { listenToTrades, getTrade, addTrade, updateTrade } from './firebase-service.js';
 
 document.addEventListener('DOMContentLoaded', () => {
