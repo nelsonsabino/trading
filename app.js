@@ -40,6 +40,8 @@ const STRATEGIES = {
        
         potentialPhases: [
             { title: "Análise Macro Inicial",
+                exampleImageUrl: "https://i.imgur.com/link_exemplo_potencial.png", // SUBSTITUA COM UM LINK REAL
+             
               inputs: [ 
                   { id: "pot-id-tf", label: "Timeframe de Análise:", type: "select", options: ["Diário", "4h"], required: true },
                   { id: "pot-id-rsi-ltb", label: "RSI furou LTB?", type: "select", options: ["Sim, com força", "Não, mas ainda tem espaço", "Não, está encostado"], required: true }    
@@ -55,7 +57,8 @@ const STRATEGIES = {
        
         armedPhases: [
             { title: "Validação do Setup (no TF de Análise)",
-              inputs: [ { id: "armed-id-image-url", label: "Link da Imagem do Gráfico (Fase Armado):", type: "text", required: false } ],
+                exampleImageUrl: "https://i.imgur.com/link_exemplo_potencial.png", // SUBSTITUA COM UM LINK REAL
+             
               checks: [
                   { id: "armed-id-tendencia", label: "Preço quebrou LTB ou tem espaço?", required: true },
                   { id: "armed-id-stoch", label: "Stochastic baixo e a cruzar Bullish?", required: true },
@@ -70,6 +73,8 @@ const STRATEGIES = {
        
         executionPhases: [
             { title: "Gatilho de Precisão",
+                exampleImageUrl: "https://i.imgur.com/link_exemplo_potencial.png", // SUBSTITUA COM UM LINK REAL
+             
               inputs: [{ id: "exec-id-tf", label: "Timeframe de Execução:", type: "select", options: ["1h", "15min", "5min"], required: true }],
               checks: [{ id: "exec-id-rsi-break", label: "Quebra da linha de resistência do RSI?", required: true }],
               radios: {
