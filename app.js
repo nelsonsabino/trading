@@ -28,6 +28,7 @@ const db = getFirestore(app);
 /* ---------------------------------------------------------------------- */
 
 
+
 const STRATEGIES = {
     'preco-suporte': {
         name: "Preço em suporte com confluências",
@@ -47,9 +48,7 @@ const STRATEGIES = {
         ],
         armedPhases: [
             { title: "Validação do Setup (no TF de Análise)",
-              inputs: [
-                  { id: "armed-id-image-url", label: "Link da Imagem do Gráfico (Fase Armado):", type: "text", required: false }
-              ],
+              inputs: [ { id: "armed-id-image-url", label: "Link da Imagem do Gráfico (Fase Armado):", type: "text", required: false } ],
               checks: [
                   { id: "armed-id-tendencia", label: "Preço quebrou LTB ou tem espaço?", required: true },
                   { id: "armed-id-stoch", label: "Stochastic baixo e a cruzar Bullish?", required: true },
@@ -66,8 +65,7 @@ const STRATEGIES = {
               inputs: [{ id: "exec-id-tf", label: "Timeframe de Execução:", type: "select", options: ["1h", "15min", "5min"], required: true }],
               checks: [{ id: "exec-id-rsi-break", label: "Quebra da linha de resistência do RSI?", required: true }],
               radios: {
-                  name: "gatilho-final-id",
-                  label: "Escolha o gatilho final:",
+                  name: "gatilho-final-id", label: "Escolha o gatilho final:",
                   options: [
                       { id: "exec-id-gatilho-base", label: "Preço na base local do FRVP + Stoch reset?" },
                       { id: "exec-id-gatilho-acima", label: "Preço acima da base local do FRVP + Stoch reset?" }
@@ -76,82 +74,42 @@ const STRATEGIES = {
             }
         ]
     }, 
-    'impulso-suporte': {
-        name: "Após impulso do suporte",
+    'impulso-suporte': { /* ... sua estratégia existente ... */ },
+    'convergencia-3tf': {
+        name: "Convergência 3 TFs",
         potentialPhases: [
-            { title: "Análise Macro Inicial",
-              inputs: [
-                  { id: "pot-is-tf-impulso", label: "Timeframe de Análise:", type: "select", options: ["Diário", "4h"], required: true },
-                  { id: "pot-is-rsi-ltb-impulso", label: "RSI furou LTB?", type: "select", options: ["Sim, com força", "Não, mas ainda tem espaço", "Não, está encostado"], required: true }
-              ],                
-              checks: [
-                  { id: "pot-is-rsi-hl", label: "RSI com Higher Lows?", required: true },
-                  { id: "pot-is-fib", label: "Preço acima de Fibonacci 0.382?", required: true },
-                  { id: "pot-is-stoch-corr", label: "Stochastic já está a corrigir?", required: true },
-                  { id: "pot-is-ema50", label: "Preço acima da EMA50?", required: true },
-                  { id: "pot-is-alarm", label: "Alarme foi colocado?", required: true },
-                  { id: "pot-is-rsi-ma", label: "RSI acima da RSI-MA?", required: false }
-              ]
+            { 
+                title: "Fase Potencial (Análise 4h)",
+                exampleImageUrl: "https://i.imgur.com/link_exemplo_potencial.png", // SUBSTITUA COM UM LINK REAL
+                checks: [
+                    { id: "pot-c3-stoch-reset", label: "Stochastic fez reset?", required: true },
+                    { id: "pot-c3-confluencia", label: "Confluência: Preço na EMA50 + Suporte LTA do RSI?", required: true }
+                ]
             }
         ],
         armedPhases: [
-            { title: "Critérios para Armar (TF Superior)",
-              inputs: [
-                  { id: "armed-is-image-url", label: "Link da Imagem do Gráfico (Fase Armado):", type: "text", required: false }
-              ],
-              checks: [
-                  { id: "armed-is-stoch-cross", label: "Stochastic TF superior está a cruzar bullish?", required: true },
-                  { id: "armed-is-rsi-hl", label: "RSI continua com Higher Lows?", required: true },
-                  { id: "armed-is-val", label: "Preço na base do VAL? (Aumenta Prob.)", required: false },
-                  { id: "armed-is-rsi-toque3", label: "RSI a fazer 3º toque no suporte? (Aumenta Prob.)", required: false }
-              ]
+            {
+                title: "Fase Armar (Confirmação 1h)",
+                exampleImageUrl: "https://i.imgur.com/link_exemplo_armado.png", // SUBSTITUA
+                checks: [
+                    { id: "armed-c3-rsi-ma", label: "RSI > RSI-MA?", required: true },
+                    { id: "armed-c3-stoch-subir", label: "Stochastic (1h) fez reset e está a subir?", required: true },
+                    { id: "armed-c3-ema200", label: "Preço > EMA200? (Aumenta Prob.)", required: false }
+                ]
             }
         ],
         executionPhases: [
-            { title: "Gatilho de Precisão",
-              inputs: [{ id: "exec-is-tf", label: "Timeframe de Execução:", type: "select", options: ["1h", "15min", "5min"], required: true }],
-              checks: [{ id: "exec-is-rsi-break", label: "Quebra da linha de resistência do RSI?", required: true }],
-              radios: {
-                  name: "gatilho-final-is",
-                  label: "Escolha o gatilho final:",
-                  options: [
-                      { id: "exec-is-gatilho-base", label: "Preço na base local do FRVP + Stoch reset?" },
-                      { id: "exec-is-gatilho-acima", label: "Preço acima da base local do FRVP + Stoch reset?" }
-                  ]
-              }
+            {
+                title: "Fase Executar (Gatilho 15min)",
+                exampleImageUrl: "https://i.imgur.com/link_exemplo_exec.png", // SUBSTITUA
+                checks: [
+                    { id: "exec-c3-stoch-reset", label: "Entrar no próximo reset do Stochastic (15m)?", required: true },
+                    { id: "exec-c3-rsi-hl", label: "RSI fez um Higher Low neste reset?", required: true },
+                    { id: "exec-c3-rsi-toque3", label: "Este é o 3º toque no suporte do RSI? (Aumenta Prob.)", required: false }
+                ]
             }
         ]
     }
-
-   'convergencia-3tf': {
-        name: "Convergência 3 TFs",
-        potentialPhases: [{ 
-            title: "Fase Potencial (Análise 4h)",
-            exampleImageUrl: "https://i.imgur.com/exemplo1.png", // SUBSTITUA
-            checks: [
-                { id: "pot-c3-stoch-reset", label: "Stochastic fez reset?", required: true },
-                { id: "pot-c3-confluencia", label: "Confluência: Preço na EMA50 + Suporte LTA do RSI?", required: true }
-            ]
-        }],
-        armedPhases: [{
-            title: "Fase Armar (Confirmação 1h)",
-            exampleImageUrl: "https://i.imgur.com/exemplo2.png", // SUBSTITUA
-            checks: [
-                { id: "armed-c3-rsi-ma", label: "RSI > RSI-MA?", required: true },
-                { id: "armed-c3-stoch-subir", label: "Stochastic (1h) fez reset e está a subir?", required: true },
-                { id: "armed-c3-ema200", label: "Preço > EMA200? (Aumenta Prob.)", required: false }
-            ]
-        }],
-        executionPhases: [{
-            title: "Fase Executar (Gatilho 15min)",
-            exampleImageUrl: "https://i.imgur.com/exemplo3.png", // SUBSTITUA
-            checks: [
-                { id: "exec-c3-stoch-reset", label: "Entrar no próximo reset do Stochastic (15m)?", required: true },
-                { id: "exec-c3-rsi-hl", label: "RSI fez um Higher Low neste reset?", required: true },
-                { id: "exec-c3-rsi-toque3", label: "Este é o 3º toque no suporte do RSI? (Aumenta Prob.)", required: false }
-            ]
-        }]
-    }   
 };
 
 const GESTAO_PADRAO = {
@@ -234,10 +192,15 @@ function runApp() {
                 const exampleContainer = document.createElement('div');
                 exampleContainer.className = 'example-image-container';
                 exampleContainer.innerHTML = `<p>Exemplo Visual:</p><img src="${phase.exampleImageUrl}" alt="Exemplo para ${phase.title}">`;
-                exampleContainer.querySelector('img').addEventListener('click', (e) => { e.stopPropagation(); openLightbox(phase.exampleImageUrl); });
+                exampleContainer.querySelector('img').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openLightbox(phase.exampleImageUrl);
+                });
                 phaseDiv.appendChild(exampleContainer);
             }
-            phaseDiv.innerHTML += `<h4>${phase.title}</h4>`;
+            const titleEl = document.createElement('h4');
+            titleEl.textContent = phase.title;
+            phaseDiv.appendChild(titleEl);
             if (phase.inputs) phase.inputs.forEach(input => phaseDiv.appendChild(createInputItem(input, data)));
             if (phase.checks) phase.checks.forEach(check => phaseDiv.appendChild(createChecklistItem(check, data)));
             if (phase.radios) phaseDiv.appendChild(createRadioGroup(phase.radios, data));
@@ -368,7 +331,6 @@ function runApp() {
             <p><strong>Status:</strong> ${trade.data.status}</p>
             <p><strong>Notas:</strong> ${trade.data.notes || ''}</p>`;
 
-        // LÓGICA DE IMAGEM CORRIGIDA
         const potentialImageUrl = trade.data.imageUrl;
         let armedImageUrl = null;
         if (trade.data.armedSetup) {
@@ -377,7 +339,6 @@ function runApp() {
         }
         
         const imageUrlToShow = armedImageUrl || potentialImageUrl;
-
         if (imageUrlToShow) {
             const img = document.createElement('img');
             img.src = imageUrlToShow;
@@ -483,4 +444,5 @@ function runApp() {
         init();
     });
 }
+
 runApp();
