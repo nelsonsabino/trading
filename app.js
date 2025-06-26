@@ -74,7 +74,66 @@ const STRATEGIES = {
             }
         ]
     }, 
-    'impulso-suporte': { /* ... sua estratégia existente ... */ },
+   
+
+ 'impulso-suporte': {
+        name: "Após impulso do suporte",
+        
+        potentialPhases: [
+            {
+                title: "Análise Macro Inicial",
+
+                inputs: [
+                    { id: "pot-id-tf-impulso", label: "Timeframe de Análise:", type: "select", options: ["Diário", "4h"], required: true },
+                    { id: "pot-id-rsi-ltb-impulso", label: "RSI furou LTB?", type: "select", options: ["Sim, com força", "Não, mas ainda tem espaço", "Não, está encostado"], required: true }
+                ],                
+                checks: [
+                    { id: "pot-is-rsi-hl", label: "RSI com Higher Lows?", required: true },
+                    { id: "pot-is-fib", label: "Preço acima de Fibonacci 0.382?", required: true },
+                    { id: "pot-is-stoch-corr", label: "Stochastic já está a corrigir?", required: true },
+                    { id: "pot-is-ema50", label: "Preço acima da EMA50?", required: true },
+                    { id: "pot-is-alarm", label: "Alarme foi colocado?", required: true },
+                    { id: "pot-is-rsi-ma", label: "RSI acima da RSI-MA?", required: false }
+                ]
+            }
+        ],
+        
+        armedPhases: [
+            {
+                title: "Critérios para Armar (TF Superior)",
+                inputs: [ { id: "armed-id-image-url", label: "Link da Imagem do Gráfico (Fase Armado):", type: "text", required: false } ],
+ 
+                checks: [
+                    { id: "armed-is-stoch-cross", label: "Stochastic TF superior está a cruzar bullish?", required: true },
+                    { id: "armed-is-rsi-hl", label: "RSI continua com Higher Lows?", required: true },
+                    { id: "armed-is-val", label: "Preço na base do VAL? (Aumenta Prob.)", required: false },
+                    { id: "armed-is-rsi-toque3", label: "RSI a fazer 3º toque no suporte? (Aumenta Prob.)", required: false }
+                ]
+            }
+        ],
+        
+        executionPhases: [
+            {
+                title: "Gatilho de Precisão",
+                inputs: [
+                    { id: "exec-is-tf", label: "Timeframe de Execução:", type: "select", options: ["1h", "15min", "5min"], required: true }
+                ],
+                checks: [
+                    { id: "exec-is-rsi-break", label: "Quebra da linha de resistência do RSI?", required: true }
+                ],
+                radios: {
+                    name: "gatilho-final-is",
+                    label: "Escolha o gatilho final:",
+                    options: [
+                        { id: "exec-is-gatilho-base", label: "Preço na base local do FRVP + Stoch reset?" },
+                        { id: "exec-is-gatilho-acima", label: "Preço acima da base local do FRVP + Stoch reset?" } // Corrigido erro de formatação aqui
+                    ]
+                }
+            }
+        ]
+    },
+
+   
     'convergencia-3tf': {
         name: "Convergência 3 TFs",
         potentialPhases: [
