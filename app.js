@@ -122,6 +122,36 @@ const STRATEGIES = {
             }
         ]
     }
+
+   'convergencia-3tf': {
+        name: "Convergência 3 TFs",
+        potentialPhases: [{ 
+            title: "Fase Potencial (Análise 4h)",
+            exampleImageUrl: "https://i.imgur.com/exemplo1.png", // SUBSTITUA
+            checks: [
+                { id: "pot-c3-stoch-reset", label: "Stochastic fez reset?", required: true },
+                { id: "pot-c3-confluencia", label: "Confluência: Preço na EMA50 + Suporte LTA do RSI?", required: true }
+            ]
+        }],
+        armedPhases: [{
+            title: "Fase Armar (Confirmação 1h)",
+            exampleImageUrl: "https://i.imgur.com/exemplo2.png", // SUBSTITUA
+            checks: [
+                { id: "armed-c3-rsi-ma", label: "RSI > RSI-MA?", required: true },
+                { id: "armed-c3-stoch-subir", label: "Stochastic (1h) fez reset e está a subir?", required: true },
+                { id: "armed-c3-ema200", label: "Preço > EMA200? (Aumenta Prob.)", required: false }
+            ]
+        }],
+        executionPhases: [{
+            title: "Fase Executar (Gatilho 15min)",
+            exampleImageUrl: "https://i.imgur.com/exemplo3.png", // SUBSTITUA
+            checks: [
+                { id: "exec-c3-stoch-reset", label: "Entrar no próximo reset do Stochastic (15m)?", required: true },
+                { id: "exec-c3-rsi-hl", label: "RSI fez um Higher Low neste reset?", required: true },
+                { id: "exec-c3-rsi-toque3", label: "Este é o 3º toque no suporte do RSI? (Aumenta Prob.)", required: false }
+            ]
+        }]
+    }   
 };
 
 const GESTAO_PADRAO = {
