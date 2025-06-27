@@ -1,11 +1,7 @@
 // --- INICIALIZAÇÃO DO FIREBASE (Sintaxe v9 Modular) ---
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
 import { 
-    getFirestore, 
-    collection, 
-    query, 
-    where, 
-    onSnapshot
+    getFirestore, collection, doc, query, where, onSnapshot, runTransaction 
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 
 // A sua configuração da web app do Firebase
@@ -24,12 +20,97 @@ const db = getFirestore(app);
 
 
 
-
-
-
 function runStatsPage() {
-    // Função principal que corre quando a página carrega
-    function calculateAndDisplayStats() {
+    // --- SELETORES DO DOM ---
+    const balanceEl = document.getElementById('current-balance');
+    const depositBtn = document.getElementById('deposit-btn');
+    const withdrawBtn = document.getElementById('withdraw-btn');
+    const transactionModal = {
+        container: document.getElementById('transaction-modal'),
+        form: document.getElementById('transaction-form'),
+        closeBtn: document.getElementById('close-transaction-modal-btn'),
+        title: document.getElementById('transaction-title')
+    };
+    
+    let currentTransactionType = 'deposit'; // 'deposit' ou 'withdraw'
+
+    // --- LÓGICA DO PORTFÓLIO ---
+    
+    // Escuta alterações no documento do portfólio e atualiza o saldo na UI
+    onSnapshot(doc(db, "portfolio", "summary"), (doc) => {
+        if (doc.exists()) {
+            const balance = doc.data().balance || 0;
+            balanceEl.textContent = `€${balance.toFixed(2)}`;
+        } else {
+            balanceEl.textContent = '€0.00';
+            console.log("Documento do portfólio não existe. Será criado na primeira transação.");
+        }
+    });
+
+    // Abre o modal para depósito
+    depositBtn.addEventListener('click', () => {
+        currentTransactionType = 'deposit';
+        transactionModal.title.textContent = 'Registar Depósito';
+        transactionModal.container.style.display = 'flex';
+    });
+    
+    // Abre o modal para levantamento
+    withdrawBtn.addEventListener('click', () => {
+        currentTransactionType = 'withdraw';
+        transactionModal.title.textContent = 'Registar Levantamento';
+        transactionModal.container.style.display = 'flex';
+    });
+    
+    // Fecha o modal
+    function closeTransactionModal() {
+        transactionModal.form.reset();
+        transactionModal.container.style.display = 'none';
+    }
+    transactionModal.closeBtn.addEventListener('click', closeTransactionModal);
+    transactionModal.container.addEventListener('click', (e) => { if (e.target.id === 'transaction-modal') closeTransactionModal(); });
+
+    // Lida com a submissão do formulário
+    transactionModal.form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const amountInput = document.getElementById('transaction-amount');
+        let amount = parseFloat(amountInput.value);
+
+        if (isNaN(amount) || amount <= 0) {
+            alert("Por favor, insira um montante válido.");
+            return;
+        }
+
+        // Se for um levantamento, o valor é negativo
+        if (currentTransactionType === 'withdraw') {
+            amount = -amount;
+        }
+
+        // Usa uma transação do Firestore para garantir que o saldo é atualizado de forma segura
+        try {
+            const portfolioRef = doc(db, "portfolio", "summary");
+            await runTransaction(db, async (transaction) => {
+                const portfolioDoc = await transaction.get(portfolioRef);
+                const currentBalance = portfolioDoc.exists() ? portfolioDoc.data().balance : 0;
+                const newBalance = currentBalance + amount;
+
+                if (newBalance < 0) {
+                    throw new Error("Não pode levantar mais do que o saldo atual.");
+                }
+                
+                transaction.set(portfolioRef, { balance: newBalance }, { merge: true });
+            });
+
+            console.log("Transação concluída com sucesso!");
+            closeTransactionModal();
+
+        } catch (error) {
+            console.error("Erro na transação: ", error);
+            alert(error.message);
+        }
+    });
+
+    // --- LÓGICA DAS ESTATÍSTICAS DE TRADES (código existente) ---
+ function calculateAndDisplayStats() {
         const q = query(collection(db, 'trades'), where('status', '==', 'CLOSED'));
 
         onSnapshot(q, (snapshot) => {
@@ -98,10 +179,9 @@ function runStatsPage() {
             generateDetailTable('strategy-stats', 'Estratégia', statsByStrategy);
             generateDetailTable('reason-stats', 'Motivo', statsByReason);
         });
-    }
-
-    // Função auxiliar para atualizar o texto e a cor dos elementos
-    function updateElementText(id, text, isPnl = false) {
+    }    
+    
+function updateElementText(id, text, isPnl = false) {
         const element = document.getElementById(id);
         if (element) {
             element.textContent = text;
@@ -114,10 +194,9 @@ function runStatsPage() {
                 }
             }
         }
-    }
-
-    // Função para gerar as tabelas de detalhes
-    function generateDetailTable(containerId, header, data) {
+    }    
+    
+function generateDetailTable(containerId, header, data) {
         const container = document.getElementById(containerId);
         if (!container) return;
 
@@ -146,6 +225,8 @@ function runStatsPage() {
         tableHtml += `</tbody></table>`;
         container.innerHTML = tableHtml;
     }
+ 
+    
 
     // Iniciar
     calculateAndDisplayStats();
