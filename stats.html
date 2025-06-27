@@ -80,6 +80,27 @@
         </section>
     </main>
 
+
+
+    <!-- NOVO: MODAL PARA TRANSAÇÕES DO PORTFÓLIO -->
+    <div id="transaction-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span id="close-transaction-modal-btn">×</span>
+            <h3 id="transaction-title">Registar Transação</h3>
+            <form id="transaction-form">
+                <div class="input-item">
+                    <label for="transaction-amount">Montante (€):</label>
+                    <input type="number" id="transaction-amount" step="any" required placeholder="Ex: 500">
+                </div>
+                <div class="input-item">
+                    <label for="transaction-notes">Notas (Opcional):</label>
+                    <input type="text" id="transaction-notes" placeholder="Ex: Depósito inicial, Bónus, etc.">
+                </div>
+                <button type="submit">Confirmar</button>
+            </form>
+        </div>
+    </div>
+
     <script type="module" src="stats.js"></script>
 </body>
 </html>
