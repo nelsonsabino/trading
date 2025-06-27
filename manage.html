@@ -26,7 +26,7 @@
                         <th>Estratégia</th>
                         <th>Status</th>
                         <th>Data de Criação</th>
-                        <th>P&L (€)</th>
+                        <th>P&L ($)</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -35,6 +35,28 @@
                 </tbody>
             </table>
         </section>
+
+ <hr class="section-divider">
+
+        <!-- NOVA SECÇÃO PARA O HISTÓRICO DE TRANSAÇÕES -->
+        <section class="transaction-history">
+            <h2>Histórico de Transações do Portfólio</h2>
+            <table id="transactions-table">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Tipo</th>
+                        <th>Montante ($)</th>
+                        <th>Notas</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="transactions-table-body">
+                    <!-- As linhas serão inseridas aqui pelo JavaScript -->
+                </tbody>
+            </table>
+        </section>
+        
     </main>
 
     <script type="module" src="manage.js"></script>
