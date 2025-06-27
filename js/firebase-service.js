@@ -53,6 +53,47 @@ export async function updateTrade(tradeId, updatedData) {
     }
 }
 
+
+/**
+ * Fecha um trade, atualiza o seu status e adiciona o P&L ao saldo do portfólio.
+ * Tudo dentro de uma única transação segura.
+ * @param {string} tradeId - O ID do trade a ser fechado.
+ * @param {Object} closeDetails - Objeto com os detalhes de fecho (pnl, exitPrice, etc.).
+ */
+export async function closeTradeAndUpdateBalance(tradeId, closeDetails) {
+    const tradeRef = doc(db, 'trades', tradeId);
+    const portfolioRef = doc(db, 'portfolio', 'summary');
+    const pnlValue = parseFloat(closeDetails.pnl);
+
+    if (isNaN(pnlValue)) {
+        // Lança um erro que será apanhado pela função que chama
+        throw new Error("Valor de P&L inválido fornecido.");
+    }
+
+    try {
+        await runTransaction(db, async (transaction) => {
+            const portfolioDoc = await transaction.get(portfolioRef);
+            const currentBalance = portfolioDoc.exists() ? portfolioDoc.data().balance : 0;
+            const newBalance = currentBalance + pnlValue;
+
+            // 1. Atualiza o documento do trade
+            transaction.update(tradeRef, { 
+                status: "CLOSED", 
+                closeDetails: closeDetails, 
+                dateClosed: new Date() 
+            });
+
+            // 2. Atualiza o documento do saldo do portfólio
+            transaction.set(portfolioRef, { balance: newBalance }, { merge: true });
+        });
+    } catch (error) {
+        console.error("Erro na transação de fecho de trade:", error);
+        // Re-lança o erro para que a UI possa notificar o utilizador
+        throw error;
+    }
+}
+
+
 // Apaga um trade da base de dados (NOVA FUNÇÃO)
 export async function deleteTrade(tradeId) {
     try {
