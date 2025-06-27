@@ -149,18 +149,49 @@ document.addEventListener('DOMContentLoaded', () => {
         await updateTrade(currentTrade.id, { status: "LIVE", executionDetails: executionData, dateExecuted: new Date() });
         closeExecModal();
     }
-    async function handleCloseSubmit(e) {
-        e.preventDefault();
-        const closeDetails = {
-            exitPrice: closeModalObj.exitPriceInput.value,
-            pnl: closeModalObj.pnlInput.value,
-            closeReason: document.getElementById('close-reason').value,
-            finalNotes: document.getElementById('final-notes').value,
-            exitScreenshotUrl: document.getElementById('exit-screenshot-url').value
-        };
-        await updateTrade(currentTrade.id, { status: "CLOSED", closeDetails: closeDetails, dateClosed: new Date() });
-        closeCloseTradeModal();
+
+    
+async function handleCloseSubmit(e) {
+    e.preventDefault();
+    const pnlValue = parseFloat(document.getElementById('final-pnl').value);
+
+    if (isNaN(pnlValue)) {
+        alert("Por favor, insira um valor de P&L válido.");
+        return;
     }
+
+    const closeDetails = {
+        exitPrice: document.getElementById('exit-price').value,
+        pnl: pnlValue, // Usamos o valor já validado
+        closeReason: document.getElementById('close-reason').value,
+        finalNotes: document.getElementById('final-notes').value,
+        exitScreenshotUrl: document.getElementById('exit-screenshot-url').value
+    };
+
+    const tradeRef = doc(db, 'trades', currentTrade.id);
+    const portfolioRef = doc(db, "portfolio", "summary");
+
+    try {
+        // Usamos uma transação para garantir que ambas as operações (atualizar o trade e o saldo) acontecem ou nenhuma acontece.
+        await runTransaction(db, async (transaction) => {
+            const portfolioDoc = await transaction.get(portfolioRef);
+            const currentBalance = portfolioDoc.exists() ? portfolioDoc.data().balance : 0;
+            const newBalance = currentBalance + pnlValue;
+
+            // 1. Atualiza o trade para "CLOSED"
+            transaction.update(tradeRef, { status: "CLOSED", closeDetails: closeDetails, dateClosed: new Date() });
+            
+            // 2. Atualiza o saldo do portfólio
+            transaction.set(portfolioRef, { balance: newBalance }, { merge: true });
+        });
+
+        console.log("Trade fechado e saldo atualizado com sucesso!");
+        closeCloseTradeModal();
+    } catch (error) {
+        console.error("Erro ao fechar o trade e atualizar o saldo:", error);
+        alert("Ocorreu um erro ao fechar o trade. Tente novamente.");
+    }
+}
     
     function calculatePnL() {
         const exitPrice = parseFloat(closeModalObj.exitPriceInput.value);
@@ -170,6 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
             closeModalObj.pnlInput.value = ((exitPrice - entryPrice) * quantity).toFixed(2);
         }
     }
+
     
     function createTradeCard(trade) {
         const card = document.createElement('div');
