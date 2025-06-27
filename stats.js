@@ -40,9 +40,9 @@ function runStatsPage() {
     onSnapshot(doc(db, "portfolio", "summary"), (doc) => {
         if (doc.exists()) {
             const balance = doc.data().balance || 0;
-            balanceEl.textContent = `€${balance.toFixed(2)}`;
+            balanceEl.textContent = `$${balance.toFixed(2)}`;
         } else {
-            balanceEl.textContent = '€0.00';
+            balanceEl.textContent = '$0.00';
             console.log("Documento do portfólio não existe. Será criado na primeira transação.");
         }
     });
@@ -167,12 +167,12 @@ function runStatsPage() {
 
             // Atualizar o DOM com os valores
             updateElementText('total-trades', totalTrades);
-            updateElementText('total-pnl', `€${totalPnl.toFixed(2)}`, true);
+            updateElementText('total-pnl', `$${totalPnl.toFixed(2)}`, true);
             updateElementText('win-rate', `${winRate.toFixed(1)}%`);
             updateElementText('win-count', winCount);
             updateElementText('loss-count', lossCount);
-            updateElementText('avg-win', `€${avgWin.toFixed(2)}`, true);
-            updateElementText('avg-loss', `€${avgLoss.toFixed(2)}`, true);
+            updateElementText('avg-win', `$${avgWin.toFixed(2)}`, true);
+            updateElementText('avg-loss', `$${avgLoss.toFixed(2)}`, true);
             updateElementText('rr-ratio', rrRatio.toFixed(2));
             
             // Gerar tabelas de detalhes
@@ -187,9 +187,9 @@ function updateElementText(id, text, isPnl = false) {
             element.textContent = text;
             if (isPnl) {
                 element.classList.remove('positive-pnl', 'negative-pnl');
-                if (parseFloat(text.replace('€', '')) > 0) {
+                if (parseFloat(text.replace('$', '')) > 0) {
                     element.classList.add('positive-pnl');
-                } else if (parseFloat(text.replace('€', '')) < 0) {
+                } else if (parseFloat(text.replace('$', '')) < 0) {
                     element.classList.add('negative-pnl');
                 }
             }
@@ -218,7 +218,7 @@ function generateDetailTable(containerId, header, data) {
                 <tr>
                     <td>${key}</td>
                     <td>${item.count}</td>
-                    <td class="${pnlClass}">€${item.pnl.toFixed(2)}</td>
+                    <td class="${pnlClass}">$${item.pnl.toFixed(2)}</td>
                 </tr>
             `;
         }
