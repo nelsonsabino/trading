@@ -1,6 +1,12 @@
 
 // A definição das suas estratégias.
 export const STRATEGIES = {
+
+        
+/* ------------------------------------------------------------------------ */    
+           /* ------------ PREÇO EM SUPORTE ------------ */
+/* ------------------------------------------------------------------------ */           
+    
     'preco-suporte': {
         name: "Preço em suporte com confluências",
         potentialPhases: [
@@ -129,7 +135,7 @@ export const STRATEGIES = {
         potentialPhases: [
             { 
                 title: "Fase Potencial (Análise 4h)",         
-                exampleImageUrl: "https://i.imgur.com/link_exemplo_potencial.png", // SUBSTITUA COM UM LINK REAL
+                exampleImageUrl: "pic/stoch4.jpg", 
                 checks: [
                     { id: "pot-c3-stoch-reset", label: "Stochastic fez reset?", required: true },
                     { id: "pot-c3-confluencia", label: "Confluência: Preço na EMA50 + Suporte LTA do RSI?", required: true }
@@ -140,7 +146,7 @@ export const STRATEGIES = {
         armedPhases: [
             {
                 title: "Fase Armar (Confirmação 1h)",
-                exampleImageUrl: "https://i.imgur.com/link_exemplo_armado.png", // SUBSTITUA
+                exampleImageUrl: "pic/stoch1.jpg", 
                 checks: [
                     { id: "armed-c3-rsi-ma", label: "RSI > RSI-MA?", required: true },
                     { id: "armed-c3-stoch-subir", label: "Stochastic (1h) fez reset e está a subir?", required: true },
@@ -152,7 +158,7 @@ export const STRATEGIES = {
         executionPhases: [
             {
                 title: "Fase Executar (Gatilho 15min)",
-                exampleImageUrl: "https://i.imgur.com/link_exemplo_exec.png", // SUBSTITUA
+                exampleImageUrl: "pic/stoch15.jpg", 
                 checks: [
                     { id: "exec-c3-stoch-reset", label: "Entrar no próximo reset do Stochastic (15m)?", required: true },
                     { id: "exec-c3-rsi-hl", label: "RSI fez um Higher Low neste reset?", required: true },
