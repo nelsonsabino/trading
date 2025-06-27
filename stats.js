@@ -1,7 +1,7 @@
 // --- INICIALIZAÇÃO DO FIREBASE (Sintaxe v9 Modular) ---
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
 import { 
-    getFirestore, collection, doc, query, where, onSnapshot, runTransaction 
+    getFirestore, collection, doc, query, where, onSnapshot, runTransaction, addDoc 
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 
 // A sua configuração da web app do Firebase
@@ -20,6 +20,7 @@ const db = getFirestore(app);
 
 
 
+
 function runStatsPage() {
     // --- SELETORES DO DOM ---
     const balanceEl = document.getElementById('current-balance');
@@ -32,7 +33,7 @@ function runStatsPage() {
         title: document.getElementById('transaction-title')
     };
     
-    let currentTransactionType = 'deposit'; // 'deposit' ou 'withdraw'
+    let currentTransactionType = 'deposit';
 
     // --- LÓGICA DO PORTFÓLIO ---
     
@@ -40,6 +41,7 @@ function runStatsPage() {
     onSnapshot(doc(db, "portfolio", "summary"), (doc) => {
         if (doc.exists()) {
             const balance = doc.data().balance || 0;
+            // ALTERAÇÃO: Usa o símbolo de dólar
             balanceEl.textContent = `$${balance.toFixed(2)}`;
         } else {
             balanceEl.textContent = '$0.00';
@@ -73,6 +75,7 @@ function runStatsPage() {
     transactionModal.form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const amountInput = document.getElementById('transaction-amount');
+        const notesInput = document.getElementById('transaction-notes');
         let amount = parseFloat(amountInput.value);
 
         if (isNaN(amount) || amount <= 0) {
@@ -80,18 +83,26 @@ function runStatsPage() {
             return;
         }
 
-        // Se for um levantamento, o valor é negativo
-        if (currentTransactionType === 'withdraw') {
-            amount = -amount;
-        }
+        // ALTERAÇÃO: Guarda a transação na sua própria coleção para o histórico
+        const transactionData = {
+            amount: amount, // Guarda sempre o valor positivo
+            type: currentTransactionType, // 'deposit' ou 'withdraw'
+            notes: notesInput.value,
+            date: new Date()
+        };
 
-        // Usa uma transação do Firestore para garantir que o saldo é atualizado de forma segura
+        const transactionAmountForBalance = currentTransactionType === 'withdraw' ? -amount : amount;
+
         try {
+            // 1. Adiciona a transação à coleção "transactions" para manter o histórico
+            await addDoc(collection(db, "transactions"), transactionData);
+            
+            // 2. Atualiza o saldo total de forma segura
             const portfolioRef = doc(db, "portfolio", "summary");
             await runTransaction(db, async (transaction) => {
                 const portfolioDoc = await transaction.get(portfolioRef);
                 const currentBalance = portfolioDoc.exists() ? portfolioDoc.data().balance : 0;
-                const newBalance = currentBalance + amount;
+                const newBalance = currentBalance + transactionAmountForBalance;
 
                 if (newBalance < 0) {
                     throw new Error("Não pode levantar mais do que o saldo atual.");
@@ -100,17 +111,17 @@ function runStatsPage() {
                 transaction.set(portfolioRef, { balance: newBalance }, { merge: true });
             });
 
-            console.log("Transação concluída com sucesso!");
+            console.log("Transação registada e saldo atualizado com sucesso!");
             closeTransactionModal();
 
         } catch (error) {
             console.error("Erro na transação: ", error);
-            alert(error.message);
+            alert("Ocorreu um erro ao processar a transação: " + error.message);
         }
     });
 
-    // --- LÓGICA DAS ESTATÍSTICAS DE TRADES (código existente) ---
- function calculateAndDisplayStats() {
+    // --- LÓGICA DAS ESTATÍSTICAS DE TRADES ---
+    function calculateAndDisplayStats() {
         const q = query(collection(db, 'trades'), where('status', '==', 'CLOSED'));
 
         onSnapshot(q, (snapshot) => {
@@ -125,47 +136,28 @@ function runStatsPage() {
 
             snapshot.forEach(doc => {
                 const trade = doc.data();
-                if (!trade.closeDetails || isNaN(parseFloat(trade.closeDetails.pnl))) {
-                    return; // Ignora trades fechados sem P&L válido
-                }
-
+                if (!trade.closeDetails || isNaN(parseFloat(trade.closeDetails.pnl))) return;
                 totalTrades++;
                 const pnl = parseFloat(trade.closeDetails.pnl);
                 totalPnl += pnl;
-
-                // Contagem de Ganhos/Perdas
-                if (pnl > 0) {
-                    winCount++;
-                    totalWinAmount += pnl;
-                } else {
-                    lossCount++;
-                    totalLossAmount += pnl; // Mantém o valor negativo
-                }
-
-                // Estatísticas por Estratégia
+                if (pnl > 0) { winCount++; totalWinAmount += pnl; }
+                else { lossCount++; totalLossAmount += pnl; }
                 const strategy = trade.strategyName || 'Sem Estratégia';
-                if (!statsByStrategy[strategy]) {
-                    statsByStrategy[strategy] = { count: 0, pnl: 0 };
-                }
+                if (!statsByStrategy[strategy]) statsByStrategy[strategy] = { count: 0, pnl: 0 };
                 statsByStrategy[strategy].count++;
                 statsByStrategy[strategy].pnl += pnl;
-
-                // Estatísticas por Motivo de Fecho
                 const reason = trade.closeDetails.closeReason || 'Não especificado';
-                if (!statsByReason[reason]) {
-                    statsByReason[reason] = { count: 0, pnl: 0 };
-                }
+                if (!statsByReason[reason]) statsByReason[reason] = { count: 0, pnl: 0 };
                 statsByReason[reason].count++;
                 statsByReason[reason].pnl += pnl;
             });
 
-            // Cálculos Finais
             const winRate = totalTrades > 0 ? (winCount / totalTrades) * 100 : 0;
             const avgWin = winCount > 0 ? totalWinAmount / winCount : 0;
             const avgLoss = lossCount > 0 ? totalLossAmount / lossCount : 0;
             const rrRatio = (avgLoss !== 0) ? Math.abs(avgWin / avgLoss) : 0;
 
-            // Atualizar o DOM com os valores
+            // ALTERAÇÃO: Usa o símbolo de dólar
             updateElementText('total-trades', totalTrades);
             updateElementText('total-pnl', `$${totalPnl.toFixed(2)}`, true);
             updateElementText('win-rate', `${winRate.toFixed(1)}%`);
@@ -175,18 +167,18 @@ function runStatsPage() {
             updateElementText('avg-loss', `$${avgLoss.toFixed(2)}`, true);
             updateElementText('rr-ratio', rrRatio.toFixed(2));
             
-            // Gerar tabelas de detalhes
             generateDetailTable('strategy-stats', 'Estratégia', statsByStrategy);
             generateDetailTable('reason-stats', 'Motivo', statsByReason);
         });
     }    
     
-function updateElementText(id, text, isPnl = false) {
+    function updateElementText(id, text, isPnl = false) {
         const element = document.getElementById(id);
         if (element) {
             element.textContent = text;
             if (isPnl) {
                 element.classList.remove('positive-pnl', 'negative-pnl');
+                // ALTERAÇÃO: Remove o símbolo da moeda antes de converter para número
                 if (parseFloat(text.replace('$', '')) > 0) {
                     element.classList.add('positive-pnl');
                 } else if (parseFloat(text.replace('$', '')) < 0) {
@@ -196,38 +188,20 @@ function updateElementText(id, text, isPnl = false) {
         }
     }    
     
-function generateDetailTable(containerId, header, data) {
+    function generateDetailTable(containerId, header, data) {
         const container = document.getElementById(containerId);
         if (!container) return;
-
-        let tableHtml = `
-            <table>
-                <thead>
-                    <tr>
-                        <th>${header}</th>
-                        <th>Nº Trades</th>
-                        <th>P&L Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-        `;
+        let tableHtml = `<table><thead><tr><th>${header}</th><th>Nº Trades</th><th>P&L Total</th></tr></thead><tbody>`;
         for (const key in data) {
             const item = data[key];
             const pnlClass = item.pnl > 0 ? 'positive-pnl' : (item.pnl < 0 ? 'negative-pnl' : '');
-            tableHtml += `
-                <tr>
-                    <td>${key}</td>
-                    <td>${item.count}</td>
-                    <td class="${pnlClass}">$${item.pnl.toFixed(2)}</td>
-                </tr>
-            `;
+            // ALTERAÇÃO: Usa o símbolo de dólar
+            tableHtml += `<tr><td>${key}</td><td>${item.count}</td><td class="${pnlClass}">$${item.pnl.toFixed(2)}</td></tr>`;
         }
         tableHtml += `</tbody></table>`;
         container.innerHTML = tableHtml;
     }
  
-    
-
     // Iniciar
     calculateAndDisplayStats();
 }
