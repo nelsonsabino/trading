@@ -9,7 +9,7 @@ import {
     onSnapshot, 
     runTransaction, 
     addDoc, 
-    setDoc // ADICIONADO AQUI
+    setDoc 
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 
 // A sua configuração da web app do Firebase
