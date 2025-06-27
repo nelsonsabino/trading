@@ -193,7 +193,7 @@ async function handleCloseSubmit(e) {
     }
 }
     
-    function calculatePnL() {
+/*    function calculatePnL() {
         const exitPrice = parseFloat(closeModalObj.exitPriceInput.value);
         const entryPrice = parseFloat(currentTrade.data?.executionDetails?.['entry-price']);
         const quantity = parseFloat(currentTrade.data?.executionDetails?.['quantity']);
@@ -201,7 +201,7 @@ async function handleCloseSubmit(e) {
             closeModalObj.pnlInput.value = ((exitPrice - entryPrice) * quantity).toFixed(2);
         }
     }
-
+*/
     
     function createTradeCard(trade) {
         const card = document.createElement('div');
@@ -312,7 +312,7 @@ async function handleCloseSubmit(e) {
     closeModalObj.closeBtn.addEventListener('click', closeCloseTradeModal);
     closeModalObj.container.addEventListener('click', e => { if (e.target.id === 'close-trade-modal') closeCloseTradeModal(); });
     closeModalObj.form.addEventListener('submit', handleCloseSubmit);
-    closeModalObj.exitPriceInput.addEventListener('input', calculatePnL);
+    /*closeModalObj.exitPriceInput.addEventListener('input', calculatePnL);*/
     lightbox.closeBtn.addEventListener('click', closeLightbox);
     lightbox.container.addEventListener('click', (e) => { if (e.target.id === 'image-lightbox') closeLightbox(); });
 
