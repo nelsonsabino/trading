@@ -107,6 +107,47 @@ export async function deleteTrade(tradeId) {
     }
 }
 
+
+// Escuta alterações na coleção de TRANSAÇÕES em tempo real
+export function listenToTransactions(callback) {
+    const q = query(collection(db, 'transactions'), orderBy('date', 'desc'));
+    onSnapshot(q, (snapshot) => {
+        const transactions = [];
+        snapshot.forEach(doc => {
+            transactions.push({ id: doc.id, data: doc.data() });
+        });
+        callback(transactions);
+    }, (error) => {
+        console.error("Erro ao escutar transações:", error);
+        callback([], error);
+    });
+}
+
+// Apaga uma transação e reverte o seu valor no saldo do portfólio
+export async function deleteTransaction(transactionId, amount, type) {
+    const amountToRevert = type === 'deposit' ? -amount : amount;
+    const transactionRef = doc(db, 'transactions', transactionId);
+    const portfolioRef = doc(db, 'portfolio', 'summary');
+
+    try {
+        await runTransaction(db, async (transaction) => {
+            const portfolioDoc = await transaction.get(portfolioRef);
+            if (!portfolioDoc.exists()) throw new Error("Documento do portfólio não encontrado!");
+            
+            const currentBalance = portfolioDoc.data().balance || 0;
+            const newBalance = currentBalance + amountToRevert;
+
+            transaction.update(portfolioRef, { balance: newBalance });
+            transaction.delete(transactionRef);
+        });
+    } catch (error) {
+        console.error("Erro na transação de apagar:", error);
+        throw error; // Lança o erro para a UI poder reagir
+    }
+}
+
+
+
 // Função para atualizar o portfólio (se precisarmos dela noutros locais)
 export async function updatePortfolioBalance(amount) {
     const portfolioRef = doc(db, "portfolio", "summary");
