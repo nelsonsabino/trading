@@ -1,6 +1,6 @@
 // js/manage.js
 
-import { listenToTrades, deleteTrade as deleteTradeService } from './firebase-service.js'; // Importa a função de apagar com um novo nome
+import { listenToTrades, deleteTrade as deleteTradeService, listenToTransactions, deleteTransaction as deleteTransactionService } from './firebase-service.js'; // Importa a função de apagar com um novo nome
 
 function runManagePage() {
     const tableBody = document.getElementById('trades-table-body');
@@ -64,5 +64,61 @@ function runManagePage() {
     // Iniciar a página
     fetchAndDisplayAllTrades();
 }
+
+
+    // --- NOVA LÓGICA PARA A TABELA DE TRANSAÇÕES DO PORTFÓLIO ---
+    const transactionsTableBody = document.getElementById('transactions-table-body');
+
+    async function deleteTransaction(transactionId, amount, type) {
+        if (!confirm("Tem a certeza que quer apagar esta transação? O seu saldo será ajustado.")) {
+            return;
+        }
+        try {
+            // A função de serviço irá lidar com a lógica complexa de reverter o saldo
+            await deleteTransactionService(transactionId, amount, type);
+            console.log("Pedido para apagar transação enviado.");
+        } catch (error) {
+            console.error("Erro ao apagar transação:", error);
+            alert("Ocorreu um erro ao apagar a transação.");
+        }
+    }
+
+    function fetchAndDisplayTransactions() {
+        if (!transactionsTableBody) return; // Não faz nada se a tabela não existir
+
+        listenToTransactions((transactions, error) => {
+            if (error) {
+                transactionsTableBody.innerHTML = `<tr><td colspan="5" style="color: red;">Erro ao carregar.</td></tr>`;
+                return;
+            }
+
+            transactionsTableBody.innerHTML = '';
+            if (transactions.length === 0) {
+                transactionsTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Nenhum registo de depósito ou levantamento.</td></tr>';
+                return;
+            }
+
+            transactions.forEach(transaction => {
+                const tr = document.createElement('tr');
+                const date = transaction.data.date?.toDate().toLocaleString('pt-PT') || 'N/A';
+                const type = transaction.data.type === 'deposit' ? 'Depósito' : 'Levantamento';
+                const amount = transaction.data.amount || 0;
+                const notes = transaction.data.notes || '-';
+                const amountClass = transaction.data.type === 'deposit' ? 'positive-pnl' : 'negative-pnl';
+
+                tr.innerHTML = `
+                    <td>${date}</td>
+                    <td>${type}</td>
+                    <td class="${amountClass}">$${amount.toFixed(2)}</td>
+                    <td>${notes}</td>
+                    <td><div class="action-buttons"><button class="btn delete-btn">Apagar</button></div></td>`;
+                
+                tr.querySelector('.delete-btn').addEventListener('click', () => deleteTransaction(transaction.id, amount, transaction.data.type));
+                
+                transactionsTableBody.appendChild(tr);
+            });
+        });
+    }
+
 
 runManagePage();
