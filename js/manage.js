@@ -63,6 +63,7 @@ function runManagePage() {
 
     // Iniciar a página
     fetchAndDisplayAllTrades();
+    fetchAndDisplayTransactions(); 
 }
 
 
