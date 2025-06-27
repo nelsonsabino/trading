@@ -2,7 +2,7 @@
 
 import { GESTAO_PADRAO } from './config.js';
 import { STRATEGIES } from './strategies.js';
-import { listenToTrades, getTrade, addTrade, updateTrade } from './firebase-service.js';
+import { listenToTrades, getTrade, addTrade, updateTrade, closeTradeAndUpdateBalance } from './firebase-service.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     let currentTrade = {};
@@ -157,30 +157,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     
 async function handleCloseSubmit(e) {
-        e.preventDefault();
-        const pnlValue = parseFloat(document.getElementById('final-pnl').value);
-        if (isNaN(pnlValue)) {
-            alert("Por favor, insira um valor de P&L válido.");
-            return;
-        }
-        const closeDetails = {
-            exitPrice: document.getElementById('exit-price').value,
-            pnl: pnlValue,
-            closeReason: document.getElementById('close-reason').value,
-            finalNotes: document.getElementById('final-notes').value,
-            exitScreenshotUrl: document.getElementById('exit-screenshot-url').value
-        };
-        const updatedData = { status: "CLOSED", closeDetails: closeDetails, dateClosed: new Date() };
-        
-        // CORREÇÃO PRINCIPAL: Usa a função de serviço `updateTrade`
-        await updateTrade(currentTrade.id, updatedData); 
-        
-        // ATENÇÃO: A lógica de atualizar o saldo do portfólio precisa ser adicionada aqui
-        // se quisermos manter a consistência, ou movida para o backend com Cloud Functions no futuro.
-        // Por agora, vamos focar em fazer o fecho do trade funcionar.
-
-        closeCloseTradeModal();
+    e.preventDefault();
+    
+    const pnlValue = parseFloat(closeModalObj.pnlInput.value);
+    if (isNaN(pnlValue)) {
+        alert("Por favor, insira um valor de P&L válido.");
+        return;
     }
+
+    const closeDetails = {
+        exitPrice: closeModalObj.exitPriceInput.value,
+        pnl: pnlValue,
+        closeReason: document.getElementById('close-reason').value,
+        finalNotes: document.getElementById('final-notes').value,
+        exitScreenshotUrl: document.getElementById('exit-screenshot-url').value
+    };
+
+    try {
+        // Chama a nova função de serviço, passando o ID e os detalhes
+        await closeTradeAndUpdateBalance(currentTrade.id, closeDetails);
+        
+        console.log("Trade fechado e saldo atualizado com sucesso!");
+        closeCloseTradeModal();
+
+    } catch (error) {
+        console.error("Erro ao processar o fecho do trade:", error);
+        alert("Ocorreu um erro: " + error.message);
+    }
+}
     
 /*    function calculatePnL() {
         const exitPrice = parseFloat(closeModalObj.exitPriceInput.value);
