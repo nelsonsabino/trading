@@ -146,6 +146,14 @@ header nav { margin-top: 1.5rem; display: flex; justify-content: center; align-i
     background-color: #5a6268;
 }
 
+.btn-tertiary {
+    background-color: #ffc107; /* Amarelo */
+    color: #212529;
+}
+.btn-tertiary:hover {
+    background-color: #e0a800;
+}
+
 .section-divider {
     border: none;
     border-top: 1px solid #dee2e6;
