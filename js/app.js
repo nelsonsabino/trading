@@ -196,10 +196,16 @@ async function handleCloseSubmit(e) {
     }
 */
     
-    function createTradeCard(trade) {
+   function createTradeCard(trade) {
         const card = document.createElement('div');
         card.className = 'trade-card';
-        card.innerHTML = `<button class="card-edit-btn">Editar</button><h3>${trade.data.asset}</h3><p style="color: #007bff; font-weight: 500;">Estratégia: ${trade.data.strategyName || 'N/A'}</p><p><strong>Status:</strong> ${trade.data.status}</p><p><strong>Notas:</strong> ${trade.data.notes || ''}</p>`;
+        card.innerHTML = `<button class="card-edit-btn">Editar</button>
+            <h3>${trade.data.asset}</h3>
+            <p style="color: #007bff; font-weight: 500;">Estratégia: ${trade.data.strategyName || 'N/A'}</p>
+            <p><strong>Status:</strong> ${trade.data.status}</p>
+            <p><strong>Notas:</strong> ${trade.data.notes || ''}</p>`;
+
+        // LÓGICA DE IMAGEM (sem alterações, mas confirmada)
         const potentialImageUrl = trade.data.imageUrl;
         let armedImageUrl = null;
         if (trade.data.armedSetup) {
@@ -207,12 +213,18 @@ async function handleCloseSubmit(e) {
             if (key) armedImageUrl = trade.data.armedSetup[key];
         }
         const imageUrlToShow = armedImageUrl || potentialImageUrl;
+
         if (imageUrlToShow) {
             const img = document.createElement('img');
             img.src = imageUrlToShow;
             img.className = 'card-screenshot';
             img.alt = `Gráfico de ${trade.data.asset}`;
-            img.addEventListener('click', (e) => { e.stopPropagation(); openLightbox(imageUrlToShow); });
+            
+            // CORREÇÃO: Adiciona o evento de clique diretamente à imagem
+            img.addEventListener('click', (event) => {
+                event.stopPropagation(); // Impede que o clique se propague para outros elementos do card
+                openLightbox(imageUrlToShow);
+            });
             card.appendChild(img);
         }
         let actionButton;
