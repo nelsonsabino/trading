@@ -138,7 +138,7 @@ export const STRATEGIES = {
                 exampleImageUrl: "pic/stoch4.jpg", 
                 checks: [
                     { id: "pot-c3-stoch-reset", label: "Stochastic fez reset?", required: true },
-                    { id: "pot-c3-confluencia", label: "Confluência: Preço na EMA50 + 3 Toques RSI ou com Higher High?", required: true }
+                    { id: "pot-c3-confluencia", label: "Confluência: Preço na EMA50 + 3 Toques RSI ou com Higher Low?", required: true }
                 ]
             }
         ],
