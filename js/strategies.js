@@ -139,8 +139,8 @@ export const STRATEGIES = {
                 checks: [
                     { id: "pot-c3-stoch-reset", label: "Stochastic fez reset?", required: true },
                     { id: "pot-c3-confluencia", label: "Preço em zona de suporte com confluências (EMA, Fib. RSI...)", required: true },
-                    { id: "pot-c3-confluencia", label: "RSI afastado da resistência", required: true },
-                    { id: "pot-c3-confluencia", label: "Target price definido", required: true }
+                    { id: "pot-c3-rse_resistencia", label: "RSI afastado da resistência", required: true },
+                    { id: "pot-c3-target", label: "Target price definido", required: true }
 
                 ]
             }
@@ -149,11 +149,13 @@ export const STRATEGIES = {
         armedPhases: [
             {
                 title: "Fase Armar (Confirmação 1h)",
-                exampleImageUrl: "pic/stoch1.jpg", 
+                exampleImageUrl: "pic/stoch1.png", 
                 checks: [
-                    { id: "armed-c3-rsi-ma", label: "RSI > RSI-MA?", required: true },
-                    { id: "armed-c3-stoch-subir", label: "Stochastic (1h) fez reset e está a subir?", required: true },
-                    { id: "armed-c3-ema200", label: "Preço > EMA200? (Aumenta Prob.)", required: false }
+                    { id: "armed-c3-rsi-ma", label: "Preço e RSI inverteram tendência descendente", required: true },
+                    { id: "armed-c3-stoch-subir", label: "Stochastic (1h) está prestes a fazer reset", required: true },
+                    { id: "armed-c3-base-frvp", label: "Preço acima da base local do FRVP", required: true },
+                    { id: "armed-c3-hl-rsi", label: "Higher low do RSI", required: false }
+                        
                 ]
             }
         ],
