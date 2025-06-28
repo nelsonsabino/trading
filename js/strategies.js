@@ -2,13 +2,71 @@
 // A definição das suas estratégias.
 export const STRATEGIES = {
 
+
+
+/* ------------------------------------------------------------------------ */    
+           /* ------------ FURA E TESTA ------------ */
+/* ------------------------------------------------------------------------ */           
+    
+    'fura-testa': {
+        name: "Preço fura resistência e testa suporte",
+        potentialPhases: [
+            { 
+                title: "Análise Macro Inicial",
+                exampleImageUrl: "https://i.imgur.com/exemplo1.png",
+                inputs: [ 
+                    { id: "pot-ft-tf", label: "Timeframe de Análise:", type: "select", options: ["Diário", "4h"], required: true }
+                ],
+                checks: [
+                    { id: "pot-ft-hl", label: "Preço com higher Low", required: true },
+                    { id: "pot-ft-divergencia", label: "RSI bullish", required: true },
+                    { id: "pot-ft-alarme", label: "Algum alarme foi colocado?", required: true }
+                ]
+            }
+        ],
+        armedPhases: [
+            { 
+                title: "Validação do Setup (no TF de Análise)",
+                exampleImageUrl: "https://i.imgur.com/exemplo2.png",
+                inputs: [ { id: "armed-ft-image-url", label: "Link da Imagem do Gráfico (Fase Armado):", type: "text", required: false } ],
+                checks: [
+                    { id: "armed-ft-tendencia", label: "Preço furou resistência", required: true },
+                    { id: "armed-ft-rhl", label: "RSI está a fazer Higher Lows?", required: true },
+                    { id: "armed-ft-val", label: "Preço na base do VAL? (Aumenta Prob.)", required: false }
+                ]
+            }
+        ],
+        executionPhases: [
+            { 
+                title: "Gatilho de Precisão",
+                exampleImageUrl: "https://i.imgur.com/exemplo3.png",
+                inputs: [{ id: "exec-ft-tf", label: "Timeframe de Execução:", type: "select", options: ["1h", "15min", "5min"], required: true }],
+                checks: [{ id: "exec-ft-rsi-break", label: "Quebra da linha de resistência do RSI", required: true }],
+                checks: [{ id: "exec-ft-rsi-break", label: "Preço mantem-se acima da resistência", required: true }],
+
+                radios: {
+                    name: "gatilho-final-id", 
+                    label: "Escolha o gatilho final:",
+                    options: [
+                        { id: "exec-ft-gatilho-base", label: "Preço na base local do FRVP + Stoch reset?" },
+                        { id: "exec-ft-gatilho-acima", label: "Preço acima da base local do FRVP + Stoch reset?" }
+                    ]
+                }
+            }
+        ]
+    }, 
+
+
+
+
+
         
 /* ------------------------------------------------------------------------ */    
            /* ------------ PREÇO EM SUPORTE ------------ */
 /* ------------------------------------------------------------------------ */           
     
     'preco-suporte': {
-        name: "Preço em suporte com confluências",
+        name: "Preço em suporte com confluencias",
         potentialPhases: [
             { 
                 title: "Análise Macro Inicial",
