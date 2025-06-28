@@ -138,7 +138,10 @@ export const STRATEGIES = {
                 exampleImageUrl: "pic/stoch4.png", 
                 checks: [
                     { id: "pot-c3-stoch-reset", label: "Stochastic fez reset?", required: true },
-                    { id: "pot-c3-confluencia", label: "Confluência: Preço na EMA50 + 3 Toques RSI ou com Higher Low?", required: true }
+                    { id: "pot-c3-confluencia", label: "Preço em zona de suporte com confluências (EMA, Fib. RSI...)", required: true },
+                    { id: "pot-c3-confluencia", label: "RSI afastado da resistência", required: true },
+                    { id: "pot-c3-confluencia", label: "Target price definido", required: true }
+
                 ]
             }
         ],
