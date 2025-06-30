@@ -37,7 +37,7 @@ function runApp() {
         const card = document.createElement('div');
         card.className = 'test-card';
         card.innerHTML = `<h3>Card do Doc: ${doc.id}</h3>`;
-        const imageUrl = 'https://i.imgur.com/exemplo1.png';
+        const imageUrl = 'https://www.tradingview.com/x/ulZSfW7P/';
         const img = document.createElement('img');
         img.src = imageUrl;
         img.alt = 'Clique em mim';
