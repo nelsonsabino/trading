@@ -287,13 +287,20 @@ document.addEventListener('DOMContentLoaded', () => {
     lightbox.closeBtn.addEventListener('click', closeLightbox);
     lightbox.container.addEventListener('click', (e) => { if (e.target.id === 'image-lightbox') closeLightbox(); });
 
+
 function handleContainerClick(e) {
-    // Verifica se o elemento clicado (e.target) tem a classe 'card-screenshot'
+    // 1. Primeiro espião: Diz-nos se o clique no contentor foi sequer registado.
+    console.log("Clique detetado no contentor. O alvo do clique foi:", e.target);
+
+    // 2. Segundo espião: Verifica a condição.
     if (e.target.matches('.card-screenshot')) {
-        // Impede que o clique se propague para outros elementos, se necessário
+        console.log("CORRESPONDEU! O alvo é uma imagem com a classe '.card-screenshot'.");
+        console.log("A tentar abrir o lightbox com o URL:", e.target.src);
+        
         e.stopPropagation();
-        // Abre o lightbox com o URL da imagem (que é o 'src' do elemento clicado)
         openLightbox(e.target.src);
+    } else {
+        console.log("NÃO CORRESPONDEU. O alvo não tem a classe '.card-screenshot'.");
     }
 }
 
