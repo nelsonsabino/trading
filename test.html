@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Teste Isolado do Lightbox</title>
+    <!-- Link para O MESMO style.css que a sua app usa -->
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Estilo extra apenas para este teste */
+        body { padding: 2rem; }
+        .test-image { width: 200px; cursor: pointer; border: 2px solid #007bff; }
+    </style>
+</head>
+<body>
+
+    <h1>Página de Teste do Lightbox</h1>
+    <p>Clique na imagem abaixo. O lightbox deve aparecer.</p>
+
+    <img src="https://i.imgur.com/exemplo1.png" alt="Imagem de Teste" class="test-image">
+
+    <!-- ESTRUTURA DO LIGHTBOX (copiada do seu index.html) -->
+    <div id="image-lightbox" class="modal-overlay">
+        <span id="close-lightbox-btn">×</span>
+        <img id="lightbox-image" src="" alt="Gráfico em detalhe">
+    </div>
+
+    <!-- SCRIPT DE TESTE (o mais simples possível) -->
+    <script>
+        // Espera que o HTML esteja pronto
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("Página de teste carregada.");
+
+            // Encontra os elementos
+            const testImage = document.querySelector('.test-image');
+            const lightboxContainer = document.getElementById('image-lightbox');
+            const lightboxImage = document.getElementById('lightbox-image');
+            const closeBtn = document.getElementById('close-lightbox-btn');
+
+            console.log("Imagem de teste:", testImage);
+            console.log("Container do Lightbox:", lightboxContainer);
+            console.log("Botão de fechar:", closeBtn);
+
+            // Função para abrir
+            function openLightbox(url) {
+                console.log("A abrir lightbox com URL:", url);
+                lightboxImage.src = url;
+                lightboxContainer.style.display = 'flex';
+            }
+
+            // Função para fechar
+            function closeLightbox() {
+                console.log("A fechar lightbox.");
+                lightboxContainer.style.display = 'none';
+            }
+
+            // Adiciona os cliques
+            testImage.addEventListener('click', () => {
+                openLightbox(testImage.src);
+            });
+
+            closeBtn.addEventListener('click', closeLightbox);
+        });
+    </script>
+
+</body>
+</html>
