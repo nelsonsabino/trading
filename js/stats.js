@@ -1,7 +1,7 @@
-
-// Importa a instância 'db' já inicializada e outras funções necessárias do Firebase
-import { db } from './firebase-service.js';
+// --- INICIALIZAÇÃO DO FIREBASE (Sintaxe v9 Modular) ---
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
 import { 
+    getFirestore, 
     collection, 
     doc, 
     query, 
@@ -11,6 +11,20 @@ import {
     addDoc, 
     setDoc 
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+
+// A sua configuração da web app do Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyAoKtcIsVOcvI5O6gH_14AXL3bF2I6X8Qc",
+  authDomain: "trading-89c13.firebaseapp.com",
+  projectId: "trading-89c13",
+  storageBucket: "trading-89c13.firebasestorage.app",
+  messagingSenderId: "782074719077",
+  appId: "1:782074719077:web:05c07a2b81b0047ef5cf8c"
+};
+
+// Inicializa o Firebase e o Firestore
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 
 
