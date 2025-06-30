@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fakeCard.innerHTML = `<h3>Trade Falso</h3><p>Clique na imagem abaixo para testar.</p>`;
 
         const fakeImage = document.createElement('img');
-        fakeImage.src = 'https://via.placeholder.com/300x150.png?text=Clique+Aqui';
+        fakeImage.src = 'pic/stoch4.png';
         fakeImage.className = 'card-screenshot';
         fakeImage.alt = 'Imagem de teste';
 
