@@ -216,29 +216,40 @@ document.addEventListener('DOMContentLoaded', () => {
         await updateTrade(currentTrade.id, { status: "LIVE", executionDetails: executionData, dateExecuted: new Date() });
         closeExecModal();
     }
-    async function handleCloseSubmit(e) {
-        e.preventDefault();
-        const pnlValue = parseFloat(document.getElementById('final-pnl').value);
-        if (isNaN(pnlValue)) { alert("Por favor, insira um valor de P&L válido."); return; }
-        const closeDetails = {
-            exitPrice: document.getElementById('exit-price').value,
-            pnl: pnlValue,
-            closeReason: document.getElementById('close-reason').value,
-            finalNotes: document.getElementById('final-notes').value,
-            exitScreenshotUrl: document.getElementById('exit-screenshot-url').value
-        };
-        const portfolioRef = doc(db, "portfolio", "summary");
-        try {
-            await runTransaction(db, async (transaction) => {
-                const portfolioDoc = await transaction.get(portfolioRef);
-                const currentBalance = portfolioDoc.exists() ? portfolioDoc.data().balance : 0;
-                const newBalance = currentBalance + pnlValue;
-                transaction.update(doc(db, 'trades', currentTrade.id), { status: "CLOSED", closeDetails: closeDetails, dateClosed: new Date() });
-                transaction.set(portfolioRef, { balance: newBalance }, { merge: true });
-            });
-            closeCloseTradeModal();
-        } catch (error) { console.error("Erro ao fechar trade:", error); alert("Erro ao fechar trade."); }
+
+    
+    
+
+async function handleCloseSubmit(e) {
+    e.preventDefault();
+    const pnlValue = parseFloat(document.getElementById('final-pnl').value);
+    if (isNaN(pnlValue)) {
+        alert("Por favor, insira um valor de P&L válido.");
+        return;
     }
+
+    const closeDetails = {
+        exitPrice: document.getElementById('exit-price').value,
+        pnl: pnlValue,
+        closeReason: document.getElementById('close-reason').value,
+        finalNotes: document.getElementById('final-notes').value,
+        exitScreenshotUrl: document.getElementById('exit-screenshot-url').value
+    };
+
+    try {
+        // A UI agora apenas chama o serviço. Muito mais limpo!
+        await closeTradeAndUpdateBalance(currentTrade.id, closeDetails);
+        closeCloseTradeModal();
+    } catch (error) {
+        console.error("Erro ao fechar trade (UI):", error);
+        alert("Ocorreu um erro ao fechar o trade. Verifique a consola para mais detalhes.");
+    }
+}
+
+
+
+    
+    
     function calculatePnL() {
         const exitPrice = parseFloat(closeModalObj.exitPriceInput.value);
         const entryPrice = parseFloat(currentTrade.data?.executionDetails?.['entry-price']);
