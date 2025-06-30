@@ -1,9 +1,9 @@
 // Versão 10.0
 // IMPORTAÇÕES REAIS DA SUA APLICAÇÃO
-import { GESTAO_PADRAO } from './config.js';
-import { STRATEGIES } from './strategies.js';
+import { GESTAO_PADRAO } from 'js/config.js';
+import { STRATEGIES } from 'js/strategies.js';
 // Vamos usar um alias para o serviço para não termos que o recriar
-import { listenToTrades, getTrade, addTrade, updateTrade, closeTradeAndUpdateBalance } from './firebase-service.js';
+import { listenToTrades, getTrade, addTrade, updateTrade, closeTradeAndUpdateBalance } from 'js/firebase-service.js';
 
 console.log(`A iniciar teste v10.0 - A réplica fiel.`);
 
