@@ -121,7 +121,11 @@ document.addEventListener('DOMContentLoaded', () => {
             img.src = imageUrlToShow;
             img.className = 'card-screenshot';
             img.alt = `Gráfico de ${trade.data.asset}`;
-            img.addEventListener('click', (e) => { e.stopPropagation(); openLightbox(imageUrlToShow); });
+            img.addEventListener('click', (e) => {
+            console.log("Imagem do card clicada! URL:", imageUrlToShow); 
+                e.stopPropagation(); 
+                 openLightbox(imageUrlToShow);
+                });
             card.appendChild(img);
         }
         let actionButton;
