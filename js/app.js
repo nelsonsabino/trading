@@ -1,11 +1,6 @@
-// js/app.js
-
 import { GESTAO_PADRAO } from './config.js';
 import { STRATEGIES } from './strategies.js';
 import { listenToTrades, getTrade, addTrade, updateTrade, closeTradeAndUpdateBalance } from './firebase-service.js';
-
-
-
 
 // --- 2. PONTO DE ENTRADA PRINCIPAL ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -32,22 +27,27 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeExecModal() { if(execModal.container) { execModal.container.style.display = 'none'; execModal.form.reset(); currentTrade = {}; } }
     function openCloseTradeModal(trade) { currentTrade = { id: trade.id, data: trade.data }; closeModalObj.assetNameSpan.textContent = trade.data.asset; if(closeModalObj.container) closeModalObj.container.style.display = 'flex'; }
     function closeCloseTradeModal() { if(closeModalObj.container) { closeModalObj.container.style.display = 'none'; closeModalObj.form.reset(); currentTrade = {}; } }
+    
     function openLightbox(imageUrl) {
-
-   // --- Início do bloco de diagnóstico ---
-    console.log("A função openLightbox foi chamada com a URL:", imageUrl);
-    console.log("O elemento 'lightbox.container' é:", lightbox.container);
-    console.log("O elemento 'lightbox.image' é:", lightbox.image);
-    // --- Fim do bloco de diagnóstico ---
-        
+        // --- Início do bloco de diagnóstico ---
+        console.log("A função openLightbox foi chamada com a URL:", imageUrl);
+        console.log("O elemento 'lightbox.container' é:", lightbox.container);
+        console.log("O elemento 'lightbox.image' é:", lightbox.image);
+        // --- Fim do bloco de diagnóstico ---
         if (lightbox.container && lightbox.image) {
-           console.log("Condição 'if' é verdadeira. A tentar abrir o lightbox...");
-            lightbox.image.src = imageUrl; 
+            console.log("Condição 'if' é verdadeira. A tentar abrir o lightbox...");
+            lightbox.image.src = imageUrl;
             lightbox.container.style.display = 'flex';
         } else {
-        console.error("ERRO: Não foi possível abrir o lightbox porque 'lightbox.container' ou 'lightbox.image' não foram encontrados no DOM.");
-            
+            console.error("ERRO: Não foi possível abrir o lightbox porque 'lightbox.container' ou 'lightbox.image' não foram encontrados no DOM.");
+        }
     }
+
+    // FUNÇÃO CORRIGIDA ESTÁ AQUI
+    function closeLightbox() {
+        if (lightbox.container) {
+            lightbox.container.style.display = 'none';
+        }
     }
 
     // --- 6. FUNÇÕES DE GERAÇÃO DE UI (Interface do Utilizador) ---
@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 exampleContainer.className = 'example-image-container';
                 exampleContainer.innerHTML = `<p>Exemplo Visual:</p><img src="${phase.exampleImageUrl}" alt="Exemplo para ${phase.title}">`;
                 exampleContainer.querySelector('img').addEventListener('click', (e) => {
-                        console.log("Imagem de exemplo clicada! URL:", phase.exampleImageUrl); 
+                    console.log("Imagem de exemplo clicada! URL:", phase.exampleImageUrl);
                     e.stopPropagation();
                     openLightbox(phase.exampleImageUrl);
                 });
@@ -141,10 +141,10 @@ document.addEventListener('DOMContentLoaded', () => {
             img.className = 'card-screenshot';
             img.alt = `Gráfico de ${trade.data.asset}`;
             img.addEventListener('click', (e) => {
-            console.log("Imagem do card clicada! URL:", imageUrlToShow); 
-                e.stopPropagation(); 
-                 openLightbox(imageUrlToShow);
-                });
+                console.log("Imagem do card clicada! URL:", imageUrlToShow);
+                e.stopPropagation();
+                openLightbox(imageUrlToShow);
+            });
             card.appendChild(img);
         }
         let actionButton;
@@ -240,38 +240,28 @@ document.addEventListener('DOMContentLoaded', () => {
         closeExecModal();
     }
 
-    
-    
-
-async function handleCloseSubmit(e) {
-    e.preventDefault();
-    const pnlValue = parseFloat(document.getElementById('final-pnl').value);
-    if (isNaN(pnlValue)) {
-        alert("Por favor, insira um valor de P&L válido.");
-        return;
+    async function handleCloseSubmit(e) {
+        e.preventDefault();
+        const pnlValue = parseFloat(document.getElementById('final-pnl').value);
+        if (isNaN(pnlValue)) {
+            alert("Por favor, insira um valor de P&L válido.");
+            return;
+        }
+        const closeDetails = {
+            exitPrice: document.getElementById('exit-price').value,
+            pnl: pnlValue,
+            closeReason: document.getElementById('close-reason').value,
+            finalNotes: document.getElementById('final-notes').value,
+            exitScreenshotUrl: document.getElementById('exit-screenshot-url').value
+        };
+        try {
+            await closeTradeAndUpdateBalance(currentTrade.id, closeDetails);
+            closeCloseTradeModal();
+        } catch (error) {
+            console.error("Erro ao fechar trade (UI):", error);
+            alert("Ocorreu um erro ao fechar o trade. Verifique a consola para mais detalhes.");
+        }
     }
-
-    const closeDetails = {
-        exitPrice: document.getElementById('exit-price').value,
-        pnl: pnlValue,
-        closeReason: document.getElementById('close-reason').value,
-        finalNotes: document.getElementById('final-notes').value,
-        exitScreenshotUrl: document.getElementById('exit-screenshot-url').value
-    };
-
-    try {
-        // A UI agora apenas chama o serviço. Muito mais limpo!
-        await closeTradeAndUpdateBalance(currentTrade.id, closeDetails);
-        closeCloseTradeModal();
-    } catch (error) {
-        console.error("Erro ao fechar trade (UI):", error);
-        alert("Ocorreu um erro ao fechar o trade. Verifique a consola para mais detalhes.");
-    }
-}
-
-
-
-    
     
     function calculatePnL() {
         const exitPrice = parseFloat(closeModalObj.exitPriceInput.value);
