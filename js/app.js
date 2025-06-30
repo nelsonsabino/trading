@@ -130,7 +130,7 @@ function closeLightbox() {
 
 
 
-// VERSÃO DE TESTE 1: Botão "Editar" desativado.
+// VERSÃO DE TESTE 2: Botão de Ação Principal desativado.
 function createTradeCard(trade) {
     const card = document.createElement('div');
     card.className = 'trade-card';
@@ -171,13 +171,16 @@ function createTradeCard(trade) {
         actionButton.textContent = 'Fechar Trade';
         actionButton.addEventListener('click', () => openCloseTradeModal(trade));
     }
-    if (actionButton) card.appendChild(actionButton);
+    
+    /* --- TESTE: Botão de Ação Principal DESATIVADO --- */
+    // if (actionButton) {
+    //    card.appendChild(actionButton);
+    // }
 
-    /* --- TESTE: Botão "Editar" DESATIVADO --- */
-    // card.querySelector('.card-edit-btn').addEventListener('click', (e) => { 
-    //     e.stopPropagation(); 
-    //     loadAndOpenForEditing(trade.id); 
-    // });
+    card.querySelector('.card-edit-btn').addEventListener('click', (e) => { 
+        e.stopPropagation(); 
+        loadAndOpenForEditing(trade.id); 
+    });
 
     return card;
 }
