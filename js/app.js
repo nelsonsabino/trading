@@ -1,66 +1,29 @@
-// js/app.js
-
 import { GESTAO_PADRAO } from './config.js';
 import { STRATEGIES } from './strategies.js';
 import { listenToTrades, getTrade, addTrade, updateTrade, closeTradeAndUpdateBalance } from './firebase-service.js';
 
-
-
-
-// --- 2. PONTO DE ENTRADA PRINCIPAL ---
-document.addEventListener('DOMContentLoaded', () => {
+// A função wrapper que cria o escopo correto, como no seu ficheiro antigo
+function runApp() {
 
     // --- 3. ESTADO DA APLICAÇÃO ---
     let currentTrade = {};
     
-    // --- 4. SELETORES DO DOM ---
-    const addModal = { container: document.getElementById('add-opportunity-modal'), form: document.getElementById('add-opportunity-form'), closeBtn: document.getElementById('close-modal-btn'), strategySelect: document.getElementById('strategy-select'), checklistContainer: document.getElementById('dynamic-checklist-container') };
-    const armModal = { container: document.getElementById('arm-trade-modal'), form: document.getElementById('arm-trade-form'), closeBtn: document.getElementById('close-arm-trade-modal-btn'), assetNameSpan: document.getElementById('arm-trade-asset-name'), strategyNameSpan: document.getElementById('arm-trade-strategy-name'), checklistContainer: document.getElementById('arm-checklist-container')};
-    const execModal = { container: document.getElementById('execution-modal'), form: document.getElementById('execution-form'), closeBtn: document.getElementById('close-execution-modal-btn'), assetNameSpan: document.getElementById('execution-asset-name'), strategyNameSpan: document.getElementById('execution-strategy-name'), checklistContainer: document.getElementById('execution-checklist-container') };
-    const closeModalObj = { container: document.getElementById('close-trade-modal'), form: document.getElementById('close-trade-form'), closeBtn: document.getElementById('close-close-trade-modal-btn'), assetNameSpan: document.getElementById('close-trade-asset-name'), exitPriceInput: document.getElementById('exit-price'), pnlInput: document.getElementById('final-pnl') };
-    const lightbox = { container: document.getElementById('image-lightbox'), image: document.getElementById('lightbox-image'), closeBtn: 
-        document.getElementById('close-lightbox-btn') };
-    
+    // --- 4. SELETORES DO DOM (serão preenchidos quando o DOM estiver pronto) ---
+    let addModal, armModal, execModal, closeModalObj, lightbox;
+    let potentialTradesContainer, armedTradesContainer, liveTradesContainer;
 
-// ADICIONE ESTA LINHA DE DEPURAÇÃO AQUI
-console.log("Objeto lightbox inicializado:", lightbox);
+    // --- 5. FUNÇÕES DE CONTROLO DE MODAIS E LIGHTBOX ---
+    function openAddModal() { if(addModal.container) addModal.container.style.display = 'flex'; }
+    function closeAddModal() { if(addModal.container) { addModal.container.style.display = 'none'; addModal.form.reset(); addModal.checklistContainer.innerHTML = ''; currentTrade = {}; } }
+    function openArmModal(trade) { currentTrade = { id: trade.id, data: trade.data }; armModal.assetNameSpan.textContent = trade.data.asset; armModal.strategyNameSpan.textContent = trade.data.strategyName; generateDynamicChecklist(armModal.checklistContainer, STRATEGIES[trade.data.strategyId]?.armedPhases, trade.data.armedSetup); if(armModal.container) armModal.container.style.display = 'flex'; }
+    function closeArmModal() { if(armModal.container) { armModal.container.style.display = 'none'; armModal.form.reset(); currentTrade = {}; } }
+    function openExecModal(trade) { currentTrade = { id: trade.id, data: trade.data }; execModal.assetNameSpan.textContent = trade.data.asset; execModal.strategyNameSpan.textContent = trade.data.strategyName; generateDynamicChecklist(execModal.checklistContainer, [...(STRATEGIES[trade.data.strategyId]?.executionPhases || []), GESTAO_PADRAO], trade.data.executionDetails); if(execModal.container) execModal.container.style.display = 'flex'; }
+    function closeExecModal() { if(execModal.container) { execModal.container.style.display = 'none'; execModal.form.reset(); currentTrade = {}; } }
+    function openCloseTradeModal(trade) { currentTrade = { id: trade.id, data: trade.data }; closeModalObj.assetNameSpan.textContent = trade.data.asset; if(closeModalObj.container) closeModalObj.container.style.display = 'flex'; }
+    function closeCloseTradeModal() { if(closeModalObj.container) { closeModalObj.container.style.display = 'none'; closeModalObj.form.reset(); currentTrade = {}; } }
+    function openLightbox(imageUrl) { if (lightbox.container && lightbox.image) { lightbox.image.src = imageUrl; lightbox.container.style.display = 'flex'; } }
+    function closeLightbox() { if (lightbox.container) lightbox.container.style.display = 'none'; }
 
-    
-    const potentialTradesContainer = document.getElementById('potential-trades-container');
-    const armedTradesContainer = document.getElementById('armed-trades-container');
-    const liveTradesContainer = document.getElementById('live-trades-container');
-
-
-
-
-    
-// --- 5. FUNÇÕES DE CONTROLO DE MODAIS E LIGHTBOX ---
-function openAddModal() { if(addModal.container) addModal.container.classList.add('visible'); }
-function closeAddModal() { if(addModal.container) { addModal.container.classList.remove('visible'); addModal.form.reset(); addModal.checklistContainer.innerHTML = ''; currentTrade = {}; } }
-function openArmModal(trade) { currentTrade = { id: trade.id, data: trade.data }; armModal.assetNameSpan.textContent = trade.data.asset; armModal.strategyNameSpan.textContent = trade.data.strategyName; generateDynamicChecklist(armModal.checklistContainer, STRATEGIES[trade.data.strategyId]?.armedPhases, trade.data.armedSetup); if(armModal.container) armModal.container.classList.add('visible'); }
-function closeArmModal() { if(armModal.container) { armModal.container.classList.remove('visible'); armModal.form.reset(); currentTrade = {}; } }
-function openExecModal(trade) { currentTrade = { id: trade.id, data: trade.data }; execModal.assetNameSpan.textContent = trade.data.asset; execModal.strategyNameSpan.textContent = trade.data.strategyName; generateDynamicChecklist(execModal.checklistContainer, [...(STRATEGIES[trade.data.strategyId]?.executionPhases || []), GESTAO_PADRAO], trade.data.executionDetails); if(execModal.container) execModal.container.classList.add('visible'); }
-function closeExecModal() { if(execModal.container) { execModal.container.classList.remove('visible'); execModal.form.reset(); currentTrade = {}; } }
-function openCloseTradeModal(trade) { currentTrade = { id: trade.id, data: trade.data }; closeModalObj.assetNameSpan.textContent = trade.data.asset; if(closeModalObj.container) closeModalObj.container.classList.add('visible'); }
-function closeCloseTradeModal() { if(closeModalObj.container) { closeModalObj.container.classList.remove('visible'); closeModalObj.form.reset(); currentTrade = {}; } }
-
-function openLightbox(imageUrl) {
-    // Agora só precisamos de nos preocupar com o 'src' da imagem e adicionar a classe.
-    if (lightbox.container && lightbox.image) {
-        lightbox.image.src = imageUrl;
-        lightbox.container.classList.add('visible');
-    }
-}
-
-function closeLightbox() {
-    if (lightbox.container) {
-        lightbox.container.classList.remove('visible');
-    }
-}
-    
-    
-
-    
     // --- 6. FUNÇÕES DE GERAÇÃO DE UI (Interface do Utilizador) ---
     function createChecklistItem(check, data) {
         const isRequired = check.required === false ? '' : 'required';
@@ -147,7 +110,8 @@ function closeLightbox() {
             img.src = imageUrlToShow;
             img.className = 'card-screenshot';
             img.alt = `Gráfico de ${trade.data.asset}`;
-           //  img.addEventListener('click', (e) => { e.stopPropagation(); openLightbox(imageUrlToShow); });
+            // A LINHA ORIGINAL E FUNCIONAL, DE VOLTA AO SEU LUGAR
+            img.addEventListener('click', (e) => { e.stopPropagation(); openLightbox(imageUrlToShow); });
             card.appendChild(img);
         }
         let actionButton;
@@ -189,157 +153,56 @@ function closeLightbox() {
     }
 
     // --- 7. FUNÇÕES DE LÓGICA DE DADOS (HANDLERS) ---
-    async function handleAddSubmit(e) {
-        e.preventDefault();
-        const strategyId = addModal.strategySelect.value;
-        const checklistData = {};
-        STRATEGIES[strategyId].potentialPhases.forEach(p => {
-            if (p.inputs) p.inputs.forEach(i => checklistData[i.id] = document.getElementById(i.id).value);
-            if (p.checks) p.checks.forEach(c => checklistData[c.id] = document.getElementById(c.id).checked);
-        });
-        const tradeData = {
-            asset: document.getElementById('asset').value,
-            imageUrl: document.getElementById('image-url').value,
-            notes: document.getElementById('notes').value,
-            strategyId: strategyId,
-            strategyName: STRATEGIES[strategyId].name,
-            status: "POTENTIAL",
-            potentialSetup: checklistData
-        };
-        if (currentTrade.id) {
-            tradeData.dateAdded = currentTrade.data.dateAdded;
-            await updateTrade(currentTrade.id, tradeData);
-        } else {
-            tradeData.dateAdded = new Date();
-            await addTrade(tradeData);
-        }
-        closeAddModal();
-    }
-    async function handleArmSubmit(e) {
-        e.preventDefault();
-        const checklistData = {};
-        const strategy = STRATEGIES[currentTrade.data.strategyId];
-        strategy.armedPhases.forEach(p => {
-            if (p.inputs) p.inputs.forEach(i => checklistData[i.id] = document.getElementById(i.id).value);
-            if (p.checks) p.checks.forEach(c => checklistData[c.id] = document.getElementById(c.id).checked);
-        });
-        await updateTrade(currentTrade.id, { status: "ARMED", armedSetup: checklistData, dateArmed: new Date() });
-        closeArmModal();
-    }
-    async function handleExecSubmit(e) {
-        e.preventDefault();
-        const executionData = {};
-        const strategy = STRATEGIES[currentTrade.data.strategyId];
-        const phasesToProcess = [...(strategy.executionPhases || []), GESTAO_PADRAO];
-        phasesToProcess.forEach(p => {
-            if (p.inputs) p.inputs.forEach(i => executionData[i.id] = document.getElementById(i.id).value);
-            if (p.checks) p.checks.forEach(c => executionData[c.id] = document.getElementById(c.id).checked);
-            if (p.radios) {
-                const checkedRadio = document.querySelector(`input[name="${p.radios.name}"]:checked`);
-                executionData[p.radios.name] = checkedRadio ? checkedRadio.value : null;
-            }
-        });
-        await updateTrade(currentTrade.id, { status: "LIVE", executionDetails: executionData, dateExecuted: new Date() });
-        closeExecModal();
-    }
-    async function handleCloseSubmit(e) {
-        e.preventDefault();
-        const pnlValue = parseFloat(document.getElementById('final-pnl').value);
-        if (isNaN(pnlValue)) { alert("Por favor, insira um valor de P&L válido."); return; }
-        const closeDetails = {
-            exitPrice: document.getElementById('exit-price').value,
-            pnl: pnlValue,
-            closeReason: document.getElementById('close-reason').value,
-            finalNotes: document.getElementById('final-notes').value,
-            exitScreenshotUrl: document.getElementById('exit-screenshot-url').value
-        };
-        const portfolioRef = doc(db, "portfolio", "summary");
-        try {
-            await runTransaction(db, async (transaction) => {
-                const portfolioDoc = await transaction.get(portfolioRef);
-                const currentBalance = portfolioDoc.exists() ? portfolioDoc.data().balance : 0;
-                const newBalance = currentBalance + pnlValue;
-                transaction.update(doc(db, 'trades', currentTrade.id), { status: "CLOSED", closeDetails: closeDetails, dateClosed: new Date() });
-                transaction.set(portfolioRef, { balance: newBalance }, { merge: true });
-            });
-            closeCloseTradeModal();
-        } catch (error) { console.error("Erro ao fechar trade:", error); alert("Erro ao fechar trade."); }
-    }
-    function calculatePnL() {
-        const exitPrice = parseFloat(closeModalObj.exitPriceInput.value);
-        const entryPrice = parseFloat(currentTrade.data?.executionDetails?.['entry-price']);
-        const quantity = parseFloat(currentTrade.data?.executionDetails?.['quantity']);
-        if (!isNaN(exitPrice) && !isNaN(entryPrice) && !isNaN(quantity)) {
-            closeModalObj.pnlInput.value = ((exitPrice - entryPrice) * quantity).toFixed(2);
-        }
-    }
+    async function handleAddSubmit(e) { e.preventDefault(); const strategyId=addModal.strategySelect.value,checklistData={};STRATEGIES[strategyId].potentialPhases.forEach(p=>{p.inputs&&p.inputs.forEach(i=>checklistData[i.id]=document.getElementById(i.id).value),p.checks&&p.checks.forEach(c=>checklistData[c.id]=document.getElementById(c.id).checked)});const tradeData={asset:document.getElementById('asset').value,imageUrl:document.getElementById('image-url').value,notes:document.getElementById('notes').value,strategyId:strategyId,strategyName:STRATEGIES[strategyId].name,status:"POTENTIAL",potentialSetup:checklistData};currentTrade.id?(tradeData.dateAdded=currentTrade.data.dateAdded,await updateTrade(currentTrade.id,tradeData)):(tradeData.dateAdded=new Date,await addTrade(tradeData)),closeAddModal()}
+    async function handleArmSubmit(e) { e.preventDefault(); const checklistData={};const strategy=STRATEGIES[currentTrade.data.strategyId];strategy.armedPhases.forEach(p=>{p.inputs&&p.inputs.forEach(i=>checklistData[i.id]=document.getElementById(i.id).value),p.checks&&p.checks.forEach(c=>checklistData[c.id]=document.getElementById(c.id).checked)}),await updateTrade(currentTrade.id,{status:"ARMED",armedSetup:checklistData,dateArmed:new Date}),closeArmModal()}
+    async function handleExecSubmit(e) { e.preventDefault(); const executionData={};const strategy=STRATEGIES[currentTrade.data.strategyId];const phasesToProcess=[...strategy.executionPhases||[],GESTAO_PADRAO];phasesToProcess.forEach(p=>{p.inputs&&p.inputs.forEach(i=>executionData[i.id]=document.getElementById(i.id).value),p.checks&&p.checks.forEach(c=>executionData[c.id]=document.getElementById(c.id).checked),p.radios&&"undefined"!=typeof document?executionData[p.radios.name]=document.querySelector(`input[name="${p.radios.name}"]:checked`)?.value||null:executionData[p.radios.name]=null}),await updateTrade(currentTrade.id,{status:"LIVE",executionDetails:executionData,dateExecuted:new Date}),closeExecModal()}
+    async function handleCloseSubmit(e) { e.preventDefault(); const pnlValue=parseFloat(document.getElementById('final-pnl').value);if(isNaN(pnlValue))return void alert("Por favor, insira um valor de P&L válido.");const closeDetails={exitPrice:document.getElementById('exit-price').value,pnl:pnlValue,closeReason:document.getElementById('close-reason').value,finalNotes:document.getElementById('final-notes').value,exitScreenshotUrl:document.getElementById('exit-screenshot-url').value};try{await closeTradeAndUpdateBalance(currentTrade.id,closeDetails),closeCloseTradeModal()}catch(o){console.error("Erro ao fechar trade (UI):",o),alert("Ocorreu um erro ao fechar o trade. Verifique a consola para mais detalhes.")}}
+    function calculatePnL() { const exitPrice=parseFloat(closeModalObj.exitPriceInput.value),entryPrice=parseFloat(currentTrade.data?.executionDetails?.['entry-price']),quantity=parseFloat(currentTrade.data?.executionDetails?.['quantity']);isNaN(exitPrice)||isNaN(entryPrice)||isNaN(quantity)||(closeModalObj.pnlInput.value=(exitPrice-entryPrice)*quantity).toFixed(2)}
 
     // --- 8. LÓGICA DE EDIÇÃO ---
-    async function loadAndOpenForEditing(tradeId) {
-        const trade = await getTrade(tradeId);
-        if (trade) {
-            currentTrade = trade;
-            if (trade.data.status === 'POTENTIAL') {
-                openAddModal();
-                addModal.strategySelect.value = trade.data.strategyId;
-                generateDynamicChecklist(addModal.checklistContainer, STRATEGIES[trade.data.strategyId]?.potentialPhases, trade.data.potentialSetup);
-                document.getElementById('asset').value = trade.data.asset;
-                document.getElementById('image-url').value = trade.data.imageUrl || '';
-                document.getElementById('notes').value = trade.data.notes;
-            } else if (trade.data.status === 'ARMED') {
-                openArmModal(trade);
-            } else if (trade.data.status === 'LIVE') {
-                openExecModal(trade);
-            }
+    async function loadAndOpenForEditing(tradeId) { const trade=await getTrade(tradeId);if(trade&&(currentTrade=trade,"POTENTIAL"===trade.data.status?(openAddModal(),addModal.strategySelect.value=trade.data.strategyId,generateDynamicChecklist(addModal.checklistContainer,STRATEGIES[trade.data.strategyId]?.potentialPhases,trade.data.potentialSetup),document.getElementById("asset").value=trade.data.asset,document.getElementById("image-url").value=trade.data.imageUrl||"",document.getElementById("notes").value=trade.data.notes):"ARMED"===trade.data.status?openArmModal(trade):"LIVE"===trade.data.status&&openExecModal(trade)) }
+
+    // --- 9. INICIALIZAÇÃO DA APLICAÇÃO (DENTRO DO DOMContentLoaded) ---
+    document.addEventListener('DOMContentLoaded', () => {
+        // Preenche as variáveis dos seletores do DOM
+        addModal = { container: document.getElementById('add-opportunity-modal'), form: document.getElementById('add-opportunity-form'), closeBtn: document.getElementById('close-modal-btn'), strategySelect: document.getElementById('strategy-select'), checklistContainer: document.getElementById('dynamic-checklist-container') };
+        armModal = { container: document.getElementById('arm-trade-modal'), form: document.getElementById('arm-trade-form'), closeBtn: document.getElementById('close-arm-trade-modal-btn'), assetNameSpan: document.getElementById('arm-trade-asset-name'), strategyNameSpan: document.getElementById('arm-trade-strategy-name'), checklistContainer: document.getElementById('arm-checklist-container')};
+        execModal = { container: document.getElementById('execution-modal'), form: document.getElementById('execution-form'), closeBtn: document.getElementById('close-execution-modal-btn'), assetNameSpan: document.getElementById('execution-asset-name'), strategyNameSpan: document.getElementById('execution-strategy-name'), checklistContainer: document.getElementById('execution-checklist-container') };
+        closeModalObj = { container: document.getElementById('close-trade-modal'), form: document.getElementById('close-trade-form'), closeBtn: document.getElementById('close-close-trade-modal-btn'), assetNameSpan: document.getElementById('close-trade-asset-name'), exitPriceInput: document.getElementById('exit-price'), pnlInput: document.getElementById('final-pnl') };
+        lightbox = { container: document.getElementById('image-lightbox'), image: document.getElementById('lightbox-image'), closeBtn: document.getElementById('close-lightbox-btn') };
+        potentialTradesContainer = document.getElementById('potential-trades-container');
+        armedTradesContainer = document.getElementById('armed-trades-container');
+        liveTradesContainer = document.getElementById('live-trades-container');
+
+        // Anexa os event listeners
+        document.getElementById('add-opportunity-btn').addEventListener('click', openAddModal);
+        addModal.closeBtn.addEventListener('click', closeAddModal);
+        addModal.container.addEventListener('click', e => { if (e.target.id === 'add-opportunity-modal') closeAddModal(); });
+        addModal.form.addEventListener('submit', handleAddSubmit);
+        addModal.strategySelect.addEventListener('change', () => generateDynamicChecklist(addModal.checklistContainer, STRATEGIES[addModal.strategySelect.value]?.potentialPhases));
+        armModal.closeBtn.addEventListener('click', closeArmModal);
+        armModal.container.addEventListener('click', e => { if (e.target.id === 'arm-trade-modal') closeArmModal(); });
+        armModal.form.addEventListener('submit', handleArmSubmit);
+        execModal.closeBtn.addEventListener('click', closeExecModal);
+        execModal.container.addEventListener('click', e => { if (e.target.id === 'execution-modal') closeExecModal(); });
+        execModal.form.addEventListener('submit', handleExecSubmit);
+        closeModalObj.closeBtn.addEventListener('click', closeCloseTradeModal);
+        closeModalObj.container.addEventListener('click', e => { if (e.target.id === 'close-trade-modal') closeCloseTradeModal(); });
+        closeModalObj.form.addEventListener('submit', handleCloseSubmit);
+        closeModalObj.exitPriceInput.addEventListener('input', calculatePnL);
+        lightbox.closeBtn.addEventListener('click', closeLightbox);
+        lightbox.container.addEventListener('click', (e) => { if (e.target.id === 'image-lightbox') closeLightbox(); });
+
+        // Inicia a aplicação
+        listenToTrades(displayTrades);
+        populateStrategySelect();
+        const tradeIdToEdit = localStorage.getItem('tradeToEdit');
+        if (tradeIdToEdit) {
+            localStorage.removeItem('tradeToEdit');
+            loadAndOpenForEditing(tradeIdToEdit);
         }
-    }
-    
-    // --- 9. INICIALIZAÇÃO DA APLICAÇÃO ---
-    document.getElementById('add-opportunity-btn').addEventListener('click', openAddModal);
-    addModal.closeBtn.addEventListener('click', closeAddModal);
-    addModal.container.addEventListener('click', e => { if (e.target.id === 'add-opportunity-modal') closeAddModal(); });
-    addModal.form.addEventListener('submit', handleAddSubmit);
-    addModal.strategySelect.addEventListener('change', () => generateDynamicChecklist(addModal.checklistContainer, STRATEGIES[addModal.strategySelect.value]?.potentialPhases));
-    armModal.closeBtn.addEventListener('click', closeArmModal);
-    armModal.container.addEventListener('click', e => { if (e.target.id === 'arm-trade-modal') closeArmModal(); });
-    armModal.form.addEventListener('submit', handleArmSubmit);
-    execModal.closeBtn.addEventListener('click', closeExecModal);
-    execModal.container.addEventListener('click', e => { if (e.target.id === 'execution-modal') closeExecModal(); });
-    execModal.form.addEventListener('submit', handleExecSubmit);
-    closeModalObj.closeBtn.addEventListener('click', closeCloseTradeModal);
-    closeModalObj.container.addEventListener('click', e => { if (e.target.id === 'close-trade-modal') closeCloseTradeModal(); });
-    closeModalObj.form.addEventListener('submit', handleCloseSubmit);
-    closeModalObj.exitPriceInput.addEventListener('input', calculatePnL);
-    lightbox.closeBtn.addEventListener('click', closeLightbox);
-    lightbox.container.addEventListener('click', (e) => { if (e.target.id === 'image-lightbox') closeLightbox(); });
-
-
-function handleContainerClick(e) {
-    // 1. Primeiro espião: Diz-nos se o clique no contentor foi sequer registado.
-    console.log("Clique detetado no contentor. O alvo do clique foi:", e.target);
-
-    // 2. Segundo espião: Verifica a condição.
-    if (e.target.matches('.card-screenshot')) {
-        console.log("CORRESPONDEU! O alvo é uma imagem com a classe '.card-screenshot'.");
-        console.log("A tentar abrir o lightbox com o URL:", e.target.src);
-        
-        e.stopPropagation();
-        openLightbox(e.target.src);
-    } else {
-        console.log("NÃO CORRESPONDEU. O alvo não tem a classe '.card-screenshot'.");
-    }
+    });
 }
 
-potentialTradesContainer.addEventListener('click', handleContainerClick);
-armedTradesContainer.addEventListener('click', handleContainerClick);
-liveTradesContainer.addEventListener('click', handleContainerClick);
-
-    
-    listenToTrades(displayTrades);
-    populateStrategySelect();
-    const tradeIdToEdit = localStorage.getItem('tradeToEdit');
-    if (tradeIdToEdit) {
-        localStorage.removeItem('tradeToEdit');
-        loadAndOpenForEditing(tradeIdToEdit);
-    }
-});
+// Chama a função principal para iniciar tudo
+runApp();
