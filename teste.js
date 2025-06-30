@@ -1,36 +1,49 @@
-// Versão 7.0
+// Versão 8.0
 import { db } from './teste-firebase.js';
 import { collection, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 
-console.log(`A iniciar teste v7.0`);
+console.log(`A iniciar teste v8.0`);
 
 function runApp() {
-    let containerDinamico, closeBtn, lightboxContainer, lightboxImage;
+    // VARIÁVEIS DE ESTADO E SELETORES (Exatamente como no seu app.js)
+    let containerDinamico;
+    let addModal, armModal, execModal, closeModalObj, lightbox; // Mudei para "lightbox" em vez de "lightboxContainer/Image"
 
-    function abrirLightboxDeTeste(imageUrl) {
-        if (lightboxContainer && lightboxImage) {
-            lightboxImage.src = imageUrl;
-            lightboxContainer.style.display = 'flex';
+    // FUNÇÕES DE CONTROLO DOS MODAIS REAIS (copiadas do seu app.js)
+    function openAddModal() { if(addModal.container) addModal.container.style.display = 'flex'; }
+    function openArmModal() { if(armModal.container) armModal.container.style.display = 'flex'; }
+    // ... (não precisamos de todas, estas servem para o teste)
+
+    // FUNÇÃO openLightbox MODIFICADA PARA USAR O OBJETO "lightbox"
+    function openLightbox(imageUrl) {
+        console.log("A tentar abrir o lightbox...");
+        // Usa a variável 'lightbox' que é preenchida no DOMContentLoaded, tal como na sua app principal
+        if (lightbox.container && lightbox.image) {
+            lightbox.image.src = imageUrl;
+            lightbox.container.style.display = 'flex';
+        } else {
+            console.error("Objeto lightbox não foi preenchido corretamente!");
         }
     }
 
-    function fecharLightboxDeTeste() {
-        if (lightboxContainer) {
-            lightboxContainer.style.display = 'none';
+    function closeLightbox() {
+        if (lightbox.container) {
+            lightbox.container.style.display = 'none';
         }
     }
 
+    // A nossa função de criação de card, agora chama "openLightbox"
     function criarCardDeTeste(doc) {
         const card = document.createElement('div');
         card.className = 'test-card';
         card.innerHTML = `<h3>Card do Doc: ${doc.id}</h3>`;
-        const imageUrl = 'https://www.tradingview.com/x/TwO0R9jW';
+        const imageUrl = 'https://i.imgur.com/exemplo1.png';
         const img = document.createElement('img');
         img.src = imageUrl;
         img.alt = 'Clique em mim';
+        // O event listener agora chama a função real
         img.addEventListener('click', () => {
-            console.log("Imagem do card dinâmico clicada!");
-            abrirLightboxDeTeste(imageUrl);
+            openLightbox(imageUrl);
         });
         card.appendChild(img);
         return card;
@@ -38,16 +51,26 @@ function runApp() {
 
     document.addEventListener('DOMContentLoaded', () => {
         console.log("DOMContentLoaded executado.");
+        
+        // PREENCHIMENTO DAS VARIÁVEIS (Exatamente como no seu app.js)
         containerDinamico = document.getElementById('container-dinamico');
-        closeBtn = document.getElementById('close-lightbox-test-btn');
-        lightboxContainer = document.getElementById('image-lightbox');
-        lightboxImage = document.getElementById('lightbox-image');
+        
+        addModal = { container: document.getElementById('add-opportunity-modal') };
+        armModal = { container: document.getElementById('arm-trade-modal') };
+        execModal = { container: document.getElementById('execution-modal') };
+        closeModalObj = { container: document.getElementById('close-trade-modal') };
+        lightbox = { 
+            container: document.getElementById('image-lightbox'), 
+            image: document.getElementById('lightbox-image'), 
+            closeBtn: document.getElementById('close-lightbox-test-btn') 
+        };
+        console.log("Objeto lightbox preenchido:", lightbox);
 
-        closeBtn.addEventListener('click', fecharLightboxDeTeste);
+        lightbox.closeBtn.addEventListener('click', closeLightbox);
 
+        // A escuta do Firebase começa aqui
         const q = collection(db, "testes");
         onSnapshot(q, (snapshot) => {
-            console.log("onSnapshot respondeu!");
             containerDinamico.innerHTML = '';
             snapshot.forEach(doc => {
                 const novoCard = criarCardDeTeste(doc);
