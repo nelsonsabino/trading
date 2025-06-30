@@ -41,19 +41,20 @@ function closeExecModal() { if(execModal.container) { execModal.container.style.
 function openCloseTradeModal(trade) { currentTrade = { id: trade.id, data: trade.data }; closeModalObj.assetNameSpan.textContent = trade.data.asset; if(closeModalObj.container) closeModalObj.container.style.display = 'flex'; }
 function closeCloseTradeModal() { if(closeModalObj.container) { closeModalObj.container.style.display = 'none'; closeModalObj.form.reset(); currentTrade = {}; } }
 
-// VERSÃO DE DEPURAÇÃO DA FUNÇÃO openLightbox
+// VERSÃO DE TESTE FINAL
 function openLightbox(imageUrl) {
-    console.log("--- Dentro da função openLightbox ---");
-    console.log("URL recebido:", imageUrl);
-    console.log("O container do lightbox é:", lightbox.container);
-    console.log("O elemento da imagem do lightbox é:", lightbox.image);
-
     if (lightbox.container && lightbox.image) {
-        console.log("CONDIÇÃO VERDADEIRA. A aplicar estilos e src.");
+        
+        console.log("TESTE FINAL: A tentar pintar o fundo de vermelho.");
+        
+        // Vamos forçar a visibilidade com uma cor de fundo berrante
+        lightbox.container.style.backgroundColor = 'rgba(255, 0, 0, 0.5)'; // Vermelho semi-transparente
+        
         lightbox.image.src = imageUrl;
         lightbox.container.style.display = 'flex';
+        
     } else {
-        console.log("CONDIÇÃO FALSA. Container ou Imagem não foram encontrados. Verifique os IDs no HTML.");
+        console.log("CONDIÇÃO FALSA. Container ou Imagem não foram encontrados.");
     }
 }
 
