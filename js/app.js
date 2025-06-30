@@ -169,7 +169,7 @@ function closeLightbox() {
             actionButton.addEventListener('click', () => openCloseTradeModal(trade));
         }
         if (actionButton) card.appendChild(actionButton);
-        card.querySelector('.card-edit-btn').addEventListener('click', (e) => { e.stopPropagation(); loadAndOpenForEditing(trade.id); });
+     */   card.querySelector('.card-edit-btn').addEventListener('click', (e) => { e.stopPropagation(); loadAndOpenForEditing(trade.id); });/*
         return card;
     }
     function displayTrades(trades) {
