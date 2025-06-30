@@ -32,8 +32,23 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeExecModal() { if(execModal.container) { execModal.container.style.display = 'none'; execModal.form.reset(); currentTrade = {}; } }
     function openCloseTradeModal(trade) { currentTrade = { id: trade.id, data: trade.data }; closeModalObj.assetNameSpan.textContent = trade.data.asset; if(closeModalObj.container) closeModalObj.container.style.display = 'flex'; }
     function closeCloseTradeModal() { if(closeModalObj.container) { closeModalObj.container.style.display = 'none'; closeModalObj.form.reset(); currentTrade = {}; } }
-    function openLightbox(imageUrl) { if (lightbox.container && lightbox.image) { lightbox.image.src = imageUrl; lightbox.container.style.display = 'flex'; } }
-    function closeLightbox() { if (lightbox.container) lightbox.container.style.display = 'none'; }
+    function openLightbox(imageUrl) {
+
+   // --- Início do bloco de diagnóstico ---
+    console.log("A função openLightbox foi chamada com a URL:", imageUrl);
+    console.log("O elemento 'lightbox.container' é:", lightbox.container);
+    console.log("O elemento 'lightbox.image' é:", lightbox.image);
+    // --- Fim do bloco de diagnóstico ---
+        
+        if (lightbox.container && lightbox.image) {
+           console.log("Condição 'if' é verdadeira. A tentar abrir o lightbox...");
+            lightbox.image.src = imageUrl; 
+            lightbox.container.style.display = 'flex';
+        } else {
+        console.error("ERRO: Não foi possível abrir o lightbox porque 'lightbox.container' ou 'lightbox.image' não foram encontrados no DOM.");
+            
+    }
+    }
 
     // --- 6. FUNÇÕES DE GERAÇÃO DE UI (Interface do Utilizador) ---
     function createChecklistItem(check, data) {
