@@ -30,18 +30,36 @@ console.log("Objeto lightbox inicializado:", lightbox);
     const armedTradesContainer = document.getElementById('armed-trades-container');
     const liveTradesContainer = document.getElementById('live-trades-container');
 
-    // --- 5. FUNÇÕES DE CONTROLO DE MODAIS E LIGHTBOX ---
-    function openAddModal() { if(addModal.container) addModal.container.style.display = 'flex'; }
-    function closeAddModal() { if(addModal.container) { addModal.container.style.display = 'none'; addModal.form.reset(); addModal.checklistContainer.innerHTML = ''; currentTrade = {}; } }
-    function openArmModal(trade) { currentTrade = { id: trade.id, data: trade.data }; armModal.assetNameSpan.textContent = trade.data.asset; armModal.strategyNameSpan.textContent = trade.data.strategyName; generateDynamicChecklist(armModal.checklistContainer, STRATEGIES[trade.data.strategyId]?.armedPhases, trade.data.armedSetup); if(armModal.container) armModal.container.style.display = 'flex'; }
-    function closeArmModal() { if(armModal.container) { armModal.container.style.display = 'none'; armModal.form.reset(); currentTrade = {}; } }
-    function openExecModal(trade) { currentTrade = { id: trade.id, data: trade.data }; execModal.assetNameSpan.textContent = trade.data.asset; execModal.strategyNameSpan.textContent = trade.data.strategyName; generateDynamicChecklist(execModal.checklistContainer, [...(STRATEGIES[trade.data.strategyId]?.executionPhases || []), GESTAO_PADRAO], trade.data.executionDetails); if(execModal.container) execModal.container.style.display = 'flex'; }
-    function closeExecModal() { if(execModal.container) { execModal.container.style.display = 'none'; execModal.form.reset(); currentTrade = {}; } }
-    function openCloseTradeModal(trade) { currentTrade = { id: trade.id, data: trade.data }; closeModalObj.assetNameSpan.textContent = trade.data.asset; if(closeModalObj.container) closeModalObj.container.style.display = 'flex'; }
-    function closeCloseTradeModal() { if(closeModalObj.container) { closeModalObj.container.style.display = 'none'; closeModalObj.form.reset(); currentTrade = {}; } }
-    function openLightbox(imageUrl) { if (lightbox.container && lightbox.image) { lightbox.image.src = imageUrl; lightbox.container.style.display = 'flex'; } }
-    function closeLightbox() { if (lightbox.container) lightbox.container.style.display = 'none'; }
 
+// --- 5. FUNÇÕES DE CONTROLO DE MODAIS E LIGHTBOX ---
+function openAddModal() { if(addModal.container) addModal.container.style.display = 'flex'; }
+function closeAddModal() { if(addModal.container) { addModal.container.style.display = 'none'; addModal.form.reset(); addModal.checklistContainer.innerHTML = ''; currentTrade = {}; } }
+function openArmModal(trade) { currentTrade = { id: trade.id, data: trade.data }; armModal.assetNameSpan.textContent = trade.data.asset; armModal.strategyNameSpan.textContent = trade.data.strategyName; generateDynamicChecklist(armModal.checklistContainer, STRATEGIES[trade.data.strategyId]?.armedPhases, trade.data.armedSetup); if(armModal.container) armModal.container.style.display = 'flex'; }
+function closeArmModal() { if(armModal.container) { armModal.container.style.display = 'none'; armModal.form.reset(); currentTrade = {}; } }
+function openExecModal(trade) { currentTrade = { id: trade.id, data: trade.data }; execModal.assetNameSpan.textContent = trade.data.asset; execModal.strategyNameSpan.textContent = trade.data.strategyName; generateDynamicChecklist(execModal.checklistContainer, [...(STRATEGIES[trade.data.strategyId]?.executionPhases || []), GESTAO_PADRAO], trade.data.executionDetails); if(execModal.container) execModal.container.style.display = 'flex'; }
+function closeExecModal() { if(execModal.container) { execModal.container.style.display = 'none'; execModal.form.reset(); currentTrade = {}; } }
+function openCloseTradeModal(trade) { currentTrade = { id: trade.id, data: trade.data }; closeModalObj.assetNameSpan.textContent = trade.data.asset; if(closeModalObj.container) closeModalObj.container.style.display = 'flex'; }
+function closeCloseTradeModal() { if(closeModalObj.container) { closeModalObj.container.style.display = 'none'; closeModalObj.form.reset(); currentTrade = {}; } }
+
+// VERSÃO DE DEPURAÇÃO DA FUNÇÃO openLightbox
+function openLightbox(imageUrl) {
+    console.log("--- Dentro da função openLightbox ---");
+    console.log("URL recebido:", imageUrl);
+    console.log("O container do lightbox é:", lightbox.container);
+    console.log("O elemento da imagem do lightbox é:", lightbox.image);
+
+    if (lightbox.container && lightbox.image) {
+        console.log("CONDIÇÃO VERDADEIRA. A aplicar estilos e src.");
+        lightbox.image.src = imageUrl;
+        lightbox.container.style.display = 'flex';
+    } else {
+        console.log("CONDIÇÃO FALSA. Container ou Imagem não foram encontrados. Verifique os IDs no HTML.");
+    }
+}
+
+function closeLightbox() { if (lightbox.container) lightbox.container.style.display = 'none'; }
+
+    
     // --- 6. FUNÇÕES DE GERAÇÃO DE UI (Interface do Utilizador) ---
     function createChecklistItem(check, data) {
         const isRequired = check.required === false ? '' : 'required';
