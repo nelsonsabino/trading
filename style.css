@@ -159,36 +159,3 @@ header nav { margin-top: 1.5rem; display: flex; justify-content: center; align-i
     border-top: 1px solid #dee2e6;
     margin: 3rem 0;
 }
-
-
-
-/* Container da imagem para melhor controle */
-.card-image-container {
-    position: relative;
-    margin-top: 1rem;
-}
-
-/* Garantir que a imagem não tenha elementos interferindo */
-.card-screenshot {
-    display: block;
-    width: 100%;
-    height: auto;
-    border-radius: 4px;
-    cursor: pointer;
-    border: 1px solid #e9ecef;
-    transition: transform 0.2s;
-}
-
-.card-screenshot:hover {
-    transform: scale(1.02);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-/* Garantir que o lightbox tenha prioridade máxima */
-#image-lightbox {
-    z-index: 9999 !important;
-}
-
-#close-lightbox-btn {
-    z-index: 10000 !important;
-}
