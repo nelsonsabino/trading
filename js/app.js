@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
             img.src = imageUrlToShow;
             img.className = 'card-screenshot';
             img.alt = `Gráfico de ${trade.data.asset}`;
-            img.addEventListener('click', (e) => { e.stopPropagation(); openLightbox(imageUrlToShow); });
+           //  img.addEventListener('click', (e) => { e.stopPropagation(); openLightbox(imageUrlToShow); });
             card.appendChild(img);
         }
         let actionButton;
@@ -287,6 +287,21 @@ document.addEventListener('DOMContentLoaded', () => {
     lightbox.closeBtn.addEventListener('click', closeLightbox);
     lightbox.container.addEventListener('click', (e) => { if (e.target.id === 'image-lightbox') closeLightbox(); });
 
+function handleContainerClick(e) {
+    // Verifica se o elemento clicado (e.target) tem a classe 'card-screenshot'
+    if (e.target.matches('.card-screenshot')) {
+        // Impede que o clique se propague para outros elementos, se necessário
+        e.stopPropagation();
+        // Abre o lightbox com o URL da imagem (que é o 'src' do elemento clicado)
+        openLightbox(e.target.src);
+    }
+}
+
+potentialTradesContainer.addEventListener('click', handleContainerClick);
+armedTradesContainer.addEventListener('click', handleContainerClick);
+liveTradesContainer.addEventListener('click', handleContainerClick);
+
+    
     listenToTrades(displayTrades);
     populateStrategySelect();
     const tradeIdToEdit = localStorage.getItem('tradeToEdit');
