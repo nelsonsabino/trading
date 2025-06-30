@@ -31,34 +31,34 @@ console.log("Objeto lightbox inicializado:", lightbox);
     const liveTradesContainer = document.getElementById('live-trades-container');
 
 
-// --- 5. FUNÇÕES DE CONTROLO DE MODAIS E LIGHTBOX ---
-function openAddModal() { if(addModal.container) addModal.container.style.display = 'flex'; }
-function closeAddModal() { if(addModal.container) { addModal.container.style.display = 'none'; addModal.form.reset(); addModal.checklistContainer.innerHTML = ''; currentTrade = {}; } }
-function openArmModal(trade) { currentTrade = { id: trade.id, data: trade.data }; armModal.assetNameSpan.textContent = trade.data.asset; armModal.strategyNameSpan.textContent = trade.data.strategyName; generateDynamicChecklist(armModal.checklistContainer, STRATEGIES[trade.data.strategyId]?.armedPhases, trade.data.armedSetup); if(armModal.container) armModal.container.style.display = 'flex'; }
-function closeArmModal() { if(armModal.container) { armModal.container.style.display = 'none'; armModal.form.reset(); currentTrade = {}; } }
-function openExecModal(trade) { currentTrade = { id: trade.id, data: trade.data }; execModal.assetNameSpan.textContent = trade.data.asset; execModal.strategyNameSpan.textContent = trade.data.strategyName; generateDynamicChecklist(execModal.checklistContainer, [...(STRATEGIES[trade.data.strategyId]?.executionPhases || []), GESTAO_PADRAO], trade.data.executionDetails); if(execModal.container) execModal.container.style.display = 'flex'; }
-function closeExecModal() { if(execModal.container) { execModal.container.style.display = 'none'; execModal.form.reset(); currentTrade = {}; } }
-function openCloseTradeModal(trade) { currentTrade = { id: trade.id, data: trade.data }; closeModalObj.assetNameSpan.textContent = trade.data.asset; if(closeModalObj.container) closeModalObj.container.style.display = 'flex'; }
-function closeCloseTradeModal() { if(closeModalObj.container) { closeModalObj.container.style.display = 'none'; closeModalObj.form.reset(); currentTrade = {}; } }
 
-// VERSÃO DE TESTE FINAL
+
+    
+// --- 5. FUNÇÕES DE CONTROLO DE MODAIS E LIGHTBOX ---
+function openAddModal() { if(addModal.container) addModal.container.classList.add('visible'); }
+function closeAddModal() { if(addModal.container) { addModal.container.classList.remove('visible'); addModal.form.reset(); addModal.checklistContainer.innerHTML = ''; currentTrade = {}; } }
+function openArmModal(trade) { currentTrade = { id: trade.id, data: trade.data }; armModal.assetNameSpan.textContent = trade.data.asset; armModal.strategyNameSpan.textContent = trade.data.strategyName; generateDynamicChecklist(armModal.checklistContainer, STRATEGIES[trade.data.strategyId]?.armedPhases, trade.data.armedSetup); if(armModal.container) armModal.container.classList.add('visible'); }
+function closeArmModal() { if(armModal.container) { armModal.container.classList.remove('visible'); armModal.form.reset(); currentTrade = {}; } }
+function openExecModal(trade) { currentTrade = { id: trade.id, data: trade.data }; execModal.assetNameSpan.textContent = trade.data.asset; execModal.strategyNameSpan.textContent = trade.data.strategyName; generateDynamicChecklist(execModal.checklistContainer, [...(STRATEGIES[trade.data.strategyId]?.executionPhases || []), GESTAO_PADRAO], trade.data.executionDetails); if(execModal.container) execModal.container.classList.add('visible'); }
+function closeExecModal() { if(execModal.container) { execModal.container.classList.remove('visible'); execModal.form.reset(); currentTrade = {}; } }
+function openCloseTradeModal(trade) { currentTrade = { id: trade.id, data: trade.data }; closeModalObj.assetNameSpan.textContent = trade.data.asset; if(closeModalObj.container) closeModalObj.container.classList.add('visible'); }
+function closeCloseTradeModal() { if(closeModalObj.container) { closeModalObj.container.classList.remove('visible'); closeModalObj.form.reset(); currentTrade = {}; } }
+
 function openLightbox(imageUrl) {
+    // Agora só precisamos de nos preocupar com o 'src' da imagem e adicionar a classe.
     if (lightbox.container && lightbox.image) {
-        
-        console.log("TESTE FINAL: A tentar pintar o fundo de vermelho.");
-        
-        // Vamos forçar a visibilidade com uma cor de fundo berrante
-        lightbox.container.style.backgroundColor = 'rgba(255, 0, 0, 0.5)'; // Vermelho semi-transparente
-        
         lightbox.image.src = imageUrl;
-        lightbox.container.style.display = 'flex';
-        
-    } else {
-        console.log("CONDIÇÃO FALSA. Container ou Imagem não foram encontrados.");
+        lightbox.container.classList.add('visible');
     }
 }
 
-function closeLightbox() { if (lightbox.container) lightbox.container.style.display = 'none'; }
+function closeLightbox() {
+    if (lightbox.container) {
+        lightbox.container.classList.remove('visible');
+    }
+}
+    
+    
 
     
     // --- 6. FUNÇÕES DE GERAÇÃO DE UI (Interface do Utilizador) ---
