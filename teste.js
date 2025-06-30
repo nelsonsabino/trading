@@ -1,37 +1,37 @@
-// Versão 4.0
-import { dummyVariable } from './teste-config.js';
-console.log(`Módulo importado: ${dummyVariable} (v4.0)`);
+// Versão 5.0
+import { db } from './teste-firebase.js'; // Importa a BD real
+import { collection, onSnapshot } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+
+console.log(`Firebase importado. A escutar a coleção 'testes'... (v5.0)`);
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Referências aos elementos que já existem no HTML
     const containerDinamico = document.getElementById('container-dinamico');
     const closeBtn = document.getElementById('close-lightbox-test-btn');
     const lightboxContainer = document.getElementById('image-lightbox');
 
-    // --- LÓGICA DE CRIAÇÃO DINÂMICA (agora dentro de um setTimeout) ---
+    // --- LÓGICA DE CRIAÇÃO DINÂMICA (agora com onSnapshot) ---
     
-    console.log("A agendar a criação do botão dinâmico para daqui a 500ms...");
-
-    setTimeout(() => {
-        console.log("setTimeout executado! A criar o botão agora.");
-
-        // 1. Criar um novo botão do zero
-        const botaoDinamico = document.createElement('button');
-        botaoDinamico.textContent = 'Abrir Lightbox (Botão Assíncrono)';
+    const q = collection(db, "testes"); // Aponte para a sua coleção de teste
+    onSnapshot(q, (snapshot) => {
+        console.log("onSnapshot respondeu! A criar o botão.");
         
-        // 2. Adicionar o ouvinte de clique
-        botaoDinamico.addEventListener('click', abrirLightboxDeTeste);
-        
-        // 3. Adicionar o novo botão à página
-        containerDinamico.appendChild(botaoDinamico);
+        // Limpa o container para não criar botões duplicados se houver mais updates
+        containerDinamico.innerHTML = ''; 
 
-    }, 500); // 500ms = meio segundo de atraso para simular a resposta da rede
+        snapshot.forEach(doc => {
+            // Criar um botão para cada documento na coleção de teste
+            const botaoDinamico = document.createElement('button');
+            botaoDinamico.textContent = `Abrir Lightbox (Firebase, Doc ID: ${doc.id})`;
+            
+            botaoDinamico.addEventListener('click', abrirLightboxDeTeste);
+            
+            containerDinamico.appendChild(botaoDinamico);
+        });
+    });
 
-    
     // --- FUNÇÕES ---
-
     function abrirLightboxDeTeste() {
-        console.log("Botão ASSÍNCRONO clicado!");
+        console.log("Botão FIREBASE clicado!");
         if (lightboxContainer) {
             lightboxContainer.style.display = 'flex';
         }
@@ -43,6 +43,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Adiciona o listener para o botão de fecho
     closeBtn.addEventListener('click', fecharLightboxDeTeste);
 });
