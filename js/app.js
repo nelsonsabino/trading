@@ -84,7 +84,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const exampleContainer = document.createElement('div');
                 exampleContainer.className = 'example-image-container';
                 exampleContainer.innerHTML = `<p>Exemplo Visual:</p><img src="${phase.exampleImageUrl}" alt="Exemplo para ${phase.title}">`;
-                exampleContainer.querySelector('img').addEventListener('click', (e) => { e.stopPropagation(); openLightbox(phase.exampleImageUrl); });
+                exampleContainer.querySelector('img').addEventListener('click', (e) => {
+                        console.log("Imagem de exemplo clicada! URL:", phase.exampleImageUrl); 
+                    e.stopPropagation();
+                    openLightbox(phase.exampleImageUrl);
+                });
                 phaseDiv.appendChild(exampleContainer);
             }
             const titleEl = document.createElement('h4');
