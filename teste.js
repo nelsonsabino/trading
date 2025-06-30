@@ -1,24 +1,19 @@
-// Espera que o HTML esteja pronto
+// A MUDANÇA ESTÁ AQUI: import
+import { dummyVariable } from './teste-config.js';
+
+console.log('Módulo importado:', dummyVariable); // Para confirmar que funciona
+
 document.addEventListener('DOMContentLoaded', () => {
-
-    // Encontra o botão de teste
     const botaoTeste = document.getElementById('botao-teste');
-
-    // A função que tenta abrir o lightbox
     function abrirLightboxDeTeste() {
-        console.log("Botão clicado. A tentar abrir o lightbox...");
-        
+        console.log("Botão clicado.");
         const lightboxContainer = document.getElementById('image-lightbox');
-
         if (lightboxContainer) {
-            console.log("Elemento do lightbox encontrado. A aplicar 'display: flex'.");
+            console.log("Elemento encontrado. A aplicar 'display: flex'.");
             lightboxContainer.style.display = 'flex';
         } else {
-            console.log("ERRO: Não encontrei o elemento #image-lightbox.");
+            console.log("ERRO: #image-lightbox não encontrado.");
         }
     }
-
-    // Adiciona o ouvinte de clique ao botão
     botaoTeste.addEventListener('click', abrirLightboxDeTeste);
-
 });
