@@ -116,17 +116,32 @@ document.addEventListener('DOMContentLoaded', () => {
             if (key) armedImageUrl = trade.data.armedSetup[key];
         }
         const imageUrlToShow = armedImageUrl || potentialImageUrl;
-        if (imageUrlToShow) {
-            const img = document.createElement('img');
-            img.src = imageUrlToShow;
-            img.className = 'card-screenshot';
-            img.alt = `Gráfico de ${trade.data.asset}`;
-             img.addEventListener('click', function(e) {
+       if (imageUrlToShow) {
+    const imgContainer = document.createElement('div');
+    imgContainer.className = 'card-image-container';
+    
+    const img = document.createElement('img');
+    img.src = imageUrlToShow;
+    img.className = 'card-screenshot';
+    img.alt = `Gráfico de ${trade.data.asset}`;
+    img.tabIndex = 0; // Permite foco via teclado
+    
+    // Novo listener mais robusto
+    img.addEventListener('click', function(e) {
         e.preventDefault();
-        openLightbox(this.src);
+        e.stopImmediatePropagation(); // Mais específico que stopPropagation
+        openLightbox(imageUrlToShow);
     });
     
-    card.appendChild(img);
+    // Suporte para tecla Enter (acessibilidade)
+    img.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            openLightbox(imageUrlToShow);
+        }
+    });
+    
+    imgContainer.appendChild(img);
+    card.appendChild(imgContainer);
 }
         let actionButton;
         if (trade.data.status === 'POTENTIAL') {
