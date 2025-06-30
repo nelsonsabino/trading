@@ -1,5 +1,6 @@
+// Versão 3.0
 import { dummyVariable } from './teste-config.js';
-console.log('Módulo importado:', dummyVariable);
+console.log(`Módulo importado: ${dummyVariable} (v3.0)`);
 
 document.addEventListener('DOMContentLoaded', () => {
     // Referências aos elementos que já existem no HTML
