@@ -152,13 +152,98 @@ function runApp() {
         });
     }
 
-    // --- 7. FUNÇÕES DE LÓGICA DE DADOS (HANDLERS) ---
-    async function handleAddSubmit(e) { e.preventDefault(); const strategyId=addModal.strategySelect.value,checklistData={};STRATEGIES[strategyId].potentialPhases.forEach(p=>{p.inputs&&p.inputs.forEach(i=>checklistData[i.id]=document.getElementById(i.id).value),p.checks&&p.checks.forEach(c=>checklistData[c.id]=document.getElementById(c.id).checked)});const tradeData={asset:document.getElementById('asset').value,imageUrl:document.getElementById('image-url').value,notes:document.getElementById('notes').value,strategyId:strategyId,strategyName:STRATEGIES[strategyId].name,status:"POTENTIAL",potentialSetup:checklistData};currentTrade.id?(tradeData.dateAdded=currentTrade.data.dateAdded,await updateTrade(currentTrade.id,tradeData)):(tradeData.dateAdded=new Date,await addTrade(tradeData)),closeAddModal()}
-    async function handleArmSubmit(e) { e.preventDefault(); const checklistData={};const strategy=STRATEGIES[currentTrade.data.strategyId];strategy.armedPhases.forEach(p=>{p.inputs&&p.inputs.forEach(i=>checklistData[i.id]=document.getElementById(i.id).value),p.checks&&p.checks.forEach(c=>checklistData[c.id]=document.getElementById(c.id).checked)}),await updateTrade(currentTrade.id,{status:"ARMED",armedSetup:checklistData,dateArmed:new Date}),closeArmModal()}
-    async function handleExecSubmit(e) { e.preventDefault(); const executionData={};const strategy=STRATEGIES[currentTrade.data.strategyId];const phasesToProcess=[...strategy.executionPhases||[],GESTAO_PADRAO];phasesToProcess.forEach(p=>{p.inputs&&p.inputs.forEach(i=>executionData[i.id]=document.getElementById(i.id).value),p.checks&&p.checks.forEach(c=>executionData[c.id]=document.getElementById(c.id).checked),p.radios&&"undefined"!=typeof document?executionData[p.radios.name]=document.querySelector(`input[name="${p.radios.name}"]:checked`)?.value||null:executionData[p.radios.name]=null}),await updateTrade(currentTrade.id,{status:"LIVE",executionDetails:executionData,dateExecuted:new Date}),closeExecModal()}
-    async function handleCloseSubmit(e) { e.preventDefault(); const pnlValue=parseFloat(document.getElementById('final-pnl').value);if(isNaN(pnlValue))return void alert("Por favor, insira um valor de P&L válido.");const closeDetails={exitPrice:document.getElementById('exit-price').value,pnl:pnlValue,closeReason:document.getElementById('close-reason').value,finalNotes:document.getElementById('final-notes').value,exitScreenshotUrl:document.getElementById('exit-screenshot-url').value};try{await closeTradeAndUpdateBalance(currentTrade.id,closeDetails),closeCloseTradeModal()}catch(o){console.error("Erro ao fechar trade (UI):",o),alert("Ocorreu um erro ao fechar o trade. Verifique a consola para mais detalhes.")}}
-    function calculatePnL() { const exitPrice=parseFloat(closeModalObj.exitPriceInput.value),entryPrice=parseFloat(currentTrade.data?.executionDetails?.['entry-price']),quantity=parseFloat(currentTrade.data?.executionDetails?.['quantity']);isNaN(exitPrice)||isNaN(entryPrice)||isNaN(quantity)||(closeModalObj.pnlInput.value=(exitPrice-entryPrice)*quantity).toFixed(2)}
 
+
+// --- 7. FUNÇÕES DE LÓGICA DE DADOS (HANDLERS) ---
+async function handleAddSubmit(e) {
+    e.preventDefault();
+    const strategyId = addModal.strategySelect.value;
+    const checklistData = {};
+    STRATEGIES[strategyId].potentialPhases.forEach(p => {
+        if (p.inputs) p.inputs.forEach(i => checklistData[i.id] = document.getElementById(i.id).value);
+        if (p.checks) p.checks.forEach(c => checklistData[c.id] = document.getElementById(c.id).checked);
+    });
+    const tradeData = {
+        asset: document.getElementById('asset').value,
+        imageUrl: document.getElementById('image-url').value,
+        notes: document.getElementById('notes').value,
+        strategyId: strategyId,
+        strategyName: STRATEGIES[strategyId].name,
+        status: "POTENTIAL",
+        potentialSetup: checklistData
+    };
+    if (currentTrade.id) {
+        tradeData.dateAdded = currentTrade.data.dateAdded;
+        await updateTrade(currentTrade.id, tradeData);
+    } else {
+        tradeData.dateAdded = new Date();
+        await addTrade(tradeData);
+    }
+    closeAddModal();
+}
+
+async function handleArmSubmit(e) {
+    e.preventDefault();
+    const checklistData = {};
+    const strategy = STRATEGIES[currentTrade.data.strategyId];
+    strategy.armedPhases.forEach(p => {
+        if (p.inputs) p.inputs.forEach(i => checklistData[i.id] = document.getElementById(i.id).value);
+        if (p.checks) p.checks.forEach(c => checklistData[c.id] = document.getElementById(c.id).checked);
+    });
+    await updateTrade(currentTrade.id, { status: "ARMED", armedSetup: checklistData, dateArmed: new Date() });
+    closeArmModal();
+}
+
+async function handleExecSubmit(e) {
+    e.preventDefault();
+    const executionData = {};
+    const strategy = STRATEGIES[currentTrade.data.strategyId];
+    const phasesToProcess = [...(strategy.executionPhases || []), GESTAO_PADRAO];
+    phasesToProcess.forEach(p => {
+        if (p.inputs) p.inputs.forEach(i => executionData[i.id] = document.getElementById(i.id).value);
+        if (p.checks) p.checks.forEach(c => executionData[c.id] = document.getElementById(c.id).checked);
+        if (p.radios) {
+            const checkedRadio = document.querySelector(`input[name="${p.radios.name}"]:checked`);
+            executionData[p.radios.name] = checkedRadio ? checkedRadio.value : null;
+        }
+    });
+    await updateTrade(currentTrade.id, { status: "LIVE", executionDetails: executionData, dateExecuted: new Date() });
+    closeExecModal();
+}
+
+async function handleCloseSubmit(e) {
+    e.preventDefault();
+    const pnlValue = parseFloat(document.getElementById('final-pnl').value);
+    if (isNaN(pnlValue)) {
+        alert("Por favor, insira um valor de P&L válido.");
+        return;
+    }
+    const closeDetails = {
+        exitPrice: document.getElementById('exit-price').value,
+        pnl: pnlValue,
+        closeReason: document.getElementById('close-reason').value,
+        finalNotes: document.getElementById('final-notes').value,
+        exitScreenshotUrl: document.getElementById('exit-screenshot-url').value
+    };
+    try {
+        await closeTradeAndUpdateBalance(currentTrade.id, closeDetails);
+        closeCloseTradeModal();
+    } catch (error) {
+        console.error("Erro ao fechar trade (UI):", error);
+        alert("Ocorreu um erro ao fechar o trade. Verifique a consola para mais detalhes.");
+    }
+}
+
+function calculatePnL() {
+    const exitPrice = parseFloat(closeModalObj.exitPriceInput.value);
+    const entryPrice = parseFloat(currentTrade.data?.executionDetails?.['entry-price']);
+    const quantity = parseFloat(currentTrade.data?.executionDetails?.['quantity']);
+    if (!isNaN(exitPrice) && !isNaN(entryPrice) && !isNaN(quantity)) {
+        closeModalObj.pnlInput.value = ((exitPrice - entryPrice) * quantity).toFixed(2);
+    }
+}
+
+    
     // --- 8. LÓGICA DE EDIÇÃO ---
     async function loadAndOpenForEditing(tradeId) { const trade=await getTrade(tradeId);if(trade&&(currentTrade=trade,"POTENTIAL"===trade.data.status?(openAddModal(),addModal.strategySelect.value=trade.data.strategyId,generateDynamicChecklist(addModal.checklistContainer,STRATEGIES[trade.data.strategyId]?.potentialPhases,trade.data.potentialSetup),document.getElementById("asset").value=trade.data.asset,document.getElementById("image-url").value=trade.data.imageUrl||"",document.getElementById("notes").value=trade.data.notes):"ARMED"===trade.data.status?openArmModal(trade):"LIVE"===trade.data.status&&openExecModal(trade)) }
 
