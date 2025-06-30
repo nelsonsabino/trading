@@ -188,7 +188,7 @@ header nav {
     display: none;
     justify-content: center;
     align-items: center;
-    z-index: 9999; /* CORREÇÃO APLICADA */
+    z-index: 1000;
     box-sizing: border-box;
     overflow-y: auto;
     padding: 2rem 1rem;
@@ -205,14 +205,8 @@ header nav {
     margin: auto;
 }
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 .modal-content > span[id^="close-"] {
     position: absolute;
@@ -246,9 +240,7 @@ header nav {
     font-size: 1.1rem;
     color: #007bff;
 }
-.input-item {
-    margin-bottom: 1.25rem;
-}
+.input-item { margin-bottom: 1.25rem; }
 .input-item label, .radio-group > label {
     display: block;
     margin-bottom: 8px;
@@ -282,9 +274,7 @@ header nav {
     transform: scale(1.2);
     flex-shrink: 0;
 }
-.checklist-item label {
-    line-height: 1.4;
-}
+.checklist-item label { line-height: 1.4; }
 .radio-group {
     margin-top: 1.5rem;
     padding: 1rem;
@@ -320,17 +310,19 @@ header nav {
     background-color: #218838;
 }
 
-/* --- LIGHTBOX --- */
+/* --- LIGHTBOX (CORREÇÃO FINAL) --- */
+#image-lightbox {
+    /* Estas regras vêm da versão antiga e funcional */
+    align-items: center;
+    justify-content: center;
+}
 #lightbox-image {
     max-width: 90%;
     max-height: 90vh;
     box-shadow: 0 0 40px rgba(0,0,0,0.5);
-    /* Adicionado para garantir que a imagem não afeta o posicionamento de outros elementos */
-    z-index: 10000; 
 }
-
 #close-lightbox-btn {
-    /* Esta é a correção principal: posiciona o botão no sítio certo */
+    /* Esta regra é a chave, dando ao botão o seu próprio posicionamento */
     position: absolute;
     top: 15px;
     right: 25px;
@@ -339,13 +331,12 @@ header nav {
     font-weight: 300;
     cursor: pointer;
     line-height: 1;
-    transition: color 0.2s;
-    z-index: 10001; /* Garante que fica por cima da imagem */
+    z-index: 1001; /* Apenas para garantir que fica por cima do overlay */
 }
-
 #close-lightbox-btn:hover {
     color: #ccc;
 }
+
 
 /* --- ESTILOS PARA EXEMPLOS NOS MODAIS --- */
 .example-image-container {
@@ -371,69 +362,19 @@ header nav {
 }
 
 /* --- PÁGINA DE GESTÃO (manage.html) --- */
-#trades-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 2rem;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    overflow: hidden;
-    font-size: 0.95em;
-}
-#trades-table thead tr {
-    background-color: #f8f9fa;
-    border-bottom: 2px solid #dee2e6;
-}
-#trades-table th {
-    padding: 1rem;
-    text-align: left;
-    font-weight: 600;
-    color: #495057;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-#trades-table td {
-    padding: 1rem;
-    border-bottom: 1px solid #e9ecef;
-    vertical-align: middle;
-}
-#trades-table tbody tr:last-child td {
-    border-bottom: none;
-}
-.action-buttons {
-    display: flex;
-    gap: 0.5rem;
-}
-.action-buttons .btn {
-    padding: 6px 12px;
-    font-size: 0.9em;
-    font-weight: 500;
-    border-radius: 5px;
-}
-.action-buttons .edit-btn {
-    background-color: #ffc107;
-    color: #212529;
-}
-.action-buttons .edit-btn:hover {
-    background-color: #e0a800;
-}
-.action-buttons .delete-btn {
-    background-color: #dc3545;
-    color: white;
-}
-.action-buttons .delete-btn:hover {
-    background-color: #c82333;
-}
-.status-badge {
-    padding: 4px 10px;
-    border-radius: 16px;
-    color: white;
-    font-size: 0.85em;
-    font-weight: 600;
-    text-transform: uppercase;
-    display: inline-block;
-}
+/* (Esta secção e as seguintes mantêm-se iguais à versão anterior) */
+#trades-table { width: 100%; border-collapse: collapse; margin-top: 2rem; background: #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: hidden; font-size: 0.95em; }
+#trades-table thead tr { background-color: #f8f9fa; border-bottom: 2px solid #dee2e6; }
+#trades-table th { padding: 1rem; text-align: left; font-weight: 600; color: #495057; text-transform: uppercase; letter-spacing: 0.5px; }
+#trades-table td { padding: 1rem; border-bottom: 1px solid #e9ecef; vertical-align: middle; }
+#trades-table tbody tr:last-child td { border-bottom: none; }
+.action-buttons { display: flex; gap: 0.5rem; }
+.action-buttons .btn { padding: 6px 12px; font-size: 0.9em; font-weight: 500; border-radius: 5px; }
+.action-buttons .edit-btn { background-color: #ffc107; color: #212529; }
+.action-buttons .edit-btn:hover { background-color: #e0a800; }
+.action-buttons .delete-btn { background-color: #dc3545; color: white; }
+.action-buttons .delete-btn:hover { background-color: #c82333; }
+.status-badge { padding: 4px 10px; border-radius: 16px; color: white; font-size: 0.85em; font-weight: 600; text-transform: uppercase; display: inline-block; }
 .status-badge.status-potential { background-color: #6c757d; }
 .status-badge.status-armed { background-color: #ffc107; color: #212529; }
 .status-badge.status-live { background-color: #28a745; }
@@ -442,107 +383,29 @@ header nav {
 .negative-pnl { color: #dc3545; font-weight: bold; }
 
 /* --- PÁGINA DE ESTATÍSTICAS (stats.html) --- */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1.5rem;
-}
-.stat-card {
-    background-color: #fff;
-    padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-    text-align: center;
-}
-.stat-card h4 {
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-    color: #6c757d;
-    font-size: 1em;
-}
-.stat-card p {
-    margin: 0;
-    font-size: 2em;
-    font-weight: bold;
-    color: #343a40;
-}
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem; }
+.stat-card { background-color: #fff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.08); text-align: center; }
+.stat-card h4 { margin-top: 0; margin-bottom: 0.5rem; color: #6c757d; font-size: 1em; }
+.stat-card p { margin: 0; font-size: 2em; font-weight: bold; color: #343a40; }
 .pnl-value.positive-pnl { color: #28a745; }
 .pnl-value.negative-pnl { color: #dc3545; }
-
-.detailed-stats {
-    margin-top: 3rem;
-}
-.detailed-stats h2 {
-    font-size: 1.5em;
-}
-.detailed-stats table {
-    width: 100%;
-    margin-top: 1rem;
-}
-.detailed-stats .positive-pnl {
-    color: #28a745;
-    font-weight: bold;
-}
-.detailed-stats .negative-pnl {
-    color: #dc3545;
-    font-weight: bold;
-}
+.detailed-stats { margin-top: 3rem; }
+.detailed-stats h2 { font-size: 1.5em; }
+.detailed-stats table { width: 100%; margin-top: 1rem; }
+.detailed-stats .positive-pnl { color: #28a745; font-weight: bold; }
+.detailed-stats .negative-pnl { color: #dc3545; font-weight: bold; }
 
 /* --- RESPONSIVIDADE --- */
-@media (max-width: 992px) {
-    .dashboard-columns {
-        grid-template-columns: 1fr 1fr;
-    }
-}
-@media (max-width: 768px) {
-    .dashboard-columns {
-        grid-template-columns: 1fr;
-    }
-    main {
-        padding: 0 1rem 1rem 1rem;
-    }
-}
+@media (max-width: 992px) { .dashboard-columns { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 768px) { .dashboard-columns { grid-template-columns: 1fr; } main { padding: 0 1rem 1rem 1rem; } }
 
-/* --- ESTILOS PARA GESTÃO DE PORTFÓLIO (stats.html) --- */
-.portfolio-section {
-    background-color: #fff;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-    text-align: center;
-    margin-bottom: 2rem;
-}
-.portfolio-balance {
-    font-size: 1.5rem;
-    color: #495057;
-}
-.portfolio-balance strong {
-    font-size: 2.5rem;
-    color: #28a745; /* Verde para o saldo */
-    margin-left: 1rem;
-}
-.portfolio-actions {
-    margin-top: 1.5rem;
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-}
-.btn-secondary {
-    background-color: #6c757d;
-    color: white;
-}
-.btn-secondary:hover {
-    background-color: #5a6268;
-}
-.btn-tertiary {
-    background-color: #ffc107; /* Amarelo */
-    color: #212529;
-}
-.btn-tertiary:hover {
-    background-color: #e0a800;
-}
-.section-divider {
-    border: none;
-    border-top: 1px solid #dee2e6;
-    margin: 3rem 0;
-}
+/* --- NOVOS ESTILOS PARA A PÁGINA DE ESTATÍSTICAS --- */
+.portfolio-section { background-color: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.08); text-align: center; margin-bottom: 2rem; }
+.portfolio-balance { font-size: 1.5rem; color: #495057; }
+.portfolio-balance strong { font-size: 2.5rem; color: #28a745; margin-left: 1rem; }
+.portfolio-actions { margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem; }
+.btn-secondary { background-color: #6c757d; color: white; }
+.btn-secondary:hover { background-color: #5a6268; }
+.btn-tertiary { background-color: #ffc107; color: #212529; }
+.btn-tertiary:hover { background-color: #e0a800; }
+.section-divider { border: none; border-top: 1px solid #dee2e6; margin: 3rem 0; }
