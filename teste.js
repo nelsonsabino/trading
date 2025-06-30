@@ -1,19 +1,24 @@
-// A MUDANÇA ESTÁ AQUI: import
 import { dummyVariable } from './teste-config.js';
-
-console.log('Módulo importado:', dummyVariable); // Para confirmar que funciona
+console.log('Módulo importado:', dummyVariable);
 
 document.addEventListener('DOMContentLoaded', () => {
     const botaoTeste = document.getElementById('botao-teste');
+    const closeBtn = document.getElementById('close-lightbox-test-btn'); // NOVO
+    const lightboxContainer = document.getElementById('image-lightbox'); // NOVO
+
     function abrirLightboxDeTeste() {
-        console.log("Botão clicado.");
-        const lightboxContainer = document.getElementById('image-lightbox');
         if (lightboxContainer) {
-            console.log("Elemento encontrado. A aplicar 'display: flex'.");
             lightboxContainer.style.display = 'flex';
-        } else {
-            console.log("ERRO: #image-lightbox não encontrado.");
         }
     }
+
+    // NOVA FUNÇÃO PARA FECHAR
+    function fecharLightboxDeTeste() {
+        if (lightboxContainer) {
+            lightboxContainer.style.display = 'none';
+        }
+    }
+
     botaoTeste.addEventListener('click', abrirLightboxDeTeste);
+    closeBtn.addEventListener('click', fecharLightboxDeTeste); // NOVO
 });
