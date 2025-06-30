@@ -1,368 +1,77 @@
 /* --- GERAL & TIPOGRAFIA --- */
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    line-height: 1.6;
-    background-color: #f8f9fa;
-    color: #343a40;
-    margin: 0;
-}
-main {
-    max-width: 1400px;
-    margin: auto;
-    padding: 0 2rem 2rem 2rem;
-}
-h1, h2, h3 {
-    font-weight: 600;
-}
-h2 {
-    color: #495057;
-    border-bottom: 2px solid #e9ecef;
-    padding-bottom: 0.5rem;
-    margin-bottom: 1.5rem;
-}
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; background-color: #f8f9fa; color: #343a40; margin: 0; }
+main { max-width: 1400px; margin: auto; padding: 0 2rem 2rem 2rem; }
+h1, h2, h3 { font-weight: 600; }
+h2 { color: #495057; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem; margin-bottom: 1.5rem; }
 
 /* --- CABEÇALHO E NAVEGAÇÃO --- */
-header {
-    text-align: center;
-    padding: 2rem 1rem;
-    background-color: #fff;
-    border-bottom: 1px solid #dee2e6;
-    margin-bottom: 2rem;
-}
-.mantra {
-    font-style: italic;
-    color: #6c757d;
-}
-header nav {
-    margin-top: 1.5rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
+header { text-align: center; padding: 2rem 1rem; background-color: #fff; border-bottom: 1px solid #dee2e6; margin-bottom: 2rem; }
+.mantra { font-style: italic; color: #6c757d; }
+header nav { margin-top: 1.5rem; display: flex; justify-content: center; align-items: center; gap: 1rem; flex-wrap: wrap; }
 
 /* --- ESTILO DE BOTÕES CONSISTENTE --- */
-.btn, .nav-link {
-    display: inline-block;
-    padding: 10px 20px;
-    font-size: 1rem;
-    font-weight: 600;
-    text-align: center;
-    text-decoration: none;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-}
-.btn-primary, #add-opportunity-btn {
-    background-color: #007bff;
-    color: white;
-}
-.btn-primary:hover, #add-opportunity-btn:hover {
-    background-color: #0056b3;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-.nav-link {
-    background-color: #6c757d;
-    color: white;
-}
-.nav-link:hover {
-    background-color: #5a6268;
-    transform: translateY(-2px);
-}
+.btn, .nav-link { display: inline-block; padding: 10px 20px; font-size: 1rem; font-weight: 600; text-align: center; text-decoration: none; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s ease-in-out; }
+.btn-primary, #add-opportunity-btn { background-color: #007bff; color: white; }
+.btn-primary:hover, #add-opportunity-btn:hover { background-color: #0056b3; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+.nav-link { background-color: #6c757d; color: white; }
+.nav-link:hover { background-color: #5a6268; transform: translateY(-2px); }
 
 /* --- DASHBOARD E COLUNAS --- */
-.dashboard-columns {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
-}
-.potential-trades, .armed-trades, .live-trades {
-    background-color: #fff;
-    padding: 1.5rem;
-    border-radius: 8px;
-    border-top: 4px solid #6c757d;
-}
-.armed-trades {
-    border-top-color: #ffc107;
-}
-.live-trades {
-    border-top-color: #28a745;
-}
+.dashboard-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+.potential-trades, .armed-trades, .live-trades { background-color: #fff; padding: 1.5rem; border-radius: 8px; border-top: 4px solid #6c757d; }
+.armed-trades { border-top-color: #ffc107; }
+.live-trades { border-top-color: #28a745; }
 
 /* --- CARDS DE TRADE --- */
-.trade-card {
-    position: relative;
-    background: #fdfdfd;
-    border: 1px solid #e9ecef;
-    padding: 1rem 1.5rem;
-    border-radius: 6px;
-    margin-bottom: 1rem;
-    transition: box-shadow 0.2s ease-in-out;
-    border-left: 5px solid #6c757d;
-}
-.trade-card:hover {
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-}
-.trade-card.armed {
-    border-left-color: #ffc107;
-}
-.trade-card.live {
-    border-left-color: #28a745;
-}
-.trade-card h3 {
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-}
-.trade-card p {
-    margin: 0.25rem 0;
-    font-size: 0.95em;
-    color: #495057;
-}
-.trade-card .card-screenshot {
-    width: 100%;
-    height: auto;
-    margin-top: 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    border: 1px solid #e9ecef;
-}
-.trigger-btn {
-    width: 100%;
-    margin-top: 1rem;
-    padding: 8px;
-    font-weight: 600;
-    color: #fff;
-    border-radius: 4px;
-    border: none;
-    cursor: pointer;
-    transition: opacity 0.2s;
-    box-sizing: border-box;
-}
-.trigger-btn:hover {
-    opacity: 0.85;
-}
-.btn-potential {
-    background-color: #ffc107;
-    color: #212529;
-}
-.btn-armed {
-    background-color: #28a745;
-}
-.btn-live, .trigger-btn.close-trade-btn {
-    background-color: #dc3545;
-}
-.card-edit-btn {
-    background-color: #ffc107;
-    color: #212529;
-    padding: 4px 8px;
-    font-size: 0.8em;
-    border-radius: 4px;
-    border: none;
-    cursor: pointer;
-    position: absolute;
-    top: 1rem;
-    right: 1.5rem;
-    opacity: 0;
-    transition: opacity 0.2s;
-}
-.trade-card:hover .card-edit-btn {
-    opacity: 1;
-}
-.empty-state-message {
-    color: #6c757d;
-    text-align: center;
-    padding: 2rem 0;
-}
+.trade-card { position: relative; background: #fdfdfd; border: 1px solid #e9ecef; padding: 1rem 1.5rem; border-radius: 6px; margin-bottom: 1rem; transition: box-shadow 0.2s ease-in-out; border-left: 5px solid #6c757d; }
+.trade-card:hover { box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
+.trade-card.armed { border-left-color: #ffc107; }
+.trade-card.live { border-left-color: #28a745; }
+.trade-card h3 { margin-top: 0; margin-bottom: 0.5rem; }
+.trade-card p { margin: 0.25rem 0; font-size: 0.95em; color: #495057; }
+.trade-card .card-screenshot { width: 100%; height: auto; margin-top: 1rem; border-radius: 4px; cursor: pointer; border: 1px solid #e9ecef; }
+.trigger-btn { width: 100%; margin-top: 1rem; padding: 8px; font-weight: 600; color: #fff; border-radius: 4px; border: none; cursor: pointer; transition: opacity 0.2s; box-sizing: border-box; }
+.trigger-btn:hover { opacity: 0.85; }
+.btn-potential { background-color: #ffc107; color: #212529; }
+.btn-armed { background-color: #28a745; }
+.btn-live, .trigger-btn.close-trade-btn { background-color: #dc3545; }
+.card-edit-btn { background-color: #ffc107; color: #212529; padding: 4px 8px; font-size: 0.8em; border-radius: 4px; border: none; cursor: pointer; position: absolute; top: 1rem; right: 1.5rem; opacity: 0; transition: opacity 0.2s; }
+.trade-card:hover .card-edit-btn { opacity: 1; }
+.empty-state-message { color: #6c757d; text-align: center; padding: 2rem 0; }
 
 /* --- MODAIS E FORMULÁRIOS --- */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(33, 37, 41, 0.6);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    box-sizing: border-box;
-    overflow-y: auto;
-    padding: 2rem 1rem;
-}
-.modal-content {
-    background: #fff;
-    padding: 2rem 2.5rem;
-    border-radius: 12px;
-    width: 100%;
-    max-width: 550px;
-    position: relative;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    animation: fadeIn 0.3s ease-out;
-    margin: auto;
-}
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-.modal-content > span[id^="close-"] {
-    position: absolute;
-    top: 15px;
-    right: 25px;
-    font-size: 2.5rem;
-    color: #adb5bd;
-    font-weight: 300;
-    cursor: pointer;
-    line-height: 1;
-    transition: color 0.2s;
-}
-.modal-content > span[id^="close-"]:hover {
-    color: #495057;
-}
-.modal-content h3 {
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-    color: #212529;
-}
-.modal-content p {
-    margin-top: 0;
-    margin-bottom: 2rem;
-    color: #6c757d;
-    border-bottom: 1px solid #e9ecef;
-    padding-bottom: 1rem;
-}
-.modal-content h4 {
-    margin-top: 1.5rem;
-    margin-bottom: 1rem;
-    font-size: 1.1rem;
-    color: #007bff;
-}
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(33, 37, 41, 0.6); display: none; justify-content: center; align-items: center; z-index: 1000; box-sizing: border-box; overflow-y: auto; padding: 2rem 1rem; }
+.modal-content { background: #fff; padding: 2rem 2.5rem; border-radius: 12px; width: 100%; max-width: 550px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.1); animation: fadeIn 0.3s ease-out; margin: auto; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+.modal-content > span[id^="close-"] { position: absolute; top: 15px; right: 25px; font-size: 2.5rem; color: #adb5bd; font-weight: 300; cursor: pointer; line-height: 1; transition: color 0.2s; }
+.modal-content > span[id^="close-"]:hover { color: #495057; }
+.modal-content h3 { margin-top: 0; margin-bottom: 0.5rem; color: #212529; }
+.modal-content p { margin-top: 0; margin-bottom: 2rem; color: #6c757d; border-bottom: 1px solid #e9ecef; padding-bottom: 1rem; }
+.modal-content h4 { margin-top: 1.5rem; margin-bottom: 1rem; font-size: 1.1rem; color: #007bff; }
 .input-item { margin-bottom: 1.25rem; }
-.input-item label, .radio-group > label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    color: #495057;
-}
-.input-item input, .input-item select, .input-item textarea {
-    width: 100%;
-    padding: 12px;
-    font-size: 1rem;
-    border: 1px solid #ced4da;
-    border-radius: 6px;
-    box-sizing: border-box;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-.input-item input:focus, .input-item select:focus, .input-item textarea:focus {
-    outline: none;
-    border-color: #80bdff;
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-}
-.checklist-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1rem;
-    padding: 10px;
-    background-color: #f8f9fa;
-    border-radius: 6px;
-}
-.checklist-item input {
-    margin-right: 12px;
-    transform: scale(1.2);
-    flex-shrink: 0;
-}
+.input-item label, .radio-group > label { display: block; margin-bottom: 8px; font-weight: 500; color: #495057; }
+.input-item input, .input-item select, .input-item textarea { width: 100%; padding: 12px; font-size: 1rem; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box; transition: border-color 0.2s, box-shadow 0.2s; }
+.input-item input:focus, .input-item select:focus, .input-item textarea:focus { outline: none; border-color: #80bdff; box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); }
+.checklist-item { display: flex; align-items: center; margin-bottom: 1rem; padding: 10px; background-color: #f8f9fa; border-radius: 6px; }
+.checklist-item input { margin-right: 12px; transform: scale(1.2); flex-shrink: 0; }
 .checklist-item label { line-height: 1.4; }
-.radio-group {
-    margin-top: 1.5rem;
-    padding: 1rem;
-    border: 1px solid #e9ecef;
-    border-radius: 6px;
-}
-.form-footnote {
-    font-size: 0.8em;
-    color: #6c757d;
-    text-align: right;
-    margin-top: -0.5rem;
-    margin-bottom: 1.5rem;
-}
-.required-asterisk {
-    color: #dc3545;
-    font-weight: bold;
-    margin-left: 4px;
-}
-.modal-content form button[type="submit"] {
-    width: 100%;
-    padding: 14px;
-    margin-top: 1.5rem;
-    font-size: 1.1rem;
-    font-weight: 600;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-.modal-content form button[type="submit"]:hover {
-    background-color: #218838;
-}
+.radio-group { margin-top: 1.5rem; padding: 1rem; border: 1px solid #e9ecef; border-radius: 6px; }
+.form-footnote { font-size: 0.8em; color: #6c757d; text-align: right; margin-top: -0.5rem; margin-bottom: 1.5rem; }
+.required-asterisk { color: #dc3545; font-weight: bold; margin-left: 4px; }
+.modal-content form button[type="submit"] { width: 100%; padding: 14px; margin-top: 1.5rem; font-size: 1.1rem; font-weight: 600; background-color: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; transition: background-color 0.2s; }
+.modal-content form button[type="submit"]:hover { background-color: #218838; }
 
-/* --- LIGHTBOX (CORREÇÃO FINAL) --- */
-#image-lightbox {
-    /* Estas regras vêm da versão antiga e funcional */
-    align-items: center;
-    justify-content: center;
-}
-#lightbox-image {
-    max-width: 90%;
-    max-height: 90vh;
-    box-shadow: 0 0 40px rgba(0,0,0,0.5);
-}
-#close-lightbox-btn {
-    /* Esta regra é a chave, dando ao botão o seu próprio posicionamento */
-    position: absolute;
-    top: 15px;
-    right: 25px;
-    color: #fff;
-    font-size: 3rem;
-    font-weight: 300;
-    cursor: pointer;
-    line-height: 1;
-    z-index: 1001; /* Apenas para garantir que fica por cima do overlay */
-}
-#close-lightbox-btn:hover {
-    color: #ccc;
-}
-
+/* --- LIGHTBOX --- */
+#image-lightbox { align-items: center; justify-content: center; }
+#lightbox-image { max-width: 90%; max-height: 90vh; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
+#close-lightbox-btn { color: #fff; font-size: 3rem; }
 
 /* --- ESTILOS PARA EXEMPLOS NOS MODAIS --- */
-.example-image-container {
-    margin-bottom: 1.5rem;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    padding: 0.5rem;
-}
-.example-image-container img {
-    width: 100%;
-    height: auto;
-    display: block;
-    border-radius: 4px;
-    cursor: pointer;
-}
-.example-image-container p {
-    font-size: 0.85em;
-    text-align: center;
-    margin: 0.5rem 0 0 0;
-    color: #6c757d;
-    padding-bottom: 0;
-    border-bottom: none;
-}
+.example-image-container { margin-bottom: 1.5rem; border: 1px solid #dee2e6; border-radius: 8px; padding: 0.5rem; }
+.example-image-container img { width: 100%; height: auto; display: block; border-radius: 4px; cursor: pointer; }
+.example-image-container p { font-size: 0.85em; text-align: center; margin: 0.5rem 0 0 0; color: #6c757d; padding-bottom: 0; border-bottom: none; }
 
 /* --- PÁGINA DE GESTÃO (manage.html) --- */
-/* (Esta secção e as seguintes mantêm-se iguais à versão anterior) */
 #trades-table { width: 100%; border-collapse: collapse; margin-top: 2rem; background: #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: hidden; font-size: 0.95em; }
 #trades-table thead tr { background-color: #f8f9fa; border-bottom: 2px solid #dee2e6; }
 #trades-table th { padding: 1rem; text-align: left; font-weight: 600; color: #495057; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -398,14 +107,3 @@ header nav {
 /* --- RESPONSIVIDADE --- */
 @media (max-width: 992px) { .dashboard-columns { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 768px) { .dashboard-columns { grid-template-columns: 1fr; } main { padding: 0 1rem 1rem 1rem; } }
-
-/* --- NOVOS ESTILOS PARA A PÁGINA DE ESTATÍSTICAS --- */
-.portfolio-section { background-color: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.08); text-align: center; margin-bottom: 2rem; }
-.portfolio-balance { font-size: 1.5rem; color: #495057; }
-.portfolio-balance strong { font-size: 2.5rem; color: #28a745; margin-left: 1rem; }
-.portfolio-actions { margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem; }
-.btn-secondary { background-color: #6c757d; color: white; }
-.btn-secondary:hover { background-color: #5a6268; }
-.btn-tertiary { background-color: #ffc107; color: #212529; }
-.btn-tertiary:hover { background-color: #e0a800; }
-.section-divider { border: none; border-top: 1px solid #dee2e6; margin: 3rem 0; }
