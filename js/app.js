@@ -244,9 +244,28 @@ function calculatePnL() {
 }
 
     
-    // --- 8. LÓGICA DE EDIÇÃO ---
-    async function loadAndOpenForEditing(tradeId) { const trade=await getTrade(tradeId);if(trade&&(currentTrade=trade,"POTENTIAL"===trade.data.status?(openAddModal(),addModal.strategySelect.value=trade.data.strategyId,generateDynamicChecklist(addModal.checklistContainer,STRATEGIES[trade.data.strategyId]?.potentialPhases,trade.data.potentialSetup),document.getElementById("asset").value=trade.data.asset,document.getElementById("image-url").value=trade.data.imageUrl||"",document.getElementById("notes").value=trade.data.notes):"ARMED"===trade.data.status?openArmModal(trade):"LIVE"===trade.data.status&&openExecModal(trade)) }
+// --- 8. LÓGICA DE EDIÇÃO ---
+async function loadAndOpenForEditing(tradeId) {
+    const trade = await getTrade(tradeId);
+    if (trade) {
+        currentTrade = trade;
+        if (trade.data.status === 'POTENTIAL') {
+            openAddModal();
+            addModal.strategySelect.value = trade.data.strategyId;
+            generateDynamicChecklist(addModal.checklistContainer, STRATEGIES[trade.data.strategyId]?.potentialPhases, trade.data.potentialSetup);
+            document.getElementById('asset').value = trade.data.asset;
+            document.getElementById('image-url').value = trade.data.imageUrl || '';
+            document.getElementById('notes').value = trade.data.notes;
+        } else if (trade.data.status === 'ARMED') {
+            openArmModal(trade);
+        } else if (trade.data.status === 'LIVE') {
+            openExecModal(trade);
+        }
+    }
+}
 
+
+    
     // --- 9. INICIALIZAÇÃO DA APLICAÇÃO (DENTRO DO DOMContentLoaded) ---
     document.addEventListener('DOMContentLoaded', () => {
         // Preenche as variáveis dos seletores do DOM
