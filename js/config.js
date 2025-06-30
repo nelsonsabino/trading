@@ -1,10 +1,4 @@
-
-// js/config.js
-
-// Este ficheiro contém APENAS objetos de configuração estáticos.
-// Não há inicialização do Firebase aqui.
-
-// A sua configuração da web app do Firebase. A palavra 'export' permite que outros ficheiros a importem.
+// A sua configuração da web app do Firebase.
 export const firebaseConfig = {
   apiKey: "AIzaSyAoKtcIsVOcvI5O6gH_14AXL3bF2I6X8Qc",
   authDomain: "trading-89c13.firebaseapp.com",
@@ -13,9 +7,6 @@ export const firebaseConfig = {
   messagingSenderId: "782074719077",
   appId: "1:782074719077:web:05c07a2b81b0047ef5cf8c"
 };
-
-
-
 
 // O plano de gestão padrão.
 export const GESTAO_PADRAO = {
