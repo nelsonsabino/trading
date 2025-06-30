@@ -1,14 +1,12 @@
 import { GESTAO_PADRAO } from './config.js';
 import { STRATEGIES } from './strategies.js';
-import { listenToTrades, getTrade, addTrade, updateTrade, closeTradeAndUpdateBalance } from './firebase-service.js';
+import { listenToTrades, getTrade, addTrade, updateTrade } from './firebase-service.js';
 
-// --- 2. PONTO DE ENTRADA PRINCIPAL ---
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- 3. ESTADO DA APLICAÇÃO ---
     let currentTrade = {};
     
-    // --- 4. SELETORES DO DOM ---
+    // Seletores do DOM
     const addModal = { container: document.getElementById('add-opportunity-modal'), form: document.getElementById('add-opportunity-form'), closeBtn: document.getElementById('close-modal-btn'), strategySelect: document.getElementById('strategy-select'), checklistContainer: document.getElementById('dynamic-checklist-container') };
     const armModal = { container: document.getElementById('arm-trade-modal'), form: document.getElementById('arm-trade-form'), closeBtn: document.getElementById('close-arm-trade-modal-btn'), assetNameSpan: document.getElementById('arm-trade-asset-name'), strategyNameSpan: document.getElementById('arm-trade-strategy-name'), checklistContainer: document.getElementById('arm-checklist-container')};
     const execModal = { container: document.getElementById('execution-modal'), form: document.getElementById('execution-form'), closeBtn: document.getElementById('close-execution-modal-btn'), assetNameSpan: document.getElementById('execution-asset-name'), strategyNameSpan: document.getElementById('execution-strategy-name'), checklistContainer: document.getElementById('execution-checklist-container') };
@@ -18,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const armedTradesContainer = document.getElementById('armed-trades-container');
     const liveTradesContainer = document.getElementById('live-trades-container');
 
-    // --- 5. FUNÇÕES DE CONTROLO DE MODAIS E LIGHTBOX ---
+    // Funções de Controlo de Modais e Lightbox
     function openAddModal() { if(addModal.container) addModal.container.style.display = 'flex'; }
     function closeAddModal() { if(addModal.container) { addModal.container.style.display = 'none'; addModal.form.reset(); addModal.checklistContainer.innerHTML = ''; currentTrade = {}; } }
     function openArmModal(trade) { currentTrade = { id: trade.id, data: trade.data }; armModal.assetNameSpan.textContent = trade.data.asset; armModal.strategyNameSpan.textContent = trade.data.strategyName; generateDynamicChecklist(armModal.checklistContainer, STRATEGIES[trade.data.strategyId]?.armedPhases, trade.data.armedSetup); if(armModal.container) armModal.container.style.display = 'flex'; }
@@ -27,30 +25,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeExecModal() { if(execModal.container) { execModal.container.style.display = 'none'; execModal.form.reset(); currentTrade = {}; } }
     function openCloseTradeModal(trade) { currentTrade = { id: trade.id, data: trade.data }; closeModalObj.assetNameSpan.textContent = trade.data.asset; if(closeModalObj.container) closeModalObj.container.style.display = 'flex'; }
     function closeCloseTradeModal() { if(closeModalObj.container) { closeModalObj.container.style.display = 'none'; closeModalObj.form.reset(); currentTrade = {}; } }
-    
-    function openLightbox(imageUrl) {
-        // --- Início do bloco de diagnóstico ---
-        console.log("A função openLightbox foi chamada com a URL:", imageUrl);
-        console.log("O elemento 'lightbox.container' é:", lightbox.container);
-        console.log("O elemento 'lightbox.image' é:", lightbox.image);
-        // --- Fim do bloco de diagnóstico ---
-        if (lightbox.container && lightbox.image) {
-            console.log("Condição 'if' é verdadeira. A tentar abrir o lightbox...");
-            lightbox.image.src = imageUrl;
-            lightbox.container.style.display = 'flex';
-        } else {
-            console.error("ERRO: Não foi possível abrir o lightbox porque 'lightbox.container' ou 'lightbox.image' não foram encontrados no DOM.");
-        }
-    }
+    function openLightbox(imageUrl) { if (lightbox.container && lightbox.image) { lightbox.image.src = imageUrl; lightbox.container.style.display = 'flex'; } }
+    function closeLightbox() { if (lightbox.container) lightbox.container.style.display = 'none'; }
 
-    // FUNÇÃO CORRIGIDA ESTÁ AQUI
-    function closeLightbox() {
-        if (lightbox.container) {
-            lightbox.container.style.display = 'none';
-        }
-    }
-
-    // --- 6. FUNÇÕES DE GERAÇÃO DE UI (Interface do Utilizador) ---
+    // Funções de Geração de UI
     function createChecklistItem(check, data) {
         const isRequired = check.required === false ? '' : 'required';
         const labelText = check.required === false ? check.label : `${check.label} <span class="required-asterisk">*</span>`;
@@ -99,11 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const exampleContainer = document.createElement('div');
                 exampleContainer.className = 'example-image-container';
                 exampleContainer.innerHTML = `<p>Exemplo Visual:</p><img src="${phase.exampleImageUrl}" alt="Exemplo para ${phase.title}">`;
-                exampleContainer.querySelector('img').addEventListener('click', (e) => {
-                    console.log("Imagem de exemplo clicada! URL:", phase.exampleImageUrl);
-                    e.stopPropagation();
-                    openLightbox(phase.exampleImageUrl);
-                });
+                exampleContainer.querySelector('img').addEventListener('click', (e) => { e.stopPropagation(); openLightbox(phase.exampleImageUrl); });
                 phaseDiv.appendChild(exampleContainer);
             }
             const titleEl = document.createElement('h4');
@@ -140,11 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
             img.src = imageUrlToShow;
             img.className = 'card-screenshot';
             img.alt = `Gráfico de ${trade.data.asset}`;
-            img.addEventListener('click', (e) => {
-                console.log("Imagem do card clicada! URL:", imageUrlToShow);
-                e.stopPropagation();
-                openLightbox(imageUrlToShow);
-            });
+            img.addEventListener('click', (e) => { e.stopPropagation(); openLightbox(imageUrlToShow); });
             card.appendChild(img);
         }
         let actionButton;
@@ -185,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 7. FUNÇÕES DE LÓGICA DE DADOS (HANDLERS) ---
+    // Handlers
     async function handleAddSubmit(e) {
         e.preventDefault();
         const strategyId = addModal.strategySelect.value;
@@ -194,85 +164,49 @@ document.addEventListener('DOMContentLoaded', () => {
             if (p.inputs) p.inputs.forEach(i => checklistData[i.id] = document.getElementById(i.id).value);
             if (p.checks) p.checks.forEach(c => checklistData[c.id] = document.getElementById(c.id).checked);
         });
-        const tradeData = {
-            asset: document.getElementById('asset').value,
-            imageUrl: document.getElementById('image-url').value,
-            notes: document.getElementById('notes').value,
-            strategyId: strategyId,
-            strategyName: STRATEGIES[strategyId].name,
-            status: "POTENTIAL",
-            potentialSetup: checklistData
-        };
-        if (currentTrade.id) {
-            tradeData.dateAdded = currentTrade.data.dateAdded;
-            await updateTrade(currentTrade.id, tradeData);
-        } else {
-            tradeData.dateAdded = new Date();
-            await addTrade(tradeData);
-        }
-        closeAddModal();
+        const tradeData = { asset: document.getElementById('asset').value, imageUrl: document.getElementById('image-url').value, notes: document.getElementById('notes').value, strategyId: strategyId, strategyName: STRATEGIES[strategyId].name, status: "POTENTIAL", potentialSetup: checklistData };
+        try {
+            if (currentTrade.id) { tradeData.dateAdded = currentTrade.data.dateAdded; await updateTrade(currentTrade.id, tradeData); } 
+            else { tradeData.dateAdded = new Date(); await addTrade(tradeData); }
+            closeAddModal();
+        } catch (err) { console.error("Erro:", err); }
     }
     async function handleArmSubmit(e) {
         e.preventDefault();
         const checklistData = {};
-        const strategy = STRATEGIES[currentTrade.data.strategyId];
-        strategy.armedPhases.forEach(p => {
+        STRATEGIES[currentTrade.data.strategyId].armedPhases.forEach(p => {
             if (p.inputs) p.inputs.forEach(i => checklistData[i.id] = document.getElementById(i.id).value);
             if (p.checks) p.checks.forEach(c => checklistData[c.id] = document.getElementById(c.id).checked);
         });
-        await updateTrade(currentTrade.id, { status: "ARMED", armedSetup: checklistData, dateArmed: new Date() });
-        closeArmModal();
+        try { await updateTrade(currentTrade.id, { status: "ARMED", armedSetup: checklistData, dateArmed: new Date() }); closeArmModal(); }
+        catch (err) { console.error("Erro:", err); }
     }
     async function handleExecSubmit(e) {
         e.preventDefault();
         const executionData = {};
-        const strategy = STRATEGIES[currentTrade.data.strategyId];
-        const phasesToProcess = [...(strategy.executionPhases || []), GESTAO_PADRAO];
+        const phasesToProcess = [...(STRATEGIES[currentTrade.data.strategyId].executionPhases || []), GESTAO_PADRAO];
         phasesToProcess.forEach(p => {
             if (p.inputs) p.inputs.forEach(i => executionData[i.id] = document.getElementById(i.id).value);
             if (p.checks) p.checks.forEach(c => executionData[c.id] = document.getElementById(c.id).checked);
-            if (p.radios) {
-                const checkedRadio = document.querySelector(`input[name="${p.radios.name}"]:checked`);
-                executionData[p.radios.name] = checkedRadio ? checkedRadio.value : null;
-            }
+            if (p.radios) { const radio = document.querySelector(`input[name="${p.radios.name}"]:checked`); executionData[p.radios.name] = radio ? radio.value : null; }
         });
-        await updateTrade(currentTrade.id, { status: "LIVE", executionDetails: executionData, dateExecuted: new Date() });
-        closeExecModal();
+        try { await updateTrade(currentTrade.id, { status: "LIVE", executionDetails: executionData, dateExecuted: new Date() }); closeExecModal(); }
+        catch (err) { console.error("Erro:", err); }
     }
-
     async function handleCloseSubmit(e) {
         e.preventDefault();
-        const pnlValue = parseFloat(document.getElementById('final-pnl').value);
-        if (isNaN(pnlValue)) {
-            alert("Por favor, insira um valor de P&L válido.");
-            return;
-        }
-        const closeDetails = {
-            exitPrice: document.getElementById('exit-price').value,
-            pnl: pnlValue,
-            closeReason: document.getElementById('close-reason').value,
-            finalNotes: document.getElementById('final-notes').value,
-            exitScreenshotUrl: document.getElementById('exit-screenshot-url').value
-        };
-        try {
-            await closeTradeAndUpdateBalance(currentTrade.id, closeDetails);
-            closeCloseTradeModal();
-        } catch (error) {
-            console.error("Erro ao fechar trade (UI):", error);
-            alert("Ocorreu um erro ao fechar o trade. Verifique a consola para mais detalhes.");
-        }
+        const closeDetails = { exitPrice: closeModalObj.exitPriceInput.value, pnl: closeModalObj.pnlInput.value, closeReason: document.getElementById('close-reason').value, finalNotes: document.getElementById('final-notes').value, exitScreenshotUrl: document.getElementById('exit-screenshot-url').value };
+        try { await updateTrade(currentTrade.id, { status: "CLOSED", closeDetails: closeDetails, dateClosed: new Date() }); closeCloseTradeModal(); }
+        catch (err) { console.error("Erro:", err); }
     }
-    
     function calculatePnL() {
         const exitPrice = parseFloat(closeModalObj.exitPriceInput.value);
         const entryPrice = parseFloat(currentTrade.data?.executionDetails?.['entry-price']);
         const quantity = parseFloat(currentTrade.data?.executionDetails?.['quantity']);
-        if (!isNaN(exitPrice) && !isNaN(entryPrice) && !isNaN(quantity)) {
-            closeModalObj.pnlInput.value = ((exitPrice - entryPrice) * quantity).toFixed(2);
-        }
+        if (!isNaN(exitPrice) && !isNaN(entryPrice) && !isNaN(quantity)) { closeModalObj.pnlInput.value = ((exitPrice - entryPrice) * quantity).toFixed(2); }
     }
-
-    // --- 8. LÓGICA DE EDIÇÃO ---
+    
+    // Lógica de Edição
     async function loadAndOpenForEditing(tradeId) {
         const trade = await getTrade(tradeId);
         if (trade) {
@@ -292,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // --- 9. INICIALIZAÇÃO DA APLICAÇÃO ---
+    // Inicialização
     document.getElementById('add-opportunity-btn').addEventListener('click', openAddModal);
     addModal.closeBtn.addEventListener('click', closeAddModal);
     addModal.container.addEventListener('click', e => { if (e.target.id === 'add-opportunity-modal') closeAddModal(); });
@@ -311,11 +245,14 @@ document.addEventListener('DOMContentLoaded', () => {
     lightbox.closeBtn.addEventListener('click', closeLightbox);
     lightbox.container.addEventListener('click', (e) => { if (e.target.id === 'image-lightbox') closeLightbox(); });
 
-    listenToTrades(displayTrades);
-    populateStrategySelect();
-    const tradeIdToEdit = localStorage.getItem('tradeToEdit');
-    if (tradeIdToEdit) {
-        localStorage.removeItem('tradeToEdit');
-        loadAndOpenForEditing(tradeIdToEdit);
+    async function init() {
+        populateStrategySelect();
+        listenToTrades(displayTrades); // Usando a nova função do serviço
+        const tradeIdToEdit = localStorage.getItem('tradeToEdit');
+        if (tradeIdToEdit) {
+            localStorage.removeItem('tradeToEdit');
+            await loadAndOpenForEditing(tradeIdToEdit);
+        }
     }
+    init();
 });
