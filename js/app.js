@@ -14,7 +14,12 @@ function runApp() {
 
 
 
-// --- 5. FUNÇÕES DE CONTROLO DE MODAIS E LIGHTBOX ---
+
+
+
+
+
+    // --- 5. FUNÇÕES DE CONTROLO DE MODAIS E LIGHTBOX ---
 function openAddModal() { if(addModal.container) addModal.container.style.display = 'flex'; }
 function closeAddModal() { if(addModal.container) { addModal.container.style.display = 'none'; addModal.form.reset(); addModal.checklistContainer.innerHTML = ''; currentTrade = {}; } }
 function openArmModal(trade) { currentTrade = { id: trade.id, data: trade.data }; armModal.assetNameSpan.textContent = trade.data.asset; armModal.strategyNameSpan.textContent = trade.data.strategyName; generateDynamicChecklist(armModal.checklistContainer, STRATEGIES[trade.data.strategyId]?.armedPhases, trade.data.armedSetup); if(armModal.container) armModal.container.style.display = 'flex'; }
@@ -24,28 +29,31 @@ function closeExecModal() { if(execModal.container) { execModal.container.style.
 function openCloseTradeModal(trade) { currentTrade = { id: trade.id, data: trade.data }; closeModalObj.assetNameSpan.textContent = trade.data.asset; if(closeModalObj.container) closeModalObj.container.style.display = 'flex'; }
 function closeCloseTradeModal() { if(closeModalObj.container) { closeModalObj.container.style.display = 'none'; closeModalObj.form.reset(); currentTrade = {}; } }
 
-// --- VERSÃO FINAL E À PROVA DE BALA ---
+// --- VERSÃO COM A CORREÇÃO DE TIMING (setTimeout) ---
 function openLightbox(imageUrl) {
-    // Busca os elementos diretamente do DOM no momento exato da execução.
-    const lightboxContainer = document.getElementById('image-lightbox');
-    const lightboxImage = document.getElementById('lightbox-image');
+    setTimeout(() => {
+        const lightboxContainer = document.getElementById('image-lightbox');
+        const lightboxImage = document.getElementById('lightbox-image');
 
-    if (lightboxContainer && lightboxImage) {
-        lightboxImage.src = imageUrl;
-        lightboxContainer.style.display = 'flex';
-    } else {
-        // Um aviso final na consola se, por alguma razão, o HTML estiver em falta.
-        console.error("Não foi possível encontrar os elementos do lightbox ('image-lightbox' ou 'lightbox-image'). Verifique os IDs no index.html.");
-    }
+        if (lightboxContainer && lightboxImage) {
+            lightboxImage.src = imageUrl;
+            lightboxContainer.style.display = 'flex';
+        }
+    }, 0); // O '0' coloca esta função no final da fila de execução atual.
 }
 
 function closeLightbox() {
-    // Busca o elemento diretamente do DOM no momento da execução para garantir.
-    const lightboxContainer = document.getElementById('image-lightbox');
-    if (lightboxContainer) {
-        lightboxContainer.style.display = 'none';
-    }
+    setTimeout(() => {
+        const lightboxContainer = document.getElementById('image-lightbox');
+        if (lightboxContainer) {
+            lightboxContainer.style.display = 'none';
+        }
+    }, 0);
 }
+
+
+
+    
 
     
 
