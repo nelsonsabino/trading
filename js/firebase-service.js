@@ -18,7 +18,7 @@ import { firebaseConfig } from './config.js';
 
 // Inicializa o Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+export const db = getFirestore(app);
 
 // --- FUNÇÕES PARA A COLEÇÃO "TRADES" ---
 
