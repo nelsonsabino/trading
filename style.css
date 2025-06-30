@@ -43,6 +43,12 @@ header nav { margin-top: 1.5rem; display: flex; justify-content: center; align-i
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(33, 37, 41, 0.6); display: none; justify-content: center; align-items: center; z-index: 1000; box-sizing: border-box; overflow-y: auto; padding: 2rem 1rem; }
 .modal-content { background: #fff; padding: 2rem 2.5rem; border-radius: 12px; width: 100%; max-width: 550px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.1); animation: fadeIn 0.3s ease-out; margin: auto; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Adicione esta nova regra ao seu style.css */
+.modal-overlay.visible {
+    display: flex !important;
+}
+
 .modal-content > span[id^="close-"] { position: absolute; top: 15px; right: 25px; font-size: 2.5rem; color: #adb5bd; font-weight: 300; cursor: pointer; line-height: 1; transition: color 0.2s; }
 .modal-content > span[id^="close-"]:hover { color: #495057; }
 .modal-content h3 { margin-top: 0; margin-bottom: 0.5rem; color: #212529; }
