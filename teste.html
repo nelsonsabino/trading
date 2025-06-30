@@ -2,32 +2,47 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <title>Teste Isolado - v9.0</title>
-    
-    <!-- O bloco <style> foi removido. -->
-    <!-- A MUDANÇA ESTÁ AQUI: Link para o seu ficheiro CSS real. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TESTE FINAL - v10.0</title> <!-- Título alterado -->
     <link rel="stylesheet" href="style.css">
-
 </head>
 <body>
-    <h1>Versão 9.0: Usar o style.css Real</h1>
-    <p>Este teste usa o seu ficheiro CSS principal. Visualmente, deve ser idêntico à sua aplicação.</p>
-    
-    <!-- Mudamos a classe para corresponder ao seu CSS real -->
-    <div id="container-dinamico" class="dashboard-columns" style="grid-template-columns: 1fr;">
-        <!-- O card será inserido aqui -->
-    </div>
 
-    <!-- O HTML dos modais, exatamente como na sua app principal -->
-    <div id="image-lightbox" class="modal-overlay">
-        <span id="close-lightbox-btn">×</span> <!-- ID MUDADO para corresponder ao JS -->
-        <img id="lightbox-image" src="" alt="Gráfico em detalhe">
-    </div>
-    <div id="add-opportunity-modal" class="modal-overlay"><div class="modal-content"><p>Isto é um modal falso para teste.</p></div></div>
-    <div id="arm-trade-modal" class="modal-overlay"><div class="modal-content"><p>Isto é um modal falso para teste.</p></div></div>
-    <div id="execution-modal" class="modal-overlay"><div class="modal-content"><p>Isto é um modal falso para teste.</p></div></div>
-    <div id="close-trade-modal" class="modal-overlay"><div class="modal-content"><p>Isto é um modal falso para teste.</p></div></div>
+    <header>
+        <h1>Painel de Oportunidades (TESTE v10.0)</h1>
+        <p class="mantra">A paciência paga. Espero que os melhores setups venham até mim.</p>
+        <nav>
+            <button id="add-opportunity-btn" class="btn btn-primary">Adicionar Nova Oportunidade</button>
+            <a href="manage.html" class="nav-link">Gerir Todas as Operações</a>
+            <a href="stats.html" class="nav-link">Ver Estatísticas</a>
+        </nav>
+    </header>  
+
+    <main>
+        <div class="dashboard-columns">
+            <section class="potential-trades">
+                <h2>Potencial</h2>
+                <div id="potential-trades-container"><p class="empty-state-message">A carregar...</p></div>
+            </section>
+            <section class="armed-trades">
+                <h2>Armado</h2>
+                <div id="armed-trades-container"><p class="empty-state-message">A carregar...</p></div>
+            </section>
+            <section class="live-trades">
+                <h2>Ativo</h2>
+                <div id="live-trades-container"><p class="empty-state-message">A carregar...</p></div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Todos os seus modais reais -->
+    <div id="add-opportunity-modal" class="modal-overlay"><div class="modal-content">... (conteúdo completo do seu modal) ...</div></div>
+    <div id="arm-trade-modal" class="modal-overlay"><div class="modal-content">...</div></div>
+    <div id="execution-modal" class="modal-overlay"><div class="modal-content">...</div></div>
+    <div id="close-trade-modal" class="modal-overlay"><div class="modal-content">...</div></div>
+    <div id="image-lightbox" class="modal-overlay"><span id="close-lightbox-btn">×</span><img id="lightbox-image" src="" alt="Gráfico em detalhe"></div>
     
-    <script type="module" src="teste.js"></script>
+    <script type="module" src="teste.js"></script> <!-- Script alterado -->
+
 </body>
 </html>
