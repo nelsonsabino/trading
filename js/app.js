@@ -1,4 +1,4 @@
-// js/app.js - 
+// js/app.js - VERSÃO COM P&L MANUAL
 
 import { GESTAO_PADRAO } from './config.js';
 import { STRATEGIES } from './strategies.js';
@@ -15,13 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const armModal = { container: document.getElementById('arm-trade-modal'), form: document.getElementById('arm-trade-form'), closeBtn: document.getElementById('close-arm-trade-modal-btn'), assetNameSpan: document.getElementById('arm-trade-asset-name'), strategyNameSpan: document.getElementById('arm-trade-strategy-name'), checklistContainer: document.getElementById('arm-checklist-container')};
     const execModal = { container: document.getElementById('execution-modal'), form: document.getElementById('execution-form'), closeBtn: document.getElementById('close-execution-modal-btn'), assetNameSpan: document.getElementById('execution-asset-name'), strategyNameSpan: document.getElementById('execution-strategy-name'), checklistContainer: document.getElementById('execution-checklist-container') };
     const closeModalObj = { container: document.getElementById('close-trade-modal'), form: document.getElementById('close-trade-form'), closeBtn: document.getElementById('close-close-trade-modal-btn'), assetNameSpan: document.getElementById('close-trade-asset-name'), exitPriceInput: document.getElementById('exit-price'), pnlInput: document.getElementById('final-pnl') };
-    // O seletor do lightbox foi removido, pois já não é necessário.
     const potentialTradesContainer = document.getElementById('potential-trades-container');
     const armedTradesContainer = document.getElementById('armed-trades-container');
     const liveTradesContainer = document.getElementById('live-trades-container');
 
     // --- 5. FUNÇÕES DE CONTROLO DE MODAIS ---
-    // As funções openLightbox e closeLightbox foram removidas.
     function openAddModal() { if(addModal.container) addModal.container.style.display = 'flex'; }
     function closeAddModal() { if(addModal.container) { addModal.container.style.display = 'none'; addModal.form.reset(); addModal.checklistContainer.innerHTML = ''; currentTrade = {}; } }
     function openArmModal(trade) { currentTrade = { id: trade.id, data: trade.data }; armModal.assetNameSpan.textContent = trade.data.asset; armModal.strategyNameSpan.textContent = trade.data.strategyName; generateDynamicChecklist(armModal.checklistContainer, STRATEGIES[trade.data.strategyId]?.armedPhases, trade.data.armedSetup); if(armModal.container) armModal.container.style.display = 'flex'; }
@@ -80,7 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const exampleContainer = document.createElement('div');
                 exampleContainer.className = 'example-image-container';
                 exampleContainer.innerHTML = `<p>Exemplo Visual:</p><img src="${phase.exampleImageUrl}" alt="Exemplo para ${phase.title}">`;
-                // ALTERAÇÃO: Agora abre numa nova aba.
                 exampleContainer.querySelector('img').addEventListener('click', (e) => { 
                     e.stopPropagation(); 
                     window.open(phase.exampleImageUrl, '_blank');
@@ -122,7 +119,6 @@ document.addEventListener('DOMContentLoaded', () => {
             img.src = imageUrlToShow;
             img.className = 'card-screenshot';
             img.alt = `Gráfico de ${trade.data.asset}`;
-            // ALTERAÇÃO: Agora abre numa nova aba.
             img.addEventListener('click', (e) => { 
                 e.stopPropagation(); 
                 window.open(imageUrlToShow, '_blank');
@@ -222,7 +218,6 @@ document.addEventListener('DOMContentLoaded', () => {
         await updateTrade(currentTrade.id, { status: "LIVE", executionDetails: executionData, dateExecuted: new Date() });
         closeExecModal();
     }
-    // CORREÇÃO: Função refatorada para usar o firebase-service, como acordado.
     async function handleCloseSubmit(e) {
         e.preventDefault();
         const pnlValue = parseFloat(document.getElementById('final-pnl').value);
@@ -245,15 +240,8 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Ocorreu um erro ao fechar o trade. Verifique a consola para mais detalhes.");
         }
     }
-    function calculatePnL() {
-        if (!currentTrade.data) return;
-        const exitPrice = parseFloat(closeModalObj.exitPriceInput.value);
-        const entryPrice = parseFloat(currentTrade.data?.executionDetails?.['entry-price']);
-        const quantity = parseFloat(currentTrade.data?.executionDetails?.['quantity']);
-        if (!isNaN(exitPrice) && !isNaN(entryPrice) && !isNaN(quantity)) {
-            closeModalObj.pnlInput.value = ((exitPrice - entryPrice) * quantity).toFixed(2);
-        }
-    }
+    
+    // A função calculatePnL foi removida.
 
     // --- 8. LÓGICA DE EDIÇÃO ---
     async function loadAndOpenForEditing(tradeId) {
@@ -290,8 +278,8 @@ document.addEventListener('DOMContentLoaded', () => {
     closeModalObj.closeBtn.addEventListener('click', closeCloseTradeModal);
     closeModalObj.container.addEventListener('click', e => { if (e.target.id === 'close-trade-modal') closeCloseTradeModal(); });
     closeModalObj.form.addEventListener('submit', handleCloseSubmit);
-    closeModalObj.exitPriceInput.addEventListener('input', calculatePnL);
-    // As linhas do lightbox foram removidas daqui.
+    
+    // A linha do event listener para o cálculo do P&L foi removida.
 
     listenToTrades(displayTrades);
     populateStrategySelect();
