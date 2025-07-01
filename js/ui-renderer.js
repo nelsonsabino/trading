@@ -6,10 +6,9 @@ import { addModal, imageModal, modalImg } from './dom-elements.js';
 import { STRATEGIES } from './strategies.js';
 import { potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 
-// ATENÇÃO: Esta é uma importação circular. Vamos ter de resolver isto.
-// Por agora, vamos assumir que o app.js irá exportar estas funções.
-// Importaremos as funções que são chamadas pelos botões.
-import { openArmModal, openExecModal, openCloseTradeModal, loadAndOpenForEditing } from '../app.js';
+import { openArmModal, openExecModal, openCloseTradeModal } from './modal-handlers.js';
+
+
 
 
 
