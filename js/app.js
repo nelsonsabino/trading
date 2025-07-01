@@ -1,4 +1,4 @@
-// js/app.js - VERSÃO COM P&L MANUAL
+// js/app.js - Versão 2.3
 
 import { GESTAO_PADRAO } from './config.js';
 import { STRATEGIES } from './strategies.js';
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function openCloseTradeModal(trade) { currentTrade = { id: trade.id, data: trade.data }; closeModalObj.assetNameSpan.textContent = trade.data.asset; if(closeModalObj.container) closeModalObj.container.style.display = 'flex'; }
     function closeCloseTradeModal() { if(closeModalObj.container) { closeModalObj.container.style.display = 'none'; closeModalObj.form.reset(); currentTrade = {}; } }
 
-    // --- 6. FUNÇÕES DE GERAÇÃO DE UI (Interface do Utilizador) ---
+    // --- 6. FUNÇÕES DE GERAÇÃO DE UI ---
     function createChecklistItem(check, data) {
         const isRequired = check.required === false ? '' : 'required';
         const labelText = check.required === false ? check.label : `${check.label} <span class="required-asterisk">*</span>`;
@@ -240,8 +240,6 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Ocorreu um erro ao fechar o trade. Verifique a consola para mais detalhes.");
         }
     }
-    
-    // A função calculatePnL foi removida.
 
     // --- 8. LÓGICA DE EDIÇÃO ---
     async function loadAndOpenForEditing(tradeId) {
@@ -278,14 +276,20 @@ document.addEventListener('DOMContentLoaded', () => {
     closeModalObj.closeBtn.addEventListener('click', closeCloseTradeModal);
     closeModalObj.container.addEventListener('click', e => { if (e.target.id === 'close-trade-modal') closeCloseTradeModal(); });
     closeModalObj.form.addEventListener('submit', handleCloseSubmit);
-    
-    // A linha do event listener para o cálculo do P&L foi removida.
 
     listenToTrades(displayTrades);
     populateStrategySelect();
+    
     const tradeIdToEdit = localStorage.getItem('tradeToEdit');
     if (tradeIdToEdit) {
         localStorage.removeItem('tradeToEdit');
         loadAndOpenForEditing(tradeIdToEdit);
+    }
+
+    // --- LÓGICA DA VERSÃO ---
+    const APP_VERSION = '2.3';
+    const versionDisplay = document.getElementById('app-version-display');
+    if (versionDisplay) {
+        versionDisplay.textContent = `Versão: ${APP_VERSION}`;
     }
 });
