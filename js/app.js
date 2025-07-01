@@ -293,3 +293,33 @@ document.addEventListener('DOMContentLoaded', () => {
         versionDisplay.textContent = `Versão: ${APP_VERSION}`;
     }
 });
+
+// Modal de imagem
+document.addEventListener('DOMContentLoaded', () => {
+    const imageModal = document.getElementById('image-modal');
+    const modalImg = document.getElementById('modal-image');
+    const closeImageModal = document.getElementById('close-image-modal');
+
+    // Quando se clica numa imagem com a classe .card-screenshot
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('card-screenshot')) {
+            e.preventDefault();
+            modalImg.src = e.target.src;
+            imageModal.classList.add('visible');
+        }
+    });
+
+    // Fechar modal
+    closeImageModal.addEventListener('click', () => {
+        imageModal.classList.remove('visible');
+        modalImg.src = '';
+    });
+
+    // Clicar fora da imagem também fecha o modal
+    imageModal.addEventListener('click', (e) => {
+        if (e.target === imageModal) {
+            imageModal.classList.remove('visible');
+            modalImg.src = '';
+        }
+    });
+});
