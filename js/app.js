@@ -38,68 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function openCloseTradeModal(trade) { currentTrade = { id: trade.id, data: trade.data }; closeModalObj.assetNameSpan.textContent = trade.data.asset; if(closeModalObj.container) closeModalObj.container.style.display = 'flex'; }
     function closeCloseTradeModal() { if(closeModalObj.container) { closeModalObj.container.style.display = 'none'; closeModalObj.form.reset(); currentTrade = {}; } }
 
-    // --- FUNÇÕES DE GERAÇÃO DE UI (Interface do Utilizador) ---
-  
-  
-    function createTradeCard(trade) {
-        const card = document.createElement('div');
-        card.className = 'trade-card';
-        card.innerHTML = `<button class="card-edit-btn">Editar</button><h3>${trade.data.asset}</h3><p style="color: #007bff; font-weight: 500;">Estratégia: ${trade.data.strategyName || 'N/A'}</p><p><strong>Status:</strong> ${trade.data.status}</p><p><strong>Notas:</strong> ${trade.data.notes || ''}</p>`;
-        const potentialImageUrl = trade.data.imageUrl;
-        let armedImageUrl = null;
-        if (trade.data.armedSetup) {
-            const key = Object.keys(trade.data.armedSetup).find(k => k.includes('image-url'));
-            if (key) armedImageUrl = trade.data.armedSetup[key];
-        }
-        const imageUrlToShow = armedImageUrl || potentialImageUrl;
-   
-        if (imageUrlToShow) {
-            const img = document.createElement('img');
-            img.src = imageUrlToShow;
-            img.className = 'card-screenshot'; 
-            img.alt = `Gráfico de ${trade.data.asset}`;
-            // Não adicionamos listener aqui, pois o clique será tratado por delegação de evento (mais abaixo)
-            card.appendChild(img);
-        }
-        
-        let actionButton;
-        if (trade.data.status === 'POTENTIAL') {
-            actionButton = document.createElement('button');
-            actionButton.className = 'trigger-btn btn-potential';
-            actionButton.textContent = 'Validar Setup (Armar)';
-            actionButton.addEventListener('click', () => openArmModal(trade));
-        } else if (trade.data.status === 'ARMED') {
-            card.classList.add('armed');
-            actionButton = document.createElement('button');
-            actionButton.className = 'trigger-btn btn-armed';
-            actionButton.textContent = 'Executar Gatilho';
-            actionButton.addEventListener('click', () => openExecModal(trade));
-        } else if (trade.data.status === 'LIVE') {
-            card.classList.add('live');
-            const details = trade.data.executionDetails;
-            if (details) { const p = document.createElement('p'); p.innerHTML = `<strong>Entrada:</strong> ${details['entry-price'] || 'N/A'} | <strong>Quantidade:</strong> ${details['quantity'] || 'N/A'}`; card.appendChild(p); }
-            actionButton = document.createElement('button');
-            actionButton.className = 'trigger-btn btn-live';
-            actionButton.textContent = 'Fechar Trade';
-            actionButton.addEventListener('click', () => openCloseTradeModal(trade));
-        }
-        if (actionButton) card.appendChild(actionButton);
-        card.querySelector('.card-edit-btn').addEventListener('click', (e) => { e.stopPropagation(); loadAndOpenForEditing(trade.id); });
-        return card;
-    }
-    function displayTrades(trades) {
-        if (!potentialTradesContainer) return;
-        potentialTradesContainer.innerHTML = '<p class="empty-state-message">Nenhuma oportunidade potencial.</p>';
-        armedTradesContainer.innerHTML = '<p class="empty-state-message">Nenhum setup armado.</p>';
-        liveTradesContainer.innerHTML = '<p class="empty-state-message">Nenhuma operação ativa.</p>';
-        let potentialCount = 0, armedCount = 0, liveCount = 0;
-        trades.forEach(trade => {
-            const card = createTradeCard(trade);
-            if (trade.data.status === 'POTENTIAL') { if (potentialCount === 0) potentialTradesContainer.innerHTML = ''; potentialTradesContainer.appendChild(card); potentialCount++; }
-            else if (trade.data.status === 'ARMED') { if (armedCount === 0) armedTradesContainer.innerHTML = ''; armedTradesContainer.appendChild(card); armedCount++; }
-            else if (trade.data.status === 'LIVE') { if (liveCount === 0) liveTradesContainer.innerHTML = ''; liveTradesContainer.appendChild(card); liveCount++; }
-        });
-    }
+
 
     // --- 7. FUNÇÕES DE LÓGICA DE DADOS (HANDLERS) ---
     async function handleAddSubmit(e) {
