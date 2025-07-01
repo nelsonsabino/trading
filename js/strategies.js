@@ -4,17 +4,17 @@
 export const STRATEGIES = {
 
     /* ------------------------------------------------------------------------ */    
-    /* ------------ PULLBACK ------------ */
+    /* ------------ Fib VAL Breakout ------------ */
     /* ------------------------------------------------------------------------ */ 
 
-    'pullback-inteligente': {
-        name: "Pullback com Confluência de zonas",
+    'Fib-VAL-Breakout': {
+        name: "Fib VAL Breakout",
         potentialPhases: [
             {
                 title: "Fase 1: Contexto e Zonas de Interesse (4h)",
                 checks: [
-                    { id: "pot-pi-tendencia", label: "Tendência de alta identificada (4h)?", required: true },
-                    { id: "pot-pi-val-marcado", label: "VAL da correção principal marcado?", required: true },
+                    { id: "pot-pi-tendencia", label: "Identificar tendência", required: false },
+                    { id: "pot-pi-val-marcado", label: "Marcar VAL desde o <strong> topo até à base </strong> na correção principal", required: true },
                     { id: "pot-pi-fibo-marcado", label: "Zonas de Fibo da correção marcadas (0.382, 0.5, 0.618)?", required: true },
                     { id: "pot-pi-alarmes", label: "Alarmes colocados nas zonas de interesse (VAL, Fibo, topo)?", required: true }
                 ],
