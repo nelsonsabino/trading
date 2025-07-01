@@ -1,10 +1,9 @@
-// js/strategies.js
+// js/strategies.js (VERSÃO COM 'Fib VAL Breakout')
 
-// A definição das suas estratégias.
 export const STRATEGIES = {
 
     /* ------------------------------------------------------------------------ */    
-    /* ------------ Fib VAL Breakout ------------ */
+    /* ------------ Fib VAL Breakout (NOVA VERSÃO) ------------ */
     /* ------------------------------------------------------------------------ */ 
 
     'Fib-VAL-Breakout': {
@@ -17,7 +16,7 @@ export const STRATEGIES = {
                     { id: "pot-pi-val-marcado", label: "Marcar VAL desde o <strong> topo até à base </strong> na correção principal", required: true },
                     { id: "pot-pi-fibo-marcado", label: "Desde a <strong> base até ao topo </strong> do 1º pullback, verificar que zona de Fibonacci faz <strong> confluência com o VAL </strong> (0.382, 0.5, 0.618).", required: true },
                     { id: "pot-pi-alarmes", label: "Alarmes colocados nas zonas de interesse (VAL, Fibo, topo)?", required: true }
-                ],              
+                ]
             }
         ],
         armedPhases: [
@@ -37,8 +36,8 @@ export const STRATEGIES = {
                 title: "Fase 3: Registo dos Alvos de Gestão",
                 // Nota: Os campos de Entrada, Stop Loss e Quantidade virão do GESTAO_PADRAO automaticamente.
                 inputs: [
-                    { id: "armed-pi-alarmes-alvo", label: "Alarmes em cada alvo para gestão ativa (1.272 / 1.414 / 1.618) ", required: true }
-
+                    // Alterei para um check, pois parece fazer mais sentido do que um campo de texto aqui.
+                    { id: "exec-pi-alarmes-alvo", label: "Alarmes colocados em cada alvo para gestão ativa (1.272 / 1.414 / 1.618)?", type: "checkbox", required: true }
                 ]
             }
         ]
