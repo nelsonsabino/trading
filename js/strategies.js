@@ -40,8 +40,14 @@ export const STRATEGIES = {
             {
                 title: "Fase 3: Registo dos Alvos de Gestão",
                 // Nota: Os campos de Entrada, Stop Loss e Quantidade virão do GESTAO_PADRAO automaticamente.
+               
+               checks: [
+                    { id: "exec-pi-alarmes-alvo", label: "Alarmes colocados em cada alvo para gestão ativa (1.272 / 1.414 / 1.618)?", required: true }
+                ],
+                
                 inputs: [
-                    { id: "exec-pi-alarmes-alvo", label: "Alarmes colocados em cada alvo para gestão ativa (1.272 / 1.414 / 1.618)?", type: "checkbox", required: true }
+                { id: "exec-pi-ltf", label: "Timeframe de Execução:", type: "select", options: ["15min", "5min"], required: true }                    
+                    
                 ]
             }
         ]
@@ -86,7 +92,7 @@ export const STRATEGIES = {
         {
             title: "Fase 3: Gatilho de Execução (Timeframe Inferior)",
             inputs: [
-                { id: "exec-mvr-tf", label: "Timeframe de Execução:", type: "select", options: ["15min", "5min", "1min"], required: true }
+                { id: "exec-mvr-tf", label: "Timeframe de Execução:", type: "select", options: ["15min", "5min"], required: true }
             ],
             checks: [
                 { id: "exec-mvr-stoch-reset", label: "Entrar no próximo <strong>reset completo do Estocástico</strong> no Timeframe de Execução?", required: true }
