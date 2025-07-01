@@ -3,6 +3,13 @@
 import { GESTAO_PADRAO } from './config.js';
 import { STRATEGIES } from './strategies.js';
 import { listenToTrades, getTrade, addTrade, updateTrade, closeTradeAndUpdateBalance } from './firebase-service.js';
+import { 
+    addModal, armModal, execModal, closeModalObj, 
+    potentialTradesContainer, armedTradesContainer, liveTradesContainer,
+    imageModal, modalImg, closeImageModalBtn
+} from './dom-elements.js';
+
+
 
 // --- 2. PONTO DE ENTRADA PRINCIPAL ---
 document.addEventListener('DOMContentLoaded', () => {
