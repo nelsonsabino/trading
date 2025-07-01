@@ -1,4 +1,4 @@
-// js/app.js - Versão 2.7 (com ui-helpers importado)
+// js/app.js - Versão 2.8 (com ui-renderer importado)
 
 import { GESTAO_PADRAO } from './config.js';
 import { STRATEGIES } from './strategies.js';
@@ -8,11 +8,15 @@ import { listenToTrades, getTrade, addTrade, updateTrade, closeTradeAndUpdateBal
 import { 
     addModal, armModal, execModal, closeModalObj, 
     potentialTradesContainer, armedTradesContainer, liveTradesContainer,
-    imageModal, modalImg, closeImageModalBtn
+    imageModal, modalImg, closeImageModalBtn // Continua a ser usado para o modal de imagem principal
 } from './dom-elements.js';
 
-// NOVO: Importar funções de criação de elementos UI
+// Importar funções de criação de elementos UI básicos
 import { createChecklistItem, createInputItem, createRadioGroup } from './ui-helpers.js';
+
+// NOVO: Importar funções de renderização de UI
+import { generateDynamicChecklist, populateStrategySelect } from './ui-renderer.js';
+
 
 
 
@@ -253,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- LÓGICA DA VERSÃO ---
-    const APP_VERSION = '2.7';
+    const APP_VERSION = '2.8';
     const versionDisplay = document.getElementById('app-version-display');
     // NOTE: Se o script de versão no index.html ainda estiver lá, ele irá sobrepor este.
     // O ideal é ter apenas uma única forma de definir e exibir a versão.
