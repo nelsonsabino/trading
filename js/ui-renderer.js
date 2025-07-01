@@ -3,7 +3,7 @@
 // Importações necessárias para estas funções
 import { createChecklistItem, createInputItem, createRadioGroup } from './ui-helpers.js';
 import { addModal, imageModal, modalImg } from './dom-elements.js';
-import { STRATEGIES } from './config.js'; // Importa as estratégias para popular o select
+import { STRATEGIES } from './strategies.js';
 
 
 export function generateDynamicChecklist(container, phases, data = {}) {
