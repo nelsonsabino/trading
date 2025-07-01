@@ -11,28 +11,24 @@ export const STRATEGIES = {
         name: "Fib VAL Breakout",
         potentialPhases: [
             {
-                title: "Fase 1: Contexto e Zonas de Interesse (4h)",
+                title: "Fase 1: Contexto e Zonas de Interesse (Diário ou 4h)",
                 checks: [
                     { id: "pot-pi-tendencia", label: "Identificar tendência", required: false },
                     { id: "pot-pi-val-marcado", label: "Marcar VAL desde o <strong> topo até à base </strong> na correção principal", required: true },
-                    { id: "pot-pi-fibo-marcado", label: "Zonas de Fibo da correção marcadas (0.382, 0.5, 0.618)?", required: true },
+                    { id: "pot-pi-fibo-marcado", label: "Desde a <strong> base até ao topo </strong> do 1º pullback, verificar que zona de Fibonacci faz <strong> confluência com o VAL </strong> (0.382, 0.5, 0.618).", required: true },
                     { id: "pot-pi-alarmes", label: "Alarmes colocados nas zonas de interesse (VAL, Fibo, topo)?", required: true }
-                ],
-                inputs: [
-                    { id: "pot-pi-confluencia", label: "Zona de confluência principal (ex: Fibo 0.618 + VAL):", type: "text", required: true, placeholder: "Fibo 0.618 + VAL" }
-                ]
+                ],              
             }
         ],
         armedPhases: [
             {
-                title: "Fase 2: Confirmação e Gatilho (1h)",
+                title: "Fase 2: Confirmação e Gatilho (1h ou 15min.)",
                 checks: [
-                    { id: "armed-pi-fibo-ext-marcado", label: "Extensões de Fibo (alvos) marcadas (1.272, 1.414, 1.618)?", required: true },
-                    { id: "armed-pi-volume-ok", label: "Volume da subida > volume da correção (análise com Date Range)?", required: true },
-                    { id: "armed-pi-stoch-reset", label: "Estocástico (1h) fez reset (sobrevenda)?", required: true },
-                    { id: "armed-pi-rsi-break", label: "RSI (1h) quebrou a LTB (linha de tendência de baixa)?", required: true },
-                    { id: "armed-pi-reversal-candle", label: "Candle de reversão confirmado na zona de confluência?", required: true },
-                    { id: "armed-pi-alarmes-gatilho", label: "Alarmes de gatilho colocados (RSI, Stoch)?", required: false }
+                    { id: "armed-pi-fibo-ext-marcado", label: "Do <strong> topo até à base da correção antes da entrada</strong>, marcar alvos com <strong> extensões de Fibonacci: 1.272 / 1.414 / 1.618</strong>", required: true },
+                    { id: "armed-pi-volume-ok", label: "Volume da subida <strong> é maior </strong> que o volume da correção (análise com Date Range).", required: true },
+                    { id: "armed-pi-stoch-reset", label: "Estocástico fez reset (sobrevenda)", required: true },
+                    { id: "armed-pi-rsi-break", label: "RSI quebrou a LTB (linha de tendência de baixa)", required: true },
+                    { id: "armed-pi-alarmes-gatilho", label: "Alarmes de gatilho colocados (RSI, Stoch)?", required: true }
                 ]
             }
         ],
@@ -41,9 +37,8 @@ export const STRATEGIES = {
                 title: "Fase 3: Registo dos Alvos de Gestão",
                 // Nota: Os campos de Entrada, Stop Loss e Quantidade virão do GESTAO_PADRAO automaticamente.
                 inputs: [
-                    { id: "exec-pi-alvo1", label: "Alvo 1 (Parcial, ex: 1.272):", type: "number", step: "any", required: true },
-                    { id: "exec-pi-alvo2", label: "Alvo 2 (Trailing, ex: 1.414):", type: "number", step: "any", required: true },
-                    { id: "exec-pi-alvo3", label: "Alvo Final (ex: 1.618):", type: "number", step: "any", required: false }
+                    { id: "armed-pi-alarmes-alvo", label: "Alarmes em cada alvo para gestão ativa (1.272 / 1.414 / 1.618) ", required: true }
+
                 ]
             }
         ]
