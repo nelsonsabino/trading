@@ -1,4 +1,4 @@
-// js/app.js - Versão 2.7 (com ui-helpers importado)
+// js/app.js - Versão 2.8 (com ui-renderer importado)
 
 import { GESTAO_PADRAO } from './config.js';
 import { STRATEGIES } from './strategies.js';
@@ -8,15 +8,14 @@ import { listenToTrades, getTrade, addTrade, updateTrade, closeTradeAndUpdateBal
 import { 
     addModal, armModal, execModal, closeModalObj, 
     potentialTradesContainer, armedTradesContainer, liveTradesContainer,
-    imageModal, modalImg, closeImageModalBtn
+    imageModal, modalImg, closeImageModalBtn // Continua a ser usado para o modal de imagem principal
 } from './dom-elements.js';
 
-// Importar funções de criação de elementos UI
+// Importar funções de criação de elementos UI básicos
 import { createChecklistItem, createInputItem, createRadioGroup } from './ui-helpers.js';
 
-// Importar funções de renderização de UI
+// NOVO: Importar funções de renderização de UI
 import { generateDynamicChecklist, populateStrategySelect } from './ui-renderer.js';
-
 
 
 
