@@ -114,5 +114,15 @@
         <p id="app-version-display"></p>
     </footer>    
 
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const version = 'TESTE MANUAL';
+    const v = document.getElementById('app-version-display');
+    if (v) v.textContent = `Versão: ${version}`;
+    else console.warn('Elemento de versão não encontrado.');
+  });
+</script>
+    
 </body>
 </html>
