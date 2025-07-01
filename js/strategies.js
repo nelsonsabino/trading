@@ -1,9 +1,9 @@
-// js/strategies.js (VERSÃO COM 'Fib VAL Breakout')
+// js/strategies.js 
 
 export const STRATEGIES = {
 
     /* ------------------------------------------------------------------------ */    
-    /* ------------ Fib VAL Breakout (NOVA VERSÃO) ------------ */
+    /* ------------ Fib VAL Breakout ------------ */
     /* ------------------------------------------------------------------------ */ 
 
     'Fib-VAL-Breakout': {
