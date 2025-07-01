@@ -7,8 +7,6 @@ export const closeModalObj = { container: document.getElementById('close-trade-m
 export const potentialTradesContainer = document.getElementById('potential-trades-container');
 export const armedTradesContainer = document.getElementById('armed-trades-container');
 export const liveTradesContainer = document.getElementById('live-trades-container');
-
-// SELETORES DO NOVO MODAL DE IMAGEM
 export const imageModal = document.getElementById('image-modal');
 export const modalImg = document.getElementById('modal-image');
 export const closeImageModalBtn = document.getElementById('close-image-modal');
