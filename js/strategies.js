@@ -8,7 +8,7 @@ export const STRATEGIES = {
            /* ------------ FURA E TESTA ------------ */
 /* ------------------------------------------------------------------------ */           
     
-    'fura-testa': {
+/*    'fura-testa': {
         name: "Preço fura resistência e testa suporte",
         potentialPhases: [
             { 
@@ -120,7 +120,7 @@ export const STRATEGIES = {
 /* ------------------------------------------------------------------------ */    
            /* ------------ APÓS IMPULSO DO SUPORTE ------------ */
 /* ------------------------------------------------------------------------ */       
-  
+/*  
 'impulso-suporte': {
         name: "Após impulso do suporte",
         
