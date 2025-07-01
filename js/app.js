@@ -11,8 +11,12 @@ import {
     imageModal, modalImg, closeImageModalBtn
 } from './dom-elements.js';
 
-// NOVO: Importar funções de criação de elementos UI
+// Importar funções de criação de elementos UI
 import { createChecklistItem, createInputItem, createRadioGroup } from './ui-helpers.js';
+
+// Importar funções de renderização de UI
+import { generateDynamicChecklist, populateStrategySelect } from './ui-renderer.js';
+
 
 
 
