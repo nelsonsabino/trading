@@ -1,4 +1,4 @@
-// js/ui.js
+// js/ui.js (Corrigido)
 
 import { STRATEGIES } from './strategies.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
@@ -126,7 +126,8 @@ export function displayTrades(trades) {
     liveTradesContainer.innerHTML = '<p class="empty-state-message">Nenhuma operação ativa.</p>';
     let potentialCount = 0, armedCount = 0, liveCount = 0;
     trades.forEach(trade => {
-        const card = createTradeCard(createTradeCard(trade)); // Pequena correção aqui, chamava createTradeCard duas vezes
+        // CORREÇÃO: Removida a chamada dupla a createTradeCard
+        const card = createTradeCard(trade); 
         if (trade.data.status === 'POTENTIAL') { if (potentialCount === 0) potentialTradesContainer.innerHTML = ''; potentialTradesContainer.appendChild(card); potentialCount++; }
         else if (trade.data.status === 'ARMED') { if (armedCount === 0) armedTradesContainer.innerHTML = ''; armedTradesContainer.appendChild(card); armedCount++; }
         else if (trade.data.status === 'LIVE') { if (liveCount === 0) liveTradesContainer.innerHTML = ''; liveTradesContainer.appendChild(card); liveCount++; }
