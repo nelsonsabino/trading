@@ -1,4 +1,4 @@
-// teste.js - A versão completa e funcional
+// teste.js - Versão 1.2.1
 
 // IMPORTAÇÕES REAIS COM OS CAMINHOS CORRETOS
 import { GESTAO_PADRAO } from './js/config.js';
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- ESTADO DA APLICAÇÃO ---
     let currentTrade = {};
     
-    // --- SELETORES DO DOM (agora completos) ---
+    // --- SELETORES DO DOM ---
     const addModal = { container: document.getElementById('add-opportunity-modal'), form: document.getElementById('add-opportunity-form'), closeBtn: document.getElementById('close-modal-btn'), strategySelect: document.getElementById('strategy-select'), checklistContainer: document.getElementById('dynamic-checklist-container') };
     const armModal = { container: document.getElementById('arm-trade-modal'), form: document.getElementById('arm-trade-form'), closeBtn: document.getElementById('close-arm-trade-modal-btn'), assetNameSpan: document.getElementById('arm-trade-asset-name'), strategyNameSpan: document.getElementById('arm-trade-strategy-name'), checklistContainer: document.getElementById('arm-checklist-container')};
     const execModal = { container: document.getElementById('execution-modal'), form: document.getElementById('execution-form'), closeBtn: document.getElementById('close-execution-modal-btn'), assetNameSpan: document.getElementById('execution-asset-name'), strategyNameSpan: document.getElementById('execution-strategy-name'), checklistContainer: document.getElementById('execution-checklist-container') };
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const armedTradesContainer = document.getElementById('armed-trades-container');
     const liveTradesContainer = document.getElementById('live-trades-container');
 
-    // --- FUNÇÕES DE CONTROLO DE MODAIS E LIGHTBOX (agora completas) ---
+    // --- FUNÇÕES DE CONTROLO DE MODAIS E LIGHTBOX ---
     function openAddModal() { if(addModal.container) addModal.container.style.display = 'flex'; }
     function closeAddModal() { if(addModal.container) { addModal.container.style.display = 'none'; addModal.form.reset(); addModal.checklistContainer.innerHTML = ''; currentTrade = {}; } }
     function openArmModal(trade) { currentTrade = { id: trade.id, data: trade.data }; armModal.assetNameSpan.textContent = trade.data.asset; armModal.strategyNameSpan.textContent = trade.data.strategyName; generateDynamicChecklist(armModal.checklistContainer, STRATEGIES[trade.data.strategyId]?.armedPhases, trade.data.armedSetup); if(armModal.container) armModal.container.style.display = 'flex'; }
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function openLightbox(imageUrl) { if (lightbox.container && lightbox.image) { lightbox.image.src = imageUrl; lightbox.container.style.display = 'flex'; } }
     function closeLightbox() { if (lightbox.container) lightbox.container.style.display = 'none'; }
 
-    // --- FUNÇÕES DE GERAÇÃO DE UI (agora completas) ---
+    // --- FUNÇÕES DE GERAÇÃO DE UI ---
     function createChecklistItem(check, data) {
         const isRequired = check.required === false ? '' : 'required';
         const labelText = check.required === false ? check.label : `${check.label} <span class="required-asterisk">*</span>`;
@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- FUNÇÕES DE LÓGICA DE DADOS (HANDLERS) (agora completas) ---
+    // --- FUNÇÕES DE LÓGICA DE DADOS (HANDLERS) ---
     async function handleAddSubmit(e) {
         e.preventDefault();
         const strategyId = addModal.strategySelect.value;
@@ -250,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- LÓGICA DE EDIÇÃO (agora completa) ---
+    // --- LÓGICA DE EDIÇÃO ---
     async function loadAndOpenForEditing(tradeId) {
         const trade = await getTrade(tradeId);
         if (trade) {
@@ -270,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // --- INICIALIZAÇÃO DA APLICAÇÃO (agora completa) ---
+    // --- INICIALIZAÇÃO DA APLICAÇÃO ---
     document.getElementById('add-opportunity-btn').addEventListener('click', openAddModal);
     addModal.closeBtn.addEventListener('click', closeAddModal);
     addModal.container.addEventListener('click', e => { if (e.target.id === 'add-opportunity-modal') closeAddModal(); });
@@ -291,9 +291,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     listenToTrades(displayTrades);
     populateStrategySelect();
+    
     const tradeIdToEdit = localStorage.getItem('tradeToEdit');
     if (tradeIdToEdit) {
         localStorage.removeItem('tradeToEdit');
         loadAndOpenForEditing(tradeIdToEdit);
+    }
+
+    // --- LÓGICA DA VERSÃO ---
+    // NOVO: Define a versão e insere no rodapé.
+    const APP_VERSION = '1.2.1';
+    const versionDisplay = document.getElementById('app-version-display');
+    if (versionDisplay) {
+        versionDisplay.textContent = `Versão: ${APP_VERSION}`;
     }
 });
