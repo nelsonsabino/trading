@@ -10,20 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 3. ESTADO DA APLICAÇÃO ---
     let currentTrade = {};
     
-    // --- 4. SELETORES DO DOM ---
-    const addModal = { container: document.getElementById('add-opportunity-modal'), form: document.getElementById('add-opportunity-form'), closeBtn: document.getElementById('close-modal-btn'), strategySelect: document.getElementById('strategy-select'), checklistContainer: document.getElementById('dynamic-checklist-container') };
-    const armModal = { container: document.getElementById('arm-trade-modal'), form: document.getElementById('arm-trade-form'), closeBtn: document.getElementById('close-arm-trade-modal-btn'), assetNameSpan: document.getElementById('arm-trade-asset-name'), strategyNameSpan: document.getElementById('arm-trade-strategy-name'), checklistContainer: document.getElementById('arm-checklist-container')};
-    const execModal = { container: document.getElementById('execution-modal'), form: document.getElementById('execution-form'), closeBtn: document.getElementById('close-execution-modal-btn'), assetNameSpan: document.getElementById('execution-asset-name'), strategyNameSpan: document.getElementById('execution-strategy-name'), checklistContainer: document.getElementById('execution-checklist-container') };
-    const closeModalObj = { container: document.getElementById('close-trade-modal'), form: document.getElementById('close-trade-form'), closeBtn: document.getElementById('close-close-trade-modal-btn'), assetNameSpan: document.getElementById('close-trade-asset-name'), exitPriceInput: document.getElementById('exit-price'), pnlInput: document.getElementById('final-pnl') };
-    const potentialTradesContainer = document.getElementById('potential-trades-container');
-    const armedTradesContainer = document.getElementById('armed-trades-container');
-    const liveTradesContainer = document.getElementById('live-trades-container');
-
-    // SELETORES DO NOVO MODAL DE IMAGEM
-    const imageModal = document.getElementById('image-modal');
-    const modalImg = document.getElementById('modal-image');
-    const closeImageModalBtn = document.getElementById('close-image-modal');
-
+   
 
     // --- 5. FUNÇÕES DE CONTROLO DE MODAIS (Gerais) ---
     function openAddModal() { if(addModal.container) addModal.container.style.display = 'flex'; }
