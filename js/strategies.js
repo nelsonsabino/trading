@@ -1,69 +1,58 @@
+// js/strategies.js
 
 // A definição das suas estratégias.
 export const STRATEGIES = {
 
+    /* ------------------------------------------------------------------------ */    
+    /* ------------ PULLBACK ------------ */
+    /* ------------------------------------------------------------------------ */ 
 
-
-/* ------------------------------------------------------------------------ */    
-           /* ------------ FURA E TESTA ------------ */
-/* ------------------------------------------------------------------------ */           
-    
-/*    'fura-testa': {
-        name: "Preço fura resistência e testa suporte",
+    'pullback-inteligente': {
+        name: "Pullback com Confluência de zonas",
         potentialPhases: [
-            { 
-                title: "Análise Macro Inicial",
-                exampleImageUrl: "https://i.imgur.com/exemplo1.png",
-                inputs: [ 
-                    { id: "pot-ft-tf", label: "Timeframe de Análise:", type: "select", options: ["Diário", "4h"], required: true }
-                ],
+            {
+                title: "Fase 1: Contexto e Zonas de Interesse (4h)",
                 checks: [
-                    { id: "pot-ft-hl", label: "Preço com higher Low", required: true },
-                    { id: "pot-ft-divergencia", label: "RSI bullish", required: true },
-                    { id: "pot-ft-alarme", label: "Algum alarme foi colocado?", required: true }
+                    { id: "pot-pi-tendencia", label: "Tendência de alta identificada (4h)?", required: true },
+                    { id: "pot-pi-val-marcado", label: "VAL da correção principal marcado?", required: true },
+                    { id: "pot-pi-fibo-marcado", label: "Zonas de Fibo da correção marcadas (0.382, 0.5, 0.618)?", required: true },
+                    { id: "pot-pi-alarmes", label: "Alarmes colocados nas zonas de interesse (VAL, Fibo, topo)?", required: true }
+                ],
+                inputs: [
+                    { id: "pot-pi-confluencia", label: "Zona de confluência principal (ex: Fibo 0.618 + VAL):", type: "text", required: true, placeholder: "Fibo 0.618 + VAL" }
                 ]
             }
         ],
         armedPhases: [
-            { 
-                title: "Validação do Setup (no TF de Análise)",
-                exampleImageUrl: "https://i.imgur.com/exemplo2.png",
-                inputs: [ { id: "armed-ft-image-url", label: "Link da Imagem do Gráfico (Fase Armado):", type: "text", required: false } ],
+            {
+                title: "Fase 2: Confirmação e Gatilho (1h)",
                 checks: [
-                    { id: "armed-ft-tendencia", label: "Preço furou resistência", required: true },
-                    { id: "armed-ft-rhl", label: "RSI está a fazer Higher Lows?", required: true },
-                    { id: "armed-ft-val", label: "Preço na base do VAL? (Aumenta Prob.)", required: false }
+                    { id: "armed-pi-fibo-ext-marcado", label: "Extensões de Fibo (alvos) marcadas (1.272, 1.414, 1.618)?", required: true },
+                    { id: "armed-pi-volume-ok", label: "Volume da subida > volume da correção (análise com Date Range)?", required: true },
+                    { id: "armed-pi-stoch-reset", label: "Estocástico (1h) fez reset (sobrevenda)?", required: true },
+                    { id: "armed-pi-rsi-break", label: "RSI (1h) quebrou a LTB (linha de tendência de baixa)?", required: true },
+                    { id: "armed-pi-reversal-candle", label: "Candle de reversão confirmado na zona de confluência?", required: true },
+                    { id: "armed-pi-alarmes-gatilho", label: "Alarmes de gatilho colocados (RSI, Stoch)?", required: false }
                 ]
             }
         ],
         executionPhases: [
-            { 
-                title: "Gatilho de Precisão",
-                exampleImageUrl: "https://i.imgur.com/exemplo3.png",
-                inputs: [{ id: "exec-ft-tf", label: "Timeframe de Execução:", type: "select", options: ["1h", "15min", "5min"], required: true }],
-                checks: [{ id: "exec-ft-rsi-break", label: "Quebra da linha de resistência do RSI", required: true }],
-                checks: [{ id: "exec-ft-rsi-break", label: "Preço mantem-se acima da resistência", required: true }],
-
-                radios: {
-                    name: "gatilho-final-id", 
-                    label: "Escolha o gatilho final:",
-                    options: [
-                        { id: "exec-ft-gatilho-base", label: "Preço na base local do FRVP + Stoch reset?" },
-                        { id: "exec-ft-gatilho-acima", label: "Preço acima da base local do FRVP + Stoch reset?" }
-                    ]
-                }
+            {
+                title: "Fase 3: Registo dos Alvos de Gestão",
+                // Nota: Os campos de Entrada, Stop Loss e Quantidade virão do GESTAO_PADRAO automaticamente.
+                inputs: [
+                    { id: "exec-pi-alvo1", label: "Alvo 1 (Parcial, ex: 1.272):", type: "number", step: "any", required: true },
+                    { id: "exec-pi-alvo2", label: "Alvo 2 (Trailing, ex: 1.414):", type: "number", step: "any", required: true },
+                    { id: "exec-pi-alvo3", label: "Alvo Final (ex: 1.618):", type: "number", step: "any", required: false }
+                ]
             }
         ]
-    }, 
+    },
 
 
-
-
-
-        
-/* ------------------------------------------------------------------------ */    
-           /* ------------ PREÇO EM SUPORTE ------------ */
-/* ------------------------------------------------------------------------ */           
+    /* ------------------------------------------------------------------------ */    
+               /* ------------ PREÇO EM SUPORTE ------------ */
+    /* ------------------------------------------------------------------------ */           
     
     'preco-suporte': {
         name: "Preço em suporte com confluencias",
@@ -117,75 +106,9 @@ export const STRATEGIES = {
         ]
     }, 
 
-/* ------------------------------------------------------------------------ */    
-           /* ------------ APÓS IMPULSO DO SUPORTE ------------ */
-/* ------------------------------------------------------------------------ */       
-/*  
-'impulso-suporte': {
-        name: "Após impulso do suporte",
-        
-        potentialPhases: [
-            {
-                title: "Análise Macro Inicial",
-                exampleImageUrl: "https://i.imgur.com/link_exemplo_potencial.png", // SUBSTITUA COM UM LINK REAL
-
-                inputs: [
-                    { id: "pot-id-tf-impulso", label: "Timeframe de Análise:", type: "select", options: ["Diário", "4h"], required: true },
-                    { id: "pot-id-rsi-ltb-impulso", label: "RSI furou LTB?", type: "select", options: ["Sim, com força", "Não, mas ainda tem espaço", "Não, está encostado"], required: true }
-                ],                
-                checks: [
-                    { id: "pot-is-rsi-hl", label: "RSI com Higher Lows?", required: true },
-                    { id: "pot-is-fib", label: "Preço acima de Fibonacci 0.382?", required: true },
-                    { id: "pot-is-stoch-corr", label: "Stochastic já está a corrigir?", required: true },
-                    { id: "pot-is-ema50", label: "Preço acima da EMA50?", required: true },
-                    { id: "pot-is-alarm", label: "Alarme foi colocado?", required: true },
-                    { id: "pot-is-rsi-ma", label: "RSI acima da RSI-MA?", required: false }
-                ]
-            }
-        ],
-        
-        armedPhases: [
-            {
-                title: "Critérios para Armar (TF Superior)",
-                exampleImageUrl: "https://i.imgur.com/link_exemplo_potencial.png", // SUBSTITUA COM UM LINK REAL
-               
-                inputs: [ { id: "armed-id-image-url", label: "Link da Imagem do Gráfico (Fase Armado):", type: "text", required: false } ],
- 
-                checks: [
-                    { id: "armed-is-stoch-cross", label: "Stochastic TF superior está a cruzar bullish?", required: true },
-                    { id: "armed-is-rsi-hl", label: "RSI continua com Higher Lows?", required: true },
-                    { id: "armed-is-val", label: "Preço na base do VAL? (Aumenta Prob.)", required: false },
-                    { id: "armed-is-rsi-toque3", label: "RSI a fazer 3º toque no suporte? (Aumenta Prob.)", required: false }
-                ]
-            }
-        ],
-        
-        executionPhases: [
-            {
-                title: "Gatilho de Precisão",
-                exampleImageUrl: "https://i.imgur.com/link_exemplo_potencial.png", // SUBSTITUA COM UM LINK REAL
-         
-                inputs: [
-                    { id: "exec-is-tf", label: "Timeframe de Execução:", type: "select", options: ["1h", "15min", "5min"], required: true }
-                ],
-                checks: [
-                    { id: "exec-is-rsi-break", label: "Quebra da linha de resistência do RSI?", required: true }
-                ],
-                radios: {
-                    name: "gatilho-final-is",
-                    label: "Escolha o gatilho final:",
-                    options: [
-                        { id: "exec-is-gatilho-base", label: "Preço na base local do FRVP + Stoch reset?" },
-                        { id: "exec-is-gatilho-acima", label: "Preço acima da base local do FRVP + Stoch reset?" } // Corrigido erro de formatação aqui
-                    ]
-                }
-            }
-        ]
-    },
-
-/* ------------------------------------------------------------------------ */    
-           /* ------------ EMA50 4h ------------ */
-/* ------------------------------------------------------------------------ */       
+    /* ------------------------------------------------------------------------ */    
+               /* ------------ EMA50 4h ------------ */
+    /* ------------------------------------------------------------------------ */       
    
     'EMA50 4h': {
         name: "EMA50 4h",
