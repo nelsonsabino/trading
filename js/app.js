@@ -1,4 +1,4 @@
-// js/app.js - Versão 2.3
+// js/app.js - Versão 2.4
 
 import { GESTAO_PADRAO } from './config.js';
 import { STRATEGIES } from './strategies.js';
@@ -285,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- LÓGICA DA VERSÃO ---
-    const APP_VERSION = '2.3';
+    const APP_VERSION = '2.4';
     const versionDisplay = document.getElementById('app-version-display');
     if (versionDisplay) {
         versionDisplay.textContent = `Versão: ${APP_VERSION}`;
