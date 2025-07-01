@@ -50,15 +50,17 @@ export const STRATEGIES = {
 
 
     /* ------------------------------------------------------------------------ */    
-               /* ------------ momentum-volume-reset ------------ */
+               /* ------------ momentum-volume ------------ */
     /* ------------------------------------------------------------------------ */         
 
 
 'momentum-volume-reset': {
-    name: "Momentum com Volume e Reset",
+    name: "Momentum com Volume",
     potentialPhases: [
         {
             title: "Fase 1: Contexto e Zonas de Interesse (Timeframe Superior)",
+            exampleImageUrl: "pic/zonas_valor_4h.png", 
+
             checks: [
                 { id: "pot-mvr-tendencia", label: "Confirmar que o mercado apresenta <strong>mínimos e máximos ascendentes</strong>.", required: true },
                 { id: "pot-mvr-frvp", label: "Aplicar <strong>FRVP</strong> (Fixed Range Volume Profile) para identificar <strong>VAL, POC e VAH</strong>.", required: true },
