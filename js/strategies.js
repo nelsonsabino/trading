@@ -78,7 +78,7 @@ export const STRATEGIES = {
         {
             title: "Fase 2: Validação do Pullback e Confluência",
             exampleImageUrl: "pic/zonas_valor_4h.png", 
-            
+            inputs: [ { id: "armed-id-image-url", label: "Link da Imagem do Gráfico (Fase Armado):", type: "text", required: false } ],            
             checks: [
                 { id: "armed-mvr-pullback", label: "Preço fez <strong>pullback</strong> até à zona do VAL ou POC.", required: true },
                 { id: "armed-mvr-volume", label: "<strong>Volume decrescente</strong> na correção (comparado com a subida anterior).", required: true },
@@ -107,7 +107,7 @@ export const STRATEGIES = {
     /* ------------------------------------------------------------------------ */    
                /* ------------ PREÇO EM SUPORTE ------------ */
     /* ------------------------------------------------------------------------ */           
-/*    
+   
     'preco-suporte': {
         name: "Preço em suporte com confluencias",
         potentialPhases: [
