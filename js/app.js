@@ -114,17 +114,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if (key) armedImageUrl = trade.data.armedSetup[key];
         }
         const imageUrlToShow = armedImageUrl || potentialImageUrl;
+   
         if (imageUrlToShow) {
-            const img = document.createElement('img');
-            img.src = imageUrlToShow;
-            img.className = 'card-screenshot';
-            img.alt = `Gráfico de ${trade.data.asset}`;
-            img.addEventListener('click', (e) => { 
-                e.stopPropagation(); 
-                window.open(imageUrlToShow, '_blank');
-            });
-            card.appendChild(img);
-        }
+    const img = document.createElement('img');
+    img.src = imageUrlToShow;
+    img.className = 'card-screenshot'; // já é suficiente
+    img.alt = `Gráfico de ${trade.data.asset}`;
+    card.appendChild(img);
+}
+        
         let actionButton;
         if (trade.data.status === 'POTENTIAL') {
             actionButton = document.createElement('button');
