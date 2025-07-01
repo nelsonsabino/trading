@@ -1,4 +1,4 @@
-// js/app.js - Versão 2.4
+// js/app.js - VERSÃO 2.5 (Consolidada e Corrigida)
 
 import { GESTAO_PADRAO } from './config.js';
 import { STRATEGIES } from './strategies.js';
@@ -19,7 +19,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const armedTradesContainer = document.getElementById('armed-trades-container');
     const liveTradesContainer = document.getElementById('live-trades-container');
 
-    // --- 5. FUNÇÕES DE CONTROLO DE MODAIS ---
+    // SELETORES DO NOVO MODAL DE IMAGEM
+    const imageModal = document.getElementById('image-modal');
+    const modalImg = document.getElementById('modal-image');
+    const closeImageModalBtn = document.getElementById('close-image-modal');
+
+
+    // --- 5. FUNÇÕES DE CONTROLO DE MODAIS (Gerais) ---
     function openAddModal() { if(addModal.container) addModal.container.style.display = 'flex'; }
     function closeAddModal() { if(addModal.container) { addModal.container.style.display = 'none'; addModal.form.reset(); addModal.checklistContainer.innerHTML = ''; currentTrade = {}; } }
     function openArmModal(trade) { currentTrade = { id: trade.id, data: trade.data }; armModal.assetNameSpan.textContent = trade.data.asset; armModal.strategyNameSpan.textContent = trade.data.strategyName; generateDynamicChecklist(armModal.checklistContainer, STRATEGIES[trade.data.strategyId]?.armedPhases, trade.data.armedSetup); if(armModal.container) armModal.container.style.display = 'flex'; }
@@ -29,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function openCloseTradeModal(trade) { currentTrade = { id: trade.id, data: trade.data }; closeModalObj.assetNameSpan.textContent = trade.data.asset; if(closeModalObj.container) closeModalObj.container.style.display = 'flex'; }
     function closeCloseTradeModal() { if(closeModalObj.container) { closeModalObj.container.style.display = 'none'; closeModalObj.form.reset(); currentTrade = {}; } }
 
-    // --- 6. FUNÇÕES DE GERAÇÃO DE UI ---
+    // --- FUNÇÕES DE GERAÇÃO DE UI (Interface do Utilizador) ---
     function createChecklistItem(check, data) {
         const isRequired = check.required === false ? '' : 'required';
         const labelText = check.required === false ? check.label : `${check.label} <span class="required-asterisk">*</span>`;
@@ -78,9 +84,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 const exampleContainer = document.createElement('div');
                 exampleContainer.className = 'example-image-container';
                 exampleContainer.innerHTML = `<p>Exemplo Visual:</p><img src="${phase.exampleImageUrl}" alt="Exemplo para ${phase.title}">`;
+                // Usar o novo modal de imagem para exemplos também
                 exampleContainer.querySelector('img').addEventListener('click', (e) => { 
                     e.stopPropagation(); 
-                    window.open(phase.exampleImageUrl, '_blank');
+                    if (imageModal && modalImg) {
+                        modalImg.src = phase.exampleImageUrl;
+                        imageModal.classList.add('visible');
+                    } else {
+                        // Fallback, caso os elementos do modal não sejam encontrados (não deve acontecer com HTML correto)
+                        window.open(phase.exampleImageUrl, '_blank');
+                    }
                 });
                 phaseDiv.appendChild(exampleContainer);
             }
@@ -116,12 +129,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const imageUrlToShow = armedImageUrl || potentialImageUrl;
    
         if (imageUrlToShow) {
-    const img = document.createElement('img');
-    img.src = imageUrlToShow;
-    img.className = 'card-screenshot'; // já é suficiente
-    img.alt = `Gráfico de ${trade.data.asset}`;
-    card.appendChild(img);
-}
+            const img = document.createElement('img');
+            img.src = imageUrlToShow;
+            img.className = 'card-screenshot'; 
+            img.alt = `Gráfico de ${trade.data.asset}`;
+            // Não adicionamos listener aqui, pois o clique será tratado por delegação de evento (mais abaixo)
+            card.appendChild(img);
+        }
         
         let actionButton;
         if (trade.data.status === 'POTENTIAL') {
@@ -238,6 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Ocorreu um erro ao fechar o trade. Verifique a consola para mais detalhes.");
         }
     }
+    // A função calculatePnL foi removida como solicitado.
 
     // --- 8. LÓGICA DE EDIÇÃO ---
     async function loadAndOpenForEditing(tradeId) {
@@ -274,6 +289,38 @@ document.addEventListener('DOMContentLoaded', () => {
     closeModalObj.closeBtn.addEventListener('click', closeCloseTradeModal);
     closeModalObj.container.addEventListener('click', e => { if (e.target.id === 'close-trade-modal') closeCloseTradeModal(); });
     closeModalObj.form.addEventListener('submit', handleCloseSubmit);
+    // A linha do event listener para o cálculo do P&L foi removida.
+
+    // NOVO: Event listeners para o modal de imagem
+    if (closeImageModalBtn) {
+        closeImageModalBtn.addEventListener('click', () => {
+            if (imageModal) imageModal.classList.remove('visible');
+            if (modalImg) modalImg.src = ''; // Limpa a imagem ao fechar
+        });
+    }
+    if (imageModal) {
+        imageModal.addEventListener('click', (e) => {
+            // Fecha o modal apenas se o clique for no overlay (não na imagem)
+            if (e.target === imageModal) {
+                imageModal.classList.remove('visible');
+                if (modalImg) modalImg.src = ''; // Limpa a imagem ao fechar
+            }
+        });
+    }
+    // NOVO: Delegacão de evento para abrir modal de imagem ao clicar em .card-screenshot (cards de trades)
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('card-screenshot')) {
+            e.preventDefault(); // Previne qualquer comportamento padrão de links ou botões
+            if (imageModal && modalImg) {
+                modalImg.src = e.target.src;
+                imageModal.classList.add('visible');
+            } else {
+                console.error('Elementos do modal de imagem não encontrados ao clicar em .card-screenshot.');
+                // Fallback para abrir numa nova aba se o modal não for encontrado
+                window.open(e.target.src, '_blank');
+            }
+        }
+    });
 
     listenToTrades(displayTrades);
     populateStrategySelect();
@@ -285,39 +332,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- LÓGICA DA VERSÃO ---
-    const APP_VERSION = '2.4';
+    const APP_VERSION = '2.5';
     const versionDisplay = document.getElementById('app-version-display');
+    // NOTE: Se o script de versão no index.html ainda estiver lá, ele irá sobrepor este.
+    // O ideal é ter apenas uma única forma de definir e exibir a versão.
     if (versionDisplay) {
         versionDisplay.textContent = `Versão: ${APP_VERSION}`;
     }
-});
-
-// Modal de imagem
-document.addEventListener('DOMContentLoaded', () => {
-    const imageModal = document.getElementById('image-modal');
-    const modalImg = document.getElementById('modal-image');
-    const closeImageModal = document.getElementById('close-image-modal');
-
-    // Quando se clica numa imagem com a classe .card-screenshot
-    document.addEventListener('click', function (e) {
-        if (e.target.classList.contains('card-screenshot')) {
-            e.preventDefault();
-            modalImg.src = e.target.src;
-            imageModal.classList.add('visible');
-        }
-    });
-
-    // Fechar modal
-    closeImageModal.addEventListener('click', () => {
-        imageModal.classList.remove('visible');
-        modalImg.src = '';
-    });
-
-    // Clicar fora da imagem também fecha o modal
-    imageModal.addEventListener('click', (e) => {
-        if (e.target === imageModal) {
-            imageModal.classList.remove('visible');
-            modalImg.src = '';
-        }
-    });
 });
