@@ -11,6 +11,8 @@ export const STRATEGIES = {
         potentialPhases: [
             {
                 title: "Fase 1: Contexto e Zonas de Interesse (Diário ou 4h)",
+                exampleImageUrl: "pic/fib_val_breakout_f1.png", 
+
                 checks: [
                     { id: "pot-pi-tendencia", label: "Identificar tendência", required: false },
                     { id: "pot-pi-val-marcado", label: "Marcar VAL desde o <strong> topo até à base </strong> na correção principal", required: true },
@@ -22,6 +24,8 @@ export const STRATEGIES = {
         armedPhases: [
             {
                 title: "Fase 2: Confirmação e Gatilho (1h ou 15min.)",
+                exampleImageUrl: "pic/fib_val_breakout_f2.png", 
+                
                 checks: [
                     { id: "armed-pi-fibo-ext-marcado", label: "Do <strong> topo até à base da correção antes da entrada</strong>, marcar alvos com <strong> extensões de Fibonacci: 1.272 / 1.414 / 1.618</strong>", required: true },
                     { id: "armed-pi-volume-ok", label: "Volume da subida <strong> é maior </strong> que o volume da correção (análise com Date Range).", required: true },
@@ -36,7 +40,6 @@ export const STRATEGIES = {
                 title: "Fase 3: Registo dos Alvos de Gestão",
                 // Nota: Os campos de Entrada, Stop Loss e Quantidade virão do GESTAO_PADRAO automaticamente.
                 inputs: [
-                    // Alterei para um check, pois parece fazer mais sentido do que um campo de texto aqui.
                     { id: "exec-pi-alarmes-alvo", label: "Alarmes colocados em cada alvo para gestão ativa (1.272 / 1.414 / 1.618)?", type: "checkbox", required: true }
                 ]
             }
