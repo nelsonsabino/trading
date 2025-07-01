@@ -67,10 +67,7 @@ header nav { margin-top: 1.5rem; display: flex; justify-content: center; align-i
 .modal-content form button[type="submit"] { width: 100%; padding: 14px; margin-top: 1.5rem; font-size: 1.1rem; font-weight: 600; background-color: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; transition: background-color 0.2s; }
 .modal-content form button[type="submit"]:hover { background-color: #218838; }
 
-/* --- LIGHTBOX --- */
-#image-lightbox { align-items: center; justify-content: center; }
-#lightbox-image { max-width: 90%; max-height: 90vh; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
-#close-lightbox-btn { color: #fff; font-size: 3rem; }
+
 
 /* --- ESTILOS PARA EXEMPLOS NOS MODAIS --- */
 .example-image-container { margin-bottom: 1.5rem; border: 1px solid #dee2e6; border-radius: 8px; padding: 0.5rem; }
