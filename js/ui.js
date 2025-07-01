@@ -1,9 +1,33 @@
-// js/ui.js 
+// js/ui.js (VERSÃO COM ÍCONES E MELHORIAS VISUAIS)
 
 import { STRATEGIES } from './strategies.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openImageModal } from './modals.js';
 import { loadAndOpenForEditing } from './handlers.js';
+
+/**
+ * Função inteligente que escolhe um ícone com base em palavras-chave no label.
+ * @param {string} labelText - O texto do label do item da checklist.
+ * @returns {string} - A classe do ícone Font Awesome (ex: 'fa-solid fa-chart-line').
+ */
+function getIconForLabel(labelText) {
+    const text = labelText.toLowerCase();
+    if (text.includes('tendência')) return 'fa-solid fa-chart-line';
+    if (text.includes('rsi')) return 'fa-solid fa-wave-square';
+    if (text.includes('stochastic') || text.includes('estocástico')) return 'fa-solid fa-arrows-down-to-line';
+    if (text.includes('suporte')) return 'fa-solid fa-arrow-down';
+    if (text.includes('resistência')) return 'fa-solid fa-arrow-up';
+    if (text.includes('fibo')) return 'fa-solid fa-ruler-vertical';
+    if (text.includes('volume')) return 'fa-solid fa-database';
+    if (text.includes('ema')) return 'fa-solid fa-chart-simple';
+    if (text.includes('alarme')) return 'fa-solid fa-bell';
+    if (text.includes('preço')) return 'fa-solid fa-dollar-sign';
+    if (text.includes('candle')) return 'fa-solid fa-bars-staggered';
+    if (text.includes('timeframe')) return 'fa-solid fa-clock';
+    if (text.includes('val ')) return 'fa-solid fa-magnet';
+    if (text.includes('alvo')) return 'fa-solid fa-crosshairs';
+    return 'fa-solid fa-check'; // Ícone padrão
+}
 
 function createChecklistItem(check, data) {
     const isRequired = check.required === false ? '' : 'required';
@@ -11,35 +35,56 @@ function createChecklistItem(check, data) {
     const isChecked = data && data[check.id] ? 'checked' : '';
     const item = document.createElement('div');
     item.className = 'checklist-item';
-    item.innerHTML = `<input type="checkbox" id="${check.id}" ${isChecked} ${isRequired}><label for="${check.id}">${labelText}</label>`;
+    
+    // Adiciona o ícone e o input de checkbox
+    item.innerHTML = `
+        <i class="${getIconForLabel(check.label)}"></i>
+        <input type="checkbox" id="${check.id}" ${isChecked} ${isRequired}>
+        <label for="${check.id}">${labelText}</label>
+    `;
     return item;
 }
+
 function createInputItem(input, data) {
     const item = document.createElement('div');
-    item.className = 'input-item';
+    // Usamos uma classe genérica para o estilo
+    item.className = 'input-item-styled'; 
     const isRequired = input.required === false ? '' : 'required';
     const labelText = input.required === false ? input.label : `${input.label} <span class="required-asterisk">*</span>`;
-    let inputHtml = `<label for="${input.id}">${labelText}</label>`;
     const value = data && data[input.id] ? data[input.id] : '';
+
+    let fieldHtml = '';
     if (input.type === 'select') {
         const optionsHtml = input.options.map(opt => `<option value="${opt}" ${value === opt ? 'selected' : ''}>${opt}</option>`).join('');
-        inputHtml += `<select id="${input.id}" ${isRequired}><option value="">-- Selecione --</option>${optionsHtml}</select>`;
+        fieldHtml = `<select id="${input.id}" ${isRequired} class="input-item-field"><option value="">-- Selecione --</option>${optionsHtml}</select>`;
     } else {
-        inputHtml += `<input type="${input.type}" id="${input.id}" value="${value}" step="any" ${isRequired}>`;
+        fieldHtml = `<input type="${input.type}" id="${input.id}" value="${value}" step="any" ${isRequired} class="input-item-field" placeholder="${input.placeholder || ''}">`;
     }
-    item.innerHTML = inputHtml;
+
+    // Estrutura com ícone e um div para o label e o input, para melhor controlo do layout
+    item.innerHTML = `
+        <i class="${getIconForLabel(input.label)}"></i>
+        <div style="flex-grow: 1;">
+            <label for="${input.id}">${labelText}</label>
+            ${fieldHtml}
+        </div>
+    `;
     return item;
 }
+
 function createRadioGroup(radioInfo, data) {
     const group = document.createElement('div');
     group.className = 'radio-group';
-    group.innerHTML = `<label><strong>${radioInfo.label}</strong></label>`;
+    group.innerHTML = `<h4><i class="fa-solid fa-bullseye" style="margin-right: 10px; color: #007bff;"></i><strong>${radioInfo.label}</strong></h4>`;
     const checkedValue = data && data[radioInfo.name];
     radioInfo.options.forEach(opt => {
         const isChecked = checkedValue === opt.id ? 'checked' : '';
         const item = document.createElement('div');
-        item.className = 'checklist-item';
-        item.innerHTML = `<input type="radio" id="${opt.id}" name="${radioInfo.name}" value="${opt.id}" ${isChecked} required><label for="${opt.id}">${opt.label}</label>`;
+        item.className = 'checklist-item'; // Reutiliza o novo estilo!
+        item.innerHTML = `
+            <i class="${getIconForLabel(opt.label)}"></i>
+            <input type="radio" id="${opt.id}" name="${radioInfo.name}" value="${opt.id}" ${isChecked} required>
+            <label for="${opt.id}">${opt.label}</label>`;
         group.appendChild(item);
     });
     return group;
@@ -66,6 +111,7 @@ export function generateDynamicChecklist(container, phases, data = {}) {
         container.appendChild(phaseDiv);
     });
 }
+
 export function populateStrategySelect() {
     if (!addModal.strategySelect) return;
     addModal.strategySelect.innerHTML = '<option value="">-- Selecione --</option>';
@@ -76,6 +122,7 @@ export function populateStrategySelect() {
         addModal.strategySelect.appendChild(option);
     }
 }
+
 export function createTradeCard(trade) {
     const card = document.createElement('div');
     card.className = 'trade-card';
@@ -119,6 +166,7 @@ export function createTradeCard(trade) {
     card.querySelector('.card-edit-btn').addEventListener('click', (e) => { e.stopPropagation(); loadAndOpenForEditing(trade.id); });
     return card;
 }
+
 export function displayTrades(trades) {
     if (!potentialTradesContainer) return;
     potentialTradesContainer.innerHTML = '<p class="empty-state-message">Nenhuma oportunidade potencial.</p>';
@@ -126,7 +174,6 @@ export function displayTrades(trades) {
     liveTradesContainer.innerHTML = '<p class="empty-state-message">Nenhuma operação ativa.</p>';
     let potentialCount = 0, armedCount = 0, liveCount = 0;
     trades.forEach(trade => {
-        // CORREÇÃO: Removida a chamada dupla a createTradeCard
         const card = createTradeCard(trade); 
         if (trade.data.status === 'POTENTIAL') { if (potentialCount === 0) potentialTradesContainer.innerHTML = ''; potentialTradesContainer.appendChild(card); potentialCount++; }
         else if (trade.data.status === 'ARMED') { if (armedCount === 0) armedTradesContainer.innerHTML = ''; armedTradesContainer.appendChild(card); armedCount++; }
