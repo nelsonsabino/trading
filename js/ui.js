@@ -1,4 +1,4 @@
-// js/ui.js (Corrigido)
+// js/ui.js 
 
 import { STRATEGIES } from './strategies.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
