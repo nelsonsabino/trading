@@ -1,4 +1,4 @@
-// js/handlers.js (Corrigido)
+// js/handlers.js 
 
 // CORREÇÃO: Importações separadas e corretas
 import { addModal } from './dom-elements.js';
