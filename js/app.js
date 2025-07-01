@@ -295,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- LÓGICA DA VERSÃO ---
-    const APP_VERSION = '2.5';
+    const APP_VERSION = '2.7';
     const versionDisplay = document.getElementById('app-version-display');
     // NOTE: Se o script de versão no index.html ainda estiver lá, ele irá sobrepor este.
     // O ideal é ter apenas uma única forma de definir e exibir a versão.
