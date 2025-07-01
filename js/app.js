@@ -1,13 +1,18 @@
-// js/app.js - VERSÃO 2.5 (Consolidada e Corrigida)
+// js/app.js - Versão 2.7 (com ui-helpers importado)
 
 import { GESTAO_PADRAO } from './config.js';
 import { STRATEGIES } from './strategies.js';
 import { listenToTrades, getTrade, addTrade, updateTrade, closeTradeAndUpdateBalance } from './firebase-service.js';
+
+// Importar todos os seletores DOM
 import { 
     addModal, armModal, execModal, closeModalObj, 
     potentialTradesContainer, armedTradesContainer, liveTradesContainer,
     imageModal, modalImg, closeImageModalBtn
 } from './dom-elements.js';
+
+// NOVO: Importar funções de criação de elementos UI
+import { createChecklistItem, createInputItem, createRadioGroup } from './ui-helpers.js';
 
 
 
