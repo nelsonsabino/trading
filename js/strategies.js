@@ -71,6 +71,8 @@ export const STRATEGIES = {
     armedPhases: [
         {
             title: "Fase 2: Validação do Pullback e Confluência",
+            exampleImageUrl: "pic/zonas_valor_4h.png", 
+            
             checks: [
                 { id: "armed-mvr-pullback", label: "Preço fez <strong>pullback</strong> até à zona do VAL ou POC.", required: true },
                 { id: "armed-mvr-volume", label: "<strong>Volume decrescente</strong> na correção (comparado com a subida anterior).", required: true },
