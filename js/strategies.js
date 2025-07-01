@@ -107,7 +107,7 @@ export const STRATEGIES = {
     /* ------------------------------------------------------------------------ */    
                /* ------------ PREÇO EM SUPORTE ------------ */
     /* ------------------------------------------------------------------------ */           
-    
+/*    
     'preco-suporte': {
         name: "Preço em suporte com confluencias",
         potentialPhases: [
