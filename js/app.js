@@ -1,4 +1,4 @@
-// js/app.js - Versão Final Corrigida
+// js/app.js - 
 
 import { GESTAO_PADRAO } from './config.js';
 import { STRATEGIES } from './strategies.js';
@@ -15,12 +15,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const armModal = { container: document.getElementById('arm-trade-modal'), form: document.getElementById('arm-trade-form'), closeBtn: document.getElementById('close-arm-trade-modal-btn'), assetNameSpan: document.getElementById('arm-trade-asset-name'), strategyNameSpan: document.getElementById('arm-trade-strategy-name'), checklistContainer: document.getElementById('arm-checklist-container')};
     const execModal = { container: document.getElementById('execution-modal'), form: document.getElementById('execution-form'), closeBtn: document.getElementById('close-execution-modal-btn'), assetNameSpan: document.getElementById('execution-asset-name'), strategyNameSpan: document.getElementById('execution-strategy-name'), checklistContainer: document.getElementById('execution-checklist-container') };
     const closeModalObj = { container: document.getElementById('close-trade-modal'), form: document.getElementById('close-trade-form'), closeBtn: document.getElementById('close-close-trade-modal-btn'), assetNameSpan: document.getElementById('close-trade-asset-name'), exitPriceInput: document.getElementById('exit-price'), pnlInput: document.getElementById('final-pnl') };
-    const lightbox = { container: document.getElementById('image-lightbox'), image: document.getElementById('lightbox-image'), closeBtn: document.getElementById('close-lightbox-btn') };
+    // O seletor do lightbox foi removido, pois já não é necessário.
     const potentialTradesContainer = document.getElementById('potential-trades-container');
     const armedTradesContainer = document.getElementById('armed-trades-container');
     const liveTradesContainer = document.getElementById('live-trades-container');
 
-    // --- 5. FUNÇÕES DE CONTROLO DE MODAIS E LIGHTBOX ---
+    // --- 5. FUNÇÕES DE CONTROLO DE MODAIS ---
+    // As funções openLightbox e closeLightbox foram removidas.
     function openAddModal() { if(addModal.container) addModal.container.style.display = 'flex'; }
     function closeAddModal() { if(addModal.container) { addModal.container.style.display = 'none'; addModal.form.reset(); addModal.checklistContainer.innerHTML = ''; currentTrade = {}; } }
     function openArmModal(trade) { currentTrade = { id: trade.id, data: trade.data }; armModal.assetNameSpan.textContent = trade.data.asset; armModal.strategyNameSpan.textContent = trade.data.strategyName; generateDynamicChecklist(armModal.checklistContainer, STRATEGIES[trade.data.strategyId]?.armedPhases, trade.data.armedSetup); if(armModal.container) armModal.container.style.display = 'flex'; }
@@ -29,8 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeExecModal() { if(execModal.container) { execModal.container.style.display = 'none'; execModal.form.reset(); currentTrade = {}; } }
     function openCloseTradeModal(trade) { currentTrade = { id: trade.id, data: trade.data }; closeModalObj.assetNameSpan.textContent = trade.data.asset; if(closeModalObj.container) closeModalObj.container.style.display = 'flex'; }
     function closeCloseTradeModal() { if(closeModalObj.container) { closeModalObj.container.style.display = 'none'; closeModalObj.form.reset(); currentTrade = {}; } }
-    function openLightbox(imageUrl) { if (lightbox.container && lightbox.image) { lightbox.image.src = imageUrl; lightbox.container.style.display = 'flex'; } }
-    function closeLightbox() { if (lightbox.container) lightbox.container.style.display = 'none'; }
 
     // --- 6. FUNÇÕES DE GERAÇÃO DE UI (Interface do Utilizador) ---
     function createChecklistItem(check, data) {
@@ -81,7 +80,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const exampleContainer = document.createElement('div');
                 exampleContainer.className = 'example-image-container';
                 exampleContainer.innerHTML = `<p>Exemplo Visual:</p><img src="${phase.exampleImageUrl}" alt="Exemplo para ${phase.title}">`;
-                exampleContainer.querySelector('img').addEventListener('click', (e) => { e.stopPropagation(); openLightbox(phase.exampleImageUrl); });
+                // ALTERAÇÃO: Agora abre numa nova aba.
+                exampleContainer.querySelector('img').addEventListener('click', (e) => { 
+                    e.stopPropagation(); 
+                    window.open(phase.exampleImageUrl, '_blank');
+                });
                 phaseDiv.appendChild(exampleContainer);
             }
             const titleEl = document.createElement('h4');
@@ -114,20 +117,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if (key) armedImageUrl = trade.data.armedSetup[key];
         }
         const imageUrlToShow = armedImageUrl || potentialImageUrl;
-        
         if (imageUrlToShow) {
             const img = document.createElement('img');
             img.src = imageUrlToShow;
             img.className = 'card-screenshot';
             img.alt = `Gráfico de ${trade.data.asset}`;
-            // CORREÇÃO: Adicionando o event listener diretamente, como provado no teste.js
-            img.addEventListener('click', (e) => {
-                e.stopPropagation();
-                openLightbox(imageUrlToShow);
+            // ALTERAÇÃO: Agora abre numa nova aba.
+            img.addEventListener('click', (e) => { 
+                e.stopPropagation(); 
+                window.open(imageUrlToShow, '_blank');
             });
             card.appendChild(img);
         }
-        
         let actionButton;
         if (trade.data.status === 'POTENTIAL') {
             actionButton = document.createElement('button');
@@ -149,13 +150,12 @@ document.addEventListener('DOMContentLoaded', () => {
             actionButton.textContent = 'Fechar Trade';
             actionButton.addEventListener('click', () => openCloseTradeModal(trade));
         }
-        
         if (actionButton) card.appendChild(actionButton);
         card.querySelector('.card-edit-btn').addEventListener('click', (e) => { e.stopPropagation(); loadAndOpenForEditing(trade.id); });
-        
         return card;
     }
     function displayTrades(trades) {
+        if (!potentialTradesContainer) return;
         potentialTradesContainer.innerHTML = '<p class="empty-state-message">Nenhuma oportunidade potencial.</p>';
         armedTradesContainer.innerHTML = '<p class="empty-state-message">Nenhum setup armado.</p>';
         liveTradesContainer.innerHTML = '<p class="empty-state-message">Nenhuma operação ativa.</p>';
@@ -222,6 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await updateTrade(currentTrade.id, { status: "LIVE", executionDetails: executionData, dateExecuted: new Date() });
         closeExecModal();
     }
+    // CORREÇÃO: Função refatorada para usar o firebase-service, como acordado.
     async function handleCloseSubmit(e) {
         e.preventDefault();
         const pnlValue = parseFloat(document.getElementById('final-pnl').value);
@@ -290,10 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
     closeModalObj.container.addEventListener('click', e => { if (e.target.id === 'close-trade-modal') closeCloseTradeModal(); });
     closeModalObj.form.addEventListener('submit', handleCloseSubmit);
     closeModalObj.exitPriceInput.addEventListener('input', calculatePnL);
-    lightbox.closeBtn.addEventListener('click', closeLightbox);
-    lightbox.container.addEventListener('click', (e) => { if (e.target.id === 'image-lightbox') closeLightbox(); });
-
-    // CORREÇÃO: O código de delegação de eventos foi removido daqui, pois a solução está no clique direto na função createTradeCard.
+    // As linhas do lightbox foram removidas daqui.
 
     listenToTrades(displayTrades);
     populateStrategySelect();
