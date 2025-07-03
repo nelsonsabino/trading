@@ -148,15 +148,13 @@
     </footer>    
 
 
-
-<div id="image-modal" class="modal-overlay">
-    <div class="modal-content" style="max-width: 90%; max-height: 90%; padding: 0; position: relative;">
-        <span id="close-image-modal" style="position: absolute; top: 10px; right: 15px; font-size: 2.5rem; color: #adb5bd; font-weight: 300; cursor: pointer;">×</span>
-        <img id="modal-image" src="" alt="Imagem ampliada" style="max-width: 100%; max-height: 90vh; border-radius: 8px; display: block; margin: auto;">
+     
+    <div id="image-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 90%; max-height: 90%; padding: 0; position: relative;">
+            <span id="close-image-modal" style="position: absolute; top: 10px; right: 15px; font-size: 2.5rem; color: #adb5bd; font-weight: 300; cursor: pointer;">×</span>
+            <img id="modal-image" src="" alt="Imagem ampliada" style="max-width: 100%; max-height: 90vh; border-radius: 8px; display: block; margin: auto;">
+        </div>
     </div>
-</div>
-
-
 
     <!-- 1. Supabase Client SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -167,9 +165,9 @@
     <!-- 3. NOVO SCRIPT INDEPENDENTE PARA OS ALARMES -->
     <script type="module" src="js/alarms.js"></script>
 
-</body>
-</html>
-    
-    
+    <footer>
+        <p id="app-version-display"></p>
+    </footer>    
+
 </body>
 </html>
