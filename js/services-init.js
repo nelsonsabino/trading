@@ -6,8 +6,7 @@ const { createClient } = window.supabase;
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 console.log("Cliente Supabase inicializado.");
 
-// --- INICIALIZAÇÃO DA ONESIGNAL ---
-let oneSignalPlayerId = null;
+
 
 export function initializeServices() {
     window.OneSignal = window.OneSignal || [];
@@ -29,5 +28,4 @@ export function initializeServices() {
     console.log("Serviços OneSignal e Supabase prontos para serem iniciados.");
 }
 
-// Função para obter o ID do jogador
-export const getPlayerId = () => oneSignalPlayerId;
+
