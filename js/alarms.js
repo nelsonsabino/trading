@@ -1,4 +1,4 @@
-// alarms.js (versão com polling para playerId)
+// alarms.js 
 
 console.log("1. Ficheiro alarms.js foi carregado.");
 
@@ -40,10 +40,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const alarmForm = document.getElementById('alarm-form');
   const feedbackDiv = document.getElementById('alarm-feedback');
 
-  if (!alarmForm) {
-    console.error("ERRO: Formulário de alarme não encontrado no DOM.");
-    return;
-  }
+const forcePromptLink = document.getElementById('force-notification-prompt');
+    if (forcePromptLink) {
+        forcePromptLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log("A forçar o pedido de subscrição da OneSignal...");
+            // Mostra a "caixa" de subscrição da OneSignal
+            window.OneSignal.showSlidedownPrompt();
+        });
+    }
 
   async function createAlarm() {
     console.log("5. Botão 'Definir Alarme' clicado.");
