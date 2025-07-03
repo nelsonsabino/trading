@@ -1,4 +1,4 @@
-// js/app.js - VERSÃO 4.0 
+// js/app.js
 
 // Importações de Módulos
 import { listenToTrades } from './firebase-service.js';
@@ -7,18 +7,14 @@ import { openAddModal, closeAddModal, closeArmModal, closeExecModal, closeCloseT
 import { displayTrades, populateStrategySelect, generateDynamicChecklist } from './ui.js';
 import { handleAddSubmit, handleArmSubmit, handleExecSubmit, handleCloseSubmit, loadAndOpenForEditing } from './handlers.js';
 import { STRATEGIES } from './strategies.js';
-import { initializeServices } from './services-init.js';
-
+import { initializeServices } from './services-init.js'; // Importação do inicializador de serviços
 
 document.addEventListener('DOMContentLoaded', () => {
+
     // Inicia os serviços de Supabase e OneSignal
     initializeServices();
 
-    // --- LÓGICA DOS ALARMES ---
-
-    // --- INICIALIZAÇÃO DA APLICAÇÃO ---
-
-    // Listeners dos Modais
+    // --- Listeners dos Modais ---
     document.getElementById('add-opportunity-btn').addEventListener('click', openAddModal);
     addModal.closeBtn.addEventListener('click', closeAddModal);
     addModal.container.addEventListener('click', e => { if (e.target.id === 'add-opportunity-modal') closeAddModal(); });
@@ -36,6 +32,17 @@ document.addEventListener('DOMContentLoaded', () => {
     closeModalObj.closeBtn.addEventListener('click', closeCloseTradeModal);
     closeModalObj.container.addEventListener('click', e => { if (e.target.id === 'close-trade-modal') closeCloseTradeModal(); });
     closeModalObj.form.addEventListener('submit', handleCloseSubmit);
+
+    // --- CORREÇÃO: LÓGICA PARA MOSTRAR/ESCONDER CAMPOS DE ALARME ---
+    const alarmCheckbox = document.getElementById('create-alarm-checkbox');
+    const alarmFieldsContainer = document.getElementById('alarm-fields-container');
+
+    if (alarmCheckbox && alarmFieldsContainer) {
+        alarmCheckbox.addEventListener('change', () => {
+            // Se a caixa for marcada, mostra os campos; senão, esconde-os.
+            alarmFieldsContainer.style.display = alarmCheckbox.checked ? 'block' : 'none';
+        });
+    }
 
     // Listeners do Modal de Imagem
     if (closeImageModalBtn) {
@@ -69,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- LÓGICA DA VERSÃO ---
-    const APP_VERSION = '4.0';
+    const APP_VERSION = '3.2'; // Mantemos a versão
     const versionDisplay = document.getElementById('app-version-display');
     if (versionDisplay) {
         versionDisplay.textContent = `Versão: ${APP_VERSION}`;
