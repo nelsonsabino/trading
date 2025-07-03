@@ -1,53 +1,38 @@
-// js/alarms.js (VERSÃO FINAL E ROBUSTA)
+// js/alarms.js (VERSÃO FINAL COM TODAS AS CORREÇÕES)
 
-console.log("1. Ficheiro alarms.js foi carregado.");
-
+// CORREÇÃO: Importamos as chaves e o createClient diretamente.
 import { supabaseUrl, supabaseAnonKey, oneSignalAppId } from './config.js';
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-// --- PASSO CHAVE 1: Criamos a "promessa" de que a OneSignal ficará pronta ---
+// --- Inicialização dos Serviços ---
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+console.log("Cliente Supabase (alarms.js) inicializado corretamente.");
+
 let oneSignalReadyResolve;
 const oneSignalReadyPromise = new Promise(resolve => {
     oneSignalReadyResolve = resolve;
 });
 
-
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("2. Evento DOMContentLoaded disparado.");
-
-    // --- Inicialização dos Serviços ---
-    let supabase;
-    try {
-        supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
-        console.log("3. Cliente Supabase inicializado.");
-    } catch (e) {
-        console.error("Falha ao inicializar Supabase.", e);
-    }
-
-    // --- PASSO CHAVE 2: Dizemos à OneSignal para cumprir a promessa quando estiver pronta ---
-    window.OneSignal = window.OneSignal || [];
-    OneSignal.push(function() {
-        // Adicionamos um listener para o evento 'sdkRegistered'
-        OneSignal.on('sdkRegistered', function() {
-            console.log("4. EVENTO RECEBIDO: OneSignal SDK está 100% registado e pronto.");
-            oneSignalReadyResolve(true); // A promessa foi cumprida!
-        });
-        
-        OneSignal.init({
-            appId: oneSignalAppId,
-        });
+window.OneSignal = window.OneSignal || [];
+OneSignal.push(function() {
+    OneSignal.on('sdkRegistered', function() {
+        oneSignalReadyResolve(true);
     });
+    
+    OneSignal.init({
+        appId: oneSignalAppId,
+    });
+});
+console.log("OneSignal (alarms.js) inicializado.");
 
-    // --- Lógica do Formulário ---
+
+// --- Lógica do Formulário de Alarmes ---
+document.addEventListener('DOMContentLoaded', () => {
     const alarmForm = document.getElementById('alarm-form');
     const feedbackDiv = document.getElementById('alarm-feedback');
 
     async function createAlarm() {
-        console.log("6. Botão 'Definir Alarme' clicado. Função createAlarm() iniciada.");
-        
-        // --- PASSO CHAVE 3: Esperamos pela promessa antes de continuar ---
-        console.log("7. A aguardar pela confirmação de que a OneSignal está pronta...");
         await oneSignalReadyPromise;
-        console.log("8. Confirmação recebida! A OneSignal está pronta. A obter playerId...");
 
         const submitButton = alarmForm.querySelector('button[type="submit"]');
         submitButton.disabled = true;
@@ -55,7 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         try {
             const playerId = await window.OneSignal.getUserId();
-            console.log("9. Player ID recebido:", playerId);
 
             if (!playerId) {
                 throw new Error("O seu ID de subscrição não foi encontrado. Por favor, recarregue a página.");
@@ -78,7 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 status: 'active'
             };
 
-            console.log("10. A tentar inserir na Supabase:", alarmData);
             const { error: dbError } = await supabase.from('alarms').insert([alarmData]);
             if (dbError) throw dbError;
 
@@ -96,12 +79,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (alarmForm && supabase) {
-        console.log("5. Formulário e Supabase OK. A adicionar o listener de 'submit'.");
         alarmForm.addEventListener('submit', (e) => {
             e.preventDefault();
             createAlarm();
         });
-    } else {
-        console.error("ERRO GRAVE: Não foi possível encontrar #alarm-form ou a Supabase.");
     }
 });
