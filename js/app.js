@@ -11,6 +11,10 @@ import { initializeServices } from './services-init.js';
 
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Inicia os serviços de Supabase e OneSignal
+    initializeServices();
+
+    // --- LÓGICA DOS ALARMES ---
 
     // --- INICIALIZAÇÃO DA APLICAÇÃO ---
 
