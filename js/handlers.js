@@ -32,54 +32,62 @@ export async function handleAddSubmit(e) {
     };
 
     // 2. Lógica de guardar trade no Firebase (Firestore)
-    const currentTrade = getCurrentTrade();
-    if (currentTrade.id) {
-        tradeData.dateAdded = currentTrade.data.dateAdded;
-        await updateTrade(currentTrade.id, tradeData);
-    } else {
-        tradeData.dateAdded = new Date();
-        await addTrade(tradeData);
+    try {
+        const currentTrade = getCurrentTrade();
+        if (currentTrade.id) {
+            tradeData.dateAdded = currentTrade.data.dateAdded;
+            await updateTrade(currentTrade.id, tradeData);
+        } else {
+            tradeData.dateAdded = new Date();
+            await addTrade(tradeData);
+        }
+    } catch (firebaseError) {
+        console.error("Erro ao guardar o trade no Firebase:", firebaseError);
+        alert("Ocorreu um erro ao guardar os dados do trade.");
+        return; // Interrompe a execução se o trade não puder ser guardado
     }
 
-    // 3. LÓGICA ROBUSTA PARA GUARDAR O ALARME NA SUPABASE
+
+    // 3. Lógica para criar o alarme na Supabase
     const alarmCheckbox = document.getElementById('create-alarm-checkbox');
     if (alarmCheckbox && alarmCheckbox.checked) {
         
-        const alarmPrice = parseFloat(document.getElementById('alarm-price').value);
-        // Validação extra: verifica se o preço é um número válido
-        if (isNaN(alarmPrice) || alarmPrice <= 0) {
-            alert("Por favor, insira um preço de alarme válido.");
-            return; // Impede o fecho do modal se o preço for inválido
-        }
-
-        const playerId = await window.OneSignal.getUserId();
-
-        if (!playerId) {
-            alert("Não foi possível obter a sua subscrição de notificações. Por favor, recarregue a página e tente novamente.");
-            return; 
-        }
-
-        const alarmData = {
-            asset_id: assetName.split('/')[0].toLowerCase().trim(),
-            asset_symbol: assetName.split('/')[0].toUpperCase().trim(),
-            condition: document.getElementById('alarm-condition').value,
-            target_price: alarmPrice, // Usa a variável já validada
-            onesignal_player_id: playerId,
-            status: 'active'
-        };
-
         try {
+            const alarmPrice = parseFloat(document.getElementById('alarm-price').value);
+            if (isNaN(alarmPrice) || alarmPrice <= 0) {
+                alert("Por favor, insira um preço de alarme válido.");
+                return; 
+            }
+
+            const playerId = await window.OneSignal.getUserId();
+            if (!playerId) {
+                alert("Não foi possível obter a sua subscrição de notificações. Por favor, verifique se permitiu as notificações e recarregue a página.");
+                return; 
+            }
+
+            const alarmData = {
+                asset_id: assetName.split('/')[0].toLowerCase().trim(),
+                asset_symbol: assetName.split('/')[0].toUpperCase().trim(),
+                condition: document.getElementById('alarm-condition').value,
+                target_price: alarmPrice,
+                onesignal_player_id: playerId,
+                status: 'active'
+            };
+
             const { error } = await supabase.from('alarms').insert([alarmData]);
-            if (error) throw error;
-            console.log("Alarme guardado com sucesso na Supabase!", alarmData);
-        } catch (error) {
-            console.error("Erro ao guardar o alarme na Supabase:", error);
-            alert("Ocorreu um erro ao guardar o seu alarme.");
-            return; // Impede o fecho do modal se houver erro
+            if (error) {
+                // Lança o erro para ser apanhado pelo bloco catch
+                throw error;
+            }
+
+        } catch (alarmError) {
+            console.error("Erro ao processar e guardar o alarme:", alarmError);
+            alert("Ocorreu um erro ao guardar o seu alarme. O trade foi criado, mas o alarme falhou.");
+            // Não interrompemos aqui, para que o modal possa fechar mesmo que o alarme falhe.
         }
     }
 
-    // 4. Fechar o modal
+    // 4. Fechar o modal (agora executa mesmo que o alarme falhe)
     closeAddModal();
 }
 
@@ -104,7 +112,7 @@ export async function handleExecSubmit(e) {
     const phasesToProcess = [...(strategy.executionPhases || []), GESTAO_PADRAO];
     phasesToProcess.forEach(p => {
         if (p.inputs) p.inputs.forEach(i => executionData[i.id] = document.getElementById(i.id).value);
-        if (p.checks) p.checks.forEach(c => executionData[c.id] = document.getElementById(c.id).checked);
+        if (p.checks) p.checks.forEach(c => checklistData[c.id] = document.getElementById(c.id).checked);
         if (p.radios) {
             const checkedRadio = document.querySelector(`input[name="${p.radios.name}"]:checked`);
             executionData[p.radios.name] = checkedRadio ? checkedRadio.value : null;
