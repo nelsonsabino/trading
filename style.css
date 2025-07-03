@@ -244,22 +244,23 @@ footer {
     padding: 2rem;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    margin-bottom: 2rem;
+    margin: 2rem auto;
+    max-width: 1400px;
 }
 .alarm-creator-section h2 {
-    border-bottom: none; /* Remove a borda padrão para um look mais limpo */
+    border-bottom: none;
     margin-bottom: 1.5rem;
     text-align: center;
 }
 .alarm-form-standalone .form-row {
     display: flex;
     gap: 1.5rem;
-    align-items: flex-end; /* Alinha os inputs pela base */
-    flex-wrap: wrap; /* Permite que quebre em ecrãs pequenos */
+    align-items: flex-end;
+    flex-wrap: wrap;
     margin-bottom: 1.5rem;
 }
 .alarm-form-standalone .input-item {
-    flex: 1; /* Faz com que os itens cresçam para ocupar o espaço */
+    flex: 1;
     min-width: 200px;
 }
 .alarm-form-standalone label {
