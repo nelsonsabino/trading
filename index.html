@@ -4,10 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard de Oportunidades Cripto</title>
-
-    <!-- OneSignal SDK -->
-    <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script> 
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -55,29 +51,6 @@
                     <input type="text" id="asset" name="asset" required placeholder="Ex: SOL/USDT">
                 </div>
                 <div id="dynamic-checklist-container"></div>
-
-                <!-- CORREÇÃO: Posição correta da Secção de Alarme -->
-                <div class="alarm-section" style="margin-bottom: 1.25rem;">
-                    <div class="checklist-item">
-                        <input type="checkbox" id="create-alarm-checkbox" style="transform: scale(1.4); margin-right: 1.25rem;">
-                        <label for="create-alarm-checkbox"><strong>Criar um Alarme de Preço?</strong></label>
-                    </div>
-                
-                    <div id="alarm-fields-container" style="display: none; margin-top: 1rem; margin-left: 2rem; border-left: 2px solid #007bff; padding-left: 1.5rem;">
-                        <div class="input-item" style="margin-bottom: 1rem;">
-                            <label for="alarm-condition">Quando o preço estiver:</label>
-                            <select id="alarm-condition" class="input-item-field">
-                                <option value="above">Acima de</option>
-                                <option value="below">Abaixo de</option>
-                            </select>
-                        </div>
-                        <div class="input-item" style="margin-bottom: 0;">
-                            <label for="alarm-price">Preço Alvo (em USD):</label>
-                            <input type="number" id="alarm-price" step="any" placeholder="Ex: 180.50" class="input-item-field">
-                        </div>
-                    </div>
-                </div>
-
                 <div class="input-item">
                     <label for="image-url">Link da Imagem do Gráfico (TradingView):</label>
                     <input type="text" id="image-url" placeholder="Cole aqui o link da imagem...">
@@ -92,69 +65,22 @@
         </div>
     </div>
 
-    <!-- Modal de Armar Trade -->
-    <div id="arm-trade-modal" class="modal-overlay">
-        <div class="modal-content">
-            <span id="close-arm-trade-modal-btn">×</span>
-            <h3>Validar e Armar Setup: <span id="arm-trade-asset-name"></span></h3>
-            <p>Estratégia: <span id="arm-trade-strategy-name"></span></p>
-            <form id="arm-trade-form">
-                <div id="arm-checklist-container"></div>
-                <button type="submit">ARMAR TRADE</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal de Execução -->
-    <div id="execution-modal" class="modal-overlay">
-        <div class="modal-content">
-            <span id="close-execution-modal-btn">×</span>
-            <h3>Executar Trade: <span id="execution-asset-name"></span></h3>
-            <p>Estratégia: <span id="execution-strategy-name"></span></p>
-            <form id="execution-form">
-                <div id="execution-checklist-container"></div>
-                <button type="submit">EXECUTAR TRADE</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal de Fecho de Trade -->
-    <div id="close-trade-modal" class="modal-overlay">
-        <div class="modal-content">
-            <span id="close-close-trade-modal-btn">×</span>
-            <h3>Fechar Operação: <span id="close-trade-asset-name"></span></h3>
-            <form id="close-trade-form">
-                <div class="input-item"><label for="exit-price">Preço de Saída:</label><input type="number" id="exit-price" step="any" required></div>
-                <div class="input-item"><label for="final-pnl">Resultado Final (P&L em $):</label>
-                    <input type="number" id="final-pnl" step="any" required placeholder="Insire o lucro/prejuízo. Ex: 150 ou -50"></div>
-                <div class="input-item"><label for="close-reason">Motivo do Fecho:</label><select id="close-reason" required><option value="">-- Seleciona o motivo --</option><option value="take-profit">Atingiu Take Profit</option><option value="stop-loss">Atingiu Stop Loss</option><option value="manual-profit">Saída Manual (Lucro)</option><option value="manual-loss">Saída Manual (Prejuízo)</option><option value="breakeven">Saída no Ponto de Entrada (Break-Even)</option></select></div>
-                <div class="input-item"><label for="final-notes">Notas Finais / Lição Aprendida:</label><textarea id="final-notes" placeholder="Ex: Gestão de risco correta..."></textarea></div>
-                <div class="input-item"><label for="exit-screenshot-url">URL do Printscreen de Saída (Opcional):</label><input type="text" id="exit-screenshot-url" placeholder="Cole aqui o link do GitHub"></div>
-                <button type="submit">CONFIRMAR E FECHAR TRADE</button>
-            </form>
-        </div>
-    </div>
-
+    <!-- Outros Modais (Armar, Executar, Fechar) -->
+    <div id="arm-trade-modal" class="modal-overlay"> ... </div>
+    <div id="execution-modal" class="modal-overlay"> ... </div>
+    <div id="close-trade-modal" class="modal-overlay"> ... </div>
+     
     <div id="image-modal" class="modal-overlay">
         <div class="modal-content" style="max-width: 90%; max-height: 90%; padding: 0; position: relative;">
             <span id="close-image-modal" style="position: absolute; top: 10px; right: 15px; font-size: 2.5rem; color: #adb5bd; font-weight: 300; cursor: pointer;">×</span>
             <img id="modal-image" src="" alt="Imagem ampliada" style="max-width: 100%; max-height: 90vh; border-radius: 8px; display: block; margin: auto;">
         </div>
     </div>
-
-    <!-- CORREÇÃO: Ordem correta dos scripts -->
-    <!-- 1. Supabase Client SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <!-- 2. Script para inicializar os serviços -->
-    <script type="module" src="js/services-init.js"></script>
-
-    <!-- 3. O SEU SCRIPT PRINCIPAL (DEVE SER O ÚLTIMO) -->
     <script type="module" src="js/app.js"></script>
 
     <footer>
         <p id="app-version-display"></p>
-    </footer>
-
+    </footer>    
 </body>
 </html>
