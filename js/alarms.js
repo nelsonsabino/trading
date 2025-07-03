@@ -1,115 +1,98 @@
-// alarms.js
+// alarms.js (versão com polling para playerId)
 
 console.log("1. Ficheiro alarms.js foi carregado.");
 
-// --- IMPORTAR DEPENDÊNCIAS ---
 import { supabaseUrl, supabaseAnonKey, oneSignalAppId } from './config.js';
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-// --- INICIAR SUPABASE ---
+// Inicializar Supabase
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 console.log("2. Cliente Supabase inicializado.");
 
-// --- PREPARAR PROMESSA PARA AGUARDAR O OneSignal ---
-let oneSignalReadyResolve;
-const oneSignalReadyPromise = new Promise(resolve => {
-    oneSignalReadyResolve = resolve;
+// Inicializar OneSignal
+window.OneSignal = window.OneSignal || [];
+OneSignal.push(() => {
+  OneSignal.init({ appId: oneSignalAppId });
+  console.log("3. OneSignal inicializado.");
 });
 
-// --- DOM TOTALMENTE CARREGADO ---
+// Função para esperar pelo playerId com timeout
+function waitForPlayerId(timeout = 30000) {
+  return new Promise((resolve, reject) => {
+    const interval = setInterval(async () => {
+      const id = await OneSignal.getUserId();
+      if (id) {
+        clearInterval(interval);
+        resolve(id);
+      }
+    }, 1000);
+
+    setTimeout(() => {
+      clearInterval(interval);
+      reject(new Error('Timeout a aguardar playerId'));
+    }, timeout);
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("3. Evento DOMContentLoaded disparado.");
+  console.log("4. Evento DOMContentLoaded disparado.");
 
-    // --- INICIALIZAR OneSignal CORRETAMENTE ---
-    window.OneSignal = window.OneSignal || [];
-    OneSignal.push(function () {
-        console.log("4. TESTE: OneSignal push() executado.");
+  const alarmForm = document.getElementById('alarm-form');
+  const feedbackDiv = document.getElementById('alarm-feedback');
 
-        // Inicializa com o App ID
-        OneSignal.init({
-            appId: oneSignalAppId,
-        });
+  if (!alarmForm) {
+    console.error("ERRO: Formulário de alarme não encontrado no DOM.");
+    return;
+  }
 
-        // Quando o SDK estiver registado
-        OneSignal.on('sdkRegistered', function () {
-            console.log("5. OneSignal registado com sucesso.");
-            oneSignalReadyResolve(true); // Promessa resolvida
-        });
-    });
+  async function createAlarm() {
+    console.log("5. Botão 'Definir Alarme' clicado.");
 
-    // --- FORMULÁRIO DE ALARME ---
-    const alarmForm = document.getElementById('alarm-form');
-    const feedbackDiv = document.getElementById('alarm-feedback');
+    const submitButton = alarmForm.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    feedbackDiv.textContent = 'A processar...';
+    feedbackDiv.style.color = '#000';
 
-    if (!alarmForm) {
-        console.error("ERRO: Formulário de alarme não encontrado no DOM.");
-        return;
+    try {
+      // Esperar até obter o playerId
+      const playerId = await waitForPlayerId();
+      console.log("playerId obtido:", playerId);
+
+      const assetName = document.getElementById('alarm-asset').value.trim();
+      const condition = document.getElementById('alarm-condition-standalone').value;
+      const targetPrice = parseFloat(document.getElementById('alarm-price-standalone').value);
+
+      if (!assetName || isNaN(targetPrice) || targetPrice <= 0) {
+        throw new Error("Por favor, preencha todos os campos com valores válidos.");
+      }
+
+      const alarmData = {
+        asset_id: assetName.split('/')[0].toLowerCase(),
+        asset_symbol: assetName.split('/')[0].toUpperCase(),
+        condition: condition,
+        target_price: targetPrice,
+        onesignal_player_id: playerId,
+        status: 'active'
+      };
+
+      const { error } = await supabase.from('alarms').insert([alarmData]);
+      if (error) throw error;
+
+      feedbackDiv.textContent = `✅ Alarme para ${assetName} criado com sucesso!`;
+      feedbackDiv.style.color = '#28a745';
+      alarmForm.reset();
+
+    } catch (error) {
+      console.error("Erro ao criar alarme:", error);
+      feedbackDiv.textContent = `Erro: ${error.message}`;
+      feedbackDiv.style.color = '#dc3545';
+    } finally {
+      submitButton.disabled = false;
     }
+  }
 
-    // --- FUNÇÃO PRINCIPAL PARA CRIAR O ALARME ---
-    async function createAlarm() {
-        console.log("6. Botão 'Definir Alarme' clicado.");
-
-        // Esperar que o OneSignal esteja pronto
-        console.log("7. A aguardar OneSignal...");
-        await oneSignalReadyPromise;
-        console.log("8. OneSignal está pronto.");
-
-        const submitButton = alarmForm.querySelector('button[type="submit"]');
-        submitButton.disabled = true;
-        feedbackDiv.textContent = 'A processar...';
-        feedbackDiv.style.color = '#000';
-
-        try {
-            const playerId = await OneSignal.getUserId();
-            console.log("9. Player ID:", playerId);
-
-            if (!playerId) {
-                throw new Error("OneSignal ainda não atribuiu um ID de utilizador. Aceitaste notificações?");
-            }
-
-            const assetInput = document.getElementById('alarm-asset');
-            const conditionInput = document.getElementById('alarm-condition-standalone');
-            const priceInput = document.getElementById('alarm-price-standalone');
-
-            const assetName = assetInput.value.trim();
-            const condition = conditionInput.value;
-            const targetPrice = parseFloat(priceInput.value);
-
-            if (!assetName || isNaN(targetPrice) || targetPrice <= 0) {
-                throw new Error("Preenche todos os campos com valores válidos.");
-            }
-
-            const alarmData = {
-                asset_id: assetName.split('/')[0].toLowerCase(),
-                asset_symbol: assetName.split('/')[0].toUpperCase(),
-                condition: condition,
-                target_price: targetPrice,
-                onesignal_player_id: playerId,
-                status: 'active'
-            };
-
-            console.log("10. A inserir na Supabase:", alarmData);
-
-            const { error } = await supabase.from('alarms').insert([alarmData]);
-            if (error) throw error;
-
-            feedbackDiv.textContent = `✅ Alarme para ${assetName} criado com sucesso!`;
-            feedbackDiv.style.color = '#28a745';
-            alarmForm.reset();
-
-        } catch (error) {
-            console.error("❌ ERRO ao criar alarme:", error);
-            feedbackDiv.textContent = `Erro: ${error.message}`;
-            feedbackDiv.style.color = '#dc3545';
-        } finally {
-            submitButton.disabled = false;
-        }
-    }
-
-    // --- EVENTO SUBMIT DO FORMULÁRIO ---
-    alarmForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        createAlarm();
-    });
+  alarmForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    createAlarm();
+  });
 });
