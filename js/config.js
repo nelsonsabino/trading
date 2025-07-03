@@ -35,5 +35,4 @@ export const GESTAO_PADRAO = {
 export const supabaseUrl = 'https://styiycllsahfcioasqpm.supabase.co'; 
 export const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0eWl5Y2xsc2FoZmNpb2FzcXBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE1MzgyMDQsImV4cCI6MjA2NzExNDIwNH0.DLOcuDrnfVDd72BplLF0qSuP05nvgT34f4zKgutHBr4';
 
-// Cole o seu App ID da OneSignal aqui
-export const oneSignalAppId = '7ae34075-a261-402c-8393-047532ba30b1';
+
