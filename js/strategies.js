@@ -2,7 +2,6 @@
 
 export const STRATEGIES = {
 
-    
     /* ------------------------------------------------------------------------ */    
     /* ------------ Fib VAL Breakout ------------ */
     /* ------------------------------------------------------------------------ */ 
@@ -40,74 +39,18 @@ export const STRATEGIES = {
             {
                 title: "Fase 3: Registo dos Alvos de Gestão",
                 // Nota: Os campos de Entrada, Stop Loss e Quantidade virão do GESTAO_PADRAO automaticamente.
-               
-               checks: [
-                    { id: "exec-pi-alarmes-alvo", label: "Alarmes colocados em cada alvo para gestão ativa (1.272 / 1.414 / 1.618)?", required: true }
-                ],
-                
                 inputs: [
-                { id: "exec-pi-ltf", label: "Timeframe de Execução:", type: "select", options: ["15min", "5min"], required: true }                    
-                    
+                    { id: "exec-pi-alarmes-alvo", label: "Alarmes colocados em cada alvo para gestão ativa (1.272 / 1.414 / 1.618)?", type: "checkbox", required: true }
                 ]
             }
         ]
     },
 
 
-
-    /* ------------------------------------------------------------------------ */    
-               /* ------------ momentum-volume ------------ */
-    /* ------------------------------------------------------------------------ */         
-
-
-'momentum-volume-reset': {
-    name: "Momentum com Volume",
-    potentialPhases: [
-        {
-            title: "Fase 1: Contexto e Zonas de Interesse (Timeframe Superior)",
-            exampleImageUrl: "pic/zonas_valor_4h.png", 
-
-            checks: [
-                { id: "pot-mvr-tendencia", label: "Confirmar que o mercado apresenta <strong>mínimos e máximos ascendentes</strong>.", required: true },
-                { id: "pot-mvr-frvp", label: "Aplicar <strong>FRVP</strong> (Fixed Range Volume Profile) para identificar <strong>VAL, POC e VAH</strong>.", required: true },
-                { id: "pot-mvr-suporte", label: "Identificar zonas de <strong>suporte com base no POC e VAL</strong> para reagir a pullbacks.", required: true }
-            ]
-        }
-    ],
-    armedPhases: [
-        {
-            title: "Fase 2: Validação do Pullback e Confluência",
-            exampleImageUrl: "pic/zonas_valor_4h.png", 
-            inputs: [ { id: "armed-id-image-url", label: "Link da Imagem do Gráfico (Fase Armado):", type: "text", required: false } ],            
-            checks: [
-                { id: "armed-mvr-pullback", label: "Preço fez <strong>pullback</strong> até à zona do VAL ou POC.", required: true },
-                { id: "armed-mvr-volume", label: "<strong>Volume decrescente</strong> na correção (comparado com a subida anterior).", required: true },
-                { id: "armed-mvr-reversao", label: "Sinal de <strong>candle de reversão</strong> (ex: martelo, engolfo altista).", required: true },
-                { id: "armed-mvr-hl", label: "Após o impulso, a correção formou um novo <strong>Higher Low (HL)</strong>?", required: false },
-                { id: "armed-mvr-rsi", label: "<strong>RSI</strong> com tendência de alta ou a encontrar suporte.", required: false }
-            ]
-        }
-    ],
-    executionPhases: [
-        {
-            title: "Fase 3: Gatilho de Execução (Timeframe Inferior)",
-            inputs: [
-                { id: "exec-mvr-tf", label: "Timeframe de Execução:", type: "select", options: ["15min", "5min"], required: true }
-            ],
-            checks: [
-                { id: "exec-mvr-stoch-reset", label: "Entrar no próximo <strong>reset completo do Estocástico</strong> no Timeframe de Execução?", required: true }
-            ]
-        }
-    ]
-},
-
-
-    
-
     /* ------------------------------------------------------------------------ */    
                /* ------------ PREÇO EM SUPORTE ------------ */
     /* ------------------------------------------------------------------------ */           
-   
+    
     'preco-suporte': {
         name: "Preço em suporte com confluencias",
         potentialPhases: [

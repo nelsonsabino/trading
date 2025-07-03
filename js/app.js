@@ -1,4 +1,6 @@
-// js/app.js
+// js/app.js - VERSÃO 3.2 
+
+// Importações de Módulos
 import { listenToTrades } from './firebase-service.js';
 import { addModal, armModal, execModal, closeModalObj, imageModal, closeImageModalBtn } from './dom-elements.js';
 import { openAddModal, closeAddModal, closeArmModal, closeExecModal, closeCloseTradeModal, closeImageModal } from './modals.js';
@@ -7,6 +9,9 @@ import { handleAddSubmit, handleArmSubmit, handleExecSubmit, handleCloseSubmit, 
 import { STRATEGIES } from './strategies.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    // --- INICIALIZAÇÃO DA APLICAÇÃO ---
+
     // Listeners dos Modais
     document.getElementById('add-opportunity-btn').addEventListener('click', openAddModal);
     addModal.closeBtn.addEventListener('click', closeAddModal);
@@ -57,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadAndOpenForEditing(tradeIdToEdit);
     }
 
-    // LÓGICA DA VERSÃO
+    // --- LÓGICA DA VERSÃO ---
     const APP_VERSION = '3.2';
     const versionDisplay = document.getElementById('app-version-display');
     if (versionDisplay) {

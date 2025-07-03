@@ -1,9 +1,10 @@
-// js/handlers.js
+// js/handlers.js 
 
-// Importações de Módulos
+// CORREÇÃO: Importações separadas e corretas
 import { addModal } from './dom-elements.js';
 import { STRATEGIES } from './strategies.js';
 import { GESTAO_PADRAO } from './config.js';
+
 import { getTrade, addTrade, updateTrade, closeTradeAndUpdateBalance } from './firebase-service.js';
 import { getCurrentTrade, setCurrentTrade } from './state.js';
 import { closeAddModal, closeArmModal, closeExecModal, closeCloseTradeModal, openAddModal, openArmModal, openExecModal } from './modals.js';
