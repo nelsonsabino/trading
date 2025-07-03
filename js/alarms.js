@@ -1,64 +1,72 @@
-// js/alarms.js (VERSÃO DE SUPER-DIAGNÓSTICO)
+// js/alarms.js (VERSÃO FINAL E ROBUSTA)
 
 console.log("1. Ficheiro alarms.js foi carregado.");
 
 import { supabaseUrl, supabaseAnonKey, oneSignalAppId } from './config.js';
 
-function initializeAndRun() {
-    console.log("3. A função initializeAndRun() foi chamada (após o DOM estar pronto).");
+// --- PASSO CHAVE 1: Criamos a "promessa" de que a OneSignal ficará pronta ---
+let oneSignalReadyResolve;
+const oneSignalReadyPromise = new Promise(resolve => {
+    oneSignalReadyResolve = resolve;
+});
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("2. Evento DOMContentLoaded disparado.");
 
     // --- Inicialização dos Serviços ---
     let supabase;
     try {
         supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
-        console.log("4. Cliente Supabase (alarms.js) inicializado.");
+        console.log("3. Cliente Supabase inicializado.");
     } catch (e) {
-        console.error("Falha ao inicializar Supabase em alarms.js", e);
+        console.error("Falha ao inicializar Supabase.", e);
     }
 
+    // --- PASSO CHAVE 2: Dizemos à OneSignal para cumprir a promessa quando estiver pronta ---
     window.OneSignal = window.OneSignal || [];
     OneSignal.push(function() {
+        // Adicionamos um listener para o evento 'sdkRegistered'
+        OneSignal.on('sdkRegistered', function() {
+            console.log("4. EVENTO RECEBIDO: OneSignal SDK está 100% registado e pronto.");
+            oneSignalReadyResolve(true); // A promessa foi cumprida!
+        });
+        
         OneSignal.init({
             appId: oneSignalAppId,
         });
     });
-    console.log("5. OneSignal (alarms.js) inicializado.");
 
-
-    // --- Lógica do Formulário de Alarmes ---
+    // --- Lógica do Formulário ---
     const alarmForm = document.getElementById('alarm-form');
     const feedbackDiv = document.getElementById('alarm-feedback');
-    console.log("6. A procurar formulário #alarm-form:", alarmForm);
 
-    function createAlarm() {
-        console.log("8. Função createAlarm() foi chamada.");
-        window.OneSignal.push(async function() {
-            console.log("9. O código dentro de OneSignal.push() está a ser executado!");
+    async function createAlarm() {
+        console.log("6. Botão 'Definir Alarme' clicado. Função createAlarm() iniciada.");
+        
+        // --- PASSO CHAVE 3: Esperamos pela promessa antes de continuar ---
+        console.log("7. A aguardar pela confirmação de que a OneSignal está pronta...");
+        await oneSignalReadyPromise;
+        console.log("8. Confirmação recebida! A OneSignal está pronta. A obter playerId...");
 
-            const submitButton = alarmForm.querySelector('button[type="submit"]');
-            submitButton.disabled = true;
-            feedbackDiv.textContent = 'A processar...';
-            feedbackDiv.style.color = '#6c757d';
+        const submitButton = alarmForm.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        feedbackDiv.textContent = 'A processar...';
+        
+        try {
+            const playerId = await window.OneSignal.getUserId();
+            console.log("9. Player ID recebido:", playerId);
 
+            if (!playerId) {
+                throw new Error("O seu ID de subscrição não foi encontrado. Por favor, recarregue a página.");
+            }
+            
             const assetName = document.getElementById('alarm-asset').value;
             const condition = document.getElementById('alarm-condition-standalone').value;
             const targetPrice = parseFloat(document.getElementById('alarm-price-standalone').value);
 
             if (!assetName || isNaN(targetPrice) || targetPrice <= 0) {
-                feedbackDiv.textContent = 'Erro: Por favor, preencha todos os campos com valores válidos.';
-                feedbackDiv.style.color = '#dc3545';
-                submitButton.disabled = false;
-                return;
-            }
-            
-            const playerId = await window.OneSignal.getUserId();
-            console.log("10. Player ID recebido:", playerId);
-
-            if (!playerId) {
-                feedbackDiv.textContent = 'Erro: Não foi possível obter a sua subscrição de notificações. Por favor, recarregue a página e aceite as notificações.';
-                feedbackDiv.style.color = '#dc3545';
-                submitButton.disabled = false;
-                return;
+                throw new Error("Por favor, preencha todos os campos com valores válidos.");
             }
 
             const alarmData = {
@@ -69,39 +77,31 @@ function initializeAndRun() {
                 onesignal_player_id: playerId,
                 status: 'active'
             };
-            
-            console.log("11. A tentar inserir na Supabase:", alarmData);
-            try {
-                const { error } = await supabase.from('alarms').insert([alarmData]);
-                if (error) throw error;
-                
-                feedbackDiv.textContent = `Alarme para ${assetName} criado com sucesso!`;
-                feedbackDiv.style.color = '#28a745';
-                alarmForm.reset();
-            } catch (error) {
-                feedbackDiv.textContent = 'Erro ao guardar o alarme na base de dados.';
-                feedbackDiv.style.color = '#dc3545';
-                console.error('Erro detalhado da Supabase:', error);
-            } finally {
-                submitButton.disabled = false;
-            }
-        });
+
+            console.log("10. A tentar inserir na Supabase:", alarmData);
+            const { error: dbError } = await supabase.from('alarms').insert([alarmData]);
+            if (dbError) throw dbError;
+
+            feedbackDiv.textContent = `Alarme para ${assetName} criado com sucesso!`;
+            feedbackDiv.style.color = '#28a745';
+            alarmForm.reset();
+
+        } catch (error) {
+            feedbackDiv.textContent = `Erro: ${error.message}`;
+            feedbackDiv.style.color = '#dc3545';
+            console.error('ERRO DETALHADO NO PROCESSO DE CRIAÇÃO DO ALARME:', error);
+        } finally {
+            submitButton.disabled = false;
+        }
     }
 
     if (alarmForm && supabase) {
-        console.log("7. Formulário e Supabase OK. A adicionar o listener de 'submit'.");
+        console.log("5. Formulário e Supabase OK. A adicionar o listener de 'submit'.");
         alarmForm.addEventListener('submit', (e) => {
             e.preventDefault();
             createAlarm();
         });
     } else {
-        console.error("ERRO GRAVE: Não foi possível encontrar #alarm-form ou a Supabase não foi inicializada.");
+        console.error("ERRO GRAVE: Não foi possível encontrar #alarm-form ou a Supabase.");
     }
-}
-
-// A MUDANÇA PRINCIPAL ESTÁ AQUI:
-// Esperamos que o HTML esteja completamente carregado antes de executar qualquer código.
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("2. Evento DOMContentLoaded disparado. O HTML está pronto.");
-    initializeAndRun();
 });
