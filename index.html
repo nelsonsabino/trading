@@ -24,10 +24,11 @@
         <h2><i class="fa-solid fa-bell-plus" style="margin-right: 10px; color: #007bff;"></i>Criar Novo Alarme de Preço</h2>
         <form id="alarm-form" class="alarm-form-standalone">
             <div class="form-row">
-                <div class="input-item">
-                    <label for="alarm-asset">Ativo</label>
-                    <input type="text" id="alarm-asset" required placeholder="Ex: BTC/USDT">
-                </div>
+               <div class="input-item" style="position: relative;">
+    <label for="alarm-asset">Ativo</label>
+    <input type="text" id="alarm-asset" required placeholder="Comece a escrever (ex: Bitcoin, SOL...)" autocomplete="off">
+    <div id="autocomplete-results" class="autocomplete-results"></div>
+</div>
                 <div class="input-item">
                     <label for="alarm-condition-standalone">Condição</label>
                     <select id="alarm-condition-standalone">
@@ -70,11 +71,11 @@
             <span id="close-modal-btn">×</span>
             <form id="add-opportunity-form">
                 <h3>Adicionar Ativo à Watchlist</h3>
-                <div class="input-item">
+                <">
                     <label for="strategy-select">Estratégia:</label>
                     <select id="strategy-select" name="strategy-select" required></select>
                 </div>
-                <div class="input-item">
+                <">
                     <label for="asset">Ativo:</label>
                     <input type="text" id="asset" name="asset" required placeholder="Ex: SOL/USDT">
                 </div>
