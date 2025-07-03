@@ -236,3 +236,48 @@ footer {
     margin-left: 5px;
     font-size: 1.1em;
 }
+
+
+/* --- ESTILOS PARA O CRIADOR DE ALARMES INDEPENDENTE --- */
+.alarm-creator-section {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+}
+.alarm-creator-section h2 {
+    border-bottom: none; /* Remove a borda padrão para um look mais limpo */
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+.alarm-form-standalone .form-row {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-end; /* Alinha os inputs pela base */
+    flex-wrap: wrap; /* Permite que quebre em ecrãs pequenos */
+    margin-bottom: 1.5rem;
+}
+.alarm-form-standalone .input-item {
+    flex: 1; /* Faz com que os itens cresçam para ocupar o espaço */
+    min-width: 200px;
+}
+.alarm-form-standalone label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+.alarm-form-standalone input, .alarm-form-standalone select {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+.alarm-feedback {
+    margin-top: 1rem;
+    font-weight: 500;
+    text-align: center;
+    min-height: 20px;
+}
