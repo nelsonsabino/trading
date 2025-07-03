@@ -26,6 +26,9 @@ document.addEventListener('DOMContentLoaded', () => {
         OneSignal.on('sdkRegistered', function () {
             console.log("4. OneSignal registado com sucesso.");
             oneSignalReadyResolve(true);
+            OneSignal.push(function () {
+    console.log("TESTE: OneSignal push() executado.");
+
         });
 
         OneSignal.init({
