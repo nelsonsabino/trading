@@ -1,4 +1,4 @@
-// js/alarms.js - Módulo Independente para Gestão de Alarmes
+// js/alarms.js - Módulo Independente para Gestão de Alarmes (VERSÃO CORRIGIDA)
 
 import { supabaseUrl, supabaseAnonKey, oneSignalAppId } from './config.js';
 
@@ -11,6 +11,7 @@ try {
     console.error("Falha ao inicializar Supabase em alarms.js", e);
 }
 
+// Inicializa a OneSignal mas espera pelo evento 'onSdkRegistered'
 window.OneSignal = window.OneSignal || [];
 OneSignal.push(function() {
     OneSignal.init({
@@ -24,10 +25,9 @@ console.log("OneSignal (alarms.js) inicializado.");
 const alarmForm = document.getElementById('alarm-form');
 const feedbackDiv = document.getElementById('alarm-feedback');
 
-if (alarmForm && supabase) {
-    alarmForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
+// A MUDANÇA ESTÁ AQUI: Usamos o método 'push' para garantir que o SDK está pronto
+function createAlarm() {
+    window.OneSignal.push(async function() {
         const submitButton = alarmForm.querySelector('button[type="submit"]');
         submitButton.disabled = true;
         feedbackDiv.textContent = 'A processar...';
@@ -43,8 +43,10 @@ if (alarmForm && supabase) {
             submitButton.disabled = false;
             return;
         }
-
+        
+        // Agora, dentro deste bloco, temos a garantia que getUserId existe.
         const playerId = await window.OneSignal.getUserId();
+
         if (!playerId) {
             feedbackDiv.textContent = 'Erro: Não foi possível obter a sua subscrição de notificações. Por favor, recarregue a página e aceite as notificações.';
             feedbackDiv.style.color = '#dc3545';
@@ -75,5 +77,14 @@ if (alarmForm && supabase) {
         } finally {
             submitButton.disabled = false;
         }
+    });
+}
+
+
+if (alarmForm && supabase) {
+    alarmForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        // Chamamos a nossa nova função que garante a inicialização
+        createAlarm();
     });
 }
