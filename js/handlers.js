@@ -1,15 +1,14 @@
-// js/handlers.js 
+// js/handlers.js
 
-// CORREÇÃO: Importações separadas e corretas
+// Importações de Módulos
 import { addModal } from './dom-elements.js';
 import { STRATEGIES } from './strategies.js';
 import { GESTAO_PADRAO } from './config.js';
-import { supabase, getPlayerId } from './services-init.js'; 
-
 import { getTrade, addTrade, updateTrade, closeTradeAndUpdateBalance } from './firebase-service.js';
 import { getCurrentTrade, setCurrentTrade } from './state.js';
 import { closeAddModal, closeArmModal, closeExecModal, closeCloseTradeModal, openAddModal, openArmModal, openExecModal } from './modals.js';
 import { generateDynamicChecklist } from './ui.js';
+import { supabase } from './services-init.js'; // Importa o cliente Supabase
 
 export async function handleAddSubmit(e) {
     e.preventDefault();
@@ -42,18 +41,21 @@ export async function handleAddSubmit(e) {
         await addTrade(tradeData);
     }
 
-    // 3. NOVO: Lógica para guardar o alarme na Supabase
+    // 3. CORREÇÃO: Lógica para guardar o alarme na Supabase
     const alarmCheckbox = document.getElementById('create-alarm-checkbox');
     if (alarmCheckbox && alarmCheckbox.checked) {
-        const playerId = getPlayerId();
+        
+        // A MUDANÇA ESTÁ AQUI: Pedimos o ID diretamente à OneSignal e esperamos (await)
+        const playerId = await window.OneSignal.getUserId();
+
         if (!playerId) {
-            alert("Por favor, aceite as notificações para poder criar alarmes.");
+            alert("Não foi possível obter a sua subscrição de notificações. Por favor, recarregue a página e tente novamente.");
             return; 
         }
 
         const alarmData = {
-            asset_id: assetName.split('/')[0].toLowerCase().trim(), // ex: "solana"
-            asset_symbol: assetName.split('/')[0].toUpperCase().trim(), // ex: "SOL"
+            asset_id: assetName.split('/')[0].toLowerCase().trim(),
+            asset_symbol: assetName.split('/')[0].toUpperCase().trim(),
             condition: document.getElementById('alarm-condition').value,
             target_price: parseFloat(document.getElementById('alarm-price').value),
             onesignal_player_id: playerId,
@@ -73,7 +75,6 @@ export async function handleAddSubmit(e) {
     // 4. Fechar o modal
     closeAddModal();
 }
-
 
 export async function handleArmSubmit(e) {
     e.preventDefault();
@@ -96,7 +97,7 @@ export async function handleExecSubmit(e) {
     const phasesToProcess = [...(strategy.executionPhases || []), GESTAO_PADRAO];
     phasesToProcess.forEach(p => {
         if (p.inputs) p.inputs.forEach(i => executionData[i.id] = document.getElementById(i.id).value);
-        if (p.checks) p.checks.forEach(c => executionData[c.id] = document.getElementById(c.id).checked);
+        if (p.checks) p.checks.forEach(c => checklistData[c.id] = document.getElementById(c.id).checked);
         if (p.radios) {
             const checkedRadio = document.querySelector(`input[name="${p.radios.name}"]:checked`);
             executionData[p.radios.name] = checkedRadio ? checkedRadio.value : null;
