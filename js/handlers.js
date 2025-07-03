@@ -13,7 +13,7 @@ import { supabase } from './services-init.js'; // Importa o cliente Supabase
 export async function handleAddSubmit(e) {
     e.preventDefault();
     
-    // 1. Recolha de dados do formulário (sem alterações)
+    // 1. Recolha de dados do formulário
     const assetName = document.getElementById('asset').value;
     const strategyId = addModal.strategySelect.value;
     const checklistData = {};
@@ -31,7 +31,7 @@ export async function handleAddSubmit(e) {
         potentialSetup: checklistData
     };
 
-    // 2. Lógica de guardar trade no Firebase (sem alterações)
+    // 2. Lógica de guardar trade no Firebase (Firestore)
     const currentTrade = getCurrentTrade();
     if (currentTrade.id) {
         tradeData.dateAdded = currentTrade.data.dateAdded;
@@ -41,11 +41,17 @@ export async function handleAddSubmit(e) {
         await addTrade(tradeData);
     }
 
-    // 3. CORREÇÃO: Lógica para guardar o alarme na Supabase
+    // 3. LÓGICA ROBUSTA PARA GUARDAR O ALARME NA SUPABASE
     const alarmCheckbox = document.getElementById('create-alarm-checkbox');
     if (alarmCheckbox && alarmCheckbox.checked) {
         
-        // A MUDANÇA ESTÁ AQUI: Pedimos o ID diretamente à OneSignal e esperamos (await)
+        const alarmPrice = parseFloat(document.getElementById('alarm-price').value);
+        // Validação extra: verifica se o preço é um número válido
+        if (isNaN(alarmPrice) || alarmPrice <= 0) {
+            alert("Por favor, insira um preço de alarme válido.");
+            return; // Impede o fecho do modal se o preço for inválido
+        }
+
         const playerId = await window.OneSignal.getUserId();
 
         if (!playerId) {
@@ -57,7 +63,7 @@ export async function handleAddSubmit(e) {
             asset_id: assetName.split('/')[0].toLowerCase().trim(),
             asset_symbol: assetName.split('/')[0].toUpperCase().trim(),
             condition: document.getElementById('alarm-condition').value,
-            target_price: parseFloat(document.getElementById('alarm-price').value),
+            target_price: alarmPrice, // Usa a variável já validada
             onesignal_player_id: playerId,
             status: 'active'
         };
@@ -69,6 +75,7 @@ export async function handleAddSubmit(e) {
         } catch (error) {
             console.error("Erro ao guardar o alarme na Supabase:", error);
             alert("Ocorreu um erro ao guardar o seu alarme.");
+            return; // Impede o fecho do modal se houver erro
         }
     }
 
@@ -97,7 +104,7 @@ export async function handleExecSubmit(e) {
     const phasesToProcess = [...(strategy.executionPhases || []), GESTAO_PADRAO];
     phasesToProcess.forEach(p => {
         if (p.inputs) p.inputs.forEach(i => executionData[i.id] = document.getElementById(i.id).value);
-        if (p.checks) p.checks.forEach(c => checklistData[c.id] = document.getElementById(c.id).checked);
+        if (p.checks) p.checks.forEach(c => executionData[c.id] = document.getElementById(c.id).checked);
         if (p.radios) {
             const checkedRadio = document.querySelector(`input[name="${p.radios.name}"]:checked`);
             executionData[p.radios.name] = checkedRadio ? checkedRadio.value : null;
