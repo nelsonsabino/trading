@@ -7,6 +7,8 @@ import { openAddModal, closeAddModal, closeArmModal, closeExecModal, closeCloseT
 import { displayTrades, populateStrategySelect, generateDynamicChecklist } from './ui.js';
 import { handleAddSubmit, handleArmSubmit, handleExecSubmit, handleCloseSubmit, loadAndOpenForEditing } from './handlers.js';
 import { STRATEGIES } from './strategies.js';
+import { initializeServices } from './services-init.js';
+
 
 document.addEventListener('DOMContentLoaded', () => {
 
