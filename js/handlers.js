@@ -4,6 +4,7 @@
 import { addModal } from './dom-elements.js';
 import { STRATEGIES } from './strategies.js';
 import { GESTAO_PADRAO } from './config.js';
+import { supabase, getPlayerId } from './services-init.js'; 
 
 import { getTrade, addTrade, updateTrade, closeTradeAndUpdateBalance } from './firebase-service.js';
 import { getCurrentTrade, setCurrentTrade } from './state.js';
@@ -12,6 +13,9 @@ import { generateDynamicChecklist } from './ui.js';
 
 export async function handleAddSubmit(e) {
     e.preventDefault();
+    
+    // 1. Recolha de dados do formulário (sem alterações)
+    const assetName = document.getElementById('asset').value;
     const strategyId = addModal.strategySelect.value;
     const checklistData = {};
     STRATEGIES[strategyId].potentialPhases.forEach(p => {
@@ -19,7 +23,7 @@ export async function handleAddSubmit(e) {
         if (p.checks) p.checks.forEach(c => checklistData[c.id] = document.getElementById(c.id).checked);
     });
     const tradeData = {
-        asset: document.getElementById('asset').value,
+        asset: assetName,
         imageUrl: document.getElementById('image-url').value,
         notes: document.getElementById('notes').value,
         strategyId: strategyId,
@@ -27,6 +31,8 @@ export async function handleAddSubmit(e) {
         status: "POTENTIAL",
         potentialSetup: checklistData
     };
+
+    // 2. Lógica de guardar trade no Firebase (sem alterações)
     const currentTrade = getCurrentTrade();
     if (currentTrade.id) {
         tradeData.dateAdded = currentTrade.data.dateAdded;
@@ -35,8 +41,39 @@ export async function handleAddSubmit(e) {
         tradeData.dateAdded = new Date();
         await addTrade(tradeData);
     }
+
+    // 3. NOVO: Lógica para guardar o alarme na Supabase
+    const alarmCheckbox = document.getElementById('create-alarm-checkbox');
+    if (alarmCheckbox && alarmCheckbox.checked) {
+        const playerId = getPlayerId();
+        if (!playerId) {
+            alert("Por favor, aceite as notificações para poder criar alarmes.");
+            return; 
+        }
+
+        const alarmData = {
+            asset_id: assetName.split('/')[0].toLowerCase().trim(), // ex: "solana"
+            asset_symbol: assetName.split('/')[0].toUpperCase().trim(), // ex: "SOL"
+            condition: document.getElementById('alarm-condition').value,
+            target_price: parseFloat(document.getElementById('alarm-price').value),
+            onesignal_player_id: playerId,
+            status: 'active'
+        };
+
+        try {
+            const { error } = await supabase.from('alarms').insert([alarmData]);
+            if (error) throw error;
+            console.log("Alarme guardado com sucesso na Supabase!", alarmData);
+        } catch (error) {
+            console.error("Erro ao guardar o alarme na Supabase:", error);
+            alert("Ocorreu um erro ao guardar o seu alarme.");
+        }
+    }
+
+    // 4. Fechar o modal
     closeAddModal();
 }
+
 
 export async function handleArmSubmit(e) {
     e.preventDefault();
