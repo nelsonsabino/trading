@@ -1,4 +1,4 @@
-// js/alarms.js (VERSÃO COM ALARME DE TOQUE NA EMA)
+// js/alarms.js (VERSÃO COM ALARME COMBO)
 
 import { supabaseUrl, supabaseAnonKey } from './config.js';
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
@@ -9,6 +9,7 @@ let debounceTimer;
 let editingAlarmId = null;
 window.alarmsData = [];
 
+// --- FUNÇÃO PARA BUSCAR E MOSTRAR TODOS OS ALARMES ---
 async function fetchAndDisplayAlarms() {
     const activeTbody = document.getElementById('active-alarms-tbody');
     const triggeredTbody = document.getElementById('triggered-alarms-tbody');
@@ -36,6 +37,8 @@ async function fetchAndDisplayAlarms() {
                 alarmDescription = `RSI(${alarm.rsi_period}) cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} da MA(${alarm.rsi_ma_period}) no ${alarm.indicator_timeframe}`;
             } else if (alarm.alarm_type === 'ema_touch') {
                 alarmDescription = `Preço toca na EMA(${alarm.ema_period}) por ${alarm.condition === 'touch_from_below' ? 'BAIXO' : 'CIMA'} no ${alarm.indicator_timeframe}`;
+            } else if (alarm.alarm_type === 'combo') {
+                alarmDescription = `CONFLUÊNCIA: Toca na EMA(${alarm.ema_period}) E Estocástico(${alarm.combo_period}) < ${alarm.combo_target_price} no ${alarm.indicator_timeframe}`;
             } else {
                 alarmDescription = `Preço ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} USD`;
             }
@@ -73,6 +76,7 @@ async function fetchAndDisplayAlarms() {
     }
 }
 
+// --- FUNÇÃO PARA APAGAR UM ALARME ---
 async function deleteAlarm(alarmId) {
     if (!confirm("Tem a certeza que quer apagar este registo?")) return;
     try {
@@ -83,6 +87,7 @@ async function deleteAlarm(alarmId) {
     }
 }
 
+// --- FUNÇÕES PARA GERIR O MODO DE EDIÇÃO ---
 function enterEditMode(alarm) {
     editingAlarmId = alarm.id;
     selectedCoin = { id: alarm.asset_id, name: alarm.asset_id, symbol: alarm.asset_symbol };
@@ -103,6 +108,11 @@ function enterEditMode(alarm) {
         document.getElementById('ema-condition').value = alarm.condition;
         document.getElementById('ema-period').value = alarm.ema_period;
         document.getElementById('ema-timeframe').value = alarm.indicator_timeframe;
+    } else if (alarmType === 'combo') {
+        document.getElementById('combo-ema-period').value = alarm.ema_period;
+        document.getElementById('combo-stoch-value').value = alarm.combo_target_price;
+        document.getElementById('combo-stoch-period').value = alarm.combo_period;
+        document.getElementById('combo-timeframe').value = alarm.indicator_timeframe;
     } else {
         document.getElementById('alarm-condition-standalone').value = alarm.condition;
         document.getElementById('alarm-price-standalone').value = alarm.target_price;
@@ -122,6 +132,7 @@ function exitEditMode() {
     document.getElementById('cancel-edit-btn').style.display = 'none';
 }
 
+// --- LÓGICA PRINCIPAL QUANDO A PÁGINA CARREGA ---
 document.addEventListener('DOMContentLoaded', () => {
     fetchAndDisplayAlarms();
 
@@ -134,14 +145,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const priceFields = document.getElementById('price-fields');
     const stochasticFields = document.getElementById('stochastic-fields');
     const rsiFields = document.getElementById('rsi-fields');
-    const emaFields = document.getElementById('ema-fields'); // NOVO
+    const emaFields = document.getElementById('ema-fields');
+    const comboFields = document.getElementById('combo-fields'); // NOVO
 
     alarmTypeSelect.addEventListener('change', () => {
         const type = alarmTypeSelect.value;
         priceFields.style.display = type === 'price' ? 'block' : 'none';
         stochasticFields.style.display = type === 'stochastic' ? 'block' : 'none';
         rsiFields.style.display = type === 'rsi_crossover' ? 'block' : 'none';
-        emaFields.style.display = type === 'ema_touch' ? 'block' : 'none'; // NOVO
+        emaFields.style.display = type === 'ema_touch' ? 'block' : 'none';
+        comboFields.style.display = type === 'combo' ? 'block' : 'none'; // NOVO
     });
 
     mainContainer.addEventListener('click', (e) => {
@@ -228,8 +241,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 alarmData.condition = document.getElementById('ema-condition').value;
                 alarmData.indicator_timeframe = document.getElementById('ema-timeframe').value;
                 alarmData.ema_period = period;
+            } else if (alarmType === 'combo') {
+                alarmData.indicator_timeframe = document.getElementById('combo-timeframe').value;
+                alarmData.ema_period = parseInt(document.getElementById('combo-ema-period').value);
+                alarmData.combo_indicator = 'stochastic';
+                alarmData.combo_condition = 'below';
+                alarmData.combo_target_price = parseInt(document.getElementById('combo-stoch-value').value);
+                alarmData.combo_period = parseInt(document.getElementById('combo-stoch-period').value);
             }
-
+            
             let error;
             if (editingAlarmId) {
                 const { error: updateError } = await supabase.from('alarms').update(alarmData).eq('id', editingAlarmId);
