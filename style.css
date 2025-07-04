@@ -176,3 +176,64 @@ footer { text-align: center; padding: 1rem 0; margin-top: 2rem; color: #6c757d; 
     margin: 2rem 0 1rem 0;
     font-size: 1.1em;
 }
+
+/* --- AJUSTES FINAIS PARA TELAS PEQUENAS (MOBILE-FIRST) --- */
+@media (max-width: 768px) {
+
+  /* 1. Reduzir o tamanho da fonte base para todo o site */
+  /* O padrão é 16px. Ao mudar para 14px, todos os textos em 'rem' e 'em'
+     ficarão proporcionalmente menores, condensando a interface. */
+  html {
+    font-size: 14px;
+  }
+
+  /* 2. Reduzir espaçamentos gerais para um look mais "condensado" */
+  header {
+    padding: 1.5rem 1rem;
+    margin-bottom: 1rem;
+  }
+
+  main {
+     /* Já tínhamos esta regra, mas garantimos que está aqui */
+    padding: 0 1rem 1rem 1rem;
+  }
+
+  .alarm-creator-section {
+      margin-top: 1.5rem;
+      margin-bottom: 1.5rem;
+      padding: 1.5rem;
+  }
+  
+  .section-divider {
+      margin: 1.5rem 0;
+  }
+
+  /* 3. Condensar as tabelas */
+  .alarms-table th,
+  .alarms-table td,
+  #trades-table th,
+  #trades-table td {
+    padding: 0.8rem 0.6rem; /* Menos padding vertical e horizontal nas células */
+    font-size: 0.9em; /* Letra da tabela um pouco mais pequena */
+  }
+
+  /* 4. Ajustar títulos e botões */
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+  }
+
+  .btn, .nav-link {
+    padding: 8px 16px; /* Botões um pouco menores */
+    font-size: 0.95rem;
+  }
+  
+  /* 5. Ajustar o formulário de alarmes */
+  .alarm-form-standalone .form-row {
+      gap: 1rem; /* Menos espaço entre os campos quando eles quebram a linha */
+  }
+}
