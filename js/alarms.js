@@ -193,11 +193,33 @@ document.addEventListener('DOMContentLoaded', () => {
                         const item = document.createElement('div');
                         item.className = 'autocomplete-item';
                         item.innerHTML = `<img src="${coin.thumb}" width="20" height="20" style="margin-right: 10px;"> <strong>${coin.name}</strong> (${coin.symbol.toUpperCase()})`;
-                        item.addEventListener('click', () => {
-                            assetInput.value = `${coin.name} (${coin.symbol.toUpperCase()})`;
-                            selectedCoin = coin;
-                            resultsDiv.style.display = 'none';
-                        });
+
+                        
+item.addEventListener('click', async () => {
+    assetInput.value = `${coin.name} (${coin.symbol.toUpperCase()})`;
+    selectedCoin = coin;
+    resultsDiv.style.display = 'none';
+
+    // NOVO: Lógica para buscar e mostrar o preço atual
+    const priceDisplay = document.getElementById('asset-current-price');
+    priceDisplay.textContent = 'A obter preço...';
+
+    try {
+        const binanceSymbol = `${coin.symbol.toUpperCase()}USDT`;
+        const response = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${binanceSymbol}`);
+        if (!response.ok) throw new Error('Par não encontrado na Binance');
+        
+        const data = await response.json();
+        const price = parseFloat(data.price);
+
+        priceDisplay.innerHTML = `Preço Atual: <span style="color: #28a745;">${price.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</span>`;
+    } catch (error) {
+        priceDisplay.textContent = 'Preço não disponível.';
+        console.error("Erro ao buscar preço da Binance:", error.message);
+    }
+});
+
+                        
                         resultsDiv.appendChild(item);
                     });
                     resultsDiv.style.display = 'block';
