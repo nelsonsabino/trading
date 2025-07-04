@@ -1,4 +1,4 @@
-// js/alarms.js (VERSÃO COM ALARMES DE PREÇO E ESTOCÁSTICO)
+// js/alarms.js (VERSÃO COM ALARMES DE PREÇO, ESTOCÁSTICO E RSI-MA)
 
 import { supabaseUrl, supabaseAnonKey } from './config.js';
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
@@ -16,8 +16,8 @@ async function fetchAndDisplayAlarms() {
     if (!activeTbody || !triggeredTbody) return;
 
     try {
-        activeTbody.innerHTML = '<tr><td colspan="5">A carregar...</td></tr>';
-        triggeredTbody.innerHTML = '<tr><td colspan="6">A carregar...</td></tr>';
+        activeTbody.innerHTML = '<tr><td colspan="4">A carregar...</td></tr>';
+        triggeredTbody.innerHTML = '<tr><td colspan="5">A carregar...</td></tr>';
 
         const { data, error } = await supabase.from('alarms').select('*').order('created_at', { ascending: false });
         if (error) throw error;
@@ -29,23 +29,24 @@ async function fetchAndDisplayAlarms() {
 
         for (const alarm of data) {
             const conditionClass = alarm.condition === 'above' ? 'condition-above' : 'condition-below';
-            const conditionText = alarm.condition === 'above' ? 'Acima de' : 'Abaixo de';
+            const conditionText = alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO';
             const formattedDate = new Date(alarm.created_at).toLocaleString('pt-PT');
             const assetDisplay = `${alarm.asset_id} (${alarm.asset_symbol})`;
 
-            // Formatação da descrição do alarme para a tabela
             let alarmDescription = '';
             if (alarm.alarm_type === 'stochastic') {
-                alarmDescription = `Estocástico(${alarm.indicator_period}) no ${alarm.indicator_timeframe}`;
-            } else { // 'price' ou indefinido (para alarmes antigos)
-                alarmDescription = `${conditionText} ${alarm.target_price} USD`;
+                alarmDescription = `Estocástico(${alarm.indicator_period}) ${conditionText} de ${alarm.target_price} no ${alarm.indicator_timeframe}`;
+            } else if (alarm.alarm_type === 'rsi_crossover') {
+                 alarmDescription = `RSI(${alarm.rsi_period}) cruza ${conditionText} da MA(${alarm.rsi_ma_period}) no ${alarm.indicator_timeframe}`;
+            } else {
+                alarmDescription = `Preço ${conditionText} de ${alarm.target_price} USD`;
             }
 
             if (alarm.status === 'active') {
                 activeAlarmsHtml.push(`
                     <tr>
                         <td><strong>${assetDisplay}</strong></td>
-                        <td class="${alarm.alarm_type === 'price' ? conditionClass : ''}">${alarmDescription}</td>
+                        <td class="${conditionClass}">${alarmDescription}</td>
                         <td>${formattedDate}</td>
                         <td>
                             <div class="action-buttons">
@@ -59,7 +60,7 @@ async function fetchAndDisplayAlarms() {
                 triggeredAlarmsHtml.push(`
                     <tr>
                         <td><strong>${assetDisplay}</strong></td>
-                        <td class="${alarm.alarm_type === 'price' ? conditionClass : ''}">${alarmDescription}</td>
+                        <td class="${conditionClass}">${alarmDescription}</td>
                         <td><span class="status-badge status-closed">Disparado</span></td>
                         <td>${formattedDate}</td>
                         <td>
@@ -99,16 +100,20 @@ function enterEditMode(alarm) {
     selectedCoin = { id: alarm.asset_id, name: alarm.asset_id, symbol: alarm.asset_symbol };
 
     document.getElementById('alarm-asset').value = `${alarm.asset_id} (${alarm.asset_symbol})`;
-    document.getElementById('alarm-type-select').value = alarm.alarm_type || 'price';
-    
-    // Dispara o evento 'change' para mostrar os campos corretos
+    const alarmType = alarm.alarm_type || 'price';
+    document.getElementById('alarm-type-select').value = alarmType;
     document.getElementById('alarm-type-select').dispatchEvent(new Event('change'));
 
-    if (alarm.alarm_type === 'stochastic') {
+    if (alarmType === 'stochastic') {
         document.getElementById('stoch-condition').value = alarm.condition;
         document.getElementById('stoch-value').value = alarm.target_price;
         document.getElementById('stoch-period').value = alarm.indicator_period;
         document.getElementById('stoch-timeframe').value = alarm.indicator_timeframe;
+    } else if (alarmType === 'rsi_crossover') {
+        document.getElementById('rsi-condition').value = alarm.condition;
+        document.getElementById('rsi-period').value = alarm.rsi_period;
+        document.getElementById('rsi-ma-period').value = alarm.rsi_ma_period;
+        document.getElementById('rsi-timeframe').value = alarm.indicator_timeframe;
     } else {
         document.getElementById('alarm-condition-standalone').value = alarm.condition;
         document.getElementById('alarm-price-standalone').value = alarm.target_price;
@@ -116,7 +121,6 @@ function enterEditMode(alarm) {
     
     document.querySelector('#alarm-form button[type="submit"]').textContent = 'Atualizar Alarme';
     document.getElementById('cancel-edit-btn').style.display = 'inline-block';
-    
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -124,7 +128,7 @@ function exitEditMode() {
     editingAlarmId = null;
     selectedCoin = null;
     document.getElementById('alarm-form').reset();
-    document.getElementById('alarm-type-select').dispatchEvent(new Event('change')); // Reseta a visibilidade dos campos
+    document.getElementById('alarm-type-select').dispatchEvent(new Event('change'));
     document.querySelector('#alarm-form button[type="submit"]').textContent = 'Definir Alarme';
     document.getElementById('cancel-edit-btn').style.display = 'none';
 }
@@ -142,19 +146,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const alarmTypeSelect = document.getElementById('alarm-type-select');
     const priceFields = document.getElementById('price-fields');
     const stochasticFields = document.getElementById('stochastic-fields');
+    const rsiFields = document.getElementById('rsi-fields');
 
-    // Listener para alternar os campos do formulário
     alarmTypeSelect.addEventListener('change', () => {
-        if (alarmTypeSelect.value === 'price') {
-            priceFields.style.display = 'block';
-            stochasticFields.style.display = 'none';
-        } else {
-            priceFields.style.display = 'none';
-            stochasticFields.style.display = 'block';
-        }
+        const type = alarmTypeSelect.value;
+        priceFields.style.display = type === 'price' ? 'block' : 'none';
+        stochasticFields.style.display = type === 'stochastic' ? 'block' : 'none';
+        rsiFields.style.display = type === 'rsi_crossover' ? 'block' : 'none';
     });
 
-    // Listener unificado para todos os cliques em botões nas tabelas
     mainContainer.addEventListener('click', (e) => {
         const target = e.target;
         if (target.classList.contains('delete-btn')) {
@@ -168,15 +168,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('cancel-edit-btn').addEventListener('click', exitEditMode);
 
-    // Lógica do Autocomplete
     assetInput.addEventListener('input', () => {
         clearTimeout(debounceTimer);
         const query = assetInput.value.trim();
         if (editingAlarmId) exitEditMode();
         selectedCoin = null;
-
         if (query.length < 2) { resultsDiv.style.display = 'none'; return; }
-
         debounceTimer = setTimeout(async () => {
             try {
                 const { data: results, error } = await supabase.functions.invoke('search-coins', { body: { query } });
@@ -206,7 +203,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.addEventListener('click', (e) => { if (e.target !== assetInput) resultsDiv.style.display = 'none'; });
 
-    // Lógica de Submissão (cria OU atualiza)
     alarmForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const submitButton = alarmForm.querySelector('button[type="submit"]');
@@ -225,15 +221,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 alarm_type: alarmType,
             };
 
-            // Preenche os dados específicos de cada tipo
             if (alarmType === 'price') {
                 const targetPrice = parseFloat(document.getElementById('alarm-price-standalone').value);
                 if (isNaN(targetPrice) || targetPrice <= 0) throw new Error("Preço alvo inválido.");
                 alarmData.condition = document.getElementById('alarm-condition-standalone').value;
                 alarmData.target_price = targetPrice;
-                alarmData.indicator_timeframe = null;
-                alarmData.indicator_period = null;
-            } else { // stochastic
+            } else if (alarmType === 'stochastic') {
                 const targetValue = parseFloat(document.getElementById('stoch-value').value);
                 const period = parseInt(document.getElementById('stoch-period').value);
                 if (isNaN(targetValue) || isNaN(period)) throw new Error("Valores do indicador inválidos.");
@@ -241,6 +234,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 alarmData.target_price = targetValue;
                 alarmData.indicator_period = period;
                 alarmData.indicator_timeframe = document.getElementById('stoch-timeframe').value;
+            } else { // rsi_crossover
+                const rsiPeriod = parseInt(document.getElementById('rsi-period').value);
+                const rsiMaPeriod = parseInt(document.getElementById('rsi-ma-period').value);
+                if (isNaN(rsiPeriod) || isNaN(rsiMaPeriod)) throw new Error("Valores do indicador inválidos.");
+                alarmData.condition = document.getElementById('rsi-condition').value;
+                alarmData.indicator_timeframe = document.getElementById('rsi-timeframe').value;
+                alarmData.rsi_period = rsiPeriod;
+                alarmData.rsi_ma_period = rsiMaPeriod;
+                alarmData.target_price = null; // Não aplicável para crossover
             }
 
             let error;
