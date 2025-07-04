@@ -168,3 +168,11 @@ footer { text-align: center; padding: 1rem 0; margin-top: 2rem; color: #6c757d; 
     width: 100%;
     -webkit-overflow-scrolling: touch; /* Melhora a experiência de scroll em iOS */
 }
+
+.combo-separator {
+    font-weight: bold;
+    color: #007bff;
+    text-align: center;
+    margin: 2rem 0 1rem 0;
+    font-size: 1.1em;
+}
