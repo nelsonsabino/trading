@@ -139,13 +139,15 @@
 </div>                
 
 
-<!-- NOVO: Campos para o Alarme Combo -->
 <div id="combo-fields" style="display: none;">
     <p class="combo-separator">CONDIÇÃO PRINCIPAL (Evento de Gatilho)</p>
     <div class="form-row">
         <div class="input-item">
-            <label>Gatilho Primário</label>
-            <input type="text" value="Preço Toca na EMA (Suporte)" readonly>
+            <label for="combo-primary-trigger">Gatilho Primário</label>
+            <select id="combo-primary-trigger">
+                <option value="touch_from_above">Preço toca na EMA (Suporte)</option>
+                <option value="touch_from_below">Preço toca na EMA (Resistência)</option>
+            </select>
         </div>
         <div class="input-item">
             <label for="combo-ema-period">Período da EMA</label>
@@ -161,15 +163,14 @@
         </div>
         <div class="input-item">
             <label for="combo-stoch-condition">Condição do Estocástico</label>
-            <input type="text" value="Abaixo de (Sobrevenda)" readonly>
+            <select id="combo-stoch-condition">
+                <option value="below">Abaixo de (Sobrevenda)</option>
+                <option value="above">Acima de (Sobrecompra)</option>
+            </select>
         </div>
         <div class="input-item">
             <label for="combo-stoch-value">Valor Alvo</label>
-            <input type="number" id="combo-stoch-value" value="20">
-        </div>
-        <div class="input-item">
-            <label for="combo-stoch-period">Período %K</label>
-            <input type="number" id="combo-stoch-period" value="14">
+            <input type="number" id="combo-stoch-value" value="20"> <!-- Valor por defeito inicial -->
         </div>
     </div>
     
