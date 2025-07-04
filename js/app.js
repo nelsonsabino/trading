@@ -1,4 +1,4 @@
-// js/app.js - VERSÃO 5.4
+// js/app.js - VERSÃO 5.5
 
 // Importações de Módulos
 import { listenToTrades } from './firebase-service.js';
@@ -7,6 +7,7 @@ import { openAddModal, closeAddModal, closeArmModal, closeExecModal, closeCloseT
 import { displayTrades, populateStrategySelect, generateDynamicChecklist } from './ui.js';
 import { handleAddSubmit, handleArmSubmit, handleExecSubmit, handleCloseSubmit, loadAndOpenForEditing } from './handlers.js';
 import { STRATEGIES } from './strategies.js';
+import { setupAutocomplete } from './utils.js'; // NOVO: Importa a função reutilizável
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -30,6 +31,21 @@ document.addEventListener('DOMContentLoaded', () => {
     closeModalObj.closeBtn.addEventListener('click', closeCloseTradeModal);
     closeModalObj.container.addEventListener('click', e => { if (e.target.id === 'close-trade-modal') closeCloseTradeModal(); });
     closeModalObj.form.addEventListener('submit', handleCloseSubmit);
+
+    // *** NOVO: Lógica para ativar o autocomplete no modal de adicionar trade ***
+    const modalAssetInput = document.getElementById('asset'); // O input dentro do modal
+    const modalResultsDiv = document.getElementById('modal-autocomplete-results');
+
+    if (modalAssetInput && modalResultsDiv) {
+        setupAutocomplete(modalAssetInput, modalResultsDiv, (coin) => {
+            // No modal de trades, não precisamos de um callback complexo.
+            // Apenas preencher o input com o nome da moeda é suficiente.
+            // O `handlers.js` vai ler o valor do input diretamente ao submeter.
+            if (coin) {
+                modalAssetInput.value = `${coin.name} (${coin.symbol.toUpperCase()})`;
+            }
+        });
+    }
 
     // Listeners do Modal de Imagem
     if (closeImageModalBtn) {
@@ -63,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- LÓGICA DA VERSÃO ---
-    const APP_VERSION = '5.4 (4 alarmes API Binance)';
+    const APP_VERSION = '5.5 (Autocomplete no Modal)';
     const versionDisplay = document.getElementById('app-version-display');
     if (versionDisplay) {
         versionDisplay.textContent = `Versão: ${APP_VERSION}`;
