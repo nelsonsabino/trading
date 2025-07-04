@@ -234,16 +234,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 alarmData.target_price = targetValue;
                 alarmData.indicator_period = period;
                 alarmData.indicator_timeframe = document.getElementById('stoch-timeframe').value;
-            } else { // rsi_crossover
-                const rsiPeriod = parseInt(document.getElementById('rsi-period').value);
-                const rsiMaPeriod = parseInt(document.getElementById('rsi-ma-period').value);
-                if (isNaN(rsiPeriod) || isNaN(rsiMaPeriod)) throw new Error("Valores do indicador inválidos.");
-                alarmData.condition = document.getElementById('rsi-condition').value;
-                alarmData.indicator_timeframe = document.getElementById('rsi-timeframe').value;
-                alarmData.rsi_period = rsiPeriod;
-                alarmData.rsi_ma_period = rsiMaPeriod;
-                alarmData.target_price = null; // Não aplicável para crossover
-            }
+           } else { // rsi_crossover
+    // Os períodos agora são definidos diretamente no código
+    const rsiPeriod = 14;
+    const rsiMaPeriod = 14;
+    
+    alarmData.condition = document.getElementById('rsi-condition').value;
+    alarmData.indicator_timeframe = document.getElementById('rsi-timeframe').value;
+    alarmData.rsi_period = rsiPeriod; // Sempre 14
+    alarmData.rsi_ma_period = rsiMaPeriod; // Sempre 14
+    alarmData.target_price = null; // Não aplicável para crossover
+}
 
             let error;
             if (editingAlarmId) {
