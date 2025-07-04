@@ -1,4 +1,4 @@
-// js/app.js - VERSÃO 4.2 
+// js/app.js - VERSÃO 5.0 
 
 // Importações de Módulos
 import { listenToTrades } from './firebase-service.js';
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- LÓGICA DA VERSÃO ---
-    const APP_VERSION = '4.2';
+    const APP_VERSION = '5.0';
     const versionDisplay = document.getElementById('app-version-display');
     if (versionDisplay) {
         versionDisplay.textContent = `Versão: ${APP_VERSION}`;
