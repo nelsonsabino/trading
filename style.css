@@ -43,12 +43,7 @@ header nav { margin-top: 1.5rem; display: flex; justify-content: center; align-i
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(33, 37, 41, 0.6); display: none; justify-content: center; align-items: center; z-index: 1000; box-sizing: border-box; overflow-y: auto; padding: 2rem 1rem; }
 .modal-content { background: #fff; padding: 2rem 2.5rem; border-radius: 12px; width: 100%; max-width: 550px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.1); animation: fadeIn 0.3s ease-out; margin: auto; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-
-/* Adicione esta nova regra ao seu style.css */
-.modal-overlay.visible {
-    display: flex !important;
-}
-
+.modal-overlay.visible { display: flex !important; }
 .modal-content > span[id^="close-"] { position: absolute; top: 15px; right: 25px; font-size: 2.5rem; color: #adb5bd; font-weight: 300; cursor: pointer; line-height: 1; transition: color 0.2s; }
 .modal-content > span[id^="close-"]:hover { color: #495057; }
 .modal-content h3 { margin-top: 0; margin-bottom: 0.5rem; color: #212529; }
@@ -66,8 +61,6 @@ header nav { margin-top: 1.5rem; display: flex; justify-content: center; align-i
 .required-asterisk { color: #dc3545; font-weight: bold; margin-left: 4px; }
 .modal-content form button[type="submit"] { width: 100%; padding: 14px; margin-top: 1.5rem; font-size: 1.1rem; font-weight: 600; background-color: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; transition: background-color 0.2s; }
 .modal-content form button[type="submit"]:hover { background-color: #218838; }
-
-
 
 /* --- ESTILOS PARA EXEMPLOS NOS MODAIS --- */
 .example-image-container { margin-bottom: 1.5rem; border: 1px solid #dee2e6; border-radius: 8px; padding: 0.5rem; }
@@ -111,499 +104,67 @@ header nav { margin-top: 1.5rem; display: flex; justify-content: center; align-i
 @media (max-width: 992px) { .dashboard-columns { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 768px) { .dashboard-columns { grid-template-columns: 1fr; } main { padding: 0 1rem 1rem 1rem; } }
 
-
-
-
 /* --- NOVOS ESTILOS PARA A PÁGINA DE ESTATÍSTICAS --- */
-.portfolio-section {
-    background-color: #fff;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-    text-align: center;
-    margin-bottom: 2rem;
-}
+.portfolio-section { background-color: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.08); text-align: center; margin-bottom: 2rem; }
+.portfolio-balance { font-size: 1.5rem; color: #495057; }
+.portfolio-balance strong { font-size: 2.5rem; color: #28a745; margin-left: 1rem; }
+.portfolio-actions { margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem; }
+.btn-secondary { background-color: #6c757d; color: white; }
+.btn-secondary:hover { background-color: #5a6268; }
+.btn-tertiary { background-color: #ffc107; color: #212529; }
+.btn-tertiary:hover { background-color: #e0a800; }
 
-.portfolio-balance {
-    font-size: 1.5rem;
-    color: #495057;
-}
-
-.portfolio-balance strong {
-    font-size: 2.5rem;
-    color: #28a745; /* Verde para o saldo */
-    margin-left: 1rem;
-}
-
-.portfolio-actions {
-    margin-top: 1.5rem;
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-}
-.btn-secondary { /* Um novo estilo para o botão de levantamento */
-    background-color: #6c757d;
-    color: white;
-}
-.btn-secondary:hover {
-    background-color: #5a6268;
-}
-
-.btn-tertiary {
-    background-color: #ffc107; /* Amarelo */
-    color: #212529;
-}
-.btn-tertiary:hover {
-    background-color: #e0a800;
-}
-
-.section-divider {
-    border: none;
-    border-top: 1px solid #dee2e6;
-    margin: 3rem 0;
-}
+.section-divider { border: none; border-top: 1px solid #dee2e6; margin: 3rem 0; }
 
 /* --- FOOTER DE VERSÃO --- */
-footer {
-    text-align: center;
-    padding: 1rem 0;
-    margin-top: 2rem;
-    color: #6c757d; /* Cinzento discreto */
-    font-size: 0.9em;
-    border-top: 1px solid #e9ecef;
-}
+footer { text-align: center; padding: 1rem 0; margin-top: 2rem; color: #6c757d; font-size: 0.9em; border-top: 1px solid #e9ecef; }
 
 /* --- NOVOS ESTILOS PARA FORMULÁRIOS E CHECKLISTS --- */
-
-/* Melhora o título da secção dentro do modal */
-.modal-content h4 {
-    margin-top: 1.5rem;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    font-size: 1.1rem;
-    color: #007bff;
-    border-bottom: 2px solid #e9ecef;
-    display: flex;
-    align-items: center;
-}
-
-/* Estilo principal do item da checklist */
-.checklist-item, .input-item-styled {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1rem;
-    padding: 1rem;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    border: 1px solid #e9ecef;
-    transition: all 0.2s ease-in-out;
-}
-
-.checklist-item:hover, .input-item-styled:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.07);
-    border-left: 3px solid #007bff;
-}
-
-/* Estilo do ícone */
-.checklist-item i, .input-item-styled i {
-    font-size: 1.5rem; /* Tamanho do ícone */
-    color: #495057;   /* Cor do ícone */
-    margin-right: 1.25rem;
-    width: 25px;      /* Largura fixa para alinhamento */
-    text-align: center;
-}
-
-/* Aumenta o tamanho do input do checkbox para ser mais fácil de clicar */
-.checklist-item input[type="checkbox"] {
-    transform: scale(1.4);
-    margin-right: 1.25rem;
-    flex-shrink: 0;
-}
-
-/* Remove margens e padding padrão do label para o flexbox controlar */
-.checklist-item label {
-    margin: 0;
-    padding: 0;
-    line-height: 1.4;
-    font-weight: 500;
-}
-
-/* Estilo para o asterisco de campo obrigatório */
-.required-asterisk {
-    color: #dc3545;
-    font-weight: bold;
-    margin-left: 5px;
-    font-size: 1.1em;
-}
-
+.modal-content h4 { margin-top: 1.5rem; margin-bottom: 1rem; padding-bottom: 0.5rem; font-size: 1.1rem; color: #007bff; border-bottom: 2px solid #e9ecef; display: flex; align-items: center; }
+.checklist-item, .input-item-styled { display: flex; align-items: center; margin-bottom: 1rem; padding: 1rem; background-color: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef; transition: all 0.2s ease-in-out; }
+.checklist-item:hover, .input-item-styled:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.07); border-left: 3px solid #007bff; }
+.checklist-item i, .input-item-styled i { font-size: 1.5rem; color: #495057; margin-right: 1.25rem; width: 25px; text-align: center; }
+.checklist-item input[type="checkbox"] { transform: scale(1.4); margin-right: 1.25rem; flex-shrink: 0; }
+.checklist-item label { margin: 0; padding: 0; line-height: 1.4; font-weight: 500; }
+.required-asterisk { color: #dc3545; font-weight: bold; margin-left: 5px; font-size: 1.1em; }
 
 /* --- ESTILOS PARA O CRIADOR DE ALARMES INDEPENDENTE --- */
-.alarm-creator-section {
-    background-color: #fff;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    margin: 2rem auto;
-    max-width: 1400px;
-}
-.alarm-creator-section h2 {
-    border-bottom: none;
-    margin-bottom: 1.5rem;
-    text-align: center;
-}
-.alarm-form-standalone .form-row {
-    display: flex;
-    gap: 1.5rem;
-    align-items: flex-end;
-    flex-wrap: wrap;
-    margin-bottom: 1.5rem;
-}
+.alarm-creator-section { background-color: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin: 2rem auto; max-width: 1400px; }
+.alarm-creator-section h2 { border-bottom: none; margin-bottom: 1.5rem; text-align: center; }
+.alarm-form-standalone .form-row { display: flex; gap: 1.5rem; align-items: flex-end; flex-wrap: wrap; margin-bottom: 1.5rem; }
 .alarm-form-standalone .input-item {
     flex: 1;
     min-width: 200px;
+    position: relative; /* ADIÇÃO: Esta é a linha chave para o autocomplete */
 }
-.alarm-form-standalone label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-}
-.alarm-form-standalone input, .alarm-form-standalone select {
-    width: 100%;
-    padding: 12px;
-    font-size: 1rem;
-    border: 1px solid #ced4da;
-    border-radius: 6px;
-    box-sizing: border-box;
-}
-.alarm-feedback {
-    margin-top: 1rem;
-    font-weight: 500;
-    text-align: center;
-    min-height: 20px;
-}
+.alarm-form-standalone label { display: block; margin-bottom: 8px; font-weight: 500; }
+.alarm-form-standalone input, .alarm-form-standalone select { width: 100%; padding: 12px; font-size: 1rem; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box; }
+.alarm-feedback { margin-top: 1rem; font-weight: 500; text-align: center; min-height: 20px; }
 
 /* --- ESTILOS PARA O AUTOCOMPLETE DE ALARMES --- */
-.autocomplete-results {
-    display: none; /* Escondido por defeito */
-    position: absolute;
-    border: 1px solid #ddd;
-    border-top: none;
-    z-index: 99;
-    top: 100%;
-    left: 0;
-    right: 0;
-    max-height: 200px;
-    overflow-y: auto;
-    background-color: #fff;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-    border-radius: 0 0 6px 6px;
-}
-.autocomplete-item {
-    padding: 12px;
-    cursor: pointer;
-    border-bottom: 1px solid #eee;
-    display: flex;
-    align-items: center;
-}
-.autocomplete-item:last-child {
-    border-bottom: none;
-}
-.autocomplete-item:hover {
-    background-color: #f1f1f1;
-}
-.autocomplete-item strong {
-    color: #007bff;
-}
+.autocomplete-results { display: none; position: absolute; border: 1px solid #ddd; border-top: none; z-index: 99; top: 100%; left: 0; right: 0; max-height: 200px; overflow-y: auto; background-color: #fff; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-radius: 0 0 6px 6px; }
+.autocomplete-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #eee; display: flex; align-items: center; }
+.autocomplete-item:last-child { border-bottom: none; }
+.autocomplete-item:hover { background-color: #f1f1f1; }
+.autocomplete-item strong { color: #007bff; }
 
 /* --- ESTILOS PARA AS TABELAS DE ALARMES --- */
-.alarms-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1.5rem;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    overflow: hidden;
-    font-size: 0.95em;
-}
-.alarms-table thead tr {
-    background-color: #f8f9fa;
-    border-bottom: 2px solid #dee2e6;
-}
-.alarms-table th {
-    padding: 1rem;
-    text-align: left;
-    font-weight: 600;
-    color: #495057;
-}
-.alarms-table td {
-    padding: 1rem;
-    border-bottom: 1px solid #e9ecef;
-    vertical-align: middle;
-}
-.alarms-table tbody tr:last-child td {
-    border-bottom: none;
-}
-.alarms-table .condition-above {
-    color: #198754; /* Verde */
-    font-weight: bold;
-}
-.alarms-table .condition-below {
-    color: #dc3545; /* Vermelho */
-    font-weight: bold;
-}
+.alarms-table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; background: #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: hidden; font-size: 0.95em; }
+.alarms-table thead tr { background-color: #f8f9fa; border-bottom: 2px solid #dee2e6; }
+.alarms-table th { padding: 1rem; text-align: left; font-weight: 600; color: #495057; }
+.alarms-table td { padding: 1rem; border-bottom: 1px solid #e9ecef; vertical-align: middle; }
+.alarms-table tbody tr:last-child td { border-bottom: none; }
+.alarms-table .condition-above { color: #198754; font-weight: bold; }
+.alarms-table .condition-below { color: #dc3545; font-weight: bold; }
 
 /* --- ESTILOS ADICIONAIS PARA BOTÕES DE AÇÃO --- */
+.form-actions { display: flex; justify-content: center; gap: 1rem; }
+.alarms-table .edit-btn { background-color: #ffc107; color: #212529; }
+.alarms-table .edit-btn:hover { background-color: #e0a800; }
 
-/* Wrapper para alinhar os botões do formulário principal */
-.form-actions {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
+/* NOVO: Wrapper para tabelas responsivas */
+.table-wrapper {
+    overflow-x: auto;
+    width: 100%;
+    -webkit-overflow-scrolling: touch; /* Melhora a experiência de scroll em iOS */
 }
-
-/* Reutiliza o estilo do botão de edição que já tínhamos */
-.alarms-table .edit-btn {
-    background-color: #ffc107; /* Amarelo */
-    color: #212529;
-}
-.alarms-table .edit-btn:hover {
-    background-color: #e0a800;
-}
-
-// js/alarms.js (VERSÃO COM EDIÇÃO E EXCLUSÃO DO HISTÓRICO)
-
-import { supabaseUrl, supabaseAnonKey } from './config.js';
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
-let selectedCoin = null;
-let debounceTimer;
-let editingAlarmId = null; // A nossa variável de estado: null = modo de criação, ID = modo de edição
-
-// --- FUNÇÃO PRINCIPAL PARA BUSCAR E MOSTRAR TODOS OS ALARMES ---
-async function fetchAndDisplayAlarms() {
-    const activeTbody = document.getElementById('active-alarms-tbody');
-    const triggeredTbody = document.getElementById('triggered-alarms-tbody');
-    if (!activeTbody || !triggeredTbody) return;
-
-    try {
-        activeTbody.innerHTML = '<tr><td colspan="5">A carregar...</td></tr>';
-        triggeredTbody.innerHTML = '<tr><td colspan="6">A carregar...</td></tr>';
-
-        const { data, error } = await supabase.from('alarms').select('*').order('created_at', { ascending: false });
-        if (error) throw error;
-        
-        const activeAlarmsHtml = [];
-        const triggeredAlarmsHtml = [];
-
-        window.alarmsData = data; // Guarda os dados globalmente para fácil acesso na edição
-
-        for (const alarm of data) {
-            const conditionClass = alarm.condition === 'above' ? 'condition-above' : 'condition-below';
-            const conditionText = alarm.condition === 'above' ? 'Acima de' : 'Abaixo de';
-            const formattedDate = new Date(alarm.created_at).toLocaleString('pt-PT');
-            const assetDisplay = `${alarm.asset_id} (${alarm.asset_symbol})`;
-
-            if (alarm.status === 'active') {
-                activeAlarmsHtml.push(`
-                    <tr>
-                        <td><strong>${assetDisplay}</strong></td>
-                        <td class="${conditionClass}">${conditionText}</td>
-                        <td>${alarm.target_price} USD</td>
-                        <td>${formattedDate}</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn edit-btn" data-id="${alarm.id}">Editar</button>
-                                <button class="btn delete-btn" data-id="${alarm.id}">Apagar</button>
-                            </div>
-                        </td>
-                    </tr>
-                `);
-            } else {
-                triggeredAlarmsHtml.push(`
-                    <tr>
-                        <td><strong>${assetDisplay}</strong></td>
-                        <td class="${conditionClass}">${conditionText}</td>
-                        <td>${alarm.target_price} USD</td>
-                        <td><span class="status-badge status-closed">Disparado</span></td>
-                        <td>${formattedDate}</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn delete-btn" data-id="${alarm.id}">Apagar</button>
-                            </div>
-                        </td>
-                    </tr>
-                `);
-            }
-        }
-
-        activeTbody.innerHTML = activeAlarmsHtml.length > 0 ? activeAlarmsHtml.join('') : '<tr><td colspan="5" style="text-align:center;">Nenhum alarme ativo.</td></tr>';
-        triggeredTbody.innerHTML = triggeredAlarmsHtml.length > 0 ? triggeredAlarmsHtml.join('') : '<tr><td colspan="6" style="text-align:center;">Nenhum alarme no histórico.</td></tr>';
-
-    } catch (error) {
-        console.error("Erro ao buscar alarmes:", error);
-    }
-}
-
-// --- FUNÇÃO PARA APAGAR UM ALARME (ATIVO OU DO HISTÓRICO) ---
-async function deleteAlarm(alarmId) {
-    const confirmationText = "Tem a certeza que quer apagar este registo? Esta ação é irreversível.";
-    if (!confirm(confirmationText)) return;
-    try {
-        const { error } = await supabase.from('alarms').delete().eq('id', alarmId);
-        if (error) throw error;
-        fetchAndDisplayAlarms();
-    } catch (error) {
-        console.error("Erro ao apagar alarme:", error);
-        alert("Não foi possível apagar o alarme.");
-    }
-}
-
-// --- FUNÇÕES PARA GERIR O MODO DE EDIÇÃO ---
-function enterEditMode(alarm) {
-    editingAlarmId = alarm.id;
-    selectedCoin = { id: alarm.asset_id, name: alarm.asset_id, symbol: alarm.asset_symbol }; // Preenche os dados da moeda
-
-    document.getElementById('alarm-asset').value = `${alarm.asset_id} (${alarm.asset_symbol})`;
-    document.getElementById('alarm-condition-standalone').value = alarm.condition;
-    document.getElementById('alarm-price-standalone').value = alarm.target_price;
-    
-    document.querySelector('#alarm-form button[type="submit"]').textContent = 'Atualizar Alarme';
-    document.getElementById('cancel-edit-btn').style.display = 'inline-block';
-    
-    window.scrollTo({ top: 0, behavior: 'smooth' }); // Rola a página para o topo
-}
-
-function exitEditMode() {
-    editingAlarmId = null;
-    selectedCoin = null;
-
-    document.getElementById('alarm-form').reset();
-    document.querySelector('#alarm-form button[type="submit"]').textContent = 'Definir Alarme';
-    document.getElementById('cancel-edit-btn').style.display = 'none';
-}
-
-
-// --- LÓGICA PRINCIPAL QUANDO A PÁGINA CARREGA ---
-document.addEventListener('DOMContentLoaded', () => {
-    fetchAndDisplayAlarms();
-
-    const alarmForm = document.getElementById('alarm-form');
-    const feedbackDiv = document.getElementById('alarm-feedback');
-    const assetInput = document.getElementById('alarm-asset');
-    const resultsDiv = document.getElementById('autocomplete-results');
-    const mainContainer = document.querySelector('main');
-
-    // Listener unificado para todos os cliques em botões nas tabelas
-    mainContainer.addEventListener('click', (e) => {
-        const target = e.target;
-        if (target.classList.contains('delete-btn')) {
-            const alarmId = target.getAttribute('data-id');
-            deleteAlarm(alarmId);
-        }
-        if (target.classList.contains('edit-btn')) {
-            const alarmId = target.getAttribute('data-id');
-            const alarmToEdit = window.alarmsData.find(a => a.id === alarmId);
-            if (alarmToEdit) {
-                enterEditMode(alarmToEdit);
-            }
-        }
-    });
-
-    document.getElementById('cancel-edit-btn').addEventListener('click', exitEditMode);
-
-    // Lógica do Autocomplete (inalterada)
-    assetInput.addEventListener('input', () => {
-        clearTimeout(debounceTimer);
-        const query = assetInput.value.trim();
-        if (editingAlarmId) exitEditMode(); // Sai do modo de edição se o utilizador começar a digitar
-
-        if (query.length < 2) {
-            resultsDiv.style.display = 'none';
-            return;
-        }
-
-        debounceTimer = setTimeout(async () => {
-            try {
-                const { data: results, error } = await supabase.functions.invoke('search-coins', { body: { query } });
-                if (error) throw error;
-
-                resultsDiv.innerHTML = '';
-                if (results.length > 0) {
-                    results.forEach(coin => {
-                        const item = document.createElement('div');
-                        item.className = 'autocomplete-item';
-                        item.innerHTML = `<img src="${coin.thumb}" width="20" height="20" style="margin-right: 10px;"> <strong>${coin.name}</strong> (${coin.symbol.toUpperCase()})`;
-                        item.addEventListener('click', () => {
-                            assetInput.value = `${coin.name} (${coin.symbol.toUpperCase()})`;
-                            selectedCoin = coin;
-                            resultsDiv.style.display = 'none';
-                        });
-                        resultsDiv.appendChild(item);
-                    });
-                    resultsDiv.style.display = 'block';
-                } else {
-                    resultsDiv.style.display = 'none';
-                }
-            } catch (err) {
-                console.error("Erro ao buscar moedas:", err);
-            }
-        }, 300);
-    });
-
-    document.addEventListener('click', (e) => { if (e.target !== assetInput) resultsDiv.style.display = 'none'; });
-
-    // Lógica de Submissão (agora cria OU atualiza)
-    alarmForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const submitButton = alarmForm.querySelector('button[type="submit"]');
-        submitButton.disabled = true;
-        feedbackDiv.textContent = 'A processar...';
-        
-        try {
-            if (!selectedCoin) {
-                throw new Error("Por favor, selecione uma moeda válida da lista de sugestões.");
-            }
-
-            const targetPrice = parseFloat(document.getElementById('alarm-price-standalone').value);
-            if (isNaN(targetPrice) || targetPrice <= 0) {
-                throw new Error("Por favor, preencha um preço alvo válido.");
-            }
-            
-            const alarmData = {
-                asset_id: selectedCoin.id,
-                asset_symbol: selectedCoin.symbol.toUpperCase(),
-                condition: document.getElementById('alarm-condition-standalone').value,
-                target_price: targetPrice
-            };
-
-            let error;
-            if (editingAlarmId) {
-                // MODO DE EDIÇÃO
-                const { error: updateError } = await supabase.from('alarms').update(alarmData).eq('id', editingAlarmId);
-                error = updateError;
-            } else {
-                // MODO DE CRIAÇÃO
-                alarmData.status = 'active'; // Adiciona o status apenas ao criar
-                const { error: insertError } = await supabase.from('alarms').insert([alarmData]);
-                error = insertError;
-            }
-
-            if (error) throw error;
-
-            feedbackDiv.textContent = `✅ Operação concluída com sucesso!`;
-            feedbackDiv.style.color = '#28a745';
-            exitEditMode();
-            fetchAndDisplayAlarms();
-
-        } catch (error) {
-            console.error("Erro na operação do alarme:", error);
-            feedbackDiv.textContent = `Erro: ${error.message}`;
-            feedbackDiv.style.color = '#dc3545';
-        } finally {
-            submitButton.disabled = false;
-        }
-    });
-});
