@@ -19,33 +19,8 @@
         </nav>
     </header>  
 
-    <!-- SECÇÃO INDEPENDENTE PARA CRIAR ALARMES -->
-    <section class="alarm-creator-section">
-        <h2><i class="fa-solid fa-bell-plus" style="margin-right: 10px; color: #007bff;"></i>Criar Novo Alarme de Preço</h2>
-        <form id="alarm-form" class="alarm-form-standalone">
-            <div class="form-row">
-                <div class="input-item">
-                    <label for="alarm-asset">Ativo</label>
-                    <input type="text" id="alarm-asset" required placeholder="Comece a escrever (ex: Bitcoin, SOL...)" autocomplete="off">
-                    <div id="autocomplete-results" class="autocomplete-results"></div>
-                </div>
-                <div class="input-item">
-                    <label for="alarm-condition-standalone">Condição</label>
-                    <select id="alarm-condition-standalone">
-                        <option value="above">Preço Acima de</option>
-                        <option value="below">Preço Abaixo de</option>
-                    </select>
-                </div>
-                <div class="input-item">
-                    <label for="alarm-price-standalone">Preço Alvo (USD)</label>
-                    <input type="number" id="alarm-price-standalone" step="any" required placeholder="65000.50">
-                </div>
-            </div>
-            <button type="submit" class="btn btn-primary">Definir Alarme</button>
-        </form>
-        <div id="alarm-feedback" class="alarm-feedback"></div>
-    </section>
 
+    
     <hr class="section-divider">
     
     <main>
