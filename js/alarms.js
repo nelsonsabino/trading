@@ -109,12 +109,10 @@ function enterEditMode(alarm) {
         document.getElementById('stoch-value').value = alarm.target_price;
         document.getElementById('stoch-period').value = alarm.indicator_period;
         document.getElementById('stoch-timeframe').value = alarm.indicator_timeframe;
-    } else if (alarmType === 'rsi_crossover') {
-        document.getElementById('rsi-condition').value = alarm.condition;
-        document.getElementById('rsi-period').value = alarm.rsi_period;
-        document.getElementById('rsi-ma-period').value = alarm.rsi_ma_period;
-        document.getElementById('rsi-timeframe').value = alarm.indicator_timeframe;
-    } else {
+   } else if (alarmType === 'rsi_crossover') {
+    document.getElementById('rsi-condition').value = alarm.condition;
+    document.getElementById('rsi-timeframe').value = alarm.indicator_timeframe;    
+} else {
         document.getElementById('alarm-condition-standalone').value = alarm.condition;
         document.getElementById('alarm-price-standalone').value = alarm.target_price;
     }
