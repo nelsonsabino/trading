@@ -1,4 +1,4 @@
-// js/app.js - VERSÃO 5.3
+// js/app.js - VERSÃO 5.4
 
 // Importações de Módulos
 import { listenToTrades } from './firebase-service.js';
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- LÓGICA DA VERSÃO ---
-    const APP_VERSION = '5.3 (4 alarmes API Binance)';
+    const APP_VERSION = '5.4 (4 alarmes API Binance)';
     const versionDisplay = document.getElementById('app-version-display');
     if (versionDisplay) {
         versionDisplay.textContent = `Versão: ${APP_VERSION}`;
