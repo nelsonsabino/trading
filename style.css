@@ -353,3 +353,21 @@ footer {
     color: #dc3545; /* Vermelho */
     font-weight: bold;
 }
+
+/* --- ESTILOS ADICIONAIS PARA BOTÕES DE AÇÃO --- */
+
+/* Wrapper para alinhar os botões do formulário principal */
+.form-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+/* Reutiliza o estilo do botão de edição que já tínhamos */
+.alarms-table .edit-btn {
+    background-color: #ffc107; /* Amarelo */
+    color: #212529;
+}
+.alarms-table .edit-btn:hover {
+    background-color: #e0a800;
+}
