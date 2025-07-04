@@ -25,11 +25,12 @@
 
                 <div class="input-item" style="max-width: 400px; margin-left: auto; margin-right: auto;">
                     <label for="alarm-type-select">Tipo de Alarme</label>
-                    <select id="alarm-type-select">
-                        <option value="price">Preço</option>
-                        <option value="stochastic">Estocástico</option>
-                        <option value="rsi_crossover">RSI-MA Crossover</option> <!-- OPÇÃO NOVA -->
-                    </select>
+                   <select id="alarm-type-select">
+    <option value="price">Preço</option>
+    <option value="stochastic">Estocástico</option>
+    <option value="rsi_crossover">RSI-MA Crossover</option>
+    <option value="ema_touch">Toque na EMA</option> 
+</select>
                 </div>
 
                 <div class="form-row">
@@ -89,17 +90,43 @@
 
                 <!-- NOVO: Campos para o alarme de RSI-MA Crossover -->
                <div id="rsi-fields" style="display: none;">
+                    <div class="form-row">
+                    <div class="input-item">
+                    <label for="rsi-condition">Condição de Cruzamento</label>
+                    <select id="rsi-condition">
+                    <option value="above">RSI cruza para CIMA da MA</option>
+                    <option value="below">RSI cruza para BAIXO da MA</option>
+                    </select>
+            </div>
+                <div class="input-item">
+                <label for="rsi-timeframe">Timeframe</label>
+                <select id="rsi-timeframe">
+                    <option value="5m">5 Minutos</option>
+                    <option value="15m">15 Minutos</option>
+                    <option value="1h">1 Hora</option>
+                    <option value="4h">4 Horas</option>
+                    <option value="1d">Diário</option>
+                </select>
+                </div>
+            </div>
+        </div>
+
+<div id="ema-fields" style="display: none;">
     <div class="form-row">
         <div class="input-item">
-            <label for="rsi-condition">Condição de Cruzamento</label>
-            <select id="rsi-condition">
-                <option value="above">RSI cruza para CIMA da MA</option>
-                <option value="below">RSI cruza para BAIXO da MA</option>
+            <label for="ema-condition">Condição do Toque</label>
+            <select id="ema-condition">
+                <option value="touch_from_below">Preço toca na EMA por baixo (suporte)</option>
+                <option value="touch_from_above">Preço toca na EMA por cima (resistência)</option>
             </select>
         </div>
         <div class="input-item">
-            <label for="rsi-timeframe">Timeframe</label>
-            <select id="rsi-timeframe">
+            <label for="ema-period">Período da EMA (ex: 50)</label>
+            <input type="number" id="ema-period" value="50">
+        </div>
+        <div class="input-item">
+            <label for="ema-timeframe">Timeframe</label>
+            <select id="ema-timeframe">
                 <option value="5m">5 Minutos</option>
                 <option value="15m">15 Minutos</option>
                 <option value="1h">1 Hora</option>
@@ -108,8 +135,8 @@
             </select>
         </div>
     </div>
-</div>
-
+</div>                
+                
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">Definir Alarme</button>
                     <button type="button" id="cancel-edit-btn" class="btn btn-secondary" style="display: none;">Cancelar Edição</button>
