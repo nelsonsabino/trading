@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Alarmes</title>
+    <!-- As mesmas folhas de estilo para manter a consistência -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>Gestão de Alarmes de Preço</h1>
+        <p class="mantra">Defina os seus gatilhos e deixe que o mercado venha até si.</p>
+        <nav>
+            <a href="index.html" class="nav-link">Voltar ao Dashboard</a>
+        </nav>
+    </header>
+
+    <main>
+        <!-- O nosso formulário de criação, agora nesta página -->
+        <section class="alarm-creator-section">
+            <h2><i class="fa-solid fa-bell-plus"></i> Criar Novo Alarme</h2>
+            <form id="alarm-form" class="alarm-form-standalone">
+                <div class="form-row">
+                    <div class="input-item">
+                        <label for="alarm-asset">Ativo</label>
+                        <input type="text" id="alarm-asset" required placeholder="Comece a escrever (ex: Bitcoin, SOL...)" autocomplete="off">
+                        <div id="autocomplete-results" class="autocomplete-results"></div>
+                    </div>
+                    <div class="input-item">
+                        <label for="alarm-condition-standalone">Condição</label>
+                        <select id="alarm-condition-standalone">
+                            <option value="above">Preço Acima de</option>
+                            <option value="below">Preço Abaixo de</option>
+                        </select>
+                    </div>
+                    <div class="input-item">
+                        <label for="alarm-price-standalone">Preço Alvo (USD)</label>
+                        <input type="number" id="alarm-price-standalone" step="any" required placeholder="65000.50">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Definir Alarme</button>
+            </form>
+            <div id="alarm-feedback" class="alarm-feedback"></div>
+        </section>
+
+        <hr class="section-divider">
+
+        <!-- NOVA: Tabela para mostrar os alarmes ativos -->
+        <section class="alarms-list-section">
+            <h2><i class="fa-solid fa-clock-rotate-left"></i> Alarmes Ativos</h2>
+            <table class="alarms-table">
+                <thead>
+                    <tr>
+                        <th>Ativo</th>
+                        <th>Condição</th>
+                        <th>Preço Alvo</th>
+                        <th>Data de Criação</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="active-alarms-tbody">
+                    <!-- As linhas serão inseridas aqui pelo alarms.js -->
+                </tbody>
+            </table>
+        </section>
+
+        <hr class="section-divider">
+
+        <!-- NOVA: Tabela para o histórico -->
+        <section class="alarms-list-section">
+            <h2><i class="fa-solid fa-history"></i> Histórico de Alarmes Disparados</h2>
+            <table class="alarms-table">
+                <thead>
+                    <tr>
+                        <th>Ativo</th>
+                        <th>Condição</th>
+                        <th>Preço Alvo</th>
+                        <th>Status</th>
+                        <th>Data de Criação</th>
+                    </tr>
+                </thead>
+                <tbody id="triggered-alarms-tbody">
+                     <!-- As linhas serão inseridas aqui pelo alarms.js -->
+                </tbody>
+            </table>
+        </section>
+
+    </main>
+
+    <!-- Os mesmos scripts que precisamos para esta página -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="js/alarms.js"></script>
+
+</body>
+</html>
