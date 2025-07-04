@@ -11,7 +11,7 @@
 <body>
 
     <header>
-        <h1>Gestão de Alarmes de Preço</h1>
+        <h1>Gestão de Alarmes de Preço e Indicadores</h1>
         <p class="mantra">Defina os seus gatilhos e deixe que o mercado venha até si.</p>
         <nav>
             <a href="index.html" class="nav-link">Voltar ao Dashboard</a>
@@ -19,99 +19,124 @@
     </header>
 
     <main>
-        
-        <!-- O nosso formulário de criação/edição -->
-        
-    <section class="alarm-creator-section">
-    <h2><i class="fa-solid fa-bell-plus"></i> Criar ou Editar Alarme</h2>
-    <form id="alarm-form" class="alarm-form-standalone">
+        <section class="alarm-creator-section">
+            <h2><i class="fa-solid fa-bell-plus"></i> Criar ou Editar Alarme</h2>
+            <form id="alarm-form" class="alarm-form-standalone">
 
-        <div class="input-item">
-            <label for="alarm-type-select">Tipo de Alarme</label>
-            <select id="alarm-type-select">
-                <option value="price">Preço</option>
-                <option value="stochastic">Estocástico</option>
-            </select>
-        </div>
-
-        <div class="form-row">
-            <div class="input-item">
-                <label for="alarm-asset">Ativo</label>
-                <input type="text" id="alarm-asset" required placeholder="Comece a escrever..." autocomplete="off">
-                <div id="autocomplete-results" class="autocomplete-results"></div>
-            </div>
-        </div>
-
-
-        <!-- Campos específicos para cada tipo de alarme -->
-        <div id="price-fields">
-            <div class="form-row">
-                <div class="input-item">
-                    <label for="alarm-condition-standalone">Condição de Preço</label>
-                    <select id="alarm-condition-standalone">
-                        <option value="above">Acima de</option>
-                        <option value="below">Abaixo de</option>
+                <div class="input-item" style="max-width: 400px; margin-left: auto; margin-right: auto;">
+                    <label for="alarm-type-select">Tipo de Alarme</label>
+                    <select id="alarm-type-select">
+                        <option value="price">Preço</option>
+                        <option value="stochastic">Estocástico</option>
+                        <option value="rsi_crossover">RSI-MA Crossover</option> <!-- OPÇÃO NOVA -->
                     </select>
                 </div>
-                <div class="input-item">
-                    <label for="alarm-price-standalone">Preço Alvo (USD)</label>
-                    <input type="number" id="alarm-price-standalone" step="any" placeholder="65000.50">
-                </div>
-            </div>
-        </div>
 
-        <div id="stochastic-fields" style="display: none;">
-            <div class="form-row">
-                <div class="input-item">
-                    <label for="stoch-condition">Condição do Estocástico</label>
-                    <select id="stoch-condition">
-                        <option value="below">Abaixo de (sobrevenda)</option>
-                        <option value="above">Acima de (sobrecompra)</option>
-                    </select>
+                <div class="form-row">
+                    <div class="input-item">
+                        <label for="alarm-asset">Ativo</label>
+                        <input type="text" id="alarm-asset" required placeholder="Comece a escrever..." autocomplete="off">
+                        <div id="autocomplete-results" class="autocomplete-results"></div>
+                    </div>
                 </div>
-                <div class="input-item">
-                    <label for="stoch-value">Valor Alvo (ex: 20)</label>
-                    <input type="number" id="stoch-value" step="any" placeholder="20">
-                </div>
-                <div class="input-item">
-                    <label for="stoch-period">Período %K (ex: 14)</label>
-                    <input type="number" id="stoch-period" value="14">
-                </div>
-                <div class="input-item">
-                    <label for="stoch-timeframe">Timeframe</label>
-                    <select id="stoch-timeframe">
-    <option value="5m">5 Minutos</option>
-    <option value="15m">15 Minutos</option>
-    <option value="1h">1 Hora</option>
-    <option value="4h">4 Horas</option>
-    <option value="1d">Diário</option>
-</select>
-                </div>
-            </div>
-        </div>
 
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Definir Alarme</button>
-            <button type="button" id="cancel-edit-btn" class="btn btn-secondary" style="display: none;">Cancelar Edição</button>
-        </div>
-    </form>
-    <div id="alarm-feedback" class="alarm-feedback"></div>
-</section>
-        
+                <!-- Campos específicos para cada tipo de alarme -->
+                <div id="price-fields">
+                    <div class="form-row">
+                        <div class="input-item">
+                            <label for="alarm-condition-standalone">Condição de Preço</label>
+                            <select id="alarm-condition-standalone">
+                                <option value="above">Acima de</option>
+                                <option value="below">Abaixo de</option>
+                            </select>
+                        </div>
+                        <div class="input-item">
+                            <label for="alarm-price-standalone">Preço Alvo (USD)</label>
+                            <input type="number" id="alarm-price-standalone" step="any" placeholder="65000.50">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="stochastic-fields" style="display: none;">
+                    <div class="form-row">
+                        <div class="input-item">
+                            <label for="stoch-condition">Condição do Estocástico</button>
+                            <select id="stoch-condition">
+                                <option value="below">Abaixo de (sobrevenda)</option>
+                                <option value="above">Acima de (sobrecompra)</option>
+                            </select>
+                        </div>
+                        <div class="input-item">
+                            <label for="stoch-value">Valor Alvo (ex: 20)</label>
+                            <input type="number" id="stoch-value" step="any" placeholder="20">
+                        </div>
+                        <div class="input-item">
+                            <label for="stoch-period">Período %K (ex: 14)</label>
+                            <input type="number" id="stoch-period" value="14">
+                        </div>
+                        <div class="input-item">
+                            <label for="stoch-timeframe">Timeframe</label>
+                            <select id="stoch-timeframe">
+                                <option value="5m">5 Minutos</option>
+                                <option value="15m">15 Minutos</option>
+                                <option value="1h">1 Hora</option>
+                                <option value="4h">4 Horas</option>
+                                <option value="1d">Diário</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NOVO: Campos para o alarme de RSI-MA Crossover -->
+                <div id="rsi-fields" style="display: none;">
+                    <div class="form-row">
+                        <div class="input-item">
+                            <label for="rsi-condition">Condição de Cruzamento</label>
+                            <select id="rsi-condition">
+                                <option value="above">RSI cruza para CIMA da MA</option>
+                                <option value="below">RSI cruza para BAIXO da MA</option>
+                            </select>
+                        </div>
+                        <div class="input-item">
+                            <label for="rsi-period">Período do RSI (ex: 14)</label>
+                            <input type="number" id="rsi-period" value="14">
+                        </div>
+                        <div class="input-item">
+                            <label for="rsi-ma-period">Período da MA (ex: 9)</label>
+                            <input type="number" id="rsi-ma-period" value="9">
+                        </div>
+                        <div class="input-item">
+                            <label for="rsi-timeframe">Timeframe</label>
+                            <select id="rsi-timeframe">
+                                <option value="5m">5 Minutos</option>
+                                <option value="15m">15 Minutos</option>
+                                <option value="1h">1 Hora</option>
+                                <option value="4h">4 Horas</option>
+                                <option value="1d">Diário</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Definir Alarme</button>
+                    <button type="button" id="cancel-edit-btn" class="btn btn-secondary" style="display: none;">Cancelar Edição</button>
+                </div>
+            </form>
+            <div id="alarm-feedback" class="alarm-feedback"></div>
+        </section>
 
         <hr class="section-divider">
 
         <!-- Tabela para mostrar os alarmes ativos -->
         <section class="alarms-list-section">
             <h2><i class="fa-solid fa-clock-rotate-left"></i> Alarmes Ativos</h2>
-            <!-- ADIÇÃO: Wrapper para scroll horizontal -->
             <div class="table-wrapper">
                 <table class="alarms-table">
                     <thead>
                         <tr>
                             <th>Ativo</th>
                             <th>Condição</th>
-                            <th>Preço Alvo</th>
                             <th>Data de Criação</th>
                             <th>Ações</th> 
                         </tr>
@@ -128,14 +153,12 @@
         <!-- Tabela para o histórico -->
         <section class="alarms-list-section">
             <h2><i class="fa-solid fa-history"></i> Histórico de Alarmes Disparados</h2>
-            <!-- ADIÇÃO: Wrapper para scroll horizontal -->
             <div class="table-wrapper">
                 <table class="alarms-table">
                     <thead>
                         <tr>
                             <th>Ativo</th>
                             <th>Condição</th>
-                            <th>Preço Alvo</th>
                             <th>Status</th>
                             <th>Data de Criação</th>
                             <th>Ações</th>
