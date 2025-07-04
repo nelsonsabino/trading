@@ -42,6 +42,10 @@
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary">Definir Alarme</button>
+                <div class="form-actions"> <!-- NOVO: Wrapper para os botões -->
+        <button type="submit" class="btn btn-primary">Definir Alarme</button>
+        <button type="button" id="cancel-edit-btn" class="btn btn-secondary" style="display: none;">Cancelar Edição</button>
+    </div>
             </form>
             <div id="alarm-feedback" class="alarm-feedback"></div>
         </section>
@@ -54,12 +58,13 @@
             <table class="alarms-table">
                 <thead>
                     <tr>
-                        <th>Ativo</th>
-                        <th>Condição</th>
-                        <th>Preço Alvo</th>
-                        <th>Data de Criação</th>
-                        <th>Ações</th>
-                    </tr>
+        <th>Ativo</th>
+        <th>Condição</th>
+        <th>Preço Alvo</th>
+        <th>Status</th>
+        <th>Data de Criação</th>
+        <th>Ações</th> 
+    </tr>
                 </thead>
                 <tbody id="active-alarms-tbody">
                     <!-- As linhas serão inseridas aqui pelo alarms.js -->
