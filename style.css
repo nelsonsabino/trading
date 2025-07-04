@@ -315,3 +315,41 @@ footer {
 .autocomplete-item strong {
     color: #007bff;
 }
+
+/* --- ESTILOS PARA AS TABELAS DE ALARMES --- */
+.alarms-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    overflow: hidden;
+    font-size: 0.95em;
+}
+.alarms-table thead tr {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+.alarms-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #495057;
+}
+.alarms-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+    vertical-align: middle;
+}
+.alarms-table tbody tr:last-child td {
+    border-bottom: none;
+}
+.alarms-table .condition-above {
+    color: #198754; /* Verde */
+    font-weight: bold;
+}
+.alarms-table .condition-below {
+    color: #dc3545; /* Vermelho */
+    font-weight: bold;
+}
