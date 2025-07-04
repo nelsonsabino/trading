@@ -1,4 +1,4 @@
-// js/alarms.js (VERSÃO FINAL COM EDIÇÃO E EXCLUSÃO DO HISTÓRICO)
+// js/alarms.js (VERSÃO COM ALARMES DE PREÇO E ESTOCÁSTICO)
 
 import { supabaseUrl, supabaseAnonKey } from './config.js';
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
@@ -6,8 +6,8 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 let selectedCoin = null;
 let debounceTimer;
-let editingAlarmId = null; // A nossa variável de estado: null = modo de criação, ID = modo de edição
-window.alarmsData = []; // Guarda os dados globalmente para fácil acesso na edição
+let editingAlarmId = null;
+window.alarmsData = [];
 
 // --- FUNÇÃO PRINCIPAL PARA BUSCAR E MOSTRAR TODOS OS ALARMES ---
 async function fetchAndDisplayAlarms() {
@@ -22,7 +22,7 @@ async function fetchAndDisplayAlarms() {
         const { data, error } = await supabase.from('alarms').select('*').order('created_at', { ascending: false });
         if (error) throw error;
         
-        window.alarmsData = data; // Atualiza os dados guardados
+        window.alarmsData = data;
         
         const activeAlarmsHtml = [];
         const triggeredAlarmsHtml = [];
@@ -33,12 +33,19 @@ async function fetchAndDisplayAlarms() {
             const formattedDate = new Date(alarm.created_at).toLocaleString('pt-PT');
             const assetDisplay = `${alarm.asset_id} (${alarm.asset_symbol})`;
 
+            // Formatação da descrição do alarme para a tabela
+            let alarmDescription = '';
+            if (alarm.alarm_type === 'stochastic') {
+                alarmDescription = `Estocástico(${alarm.indicator_period}) no ${alarm.indicator_timeframe}`;
+            } else { // 'price' ou indefinido (para alarmes antigos)
+                alarmDescription = `${conditionText} ${alarm.target_price} USD`;
+            }
+
             if (alarm.status === 'active') {
                 activeAlarmsHtml.push(`
                     <tr>
                         <td><strong>${assetDisplay}</strong></td>
-                        <td class="${conditionClass}">${conditionText}</td>
-                        <td>${alarm.target_price} USD</td>
+                        <td class="${alarm.alarm_type === 'price' ? conditionClass : ''}">${alarmDescription}</td>
                         <td>${formattedDate}</td>
                         <td>
                             <div class="action-buttons">
@@ -52,8 +59,7 @@ async function fetchAndDisplayAlarms() {
                 triggeredAlarmsHtml.push(`
                     <tr>
                         <td><strong>${assetDisplay}</strong></td>
-                        <td class="${conditionClass}">${conditionText}</td>
-                        <td>${alarm.target_price} USD</td>
+                        <td class="${alarm.alarm_type === 'price' ? conditionClass : ''}">${alarmDescription}</td>
                         <td><span class="status-badge status-closed">Disparado</span></td>
                         <td>${formattedDate}</td>
                         <td>
@@ -66,18 +72,17 @@ async function fetchAndDisplayAlarms() {
             }
         }
 
-        activeTbody.innerHTML = activeAlarmsHtml.length > 0 ? activeAlarmsHtml.join('') : '<tr><td colspan="5" style="text-align:center;">Nenhum alarme ativo.</td></tr>';
-        triggeredTbody.innerHTML = triggeredAlarmsHtml.length > 0 ? triggeredAlarmsHtml.join('') : '<tr><td colspan="6" style="text-align:center;">Nenhum alarme no histórico.</td></tr>';
+        activeTbody.innerHTML = activeAlarmsHtml.length > 0 ? activeAlarmsHtml.join('') : '<tr><td colspan="4" style="text-align:center;">Nenhum alarme ativo.</td></tr>';
+        triggeredTbody.innerHTML = triggeredAlarmsHtml.length > 0 ? triggeredAlarmsHtml.join('') : '<tr><td colspan="5" style="text-align:center;">Nenhum alarme no histórico.</td></tr>';
 
     } catch (error) {
         console.error("Erro ao buscar alarmes:", error);
     }
 }
 
-// --- FUNÇÃO PARA APAGAR UM ALARME (ATIVO OU DO HISTÓRICO) ---
+// --- FUNÇÃO PARA APAGAR UM ALARME ---
 async function deleteAlarm(alarmId) {
-    const confirmationText = "Tem a certeza que quer apagar este registo? Esta ação é irreversível.";
-    if (!confirm(confirmationText)) return;
+    if (!confirm("Tem a certeza que quer apagar este registo?")) return;
     try {
         const { error } = await supabase.from('alarms').delete().eq('id', alarmId);
         if (error) throw error;
@@ -94,8 +99,20 @@ function enterEditMode(alarm) {
     selectedCoin = { id: alarm.asset_id, name: alarm.asset_id, symbol: alarm.asset_symbol };
 
     document.getElementById('alarm-asset').value = `${alarm.asset_id} (${alarm.asset_symbol})`;
-    document.getElementById('alarm-condition-standalone').value = alarm.condition;
-    document.getElementById('alarm-price-standalone').value = alarm.target_price;
+    document.getElementById('alarm-type-select').value = alarm.alarm_type || 'price';
+    
+    // Dispara o evento 'change' para mostrar os campos corretos
+    document.getElementById('alarm-type-select').dispatchEvent(new Event('change'));
+
+    if (alarm.alarm_type === 'stochastic') {
+        document.getElementById('stoch-condition').value = alarm.condition;
+        document.getElementById('stoch-value').value = alarm.target_price;
+        document.getElementById('stoch-period').value = alarm.indicator_period;
+        document.getElementById('stoch-timeframe').value = alarm.indicator_timeframe;
+    } else {
+        document.getElementById('alarm-condition-standalone').value = alarm.condition;
+        document.getElementById('alarm-price-standalone').value = alarm.target_price;
+    }
     
     document.querySelector('#alarm-form button[type="submit"]').textContent = 'Atualizar Alarme';
     document.getElementById('cancel-edit-btn').style.display = 'inline-block';
@@ -106,8 +123,8 @@ function enterEditMode(alarm) {
 function exitEditMode() {
     editingAlarmId = null;
     selectedCoin = null;
-
     document.getElementById('alarm-form').reset();
+    document.getElementById('alarm-type-select').dispatchEvent(new Event('change')); // Reseta a visibilidade dos campos
     document.querySelector('#alarm-form button[type="submit"]').textContent = 'Definir Alarme';
     document.getElementById('cancel-edit-btn').style.display = 'none';
 }
@@ -122,20 +139,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const assetInput = document.getElementById('alarm-asset');
     const resultsDiv = document.getElementById('autocomplete-results');
     const mainContainer = document.querySelector('main');
+    const alarmTypeSelect = document.getElementById('alarm-type-select');
+    const priceFields = document.getElementById('price-fields');
+    const stochasticFields = document.getElementById('stochastic-fields');
+
+    // Listener para alternar os campos do formulário
+    alarmTypeSelect.addEventListener('change', () => {
+        if (alarmTypeSelect.value === 'price') {
+            priceFields.style.display = 'block';
+            stochasticFields.style.display = 'none';
+        } else {
+            priceFields.style.display = 'none';
+            stochasticFields.style.display = 'block';
+        }
+    });
 
     // Listener unificado para todos os cliques em botões nas tabelas
     mainContainer.addEventListener('click', (e) => {
         const target = e.target;
         if (target.classList.contains('delete-btn')) {
-            const alarmId = target.getAttribute('data-id');
-            deleteAlarm(alarmId);
+            deleteAlarm(target.getAttribute('data-id'));
         }
         if (target.classList.contains('edit-btn')) {
-            const alarmId = target.getAttribute('data-id');
-            const alarmToEdit = window.alarmsData.find(a => a.id === alarmId);
-            if (alarmToEdit) {
-                enterEditMode(alarmToEdit);
-            }
+            const alarmToEdit = window.alarmsData.find(a => a.id === target.getAttribute('data-id'));
+            if (alarmToEdit) enterEditMode(alarmToEdit);
         }
     });
 
@@ -148,16 +175,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (editingAlarmId) exitEditMode();
         selectedCoin = null;
 
-        if (query.length < 2) {
-            resultsDiv.style.display = 'none';
-            return;
-        }
+        if (query.length < 2) { resultsDiv.style.display = 'none'; return; }
 
         debounceTimer = setTimeout(async () => {
             try {
                 const { data: results, error } = await supabase.functions.invoke('search-coins', { body: { query } });
                 if (error) throw error;
-
                 resultsDiv.innerHTML = '';
                 if (results.length > 0) {
                     results.forEach(coin => {
@@ -183,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.addEventListener('click', (e) => { if (e.target !== assetInput) resultsDiv.style.display = 'none'; });
 
-    // Lógica de Submissão (agora cria OU atualiza)
+    // Lógica de Submissão (cria OU atualiza)
     alarmForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const submitButton = alarmForm.querySelector('button[type="submit"]');
@@ -195,26 +218,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error("Por favor, selecione uma moeda válida da lista de sugestões.");
             }
 
-            const targetPrice = parseFloat(document.getElementById('alarm-price-standalone').value);
-            if (isNaN(targetPrice) || targetPrice <= 0) {
-                throw new Error("Por favor, preencha um preço alvo válido.");
-            }
-            
-            const alarmData = {
+            const alarmType = document.getElementById('alarm-type-select').value;
+            let alarmData = {
                 asset_id: selectedCoin.id,
                 asset_symbol: selectedCoin.symbol.toUpperCase(),
-                condition: document.getElementById('alarm-condition-standalone').value,
-                target_price: targetPrice
+                alarm_type: alarmType,
             };
+
+            // Preenche os dados específicos de cada tipo
+            if (alarmType === 'price') {
+                const targetPrice = parseFloat(document.getElementById('alarm-price-standalone').value);
+                if (isNaN(targetPrice) || targetPrice <= 0) throw new Error("Preço alvo inválido.");
+                alarmData.condition = document.getElementById('alarm-condition-standalone').value;
+                alarmData.target_price = targetPrice;
+                alarmData.indicator_timeframe = null;
+                alarmData.indicator_period = null;
+            } else { // stochastic
+                const targetValue = parseFloat(document.getElementById('stoch-value').value);
+                const period = parseInt(document.getElementById('stoch-period').value);
+                if (isNaN(targetValue) || isNaN(period)) throw new Error("Valores do indicador inválidos.");
+                alarmData.condition = document.getElementById('stoch-condition').value;
+                alarmData.target_price = targetValue;
+                alarmData.indicator_period = period;
+                alarmData.indicator_timeframe = document.getElementById('stoch-timeframe').value;
+            }
 
             let error;
             if (editingAlarmId) {
-                // MODO DE EDIÇÃO
                 const { error: updateError } = await supabase.from('alarms').update(alarmData).eq('id', editingAlarmId);
                 error = updateError;
             } else {
-                // MODO DE CRIAÇÃO
-                alarmData.status = 'active'; // Adiciona o status apenas ao criar
+                alarmData.status = 'active';
                 const { error: insertError } = await supabase.from('alarms').insert([alarmData]);
                 error = insertError;
             }
