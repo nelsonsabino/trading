@@ -53,10 +53,12 @@
                     <label for="strategy-select">Estratégia:</label>
                     <select id="strategy-select" name="strategy-select" required></select>
                 </div>
-                <div class="input-item">
-                    <label for="asset">Ativo:</label>
-                    <input type="text" id="asset" name="asset" required placeholder="Ex: SOL/USDT">
-                </div>
+                <div class="input-item" style="position: relative;"> <!-- Adicionado position: relative -->
+    <label for="asset">Ativo:</label>
+    <input type="text" id="asset" name="asset" required placeholder="Comece a escrever para pesquisar..." autocomplete="off">
+    <div id="modal-autocomplete-results" class="autocomplete-results"></div>
+    <!-- Usamos um ID diferente para não haver conflito com a página principal -->
+</div>
                 <div id="dynamic-checklist-container"></div>
                 <div class="input-item">
                     <label for="image-url">Link da Imagem do Gráfico (TradingView):</label>
