@@ -88,35 +88,27 @@
                 </div>
 
                 <!-- NOVO: Campos para o alarme de RSI-MA Crossover -->
-                <div id="rsi-fields" style="display: none;">
-                    <div class="form-row">
-                        <div class="input-item">
-                            <label for="rsi-condition">Condição de Cruzamento</label>
-                            <select id="rsi-condition">
-                                <option value="above">RSI cruza para CIMA da MA</option>
-                                <option value="below">RSI cruza para BAIXO da MA</option>
-                            </select>
-                        </div>
-                        <div class="input-item">
-                            <label for="rsi-period">Período do RSI (ex: 14)</label>
-                            <input type="number" id="rsi-period" value="14">
-                        </div>
-                        <div class="input-item">
-                            <label for="rsi-ma-period">Período da MA (ex: 14)</label>
-                            <input type="number" id="rsi-ma-period" value="14">
-                        </div>
-                        <div class="input-item">
-                            <label for="rsi-timeframe">Timeframe</label>
-                            <select id="rsi-timeframe">
-                                <option value="5m">5 Minutos</option>
-                                <option value="15m">15 Minutos</option>
-                                <option value="1h">1 Hora</option>
-                                <option value="4h">4 Horas</option>
-                                <option value="1d">Diário</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
+               <div id="rsi-fields" style="display: none;">
+    <div class="form-row">
+        <div class="input-item">
+            <label for="rsi-condition">Condição de Cruzamento</label>
+            <select id="rsi-condition">
+                <option value="above">RSI cruza para CIMA da MA</option>
+                <option value="below">RSI cruza para BAIXO da MA</option>
+            </select>
+        </div>
+        <div class="input-item">
+            <label for="rsi-timeframe">Timeframe</label>
+            <select id="rsi-timeframe">
+                <option value="5m">5 Minutos</option>
+                <option value="15m">15 Minutos</option>
+                <option value="1h">1 Hora</option>
+                <option value="4h">4 Horas</option>
+                <option value="1d">Diário</option>
+            </select>
+        </div>
+    </div>
+</div>
 
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">Definir Alarme</button>
