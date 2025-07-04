@@ -19,35 +19,82 @@
     </header>
 
     <main>
+        
         <!-- O nosso formulário de criação/edição -->
-        <section class="alarm-creator-section">
-            <h2><i class="fa-solid fa-bell-plus"></i> Criar ou Editar Alarme</h2>
-            <form id="alarm-form" class="alarm-form-standalone">
-                <div class="form-row">
-                    <div class="input-item">
-                        <label for="alarm-asset">Ativo</label>
-                        <input type="text" id="alarm-asset" required placeholder="Comece a escrever (ex: Bitcoin, SOL...)" autocomplete="off">
-                        <div id="autocomplete-results" class="autocomplete-results"></div>
-                    </div>
-                    <div class="input-item">
-                        <label for="alarm-condition-standalone">Condição</label>
-                        <select id="alarm-condition-standalone">
-                            <option value="above">Preço Acima de</option>
-                            <option value="below">Preço Abaixo de</option>
-                        </select>
-                    </div>
-                    <div class="input-item">
-                        <label for="alarm-price-standalone">Preço Alvo (USD)</label>
-                        <input type="number" id="alarm-price-standalone" step="any" required placeholder="65000.50">
-                    </div>
+        
+    <section class="alarm-creator-section">
+    <h2><i class="fa-solid fa-bell-plus"></i> Criar ou Editar Alarme</h2>
+    <form id="alarm-form" class="alarm-form-standalone">
+
+        <div class="input-item">
+            <label for="alarm-type-select">Tipo de Alarme</label>
+            <select id="alarm-type-select">
+                <option value="price">Preço</option>
+                <option value="stochastic">Estocástico</option>
+            </select>
+        </div>
+
+        <div class="form-row">
+            <div class="input-item">
+                <label for="alarm-asset">Ativo</label>
+                <input type="text" id="alarm-asset" required placeholder="Comece a escrever..." autocomplete="off">
+                <div id="autocomplete-results" class="autocomplete-results"></div>
+            </div>
+        </div>
+
+
+        <!-- Campos específicos para cada tipo de alarme -->
+        <div id="price-fields">
+            <div class="form-row">
+                <div class="input-item">
+                    <label for="alarm-condition-standalone">Condição de Preço</label>
+                    <select id="alarm-condition-standalone">
+                        <option value="above">Acima de</option>
+                        <option value="below">Abaixo de</option>
+                    </select>
                 </div>
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Definir Alarme</button>
-                    <button type="button" id="cancel-edit-btn" class="btn btn-secondary" style="display: none;">Cancelar Edição</button>
+                <div class="input-item">
+                    <label for="alarm-price-standalone">Preço Alvo (USD)</label>
+                    <input type="number" id="alarm-price-standalone" step="any" placeholder="65000.50">
                 </div>
-            </form>
-            <div id="alarm-feedback" class="alarm-feedback"></div>
-        </section>
+            </div>
+        </div>
+
+        <div id="stochastic-fields" style="display: none;">
+            <div class="form-row">
+                <div class="input-item">
+                    <label for="stoch-condition">Condição do Estocástico</label>
+                    <select id="stoch-condition">
+                        <option value="below">Abaixo de (sobrevenda)</option>
+                        <option value="above">Acima de (sobrecompra)</option>
+                    </select>
+                </div>
+                <div class="input-item">
+                    <label for="stoch-value">Valor Alvo (ex: 20)</label>
+                    <input type="number" id="stoch-value" step="any" placeholder="20">
+                </div>
+                <div class="input-item">
+                    <label for="stoch-period">Período %K (ex: 14)</label>
+                    <input type="number" id="stoch-period" value="14">
+                </div>
+                <div class="input-item">
+                    <label for="stoch-timeframe">Timeframe</label>
+                    <select id="stoch-timeframe">
+                        <option value="h4">4 Horas</option>
+                        <option value="d1">Diário</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Definir Alarme</button>
+            <button type="button" id="cancel-edit-btn" class="btn btn-secondary" style="display: none;">Cancelar Edição</button>
+        </div>
+    </form>
+    <div id="alarm-feedback" class="alarm-feedback"></div>
+</section>
+        
 
         <hr class="section-divider">
 
