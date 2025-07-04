@@ -237,3 +237,14 @@ footer { text-align: center; padding: 1rem 0; margin-top: 2rem; color: #6c757d; 
       gap: 1rem; /* Menos espaço entre os campos quando eles quebram a linha */
   }
 }
+
+
+/* --- ESTILO PARA O MOSTRADOR DE PREÇO ATUAL --- */
+.asset-price-display {
+    min-height: 24px; /* Garante que não "salta" o layout */
+    padding-top: 8px;
+    font-size: 0.9em;
+    color: #007bff;
+    font-weight: bold;
+    transition: opacity 0.3s ease-in-out;
+}
