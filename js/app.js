@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Inicialização da Aplicação Principal
     listenToTrades(displayTrades);
     populateStrategySelect();
-    const APP_VERSION = '5.6 (Integração Total)';
+    const APP_VERSION = '6.1 (Integração Total)';
     const versionDisplay = document.getElementById('app-version-display');
     if (versionDisplay) { versionDisplay.textContent = `Versão: ${APP_VERSION}`; }
 });
