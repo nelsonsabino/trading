@@ -1,15 +1,10 @@
-// js/ui.js (VERSÃO COM ÍCONES E MELHORIAS VISUAIS)
+// js/ui.js (VERSÃO FINAL COM LINK PARA TRADINGVIEW E ÍCONES)
 
 import { STRATEGIES } from './strategies.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openImageModal } from './modals.js';
 import { loadAndOpenForEditing } from './handlers.js';
 
-/**
- * Função inteligente que escolhe um ícone com base em palavras-chave no label.
- * @param {string} labelText - O texto do label do item da checklist.
- * @returns {string} - A classe do ícone Font Awesome (ex: 'fa-solid fa-chart-line').
- */
 function getIconForLabel(labelText) {
     const text = labelText.toLowerCase();
     if (text.includes('tendência')) return 'fa-solid fa-chart-line';
@@ -26,7 +21,7 @@ function getIconForLabel(labelText) {
     if (text.includes('timeframe')) return 'fa-solid fa-clock';
     if (text.includes('val ')) return 'fa-solid fa-magnet';
     if (text.includes('alvo')) return 'fa-solid fa-crosshairs';
-    return 'fa-solid fa-check'; // Ícone padrão
+    return 'fa-solid fa-check';
 }
 
 function createChecklistItem(check, data) {
@@ -35,24 +30,16 @@ function createChecklistItem(check, data) {
     const isChecked = data && data[check.id] ? 'checked' : '';
     const item = document.createElement('div');
     item.className = 'checklist-item';
-    
-    // Adiciona o ícone e o input de checkbox
-    item.innerHTML = `
-        <i class="${getIconForLabel(check.label)}"></i>
-        <input type="checkbox" id="${check.id}" ${isChecked} ${isRequired}>
-        <label for="${check.id}">${labelText}</label>
-    `;
+    item.innerHTML = `<i class="${getIconForLabel(check.label)}"></i><input type="checkbox" id="${check.id}" ${isChecked} ${isRequired}><label for="${check.id}">${labelText}</label>`;
     return item;
 }
 
 function createInputItem(input, data) {
     const item = document.createElement('div');
-    // Usamos uma classe genérica para o estilo
     item.className = 'input-item-styled'; 
     const isRequired = input.required === false ? '' : 'required';
     const labelText = input.required === false ? input.label : `${input.label} <span class="required-asterisk">*</span>`;
     const value = data && data[input.id] ? data[input.id] : '';
-
     let fieldHtml = '';
     if (input.type === 'select') {
         const optionsHtml = input.options.map(opt => `<option value="${opt}" ${value === opt ? 'selected' : ''}>${opt}</option>`).join('');
@@ -60,15 +47,7 @@ function createInputItem(input, data) {
     } else {
         fieldHtml = `<input type="${input.type}" id="${input.id}" value="${value}" step="any" ${isRequired} class="input-item-field" placeholder="${input.placeholder || ''}">`;
     }
-
-    // Estrutura com ícone e um div para o label e o input, para melhor controlo do layout
-    item.innerHTML = `
-        <i class="${getIconForLabel(input.label)}"></i>
-        <div style="flex-grow: 1;">
-            <label for="${input.id}">${labelText}</label>
-            ${fieldHtml}
-        </div>
-    `;
+    item.innerHTML = `<i class="${getIconForLabel(input.label)}"></i><div style="flex-grow: 1;"><label for="${input.id}">${labelText}</label>${fieldHtml}</div>`;
     return item;
 }
 
@@ -80,11 +59,8 @@ function createRadioGroup(radioInfo, data) {
     radioInfo.options.forEach(opt => {
         const isChecked = checkedValue === opt.id ? 'checked' : '';
         const item = document.createElement('div');
-        item.className = 'checklist-item'; // Reutiliza o novo estilo!
-        item.innerHTML = `
-            <i class="${getIconForLabel(opt.label)}"></i>
-            <input type="radio" id="${opt.id}" name="${radioInfo.name}" value="${opt.id}" ${isChecked} required>
-            <label for="${opt.id}">${opt.label}</label>`;
+        item.className = 'checklist-item';
+        item.innerHTML = `<i class="${getIconForLabel(opt.label)}"></i><input type="radio" id="${opt.id}" name="${radioInfo.name}" value="${opt.id}" ${isChecked} required><label for="${opt.id}">${opt.label}</label>`;
         group.appendChild(item);
     });
     return group;
@@ -126,7 +102,20 @@ export function populateStrategySelect() {
 export function createTradeCard(trade) {
     const card = document.createElement('div');
     card.className = 'trade-card';
-    card.innerHTML = `<button class="card-edit-btn">Editar</button><h3>${trade.data.asset}</h3><p style="color: #007bff; font-weight: 500;">Estratégia: ${trade.data.strategyName || 'N/A'}</p><p><strong>Status:</strong> ${trade.data.status}</p><p><strong>Notas:</strong> ${trade.data.notes || ''}</p>`;
+
+    const assetName = trade.data.asset;
+    let symbol = '';
+    const match = assetName.match(/\(([^)]+)\)/);
+    if (match && match[1]) {
+        symbol = match[1];
+    } else {
+        symbol = assetName.split('/')[0].trim();
+    }
+    const tradingViewSymbol = `${symbol.toUpperCase()}USDT`;
+    const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${tradingViewSymbol}`;
+    
+    card.innerHTML = `<button class="card-edit-btn">Editar</button><h3>${assetName}</h3><p style="color: #007bff; font-weight: 500;">Estratégia: ${trade.data.strategyName || 'N/A'}</p><p><strong>Status:</strong> ${trade.data.status}</p><p><strong>Notas:</strong> ${trade.data.notes || ''}</p>`;
+    
     const potentialImageUrl = trade.data.imageUrl;
     let armedImageUrl = null;
     if (trade.data.armedSetup) {
@@ -138,15 +127,27 @@ export function createTradeCard(trade) {
         const img = document.createElement('img');
         img.src = imageUrlToShow;
         img.className = 'card-screenshot';
-        img.alt = `Gráfico de ${trade.data.asset}`;
+        img.alt = `Gráfico de ${assetName}`;
         card.appendChild(img);
     }
+    
+    const actionsWrapper = document.createElement('div');
+    actionsWrapper.className = 'card-actions';
     let actionButton;
+
     if (trade.data.status === 'POTENTIAL') {
+        const tvLink = document.createElement('a');
+        tvLink.href = tradingViewUrl;
+        tvLink.target = '_blank';
+        tvLink.className = 'btn edit-btn';
+        tvLink.textContent = 'Gráfico';
+        actionsWrapper.appendChild(tvLink);
+
         actionButton = document.createElement('button');
         actionButton.className = 'trigger-btn btn-potential';
         actionButton.textContent = 'Validar Setup (Armar)';
         actionButton.addEventListener('click', () => openArmModal(trade));
+
     } else if (trade.data.status === 'ARMED') {
         card.classList.add('armed');
         actionButton = document.createElement('button');
@@ -162,7 +163,12 @@ export function createTradeCard(trade) {
         actionButton.textContent = 'Fechar Trade';
         actionButton.addEventListener('click', () => openCloseTradeModal(trade));
     }
-    if (actionButton) card.appendChild(actionButton);
+    
+    if (actionButton) {
+        actionsWrapper.appendChild(actionButton);
+    }
+
+    card.appendChild(actionsWrapper);
     card.querySelector('.card-edit-btn').addEventListener('click', (e) => { e.stopPropagation(); loadAndOpenForEditing(trade.id); });
     return card;
 }
