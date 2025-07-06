@@ -1,6 +1,5 @@
-// js/app.js (VERSÃO CORRIGIDA SEM DECLARAÇÃO DUPLICADA)
+// js/app.js (VERSÃO CORRIGIDA COM PRÉ-PREENCHIMENTO DE MODAL)
 
-// Importações de Módulos
 import { listenToTrades } from './firebase-service.js';
 import { addModal, armModal, execModal, closeModalObj, imageModal, closeImageModalBtn } from './dom-elements.js';
 import { openAddModal, closeAddModal, closeArmModal, closeExecModal, closeCloseTradeModal, closeImageModal } from './modals.js';
@@ -8,28 +7,23 @@ import { displayTrades, populateStrategySelect, generateDynamicChecklist } from 
 import { handleAddSubmit, handleArmSubmit, handleExecSubmit, handleCloseSubmit, loadAndOpenForEditing } from './handlers.js';
 import { STRATEGIES } from './strategies.js';
 import { setupAutocomplete } from './utils.js';
-// Não precisamos de importar a supabase aqui, pois o app.js não a usa diretamente.
-// A sua dependência (utils.js) já a importa do sítio certo.
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- INICIALIZAÇÃO DA APLICAÇÃO ---
-
-    // Listeners dos Modais
+    // --- Listeners dos Modais ---
     document.getElementById('add-opportunity-btn').addEventListener('click', openAddModal);
     addModal.closeBtn.addEventListener('click', closeAddModal);
     addModal.container.addEventListener('click', e => { if (e.target.id === 'add-opportunity-modal') closeAddModal(); });
     addModal.form.addEventListener('submit', handleAddSubmit);
     addModal.strategySelect.addEventListener('change', () => generateDynamicChecklist(addModal.checklistContainer, STRATEGIES[addModal.strategySelect.value]?.potentialPhases));
 
+    // ... (outros listeners de modais inalterados) ...
     armModal.closeBtn.addEventListener('click', closeArmModal);
     armModal.container.addEventListener('click', e => { if (e.target.id === 'arm-trade-modal') closeArmModal(); });
     armModal.form.addEventListener('submit', handleArmSubmit);
-
     execModal.closeBtn.addEventListener('click', closeExecModal);
     execModal.container.addEventListener('click', e => { if (e.target.id === 'execution-modal') closeExecModal(); });
     execModal.form.addEventListener('submit', handleExecSubmit);
-
     closeModalObj.closeBtn.addEventListener('click', closeCloseTradeModal);
     closeModalObj.container.addEventListener('click', e => { if (e.target.id === 'close-trade-modal') closeCloseTradeModal(); });
     closeModalObj.form.addEventListener('submit', handleCloseSubmit);
@@ -37,7 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Lógica para ativar o autocomplete no modal de adicionar trade
     const modalAssetInput = document.getElementById('asset');
     const modalResultsDiv = document.getElementById('modal-autocomplete-results');
-
     if (modalAssetInput && modalResultsDiv) {
         setupAutocomplete(modalAssetInput, modalResultsDiv, (coin) => {
             if (coin) {
@@ -46,17 +39,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Listeners do Modal de Imagem
-    if (closeImageModalBtn) {
-        closeImageModalBtn.addEventListener('click', closeImageModal);
+    // --- LÓGICA RESTAURADA: Verifica o URL para pré-preencher o modal ---
+    const urlParams = new URLSearchParams(window.location.search);
+    const assetSymbolFromUrl = urlParams.get('assetSymbol');
+    if (assetSymbolFromUrl) {
+        openAddModal();
+        modalAssetInput.value = assetSymbolFromUrl;
+        // Simula um input para ativar a busca do autocomplete e mostrar sugestões
+        modalAssetInput.dispatchEvent(new Event('input', { bubbles: true }));
     }
-    if (imageModal) {
-        imageModal.addEventListener('click', (e) => {
-            if (e.target === imageModal) {
-                closeImageModal();
-            }
-        });
-    }
+
+    // ... (Listeners do Modal de Imagem inalterados) ...
+    if (closeImageModalBtn) { closeImageModalBtn.addEventListener('click', closeImageModal); }
+    if (imageModal) { imageModal.addEventListener('click', (e) => { if (e.target === imageModal) { closeImageModal(); } }); }
     document.addEventListener('click', function (e) {
         if (e.target.classList.contains('card-screenshot')) {
             e.preventDefault();
@@ -78,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- LÓGICA DA VERSÃO ---
-    const APP_VERSION = '6.1.1';
+    const APP_VERSION = '6.1.2 (Fluxo de Trabalho Corrigido)';
     const versionDisplay = document.getElementById('app-version-display');
     if (versionDisplay) {
         versionDisplay.textContent = `Versão: ${APP_VERSION}`;
