@@ -1,4 +1,4 @@
-// js/app.js (VERSÃO REATORADA COM AUTOCOMPLETE NO MODAL)
+// js/app.js 
 
 // Importações de Módulos
 import { listenToTrades } from './firebase-service.js';
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- LÓGICA DA VERSÃO ---
-    const APP_VERSION = '5.6';
+    const APP_VERSION = '5.7';
     const versionDisplay = document.getElementById('app-version-display');
     if (versionDisplay) {
         versionDisplay.textContent = `Versão: ${APP_VERSION}`;
