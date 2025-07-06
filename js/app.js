@@ -78,8 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- LÓGICA DA VERSÃO ---
-    // Vamos manter a versão 5.4, pois as alterações são de refatoração
-    const APP_VERSION = '5.4 (4 alarmes API Binance)';
+    const APP_VERSION = '5.6';
     const versionDisplay = document.getElementById('app-version-display');
     if (versionDisplay) {
         versionDisplay.textContent = `Versão: ${APP_VERSION}`;
