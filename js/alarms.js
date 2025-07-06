@@ -1,4 +1,4 @@
-// js/alarms.js (VERSÃO COMPLETA COM CRUZAMENTO DO ESTOCÁSTICO)
+// js/alarms.js (VERSÃO COM PRÉ-PREENCHIMENTO DE ATIVO VIA URL)
 
 import { supabase } from './services.js';
 import { setupAutocomplete } from './utils.js';
@@ -8,87 +8,37 @@ let debounceTimer;
 let editingAlarmId = null;
 window.alarmsData = [];
 
-// --- FUNÇÃO PRINCIPAL PARA BUSCAR E MOSTRAR TODOS OS ALARMES ---
 async function fetchAndDisplayAlarms() {
     const activeTbody = document.getElementById('active-alarms-tbody');
     const triggeredTbody = document.getElementById('triggered-alarms-tbody');
     if (!activeTbody || !triggeredTbody) return;
-
     try {
         activeTbody.innerHTML = '<tr><td colspan="4">A carregar...</td></tr>';
         triggeredTbody.innerHTML = '<tr><td colspan="5">A carregar...</td></tr>';
-
         const { data, error } = await supabase.from('alarms').select('*').order('created_at', { ascending: false });
         if (error) throw error;
-        
         window.alarmsData = data;
         const activeAlarmsHtml = [], triggeredAlarmsHtml = [];
-
         for (const alarm of data) {
             const conditionClass = (alarm.condition === 'above' || alarm.condition === 'touch_from_below') ? 'condition-above' : 'condition-below';
             const formattedDate = new Date(alarm.created_at).toLocaleString('pt-PT');
             const assetDisplay = `${alarm.asset_id} (${alarm.asset_symbol})`;
-
             let alarmDescription = '';
-            if (alarm.alarm_type === 'stochastic') {
-                alarmDescription = `Estocástico(${alarm.indicator_period}) ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} no ${alarm.indicator_timeframe}`;
-            } else if (alarm.alarm_type === 'stochastic_crossover') {
-                alarmDescription = `Estocástico %K(${alarm.indicator_period}) cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} de %D(${alarm.combo_period}) no ${alarm.indicator_timeframe}`;
-            } else if (alarm.alarm_type === 'rsi_crossover') {
-                alarmDescription = `RSI(${alarm.rsi_period}) cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} da MA(${alarm.rsi_ma_period}) no ${alarm.indicator_timeframe}`;
-            } else if (alarm.alarm_type === 'ema_touch') {
-                alarmDescription = `Preço toca na EMA(${alarm.ema_period}) por ${alarm.condition === 'touch_from_below' ? 'BAIXO (Suporte)' : 'CIMA (Resistência)'} no ${alarm.indicator_timeframe}`;
-            } else if (alarm.alarm_type === 'combo') {
-                const primaryTriggerText = alarm.condition === 'touch_from_above' ? `toca na EMA (Suporte)` : `toca na EMA (Resistência)`;
-                const secondaryTriggerText = `Estocástico(${alarm.combo_period}) ${alarm.combo_condition === 'below' ? 'abaixo de' : 'acima de'} ${alarm.combo_target_price}`;
-                alarmDescription = `CONFLUÊNCIA: ${primaryTriggerText} E ${secondaryTriggerText} no ${alarm.indicator_timeframe}`;
-            } else {
-                alarmDescription = `Preço ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} USD`;
-            }
-
-            if (alarm.status === 'active') {
-                activeAlarmsHtml.push(`
-                    <tr>
-                        <td><strong>${assetDisplay}</strong></td>
-                        <td class="${conditionClass}">${alarmDescription}</td>
-                        <td>${formattedDate}</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn edit-btn" data-id="${alarm.id}">Editar</button>
-                                <button class="btn delete-btn" data-id="${alarm.id}">Apagar</button>
-                            </div>
-                        </td>
-                    </tr>
-                `);
-            } else {
-                const triggeredDate = alarm.triggered_at ? new Date(alarm.triggered_at).toLocaleString('pt-PT') : new Date(alarm.created_at).toLocaleString('pt-PT');
-                triggeredAlarmsHtml.push(`
-                    <tr>
-                        <td><strong>${assetDisplay}</strong></td>
-                        <td class="${conditionClass}">${alarmDescription}</td>
-                        <td><span class="status-badge status-closed">Disparado</span></td>
-                        <td>${triggeredDate}</td>
-                        <td><div class="action-buttons"><button class="btn delete-btn" data-id="${alarm.id}">Apagar</button></div></td>
-                    </tr>
-                `);
-            }
+            if (alarm.alarm_type === 'stochastic') { alarmDescription = `Estocástico(${alarm.indicator_period}) ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} no ${alarm.indicator_timeframe}`; } 
+            else if (alarm.alarm_type === 'stochastic_crossover') { alarmDescription = `Estocástico %K(${alarm.indicator_period}) cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} de %D(${alarm.combo_period}) no ${alarm.indicator_timeframe}`; } 
+            else if (alarm.alarm_type === 'rsi_crossover') { alarmDescription = `RSI(${alarm.rsi_period}) cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} da MA(${alarm.rsi_ma_period}) no ${alarm.indicator_timeframe}`; } 
+            else if (alarm.alarm_type === 'ema_touch') { alarmDescription = `Preço toca na EMA(${alarm.ema_period}) por ${alarm.condition === 'touch_from_below' ? 'BAIXO (Suporte)' : 'CIMA (Resistência)'} no ${alarm.indicator_timeframe}`; } 
+            else if (alarm.alarm_type === 'combo') { const primaryTriggerText = alarm.condition === 'touch_from_above' ? `toca na EMA (Suporte)` : `toca na EMA (Resistência)`; const secondaryTriggerText = `Estocástico(${alarm.combo_period}) ${alarm.combo_condition === 'below' ? 'abaixo de' : 'acima de'} ${alarm.combo_target_price}`; alarmDescription = `CONFLUÊNCIA: ${primaryTriggerText} E ${secondaryTriggerText} no ${alarm.indicator_timeframe}`; } 
+            else { alarmDescription = `Preço ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} USD`; }
+            if (alarm.status === 'active') { activeAlarmsHtml.push(`<tr><td><strong>${assetDisplay}</strong></td><td class="${conditionClass}">${alarmDescription}</td><td>${formattedDate}</td><td><div class="action-buttons"><button class="btn edit-btn" data-id="${alarm.id}">Editar</button><button class="btn delete-btn" data-id="${alarm.id}">Apagar</button></div></td></tr>`); } 
+            else { const triggeredDate = alarm.triggered_at ? new Date(alarm.triggered_at).toLocaleString('pt-PT') : new Date(alarm.created_at).toLocaleString('pt-PT'); triggeredAlarmsHtml.push(`<tr><td><strong>${assetDisplay}</strong></td><td class="${conditionClass}">${alarmDescription}</td><td><span class="status-badge status-closed">Disparado</span></td><td>${triggeredDate}</td><td><div class="action-buttons"><button class="btn delete-btn" data-id="${alarm.id}">Apagar</button></div></td></tr>`); }
         }
         activeTbody.innerHTML = activeAlarmsHtml.length > 0 ? activeAlarmsHtml.join('') : '<tr><td colspan="4" style="text-align:center;">Nenhum alarme ativo.</td></tr>';
         triggeredTbody.innerHTML = triggeredAlarmsHtml.length > 0 ? triggeredAlarmsHtml.join('') : '<tr><td colspan="5" style="text-align:center;">Nenhum alarme no histórico.</td></tr>';
-    } catch (error) {
-        console.error("Erro ao buscar alarmes:", error);
-    }
+    } catch (error) { console.error("Erro ao buscar alarmes:", error); }
 }
 
-async function deleteAlarm(alarmId) {
-    if (!confirm("Tem a certeza que quer apagar este registo?")) return;
-    try {
-        await supabase.from('alarms').delete().eq('id', alarmId);
-        fetchAndDisplayAlarms();
-    } catch (error) {
-        console.error("Erro ao apagar alarme:", error);
-    }
-}
+async function deleteAlarm(alarmId) { if (!confirm("Tem a certeza que quer apagar este registo?")) return; try { await supabase.from('alarms').delete().eq('id', alarmId); fetchAndDisplayAlarms(); } catch (error) { console.error("Erro ao apagar alarme:", error); } }
 
 function enterEditMode(alarm) {
     editingAlarmId = alarm.id;
@@ -97,7 +47,6 @@ function enterEditMode(alarm) {
     const alarmType = alarm.alarm_type || 'price';
     document.getElementById('alarm-type-select').value = alarmType;
     document.getElementById('alarm-type-select').dispatchEvent(new Event('change'));
-
     if (alarmType === 'stochastic') {
         document.getElementById('stoch-condition').value = alarm.condition;
         document.getElementById('stoch-value').value = alarm.target_price;
@@ -125,7 +74,6 @@ function enterEditMode(alarm) {
         document.getElementById('alarm-condition-standalone').value = alarm.condition;
         document.getElementById('alarm-price-standalone').value = alarm.target_price;
     }
-    
     document.querySelector('#alarm-form button[type="submit"]').textContent = 'Atualizar Alarme';
     document.getElementById('cancel-edit-btn').style.display = 'inline-block';
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -138,6 +86,7 @@ function exitEditMode() {
     document.getElementById('alarm-type-select').dispatchEvent(new Event('change'));
     document.querySelector('#alarm-form button[type="submit"]').textContent = 'Definir Alarme';
     document.getElementById('cancel-edit-btn').style.display = 'none';
+    document.getElementById('asset-current-price').textContent = '';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -158,6 +107,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const comboFields = document.getElementById('combo-fields');
     const comboStochCondition = document.getElementById('combo-stoch-condition');
     const comboStochValue = document.getElementById('combo-stoch-value');
+
+    // **** NOVO: LÓGICA PARA LER O URL AO CARREGAR A PÁGINA ****
+    const urlParams = new URLSearchParams(window.location.search);
+    const assetSymbolFromUrl = urlParams.get('assetSymbol');
+    
+    if (assetSymbolFromUrl && assetInput) {
+        // Pré-preenche o campo de input com o símbolo vindo do URL
+        assetInput.value = assetSymbolFromUrl;
+        // Simula um evento de input para ativar a busca do autocomplete
+        assetInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
 
     if (comboStochCondition && comboStochValue) {
         comboStochCondition.addEventListener('change', () => {
@@ -217,7 +177,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 asset_symbol: selectedCoin.symbol.toUpperCase(),
                 alarm_type: alarmType,
             };
-
             if (alarmType === 'price') {
                 alarmData.condition = document.getElementById('alarm-condition-standalone').value;
                 alarmData.target_price = parseFloat(document.getElementById('alarm-price-standalone').value);
@@ -229,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (alarmType === 'stochastic_crossover') {
                 alarmData.condition = document.getElementById('stoch-cross-condition').value;
                 alarmData.indicator_period = parseInt(document.getElementById('stoch-cross-k-period').value);
-                alarmData.combo_period = parseInt(document.getElementById('stoch-cross-d-period').value); // Reutilizamos a coluna combo_period
+                alarmData.combo_period = parseInt(document.getElementById('stoch-cross-d-period').value);
                 alarmData.indicator_timeframe = document.getElementById('stoch-cross-timeframe').value;
             } else if (alarmType === 'rsi_crossover') {
                 alarmData.condition = document.getElementById('rsi-condition').value;
@@ -249,7 +208,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 alarmData.combo_target_price = parseInt(document.getElementById('combo-stoch-value').value);
                 alarmData.combo_period = 14;
             }
-            
             let error;
             if (editingAlarmId) {
                 const { error: updateError } = await supabase.from('alarms').update(alarmData).eq('id', editingAlarmId);
