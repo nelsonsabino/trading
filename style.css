@@ -289,3 +289,21 @@ footer { text-align: center; padding: 1rem 0; margin-top: 2rem; color: #6c757d; 
     gap: 10px;
     font-weight: bold;
 }
+
+/* --- ESTILOS PARA OS BOTÕES DENTRO DOS CARDS --- */
+.card-actions {
+    display: flex;
+    gap: 10px; /* Espaço entre os botões */
+    margin-top: 1rem;
+}
+
+.card-actions .btn,
+.card-actions .trigger-btn {
+    flex-grow: 1; /* Faz com que os botões ocupem o espaço disponível */
+    margin-top: 0; /* Remove a margem que o trigger-btn tinha */
+}
+
+/* Garante que o link do gráfico não é mais largo que o necessário se houver 2 botões */
+.card-actions a.btn {
+    flex-grow: 0; 
+}
