@@ -1,6 +1,7 @@
 // js/alarms.js (VERSÃO FINAL QUE MOSTRA A DATA DO DISPARO)
 
 import { supabase } from './services.js';
+import { setupAutocomplete } from './utils.js'; 
 let selectedCoin = null;
 let debounceTimer;
 let editingAlarmId = null;
