@@ -51,13 +51,11 @@
                     <label for="strategy-select">Estratégia:</label>
                     <select id="strategy-select" name="strategy-select" required></select>
                 </div>
-                <!-- **** ALTERAÇÃO AQUI **** -->
                 <div class="input-item" style="position: relative;">
                     <label for="asset">Ativo:</label>
                     <input type="text" id="asset" name="asset" required placeholder="Comece a escrever para pesquisar..." autocomplete="off">
                     <div id="modal-autocomplete-results" class="autocomplete-results"></div>
                 </div>
-                <!-- **** FIM DA ALTERAÇÃO **** -->
                 <div id="dynamic-checklist-container"></div>
                 <div class="input-item">
                     <label for="image-url">Link da Imagem do Gráfico (TradingView):</label>
@@ -127,11 +125,11 @@
         <p id="app-version-display"></p>
     </footer>    
 
-    <!-- **** ALTERAÇÃO NA ORDEM DOS SCRIPTS **** -->
+    <!-- ORDEM DE SCRIPTS CORRIGIDA -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="js/services.js"></script>
     <script type="module" src="js/utils.js"></script>
     <script type="module" src="js/app.js"></script>
-    <!-- A linha do alarms.js foi removida daqui, pois a sua lógica já não é necessária na index -->
 
 </body>
 </html>
