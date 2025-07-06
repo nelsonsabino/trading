@@ -28,7 +28,8 @@
                     <select id="alarm-type-select">
                         <option value="price">Preço</option>
                         <option value="ema_touch">Toque na EMA</option>
-                        <option value="stochastic">Estocástico</option>
+                        <option value="stochastic">Estocástico (Nível)</option>
+                        <option value="stochastic_crossover">Estocástico (Cruzamento)</option> <!-- OPÇÃO NOVA -->
                         <option value="rsi_crossover">RSI-MA Crossover</option>
                         <option value="combo">Alarme Combo</option>
                     </select>
@@ -91,6 +92,39 @@
                     </div>
                 </div>
 
+
+<!-- NOVO: Campos para o alarme de Cruzamento do Estocástico -->
+<div id="stoch-crossover-fields" style="display: none;">
+    <div class="form-row">
+        <div class="input-item">
+            <label for="stoch-cross-condition">Condição de Cruzamento</label>
+            <select id="stoch-cross-condition">
+                <option value="above">%K cruza para CIMA de %D (Bullish)</option>
+                <option value="below">%K cruza para BAIXO de %D (Bearish)</option>
+            </select>
+        </div>
+        <div class="input-item">
+            <label for="stoch-cross-k-period">Período %K (ex: 14)</label>
+            <input type="number" id="stoch-cross-k-period" value="14">
+        </div>
+        <div class="input-item">
+            <label for="stoch-cross-d-period">Período %D (ex: 3)</label>
+            <input type="number" id="stoch-cross-d-period" value="3">
+        </div>
+        <div class="input-item">
+            <label for="stoch-cross-timeframe">Timeframe</label>
+            <select id="stoch-cross-timeframe">
+                <option value="5m">5 Minutos</option>
+                <option value="15m">15 Minutos</option>
+                <option value="1h">1 Hora</option>
+                <option value="4h">4 Horas</option>
+                <option value="1d">Diário</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+                
                 <!-- Campos para Alarme de RSI-MA Crossover -->
                 <div id="rsi-fields" style="display: none;">
                     <div class="form-row">
