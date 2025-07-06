@@ -77,8 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
         loadAndOpenForEditing(tradeIdToEdit);
     }
 
-    // --- LÓGICA DA VERSÃO ---
-    const APP_VERSION = '5.7';
+    // --- VERSÃO SCANNER DE MERCADO ---
+    const APP_VERSION = '6.0';
     const versionDisplay = document.getElementById('app-version-display');
     if (versionDisplay) {
         versionDisplay.textContent = `Versão: ${APP_VERSION}`;
