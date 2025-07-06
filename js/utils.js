@@ -1,7 +1,7 @@
 // js/utils.js - Módulo de Funções Reutilizáveis
 
 // Importamos a instância do cliente Supabase do alarms.js
-import { supabase } from './alarms.js';
+import { supabase } from './services.js';
 
 /**
  * Anexa a funcionalidade de autocomplete a um campo de input.
