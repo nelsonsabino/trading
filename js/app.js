@@ -1,4 +1,4 @@
-// js/app.js - VERSÃO 5.5
+// js/app.js (VERSÃO REATORADA COM AUTOCOMPLETE NO MODAL)
 
 // Importações de Módulos
 import { listenToTrades } from './firebase-service.js';
@@ -38,9 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (modalAssetInput && modalResultsDiv) {
         setupAutocomplete(modalAssetInput, modalResultsDiv, (coin) => {
-            // No modal de trades, não precisamos de um callback complexo.
-            // Apenas preencher o input com o nome da moeda é suficiente.
-            // O `handlers.js` vai ler o valor do input diretamente ao submeter.
+            // Apenas preenchemos o input. O `handlers.js` já sabe como ler o valor.
+            // A função de callback é mais simples aqui porque não precisamos do preço em tempo real.
             if (coin) {
                 modalAssetInput.value = `${coin.name} (${coin.symbol.toUpperCase()})`;
             }
@@ -79,7 +78,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- LÓGICA DA VERSÃO ---
-    const APP_VERSION = '5.5 (Autocomplete no Modal)';
+    // Vamos manter a versão 5.4, pois as alterações são de refatoração
+    const APP_VERSION = '5.4 (4 alarmes API Binance)';
     const versionDisplay = document.getElementById('app-version-display');
     if (versionDisplay) {
         versionDisplay.textContent = `Versão: ${APP_VERSION}`;
