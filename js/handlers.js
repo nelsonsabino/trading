@@ -1,10 +1,8 @@
-// js/handlers.js 
+// js/handlers.js (VERSÃO COM REDIRECIONAMENTO PARA ALARMES)
 
-// CORREÇÃO: Importações separadas e corretas
 import { addModal } from './dom-elements.js';
 import { STRATEGIES } from './strategies.js';
 import { GESTAO_PADRAO } from './config.js';
-
 import { getTrade, addTrade, updateTrade, closeTradeAndUpdateBalance } from './firebase-service.js';
 import { getCurrentTrade, setCurrentTrade } from './state.js';
 import { closeAddModal, closeArmModal, closeExecModal, closeCloseTradeModal, openAddModal, openArmModal, openExecModal } from './modals.js';
@@ -12,6 +10,10 @@ import { generateDynamicChecklist } from './ui.js';
 
 export async function handleAddSubmit(e) {
     e.preventDefault();
+    
+    // 1. Recolha de dados e guardar no Firebase
+    const assetInput = document.getElementById('asset');
+    const assetName = assetInput.value;
     const strategyId = addModal.strategySelect.value;
     const checklistData = {};
     STRATEGIES[strategyId].potentialPhases.forEach(p => {
@@ -19,7 +21,7 @@ export async function handleAddSubmit(e) {
         if (p.checks) p.checks.forEach(c => checklistData[c.id] = document.getElementById(c.id).checked);
     });
     const tradeData = {
-        asset: document.getElementById('asset').value,
+        asset: assetName,
         imageUrl: document.getElementById('image-url').value,
         notes: document.getElementById('notes').value,
         strategyId: strategyId,
@@ -35,7 +37,23 @@ export async function handleAddSubmit(e) {
         tradeData.dateAdded = new Date();
         await addTrade(tradeData);
     }
+    
+    // 2. Fechar o modal
     closeAddModal();
+
+    // 3. *** NOVA LÓGICA DE REDIRECIONAMENTO ***
+    const redirectToAlarmCheckbox = document.getElementById('redirect-to-alarm-checkbox');
+    if (redirectToAlarmCheckbox && redirectToAlarmCheckbox.checked) {
+        // Extrai o símbolo do nome completo, ex: "Bitcoin (BTC)" -> "BTC"
+        const match = assetName.match(/\(([^)]+)\)/);
+        // Se encontrar o parêntese, usa o conteúdo. Senão, faz um fallback para o que vier antes de "/"
+        const symbol = match ? match[1] : assetName.split('/')[0].trim();
+        
+        if (symbol) {
+            // Redireciona para a página de alarmes, passando o símbolo como parâmetro no URL
+            window.location.href = `alarms.html?assetSymbol=${symbol.toUpperCase()}`;
+        }
+    }
 }
 
 export async function handleArmSubmit(e) {
