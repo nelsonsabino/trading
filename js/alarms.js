@@ -1,7 +1,8 @@
-// js/alarms.js (VERSÃO FINAL QUE MOSTRA A DATA DO DISPARO)
+// js/alarms.js (VERSÃO COMPLETA COM CRUZAMENTO DO ESTOCÁSTICO)
 
 import { supabase } from './services.js';
-import { setupAutocomplete } from './utils.js'; 
+import { setupAutocomplete } from './utils.js';
+
 let selectedCoin = null;
 let debounceTimer;
 let editingAlarmId = null;
@@ -25,11 +26,14 @@ async function fetchAndDisplayAlarms() {
 
         for (const alarm of data) {
             const conditionClass = (alarm.condition === 'above' || alarm.condition === 'touch_from_below') ? 'condition-above' : 'condition-below';
+            const formattedDate = new Date(alarm.created_at).toLocaleString('pt-PT');
             const assetDisplay = `${alarm.asset_id} (${alarm.asset_symbol})`;
 
             let alarmDescription = '';
             if (alarm.alarm_type === 'stochastic') {
                 alarmDescription = `Estocástico(${alarm.indicator_period}) ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} no ${alarm.indicator_timeframe}`;
+            } else if (alarm.alarm_type === 'stochastic_crossover') {
+                alarmDescription = `Estocástico %K(${alarm.indicator_period}) cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} de %D(${alarm.combo_period}) no ${alarm.indicator_timeframe}`;
             } else if (alarm.alarm_type === 'rsi_crossover') {
                 alarmDescription = `RSI(${alarm.rsi_period}) cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} da MA(${alarm.rsi_ma_period}) no ${alarm.indicator_timeframe}`;
             } else if (alarm.alarm_type === 'ema_touch') {
@@ -43,7 +47,6 @@ async function fetchAndDisplayAlarms() {
             }
 
             if (alarm.status === 'active') {
-                const formattedDate = new Date(alarm.created_at).toLocaleString('pt-PT');
                 activeAlarmsHtml.push(`
                     <tr>
                         <td><strong>${assetDisplay}</strong></td>
@@ -58,11 +61,7 @@ async function fetchAndDisplayAlarms() {
                     </tr>
                 `);
             } else {
-                // AQUI ESTÁ A ALTERAÇÃO: Usa triggered_at se existir, senão usa created_at
-                const triggeredDate = alarm.triggered_at 
-                    ? new Date(alarm.triggered_at).toLocaleString('pt-PT') 
-                    : new Date(alarm.created_at).toLocaleString('pt-PT');
-                
+                const triggeredDate = alarm.triggered_at ? new Date(alarm.triggered_at).toLocaleString('pt-PT') : new Date(alarm.created_at).toLocaleString('pt-PT');
                 triggeredAlarmsHtml.push(`
                     <tr>
                         <td><strong>${assetDisplay}</strong></td>
@@ -104,6 +103,11 @@ function enterEditMode(alarm) {
         document.getElementById('stoch-value').value = alarm.target_price;
         document.getElementById('stoch-period').value = alarm.indicator_period;
         document.getElementById('stoch-timeframe').value = alarm.indicator_timeframe;
+    } else if (alarmType === 'stochastic_crossover') {
+        document.getElementById('stoch-cross-condition').value = alarm.condition;
+        document.getElementById('stoch-cross-k-period').value = alarm.indicator_period;
+        document.getElementById('stoch-cross-d-period').value = alarm.combo_period;
+        document.getElementById('stoch-cross-timeframe').value = alarm.indicator_timeframe;
     } else if (alarmType === 'rsi_crossover') {
         document.getElementById('rsi-condition').value = alarm.condition;
         document.getElementById('rsi-timeframe').value = alarm.indicator_timeframe;
@@ -148,6 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const alarmTypeSelect = document.getElementById('alarm-type-select');
     const priceFields = document.getElementById('price-fields');
     const stochasticFields = document.getElementById('stochastic-fields');
+    const stochCrossoverFields = document.getElementById('stoch-crossover-fields');
     const rsiFields = document.getElementById('rsi-fields');
     const emaFields = document.getElementById('ema-fields');
     const comboFields = document.getElementById('combo-fields');
@@ -164,6 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const type = alarmTypeSelect.value;
         priceFields.style.display = type === 'price' ? 'block' : 'none';
         stochasticFields.style.display = type === 'stochastic' ? 'block' : 'none';
+        stochCrossoverFields.style.display = type === 'stochastic_crossover' ? 'block' : 'none';
         rsiFields.style.display = type === 'rsi_crossover' ? 'block' : 'none';
         emaFields.style.display = type === 'ema_touch' ? 'block' : 'none';
         comboFields.style.display = type === 'combo' ? 'block' : 'none';
@@ -211,16 +217,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 asset_symbol: selectedCoin.symbol.toUpperCase(),
                 alarm_type: alarmType,
             };
+
             if (alarmType === 'price') {
-                const targetPrice = parseFloat(document.getElementById('alarm-price-standalone').value);
-                if (isNaN(targetPrice) || targetPrice <= 0) throw new Error("Preço alvo inválido.");
                 alarmData.condition = document.getElementById('alarm-condition-standalone').value;
-                alarmData.target_price = targetPrice;
+                alarmData.target_price = parseFloat(document.getElementById('alarm-price-standalone').value);
             } else if (alarmType === 'stochastic') {
                 alarmData.condition = document.getElementById('stoch-condition').value;
                 alarmData.target_price = parseFloat(document.getElementById('stoch-value').value);
                 alarmData.indicator_period = parseInt(document.getElementById('stoch-period').value);
                 alarmData.indicator_timeframe = document.getElementById('stoch-timeframe').value;
+            } else if (alarmType === 'stochastic_crossover') {
+                alarmData.condition = document.getElementById('stoch-cross-condition').value;
+                alarmData.indicator_period = parseInt(document.getElementById('stoch-cross-k-period').value);
+                alarmData.combo_period = parseInt(document.getElementById('stoch-cross-d-period').value); // Reutilizamos a coluna combo_period
+                alarmData.indicator_timeframe = document.getElementById('stoch-cross-timeframe').value;
             } else if (alarmType === 'rsi_crossover') {
                 alarmData.condition = document.getElementById('rsi-condition').value;
                 alarmData.indicator_timeframe = document.getElementById('rsi-timeframe').value;
@@ -239,6 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 alarmData.combo_target_price = parseInt(document.getElementById('combo-stoch-value').value);
                 alarmData.combo_period = 14;
             }
+            
             let error;
             if (editingAlarmId) {
                 const { error: updateError } = await supabase.from('alarms').update(alarmData).eq('id', editingAlarmId);
