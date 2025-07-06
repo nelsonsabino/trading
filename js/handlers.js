@@ -1,4 +1,4 @@
-// js/handlers.js (VERSÃO COM REDIRECIONAMENTO PARA ALARMES)
+// js/handlers.js (VERSÃO COM REDIRECIONAMENTO ROBUSTO)
 
 import { addModal } from './dom-elements.js';
 import { STRATEGIES } from './strategies.js';
@@ -41,16 +41,24 @@ export async function handleAddSubmit(e) {
     // 2. Fechar o modal
     closeAddModal();
 
-    // 3. *** NOVA LÓGICA DE REDIRECIONAMENTO ***
+    // 3. LÓGICA DE REDIRECIONAMENTO MAIS ROBUSTA
     const redirectToAlarmCheckbox = document.getElementById('redirect-to-alarm-checkbox');
     if (redirectToAlarmCheckbox && redirectToAlarmCheckbox.checked) {
-        // Extrai o símbolo do nome completo, ex: "Bitcoin (BTC)" -> "BTC"
-        const match = assetName.match(/\(([^)]+)\)/);
-        // Se encontrar o parêntese, usa o conteúdo. Senão, faz um fallback para o que vier antes de "/"
-        const symbol = match ? match[1] : assetName.split('/')[0].trim();
+        
+        let symbol = '';
+        // Tenta encontrar o símbolo dentro de parênteses, ex: "Bitcoin (BTC)"
+        const match = assetName.match(/\(([^)]+)\)/); 
+        
+        if (match && match[1]) {
+            // Se encontrar, o símbolo é o que está dentro dos parênteses
+            symbol = match[1];
+        } else {
+            // Se não, assume um formato como "BTC/USDT" e pega na primeira parte
+            symbol = assetName.split('/')[0].trim();
+        }
         
         if (symbol) {
-            // Redireciona para a página de alarmes, passando o símbolo como parâmetro no URL
+            // Redireciona para a página de alarmes com o símbolo no URL
             window.location.href = `alarms.html?assetSymbol=${symbol.toUpperCase()}`;
         }
     }
@@ -119,7 +127,11 @@ export async function loadAndOpenForEditing(tradeId) {
             openAddModal();
             addModal.strategySelect.value = trade.data.strategyId;
             generateDynamicChecklist(addModal.checklistContainer, STRATEGIES[trade.data.strategyId]?.potentialPhases, trade.data.potentialSetup);
-            document.getElementById('asset').value = trade.data.asset;
+            // Preenche o input e ativa o autocomplete para consistência
+            const modalAssetInput = document.getElementById('asset');
+            modalAssetInput.value = trade.data.asset;
+            modalAssetInput.dispatchEvent(new Event('input', { bubbles: true }));
+
             document.getElementById('image-url').value = trade.data.imageUrl || '';
             document.getElementById('notes').value = trade.data.notes;
         } else if (trade.data.status === 'ARMED') {
