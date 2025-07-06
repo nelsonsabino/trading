@@ -1,5 +1,6 @@
 // js/app.js (VERSÃO FINAL COM INTEGRAÇÃO TOTAL)
 
+import { supabase } from './services.js'; 
 import { listenToTrades } from './firebase-service.js';
 import { addModal, armModal, execModal, closeModalObj, imageModal, closeImageModalBtn } from './dom-elements.js';
 import { openAddModal, closeAddModal, closeArmModal, closeExecModal, closeCloseTradeModal, closeImageModal } from './modals.js';
