@@ -248,3 +248,44 @@ footer { text-align: center; padding: 1rem 0; margin-top: 2rem; color: #6c757d; 
     font-weight: bold;
     transition: opacity 0.3s ease-in-out;
 }
+
+/* --- ESTILOS PARA A PÁGINA DE SCANNER DE MERCADO --- */
+.market-scan-section h2 {
+    text-align: center;
+    border-bottom: none;
+    margin-bottom: 1.5rem;
+}
+.market-table {
+    /* Reutiliza muitos estilos das outras tabelas */
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    overflow: hidden;
+    font-size: 0.95em;
+}
+.market-table thead tr {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+.market-table th, .market-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e9ecef;
+    vertical-align: middle;
+}
+.market-table th:first-child, .market-table td:first-child {
+    text-align: center;
+    width: 50px;
+}
+.market-table tbody tr:last-child td {
+    border-bottom: none;
+}
+.market-table .asset-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+}
