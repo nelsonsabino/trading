@@ -25,13 +25,13 @@
 
                 <div class="input-item" style="max-width: 400px; margin-left: auto; margin-right: auto;">
                     <label for="alarm-type-select">Tipo de Alarme</label>
-                        <select id="alarm-type-select">
-                            <option value="price">Preço</option>
-                            <option value="ema_touch">Toque na EMA</option>
-                            <option value="stochastic">Estocástico</option>
-                            <option value="rsi_crossover">RSI-MA Crossover</option>
-                            <option value="combo">Alarme Combo</option> 
-                        </select>
+                    <select id="alarm-type-select">
+                        <option value="price">Preço</option>
+                        <option value="ema_touch">Toque na EMA</option>
+                        <option value="stochastic">Estocástico</option>
+                        <option value="rsi_crossover">RSI-MA Crossover</option>
+                        <option value="combo">Alarme Combo</option>
+                    </select>
                 </div>
 
                 <div class="form-row">
@@ -43,7 +43,7 @@
                     </div>
                 </div>
 
-                <!-- Campos específicos para cada tipo de alarme -->
+                <!-- Campos para Alarme de Preço -->
                 <div id="price-fields">
                     <div class="form-row">
                         <div class="input-item">
@@ -60,13 +60,14 @@
                     </div>
                 </div>
 
+                <!-- Campos para Alarme de Estocástico -->
                 <div id="stochastic-fields" style="display: none;">
                     <div class="form-row">
                         <div class="input-item">
-                            <label for="stoch-condition">Condição do Estocástico</button>
+                            <label for="stoch-condition">Condição do Estocástico</label>
                             <select id="stoch-condition">
-                                <option value="below">Abaixo de (sobrevenda)</option>
-                                <option value="above">Acima de (sobrecompra)</option>
+                                <option value="below">Abaixo de (Sobrevenda)</option>
+                                <option value="above">Acima de (Sobrecompra)</option>
                             </select>
                         </div>
                         <div class="input-item">
@@ -90,107 +91,107 @@
                     </div>
                 </div>
 
-                <!-- NOVO: Campos para o alarme de RSI-MA Crossover -->
-               <div id="rsi-fields" style="display: none;">
+                <!-- Campos para Alarme de RSI-MA Crossover -->
+                <div id="rsi-fields" style="display: none;">
                     <div class="form-row">
-                    <div class="input-item">
-                    <label for="rsi-condition">Condição de Cruzamento</label>
-                    <select id="rsi-condition">
-                    <option value="above">RSI cruza para CIMA da MA</option>
-                    <option value="below">RSI cruza para BAIXO da MA</option>
-                    </select>
-            </div>
-                <div class="input-item">
-                <label for="rsi-timeframe">Timeframe</label>
-                <select id="rsi-timeframe">
-                    <option value="5m">5 Minutos</option>
-                    <option value="15m">15 Minutos</option>
-                    <option value="1h">1 Hora</option>
-                    <option value="4h">4 Horas</option>
-                    <option value="1d">Diário</option>
-                </select>
+                        <div class="input-item">
+                            <label for="rsi-condition">Condição de Cruzamento</label>
+                            <select id="rsi-condition">
+                                <option value="above">RSI cruza para CIMA da MA</option>
+                                <option value="below">RSI cruza para BAIXO da MA</option>
+                            </select>
+                        </div>
+                        <div class="input-item">
+                            <label for="rsi-timeframe">Timeframe</label>
+                            <select id="rsi-timeframe">
+                                <option value="5m">5 Minutos</option>
+                                <option value="15m">15 Minutos</option>
+                                <option value="1h">1 Hora</option>
+                                <option value="4h">4 Horas</option>
+                                <option value="1d">Diário</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-<div id="ema-fields" style="display: none;">
-    <div class="form-row">
-        <div class="input-item">
-            <label for="ema-condition">Condição do Toque</label>
-            <select id="ema-condition">
-                <option value="touch_from_below">Preço testa suporte de EMA</option>
-                <option value="touch_from_above">Preço testa resistência de EMA</option>
-            </select>
-        </div>
-        <div class="input-item">
-            <label for="ema-period">Período da EMA (ex: 50)</label>
-            <input type="number" id="ema-period" value="50">
-        </div>
-        <div class="input-item">
-            <label for="ema-timeframe">Timeframe</label>
-            <select id="ema-timeframe">
-                <option value="5m">5 Minutos</option>
-                <option value="15m">15 Minutos</option>
-                <option value="1h">1 Hora</option>
-                <option value="4h">4 Horas</option>
-                <option value="1d">Diário</option>
-            </select>
-        </div>
-    </div>
-</div>                
+                <!-- Campos para Alarme de Toque na EMA -->
+                <div id="ema-fields" style="display: none;">
+                    <div class="form-row">
+                        <div class="input-item">
+                            <label for="ema-condition">Condição do Toque</label>
+                            <select id="ema-condition">
+                                <option value="touch_from_above">Preço toca na EMA (Suporte)</option>
+                                <option value="touch_from_below">Preço toca na EMA (Resistência)</option>
+                            </select>
+                        </div>
+                        <div class="input-item">
+                            <label for="ema-period">Período da EMA (ex: 50)</label>
+                            <input type="number" id="ema-period" value="50">
+                        </div>
+                        <div class="input-item">
+                            <label for="ema-timeframe">Timeframe</label>
+                            <select id="ema-timeframe">
+                                <option value="5m">5 Minutos</option>
+                                <option value="15m">15 Minutos</option>
+                                <option value="1h">1 Hora</option>
+                                <option value="4h">4 Horas</option>
+                                <option value="1d">Diário</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
 
+                <!-- Campos para o Alarme Combo -->
+                <div id="combo-fields" style="display: none;">
+                    <p class="combo-separator">CONDIÇÃO PRINCIPAL (Evento de Gatilho)</p>
+                    <div class="form-row">
+                        <div class="input-item">
+                            <label for="combo-primary-trigger">Gatilho Primário</label>
+                            <select id="combo-primary-trigger">
+                                <option value="touch_from_above">Preço toca na EMA (Suporte)</option>
+                                <option value="touch_from_below">Preço toca na EMA (Resistência)</option>
+                            </select>
+                        </div>
+                        <div class="input-item">
+                            <label for="combo-ema-period">Período da EMA</label>
+                            <input type="number" id="combo-ema-period" value="50">
+                        </div>
+                    </div>
 
-<div id="combo-fields" style="display: none;">
-    <p class="combo-separator">CONDIÇÃO PRINCIPAL (Evento de Gatilho)</p>
-    <div class="form-row">
-        <div class="input-item">
-            <label for="combo-primary-trigger">Gatilho Primário</label>
-            <select id="combo-primary-trigger">
-                <option value="touch_from_above">Preço toca na EMA (Suporte)</option>
-                <option value="touch_from_below">Preço toca na EMA (Resistência)</option>
-            </select>
-        </div>
-        <div class="input-item">
-            <label for="combo-ema-period">Período da EMA</label>
-            <input type="number" id="combo-ema-period" value="50">
-        </div>
-    </div>
+                    <p class="combo-separator">E (CONDIÇÃO SECUNDÁRIA)</p>
+                    <div class="form-row">
+                        <div class="input-item">
+                            <label>Indicador de Confirmação</label>
+                            <input type="text" value="Estocástico" readonly>
+                        </div>
+                        <div class="input-item">
+                            <label for="combo-stoch-condition">Condição do Estocástico</label>
+                            <select id="combo-stoch-condition">
+                                <option value="below">Abaixo de (Sobrevenda)</option>
+                                <option value="above">Acima de (Sobrecompra)</option>
+                            </select>
+                        </div>
+                        <div class="input-item">
+                            <label for="combo-stoch-value">Valor Alvo</label>
+                            <input type="number" id="combo-stoch-value" value="20">
+                        </div>
+                    </div>
+                    
+                    <p class="combo-separator">NO TIMEFRAME</p>
+                    <div class="form-row">
+                        <div class="input-item" style="flex-grow: 2;">
+                            <label for="combo-timeframe">Timeframe (para ambos os indicadores)</label>
+                            <select id="combo-timeframe">
+                                <option value="5m">5 Minutos</option>
+                                <option value="15m">15 Minutos</option>
+                                <option value="1h">1 Hora</option>
+                                <option value="4h">4 Horas</option>
+                                <option value="1d">Diário</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
 
-    <p class="combo-separator">E (CONDIÇÃO SECUNDÁRIA)</p>
-    <div class="form-row">
-        <div class="input-item">
-            <label>Indicador de Confirmação</label>
-            <input type="text" value="Estocástico" readonly>
-        </div>
-        <div class="input-item">
-            <label for="combo-stoch-condition">Condição do Estocástico</label>
-            <select id="combo-stoch-condition">
-                <option value="below">Abaixo de (Sobrevenda)</option>
-                <option value="above">Acima de (Sobrecompra)</option>
-            </select>
-        </div>
-        <div class="input-item">
-            <label for="combo-stoch-value">Valor Alvo</label>
-            <input type="number" id="combo-stoch-value" value="20"> <!-- Valor por defeito inicial -->
-        </div>
-    </div>
-    
-    <p class="combo-separator">NO TIMEFRAME</p>
-    <div class="form-row">
-        <div class="input-item" style="flex-grow: 2;">
-            <label for="combo-timeframe">Timeframe (para ambos os indicadores)</label>
-            <select id="combo-timeframe">
-                <option value="5m">5 Minutos</option>
-                <option value="15m">15 Minutos</option>
-                <option value="1h">1 Hora</option>
-                <option value="4h">4 Horas</option>
-                <option value="1d">Diário</option>
-            </select>
-        </div>
-    </div>
-</div>
-
-                
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">Definir Alarme</button>
                     <button type="button" id="cancel-edit-btn" class="btn btn-secondary" style="display: none;">Cancelar Edição</button>
@@ -214,9 +215,7 @@
                             <th>Ações</th> 
                         </tr>
                     </thead>
-                    <tbody id="active-alarms-tbody">
-                        <!-- As linhas serão inseridas aqui pelo alarms.js -->
-                    </tbody>
+                    <tbody id="active-alarms-tbody"></tbody>
                 </table>
             </div>
         </section>
@@ -233,13 +232,11 @@
                             <th>Ativo</th>
                             <th>Condição</th>
                             <th>Status</th>
-                            <th>Data de Criação</th>
+                            <th>Data do Disparo</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
-                    <tbody id="triggered-alarms-tbody">
-                         <!-- As linhas serão inseridas aqui pelo alarms.js -->
-                    </tbody>
+                    <tbody id="triggered-alarms-tbody"></tbody>
                 </table>
             </div>
         </section>
