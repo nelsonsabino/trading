@@ -58,6 +58,32 @@
                     <div id="modal-autocomplete-results" class="autocomplete-results"></div>
                 </div>
                 <div id="dynamic-checklist-container"></div>
+
+
+<!-- RE-INTEGRAÇÃO: Secção para Criar Alarme de Preço -->
+<hr style="margin: 2rem 0;">
+<div class="alarm-section-modal">
+    <div class="checklist-item">
+        <input type="checkbox" id="modal-create-alarm-checkbox">
+        <label for="modal-create-alarm-checkbox"><strong>Adicionar um Alarme de Preço a esta Oportunidade?</strong></label>
+    </div>
+
+    <div id="modal-alarm-fields" style="display: none; margin-left: 1rem; border-left: 2px solid #007bff; padding-left: 1rem; margin-top: 1rem;">
+        <div class="input-item">
+            <label for="modal-alarm-condition">Quando o preço estiver:</label>
+            <select id="modal-alarm-condition">
+                <option value="above">Acima de</option>
+                <option value="below">Abaixo de</option>
+            </select>
+        </div>
+        <div class="input-item" style="margin-bottom: 0;">
+            <label for="modal-alarm-price">Preço Alvo (USD):</label>
+            <input type="number" id="modal-alarm-price" step="any" placeholder="Ex: 180.50">
+        </div>
+    </div>
+</div>
+
+                
                 <div class="input-item">
                     <label for="image-url">Link da Imagem do Gráfico (TradingView):</label>
                     <input type="text" id="image-url" placeholder="Cole aqui o link da imagem...">
