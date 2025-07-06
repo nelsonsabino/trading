@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scanner de Mercado - Top Volume</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>Scanner de Mercado</h1>
+        <p class="mantra">Encontre os ativos com maior atividade e liquidez.</p>
+        <nav>
+            <a href="index.html" class="nav-link">Voltar ao Dashboard</a>
+            <a href="alarms.html" class="nav-link">Gerir Alarmes</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="market-scan-section">
+            <h2><i class="fa-solid fa-fire" style="color: #ffc107;"></i> Top 30 Pares com Maior Volume (USDC)</h2>
+            <div class="table-wrapper">
+                <table class="market-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Ativo</th>
+                            <th>Último Preço</th>
+                            <th>Volume (24h)</th>
+                            <th>Variação (24h)</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="market-scan-tbody">
+                        <!-- As linhas serão inseridas aqui pelo market-scan.js -->
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 2rem;">A carregar dados do mercado...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script type="module" src="js/market-scan.js"></script>
+
+</body>
+</html>
