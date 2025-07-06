@@ -1,9 +1,6 @@
 // js/alarms.js (VERSÃO FINAL QUE MOSTRA A DATA DO DISPARO)
 
-import { supabaseUrl, supabaseAnonKey } from './config.js';
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { supabase } from './services.js';
 let selectedCoin = null;
 let debounceTimer;
 let editingAlarmId = null;
