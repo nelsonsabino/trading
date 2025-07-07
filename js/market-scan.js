@@ -1,4 +1,4 @@
-// js/market-scan.js - Cérebro da Página de Scanner de Mercado
+// js/market-scan.js (VERSÃO COM LINKS CONSISTENTES)
 
 // Função para formatar números grandes (ex: 1.25B para biliões, 345.M para milhões)
 function formatVolume(volume) {
@@ -28,11 +28,8 @@ async function fetchAndDisplayMarketData() {
 
         // 2. Filtrar, Ordenar e Limitar os dados
         const top30Usdc = allTickers
-            // Filtra apenas por pares que terminam em "USDC"
             .filter(ticker => ticker.symbol.endsWith('USDC'))
-            // Ordena pelo volume (quoteVolume), do maior para o menor
             .sort((a, b) => parseFloat(b.quoteVolume) - parseFloat(a.quoteVolume))
-            // Pega apenas nos primeiros 30
             .slice(0, 30);
 
         if (top30Usdc.length === 0) {
@@ -42,24 +39,25 @@ async function fetchAndDisplayMarketData() {
 
         // 3. Gerar as linhas da tabela
         const tableRowsHtml = top30Usdc.map((ticker, index) => {
-            const baseAsset = ticker.symbol.replace('USDC', ''); // Ex: "BTCUSDC" -> "BTC"
+            const baseAsset = ticker.symbol.replace('USDC', '');
+            const fullPairName = `${baseAsset}/USDC`; // Ex: "BTC/USDC"
             const price = parseFloat(ticker.lastPrice);
             const volume = parseFloat(ticker.quoteVolume);
             const priceChangePercent = parseFloat(ticker.priceChangePercent);
             
-            // Define a cor da variação de preço
             const priceChangeClass = priceChangePercent >= 0 ? 'positive-pnl' : 'negative-pnl';
 
-            // Links dinâmicos
+            // **** AQUI ESTÁ A ALTERAÇÃO PRINCIPAL ****
+            // Links dinâmicos agora usam a mesma informação
             const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${ticker.symbol}`;
-            const createAlarmUrl = `alarms.html?assetName=${baseAsset}USDC&assetId=${baseAsset.toLowerCase()}`;
+            const createAlarmUrl = `alarms.html?assetName=${fullPairName}`; // Passa o nome completo do par
+            const addOpportunityUrl = `index.html?assetName=${fullPairName}`; // Passa o nome completo do par
 
             return `
                 <tr>
                     <td>${index + 1}</td>
                     <td>
                         <div class="asset-name">
-                            <!-- Ícone virá de uma fonte externa no futuro, por agora usamos texto -->
                             <span>${baseAsset}</span>
                         </div>
                     </td>
@@ -67,10 +65,11 @@ async function fetchAndDisplayMarketData() {
                     <td>${formatVolume(volume)}</td>
                     <td class="${priceChangeClass}">${priceChangePercent.toFixed(2)}%</td>
                     <td>
-<div class="action-buttons">
-    <a href="${tradingViewUrl}" target="_blank" class="btn edit-btn">Gráfico</a>
-    <a href="alarms.html?assetSymbol=${baseAsset}" class="btn btn-secondary">Criar Alarme</a>
-    <a href="index.html?assetSymbol=${baseAsset}&pair=${ticker.symbol}" class="btn btn-primary">Add Oportunidade</a></div>
+                        <div class="action-buttons">
+                            <a href="${tradingViewUrl}" target="_blank" class="btn edit-btn">Gráfico</a>
+                            <a href="${createAlarmUrl}" class="btn btn-secondary">Criar Alarme</a>
+                            <a href="${addOpportunityUrl}" class="btn btn-primary">Add Oportunidade</a>
+                        </div>
                     </td>
                 </tr>
             `;
