@@ -80,28 +80,22 @@ export const STRATEGIES = {
     /* ------------ Resistance-Breakout ------------ */
     /* ------------------------------------------------------------------------ */ 
 
-   'Resistance-Breakout': {
+  'Resistance-Breakout': {
     name: "Resistance Breakout into Support",
     potentialPhases: [
         {
             title: "Fase 1: Rompimento da resistência (TF 1h, 4h ou D)",
             exampleImageUrl: "pic/Resistencia-suporte_1h.png", 
             inputs: [
-                { 
-                    id: "pot-rb-tf",
-                    label: "Timeframe de Análise:", 
-                    type: "select", 
-                    options: ["1h", "4h", "1d"],
-                    required: true 
-                }
-               
+                { id: "exec-id-tf-rb", label: "Timeframe de Análise:", type: "select", options: ["1h", "4h", "1d"], required: true },
+                { id: "pot-id-image-url-rb", label: "Link da Imagem do Gráfico (Fase Potencial):", type: "text", required: false }
             ],
             checks: [
-                { id: "pot-rb-ema", label: "Preço acima de EMA50, ou 200", required: true },
-                { id: "pot-rb-rsi-hl", label: "RSI está com Higher Low, ou divergência bullish", required: true },
-                { id: "pot-rb-resistance-break", label: "Preço rompeu resistência e está acima de niveis com confluência (ex.Fib.+EMA)", required: true },
-                { id: "pot-rb-rsi-breakout", label: "RSI rompeu a linha de tendência num TF maior (confirmação de força)", required: true },
-                { id: "pot-rb-alarm", label: "Colocar alarme em suporte", required: true }
+                { id: "pot-pi-tendencia", label: "Preço acima de EMA50, ou 200", required: true },
+                { id: "pot-pi-HL_RSI", label: "RSI está com Higher Low, ou divergência bullish", required: true },
+                { id: "pot-pi-fibo-marcado", label: "Preço rompeu resistência e está acima de níveis com confluência (ex.Fib.+EMA)", required: true },
+                { id: "pot-pi-RSI-Breakout", label: "RSI rompeu a linha de tendência num TF maior (confirmação de força)", required: true },
+                { id: "pot-pi-alarmes", label: "Colocar alarme em suporte", required: true }
             ]
         }
     ],
@@ -110,20 +104,14 @@ export const STRATEGIES = {
             title: "Fase 2: Confirmação (15 ou 5min.)",
             exampleImageUrl: "pic/Resistencia-suporte_15m.png", 
             inputs: [
-                { 
-                    id: "armed-rb-tf",
-                    label: "Timeframe de Confirmação:", 
-                    type: "select", 
-                    options: ["15m", "5m"], 
-                    required: true 
-                }
-               
+                { id: "exec-id-tf-armed-rb", label: "Timeframe de Confirmação:", type: "select", options: ["15m", "5min"], required: true },
+                { id: "armed-id-image-url-rb", label: "Link da Imagem do Gráfico (Fase Armado):", type: "text", required: false }
             ],                
             checks: [
-                { id: "armed-rb-fib-ext", label: "Do <strong> topo até à base da correção antes da entrada</strong>, verificar suportes 0.25, 0.382 ou 0.5, e marcar alvos com <strong> extensões de Fibonacci: 1.272 / 1.414 / 1.618</strong>", required: true },
-                { id: "armed-rb-stoch-reset", label: "Estocástico está em (sobrevenda)", required: false },
-                { id: "armed-rb-price-line", label: "Linha de tendência descendente do preço marcada", required: true },
-                { id: "armed-rb-alarm", label: "Alarmes criado (Rompimento do RSI em MA, ou stocastico", required: true }
+                { id: "armed-pi-fibo-ext-marcado", label: "Do <strong> topo até à base da correção antes da entrada</strong>, verificar suportes 0.25, 0.382 ou 0.5, e marcar alvos com <strong> extensões de Fibonacci: 1.272 / 1.414 / 1.618</strong>", required: true },
+                { id: "armed-pi-stoch-reset", label: "Estocástico está em (sobrevenda)", required: false },
+                { id: "armed-pi-price-line", label: "Linha de tendência descendente do preço marcada", required: true },
+                { id: "armed-pi-alarmes-gatilho", label: "Alarmes criado (Rompimento do RSI em MA, ou stocastico", required: true }
             ]
         }
     ],
@@ -131,9 +119,9 @@ export const STRATEGIES = {
         {
             title: "Fase 3: Gatilho e Registo dos Alvos de Gestão",
             checks: [
-                { id: "exec-rb-resistance-break", label: "Preço rompeu resistências (tendência, VAL)", required: true },
-                { id: "exec-rb-stoch-bull", label: "Estocástico cruzou bullish", required: true },
-                { id: "exec-rb-rsi-ma", label: "RSI passou MA", required: true }
+                { id: "armed-pi-preco-resistencia", label: "Preço rompeu resistências (tendência, VAL)", required: true },
+                { id: "armed-pi-stoch-bull", label: "Estocástico cruzou bullish", required: true },
+                { id: "armed-pi-RSI-MA", label: "RSI passou MA", required: true }
             ]
         }
     ]
