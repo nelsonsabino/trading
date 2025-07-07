@@ -1,9 +1,10 @@
-// js/ui.js (VERSÃO FINAL COM LINK PARA TRADINGVIEW E ÍCONES)
+// js/ui.js (VERSÃO COM DEEP LINKING PARA TRADINGVIEW EM MOBILE)
 
 import { STRATEGIES } from './strategies.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openImageModal } from './modals.js';
 import { loadAndOpenForEditing } from './handlers.js';
+import { isMobileDevice } from './utils.js'; // NOVO: Importa a função de deteção
 
 function getIconForLabel(labelText) {
     const text = labelText.toLowerCase();
@@ -111,8 +112,15 @@ export function createTradeCard(trade) {
     } else {
         symbol = assetName.split('/')[0].trim();
     }
-    const tradingViewSymbol = `${symbol.toUpperCase()}USDT`;
-    const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${tradingViewSymbol}`;
+    const tradingViewSymbol = `BINANCE:${symbol.toUpperCase()}USDT`;
+
+    // **** AQUI ESTÁ A NOVA LÓGICA ****
+    let finalTradingViewUrl;
+    if (isMobileDevice()) {
+        finalTradingViewUrl = `tradingview://chart?symbol=${tradingViewSymbol}`;
+    } else {
+        finalTradingViewUrl = `https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}`;
+    }
     
     card.innerHTML = `<button class="card-edit-btn">Editar</button><h3>${assetName}</h3><p style="color: #007bff; font-weight: 500;">Estratégia: ${trade.data.strategyName || 'N/A'}</p><p><strong>Status:</strong> ${trade.data.status}</p><p><strong>Notas:</strong> ${trade.data.notes || ''}</p>`;
     
@@ -137,7 +145,7 @@ export function createTradeCard(trade) {
 
     if (trade.data.status === 'POTENTIAL') {
         const tvLink = document.createElement('a');
-        tvLink.href = tradingViewUrl;
+        tvLink.href = finalTradingViewUrl; // Usa a nova URL dinâmica
         tvLink.target = '_blank';
         tvLink.className = 'btn edit-btn';
         tvLink.textContent = 'Gráfico';
