@@ -117,8 +117,11 @@ export function createTradeCard(trade) {
     // **** AQUI ESTÁ A NOVA LÓGICA INTELIGENTE ****
     let finalTradingViewUrl;
     if (isAndroid()) {
+
         // Link especial para Android
-        finalTradingViewUrl = `intent://chart?symbol=${tradingViewSymbol}#Intent;scheme=tradingview;package=com.tradingview.tradingviewapp;end`;
+const httpUrl = `https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}`;
+finalTradingViewUrl = `intent://${httpUrl}#Intent;scheme=https;package=com.tradingview.tradingviewapp;S.browser_fallback_url=${encodeURIComponent(httpUrl)};end`;
+
     } else if (isIOS()) {
         // Deep link para iOS
         finalTradingViewUrl = `tradingview://chart?symbol=${tradingViewSymbol}`;
