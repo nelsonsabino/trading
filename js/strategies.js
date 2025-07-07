@@ -78,11 +78,11 @@ export const STRATEGIES = {
                 exampleImageUrl: "https://i.imgur.com/exemplo1.png",
                 inputs: [ 
                     { id: "pot-id-tf", label: "Timeframe de Análise:", type: "select", options: ["Diário", "4h"], required: true },
-                    { id: "pot-id-rsi-ltb", label: "RSI furou LTB?", type: "select", options: ["Sim, com força", "Não, mas ainda tem espaço", "Não, está encostado"], required: true }
+                    { id: "pot-id-rsi-ltb", label: "RSI furou LTB?", type: "select", options: ["Sim", "Não, mas tem espaço até à resistência", "Não, está encostado"], required: true }
                 ],
                 checks: [
-                    { id: "pot-id-suporte", label: "Preço está em zona de suporte?", required: true },
-                    { id: "pot-id-ema50", label: "EMA50 a suportar ou com espaço?", required: true },
+                    { id: "pot-id-suporte", label: "Preço está em zona de suporte", required: true },
+                    { id: "pot-id-ema50", label: "EMA50/200 a suportar", required: true },
                     { id: "pot-id-divergencia", label: "Divergência bullish nos indicadores?", required: false },
                     { id: "pot-id-alarme", label: "Algum alarme foi colocado?", required: true }
                 ]
