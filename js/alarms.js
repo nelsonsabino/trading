@@ -1,4 +1,4 @@
-// js/alarms.js (VERSÃO COMPLETA COM LÓGICA DE EMA CORRIGIDA)
+// js/alarms.js 
 
 import { supabase } from './services.js';
 import { setupAutocomplete } from './utils.js';
