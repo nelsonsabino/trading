@@ -111,16 +111,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const comboStochValue = document.getElementById('combo-stoch-value');
 
     // **** NOVO: LÓGICA CORRIGIDA PARA LER O URL AO CARREGAR A PÁGINA ****
-    const urlParams = new URLSearchParams(window.location.search);
-    const assetSymbolFromUrl = urlParams.get('assetSymbol');
-    
-    if (assetSymbolFromUrl && assetInput) {
-        // Pré-preenche o campo de input com o símbolo vindo do URL
-        assetInput.value = assetSymbolFromUrl;
-        // Simula um evento de input para ativar a busca do autocomplete
-        // Isto vai mostrar a lista de sugestões, onde o utilizador pode clicar para confirmar
-        assetInput.dispatchEvent(new Event('input', { bubbles: true }));
-    }
+   const urlParams = new URLSearchParams(window.location.search);
+const assetNameFromUrl = urlParams.get('assetName'); // Lê o novo parâmetro
+if (assetNameFromUrl && assetInput) {
+    assetInput.value = assetNameFromUrl;
+    assetInput.dispatchEvent(new Event('input', { bubbles: true }));
+}
 
     if (comboStochCondition && comboStochValue) { comboStochCondition.addEventListener('change', () => { comboStochValue.value = (comboStochCondition.value === 'below') ? 20 : 80; }); }
     alarmTypeSelect.addEventListener('change', () => {
