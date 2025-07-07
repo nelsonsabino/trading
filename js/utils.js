@@ -1,4 +1,4 @@
-// js/utils.js (VERSÃO CORRIGIDA E INDEPENDENTE)
+// js/utils.js (VERSÃO FINAL E INDEPENDENTE)
 
 /**
  * Anexa a funcionalidade de autocomplete a um campo de input.
@@ -18,8 +18,10 @@ export function setupAutocomplete(supabase, inputElement, resultsContainer, onCo
 
         debounceTimer = setTimeout(async () => {
             try {
+                // Chama a Edge Function 'search-coins'
                 const { data: results, error } = await supabase.functions.invoke('search-coins', { body: { query } });
                 if (error) throw error;
+
                 resultsContainer.innerHTML = '';
                 if (results && results.length > 0) {
                     results.forEach(coin => {
