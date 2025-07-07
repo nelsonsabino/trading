@@ -2,6 +2,80 @@
 
 export const STRATEGIES = {
 
+
+    
+    /* ------------------------------------------------------------------------ */    
+    /* ------------ Range Trading ------------ */
+    /* ------------------------------------------------------------------------ */ 
+    
+
+'range-trading': {
+    name: "Range Trading",
+    potentialPhases: [
+        {
+            title: "Fase 1: Análise do Range",
+            checks: [
+                { id: "pot-rt-sr-defined", label: "Suporte e Resistência definidos com confluência", required: true },
+                { id: "pot-rt-ema-above", label: "Preço está acima da EMA50/200", required: true }
+            ],
+            inputs: [
+                {
+                    id: "pot-rt-range-duration",
+                    label: "Preço em range ao longo do TF escolhido?",
+                    type: "select",
+                    options: [
+                        "Diário (1-3 meses)",
+                        "4 Horas (vários dias)",
+                        "1 Hora (> 1 dia)"
+                    ],
+                    required: true
+                },
+                {
+                    id: "pot-rt-rsi-breakout",
+                    label: "RSI já rompeu a sua LTB (linha de tendência de baixa)?",
+                    type: "select",
+                    options: ["Sim", "Não", "Ainda não formou LTB clara"],
+                    required: true
+                }
+            ]
+        }
+    ],
+    // Fases 2 e 3 reutilizadas da estratégia 'Resistance-Breakout'
+    armedPhases: [
+        {
+            title: "Fase 2: Confirmação (15 ou 5min.)",
+            exampleImageUrl: "pic/Resistencia-suporte_15m.png", 
+            inputs: [
+                { 
+                    id: "armed-rt-tf", // ID único para evitar conflitos
+                    label: "Timeframe de Confirmação:", 
+                    type: "select", 
+                    options: ["15m", "5m"], 
+                    required: true 
+                }
+            ],                
+            checks: [
+                { id: "armed-rt-fib-ext", label: "Do <strong> topo até à base da correção antes da entrada</strong>, verificar suportes 0.25, 0.382 ou 0.5, e marcar alvos com <strong> extensões de Fibonacci: 1.272 / 1.414 / 1.618</strong>", required: true },
+                { id: "armed-rt-stoch-reset", label: "Estocástico está em (sobrevenda)", required: false },
+                { id: "armed-rt-price-line", label: "Linha de tendência descendente do preço marcada", required: true },
+                { id: "armed-rt-alarm", label: "Alarmes criado (Rompimento do RSI em MA, ou stocastico", required: true }
+            ]
+        }
+    ],
+    executionPhases: [
+        {
+            title: "Fase 3: Gatilho e Registo dos Alvos de Gestão",
+            checks: [
+                { id: "exec-rt-resistance-break", label: "Preço rompeu resistências (tendência, VAL)", required: true },
+                { id: "exec-rt-stoch-bull", label: "Estocástico cruzou bullish", required: true },
+                { id: "exec-rt-rsi-ma", label: "RSI passou MA", required: true }
+            ]
+        }
+    ]
+},
+
+
+    
     /* ------------------------------------------------------------------------ */    
     /* ------------ Resistance-Breakout ------------ */
     /* ------------------------------------------------------------------------ */ 
