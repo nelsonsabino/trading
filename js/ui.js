@@ -1,10 +1,10 @@
-// js/ui.js (VERSÃO FINAL COM LINKS INTELIGENTES PARA ANDROID/IOS)
+// js/ui.js (VERSÃO FINAL COM DEEP LINKING E LÓGICA DE PAR ROBUSTA)
 
 import { STRATEGIES } from './strategies.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openImageModal } from './modals.js';
 import { loadAndOpenForEditing } from './handlers.js';
-import { isAndroid, isIOS } from './utils.js'; // NOVO: Importa as novas funções de deteção
+import { isAndroid, isIOS } from './utils.js'; // Importa as novas funções de deteção
 
 function getIconForLabel(labelText) {
     const text = labelText.toLowerCase();
@@ -104,40 +104,31 @@ export function createTradeCard(trade) {
     const card = document.createElement('div');
     card.className = 'trade-card';
 
-const assetName = trade.data.asset; // Ex: "SOL/USDC" ou "Bitcoin (BTC)"
-let tradingViewSymbol = '';
+    const assetName = trade.data.asset;
+    let tradingViewPair = '';
 
-// Verifica se o ativo contém uma barra (ex: SOL/USDC)
-if (assetName.includes('/')) {
-    // Constrói o símbolo para o TradingView, ex: "BINANCE:SOLUSDC"
-    tradingViewSymbol = `BINANCE:${assetName.replace('/', '')}`;
-} else {
-    // Se não tiver barra, usa a lógica antiga de extrair de parênteses
-    let symbol = '';
-    const match = assetName.match(/\(([^)]+)\)/);
-    if (match && match[1]) {
-        symbol = match[1];
+    // Lógica robusta para determinar o par do TradingView
+    if (assetName.includes('/')) {
+        tradingViewPair = `BINANCE:${assetName.replace('/', '')}`;
     } else {
-        symbol = assetName.trim();
+        let symbol = '';
+        const match = assetName.match(/\(([^)]+)\)/);
+        if (match && match[1]) {
+            symbol = match[1];
+        } else {
+            symbol = assetName.trim();
+        }
+        tradingViewPair = `BINANCE:${symbol.toUpperCase()}USDT`;
     }
-    // Assume USDT como par padrão se não for especificado
-    tradingViewSymbol = `BINANCE:${symbol.toUpperCase()}USDT`;
-}
 
-    // **** AQUI ESTÁ A NOVA LÓGICA INTELIGENTE ****
+    // Lógica inteligente para construir o link correto para cada plataforma
     let finalTradingViewUrl;
     if (isAndroid()) {
-
-        // Link especial para Android
-const httpUrl = `https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}`;
-finalTradingViewUrl = `intent://${httpUrl}#Intent;scheme=https;package=com.tradingview.tradingviewapp;S.browser_fallback_url=${encodeURIComponent(httpUrl)};end`;
-
+        finalTradingViewUrl = `intent://chart?symbol=${tradingViewPair}#Intent;scheme=tradingview;package=com.tradingview.tradingviewapp;end`;
     } else if (isIOS()) {
-        // Deep link para iOS
-        finalTradingViewUrl = `tradingview://chart?symbol=${tradingViewSymbol}`;
+        finalTradingViewUrl = `tradingview://chart?symbol=${tradingViewPair}`;
     } else {
-        // Link padrão para browsers de desktop
-        finalTradingViewUrl = `https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}`;
+        finalTradingViewUrl = `https://www.tradingview.com/chart/?symbol=${tradingViewPair}`;
     }
     
     card.innerHTML = `<button class="card-edit-btn">Editar</button><h3>${assetName}</h3><p style="color: #007bff; font-weight: 500;">Estratégia: ${trade.data.strategyName || 'N/A'}</p><p><strong>Status:</strong> ${trade.data.status}</p><p><strong>Notas:</strong> ${trade.data.notes || ''}</p>`;
@@ -163,12 +154,13 @@ finalTradingViewUrl = `intent://${httpUrl}#Intent;scheme=https;package=com.tradi
 
     if (trade.data.status === 'POTENTIAL') {
         const tvLink = document.createElement('a');
-        tvLink.href = finalTradingViewUrl; // Usa a nova URL dinâmica
-        // Não adicionamos target="_blank" para permitir que os deep links funcionem corretamente
+        tvLink.href = finalTradingViewUrl;
+        if (!isAndroid() && !isIOS()) {
+            tvLink.target = '_blank';
+            tvLink.rel = 'noopener noreferrer';
+        }
         tvLink.className = 'btn edit-btn';
         tvLink.textContent = 'Gráfico';
-        tvLink.target = '_blank'; // Abre numa nova aba
-        tvLink.rel = 'noopener noreferrer'; // Boas práticas de segurança
         actionsWrapper.appendChild(tvLink);
 
         actionButton = document.createElement('button');
