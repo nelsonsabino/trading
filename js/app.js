@@ -1,5 +1,6 @@
-// js/app.js (VERSÃO CORRIGIDA COM PRÉ-PREENCHIMENTO DE MODAL)
+// js/app.js
 
+import { supabase } from './services.js'; // **** ADICIONE ESTA LINHA ****
 import { listenToTrades } from './firebase-service.js';
 import { addModal, armModal, execModal, closeModalObj, imageModal, closeImageModalBtn } from './dom-elements.js';
 import { openAddModal, closeAddModal, closeArmModal, closeExecModal, closeCloseTradeModal, closeImageModal } from './modals.js';
@@ -72,7 +73,7 @@ if (assetNameFromUrl) {
     }
 
     // --- LÓGICA DA VERSÃO ---
-    const APP_VERSION = '6.2.3';
+    const APP_VERSION = '6.2.4';
     const versionDisplay = document.getElementById('app-version-display');
     if (versionDisplay) {
         versionDisplay.textContent = `Versão: ${APP_VERSION}`;
