@@ -1,18 +1,19 @@
-// js/utils.js (VERSÃO COM DETEÇÃO DE ANDROID/IOS)
-
-import { supabase } from './services.js';
+// js/utils.js (VERSÃO CORRIGIDA E INDEPENDENTE)
 
 /**
  * Anexa a funcionalidade de autocomplete a um campo de input.
- * (Esta função permanece inalterada)
+ * @param {object} supabase - A instância do cliente Supabase.
+ * @param {HTMLInputElement} inputElement - O campo de input.
+ * @param {HTMLDivElement} resultsContainer - O div para os resultados.
+ * @param {function(object | null): void} onCoinSelect - O callback.
  */
-export function setupAutocomplete(inputElement, resultsContainer, onCoinSelect) {
+export function setupAutocomplete(supabase, inputElement, resultsContainer, onCoinSelect) {
     let debounceTimer;
 
     inputElement.addEventListener('input', () => {
         clearTimeout(debounceTimer);
         const query = inputElement.value.trim();
-        if (onCoinSelect) { onCoinSelect(null); }
+        if (onCoinSelect) onCoinSelect(null);
         if (query.length < 2) { resultsContainer.style.display = 'none'; return; }
 
         debounceTimer = setTimeout(async () => {
@@ -28,7 +29,7 @@ export function setupAutocomplete(inputElement, resultsContainer, onCoinSelect) 
                         item.addEventListener('click', () => {
                             inputElement.value = `${coin.name} (${coin.symbol.toUpperCase()})`;
                             resultsContainer.style.display = 'none';
-                            if (onCoinSelect) { onCoinSelect(coin); }
+                            if (onCoinSelect) onCoinSelect(coin);
                         });
                         resultsContainer.appendChild(item);
                     });
@@ -37,8 +38,7 @@ export function setupAutocomplete(inputElement, resultsContainer, onCoinSelect) 
                     resultsContainer.style.display = 'none';
                 }
             } catch (err) {
-                console.error("Erro ao buscar moedas para o autocomplete:", err);
-                resultsContainer.style.display = 'none';
+                console.error("Erro no autocomplete:", err);
             }
         }, 300);
     });
@@ -48,20 +48,4 @@ export function setupAutocomplete(inputElement, resultsContainer, onCoinSelect) 
             resultsContainer.style.display = 'none';
         }
     });
-}
-
-/**
- * NOVO: Verifica se o utilizador está num dispositivo Android.
- * @returns {boolean}
- */
-export function isAndroid() {
-    return /Android/i.test(navigator.userAgent);
-}
-
-/**
- * NOVO: Verifica se o utilizador está num dispositivo iOS (iPhone, iPad, iPod).
- * @returns {boolean}
- */
-export function isIOS() {
-    return /iPhone|iPad|iPod/i.test(navigator.userAgent);
 }
