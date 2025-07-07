@@ -104,15 +104,25 @@ export function createTradeCard(trade) {
     const card = document.createElement('div');
     card.className = 'trade-card';
 
-    const assetName = trade.data.asset;
+const assetName = trade.data.asset; // Ex: "SOL/USDC" ou "Bitcoin (BTC)"
+let tradingViewSymbol = '';
+
+// Verifica se o ativo contém uma barra (ex: SOL/USDC)
+if (assetName.includes('/')) {
+    // Constrói o símbolo para o TradingView, ex: "BINANCE:SOLUSDC"
+    tradingViewSymbol = `BINANCE:${assetName.replace('/', '')}`;
+} else {
+    // Se não tiver barra, usa a lógica antiga de extrair de parênteses
     let symbol = '';
     const match = assetName.match(/\(([^)]+)\)/);
     if (match && match[1]) {
         symbol = match[1];
     } else {
-        symbol = assetName.split('/')[0].trim();
+        symbol = assetName.trim();
     }
-    const tradingViewSymbol = `BINANCE:${symbol.toUpperCase()}USDT`;
+    // Assume USDT como par padrão se não for especificado
+    tradingViewSymbol = `BINANCE:${symbol.toUpperCase()}USDT`;
+}
 
     // **** AQUI ESTÁ A NOVA LÓGICA INTELIGENTE ****
     let finalTradingViewUrl;
