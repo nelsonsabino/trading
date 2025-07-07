@@ -1,10 +1,10 @@
-// js/ui.js (VERSÃO COM DEEP LINKING PARA TRADINGVIEW EM MOBILE)
+// js/ui.js (VERSÃO FINAL COM LINKS INTELIGENTES PARA ANDROID/IOS)
 
 import { STRATEGIES } from './strategies.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openImageModal } from './modals.js';
 import { loadAndOpenForEditing } from './handlers.js';
-import { isMobileDevice } from './utils.js'; // NOVO: Importa a função de deteção
+import { isAndroid, isIOS } from './utils.js'; // NOVO: Importa as novas funções de deteção
 
 function getIconForLabel(labelText) {
     const text = labelText.toLowerCase();
@@ -114,11 +114,16 @@ export function createTradeCard(trade) {
     }
     const tradingViewSymbol = `BINANCE:${symbol.toUpperCase()}USDT`;
 
-    // **** AQUI ESTÁ A NOVA LÓGICA ****
+    // **** AQUI ESTÁ A NOVA LÓGICA INTELIGENTE ****
     let finalTradingViewUrl;
-    if (isMobileDevice()) {
+    if (isAndroid()) {
+        // Link especial para Android
+        finalTradingViewUrl = `intent://chart?symbol=${tradingViewSymbol}#Intent;scheme=tradingview;package=com.tradingview.tradingviewapp;end`;
+    } else if (isIOS()) {
+        // Deep link para iOS
         finalTradingViewUrl = `tradingview://chart?symbol=${tradingViewSymbol}`;
     } else {
+        // Link padrão para browsers de desktop
         finalTradingViewUrl = `https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}`;
     }
     
@@ -146,7 +151,7 @@ export function createTradeCard(trade) {
     if (trade.data.status === 'POTENTIAL') {
         const tvLink = document.createElement('a');
         tvLink.href = finalTradingViewUrl; // Usa a nova URL dinâmica
-        tvLink.target = '_blank';
+        // Não adicionamos target="_blank" para permitir que os deep links funcionem corretamente
         tvLink.className = 'btn edit-btn';
         tvLink.textContent = 'Gráfico';
         actionsWrapper.appendChild(tvLink);
