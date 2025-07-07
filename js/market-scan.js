@@ -70,8 +70,7 @@ async function fetchAndDisplayMarketData() {
 <div class="action-buttons">
     <a href="${tradingViewUrl}" target="_blank" class="btn edit-btn">Gráfico</a>
     <a href="alarms.html?assetSymbol=${baseAsset}" class="btn btn-secondary">Criar Alarme</a>
-    <a href="index.html?assetSymbol=${baseAsset}" class="btn btn-primary">Add Oportunidade</a>
-</div>
+    <a href="index.html?assetSymbol=${baseAsset}&pair=${ticker.symbol}" class="btn btn-primary">Add Oportunidade</a></div>
                     </td>
                 </tr>
             `;
