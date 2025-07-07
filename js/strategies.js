@@ -19,13 +19,8 @@ export const STRATEGIES = {
                     type: "select", 
                     options: ["1h", "4h", "1d"],
                     required: true 
-                },
-                { 
-                    id: "pot-rb-image-url",
-                    label: "Link da Imagem do Gráfico (Fase Potencial):", 
-                    type: "text", 
-                    required: false 
                 }
+               
             ],
             checks: [
                 { id: "pot-rb-ema", label: "Preço acima de EMA50, ou 200", required: true },
@@ -47,13 +42,8 @@ export const STRATEGIES = {
                     type: "select", 
                     options: ["15m", "5m"], 
                     required: true 
-                },
-                {
-                    id: "armed-rb-image-url",
-                    label: "Link da Imagem do Gráfico (Fase Armado):",
-                    type: "text",
-                    required: false
                 }
+               
             ],                
             checks: [
                 { id: "armed-rb-fib-ext", label: "Do <strong> topo até à base da correção antes da entrada</strong>, verificar suportes 0.25, 0.382 ou 0.5, e marcar alvos com <strong> extensões de Fibonacci: 1.272 / 1.414 / 1.618</strong>", required: true },
