@@ -40,7 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- LÓGICA RESTAURADA: Verifica o URL para pré-preencher o modal ---
-// Dentro do DOMContentLoaded em app.js
 const urlParams = new URLSearchParams(window.location.search);
 const assetSymbolFromUrl = urlParams.get('assetSymbol');
 const pairFromUrl = urlParams.get('pair'); // NOVO: Lê o par completo
