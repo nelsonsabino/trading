@@ -6,41 +6,43 @@ export const STRATEGIES = {
     /* ------------ Fib VAL Breakout ------------ */
     /* ------------------------------------------------------------------------ */ 
 
-    'Fib-VAL-Breakout': {
-        name: "Fib VAL Breakout",
+    'Resistance-Breakout': {
+        name: "Resistance Breakout into Support",
         potentialPhases: [
             {
-                title: "Fase 1: Contexto e Zonas de Interesse (Diário ou 4h)",
-                exampleImageUrl: "pic/fib_val_breakout_f1.png", 
-
+                title: "Fase 1: Rompimento da resistência (TF 1h, 4h ou D)",
+                exampleImageUrl: "pic/Resistencia-suporte_1h.png", 
+                inputs: [{ id: "exec-id-tf", label: "Timeframe de Execução:", type: "select", options: ["1h", "4h", "D"], required: true }],
                 checks: [
-                    { id: "pot-pi-tendencia", label: "Identificar tendência", required: false },
-                    { id: "pot-pi-val-marcado", label: "Marcar VAL desde o <strong> topo até à base </strong> na correção principal", required: true },
-                    { id: "pot-pi-fibo-marcado", label: "Desde a <strong> base até ao topo </strong> do 1º pullback, verificar que zona de Fibonacci faz <strong> confluência com o VAL </strong> (0.382, 0.5, 0.618).", required: true },
-                    { id: "pot-pi-alarmes", label: "Alarmes colocados nas zonas de interesse (VAL, Fibo, topo)?", required: true }
+                    { id: "pot-pi-tendencia", label: "Preço acima de EMA50, ou 200", required: true },
+                    { id: "pot-pi-HL_RSI", label: "RSI está com Higher Low, ou divergência bullish", required: true },
+                    { id: "pot-pi-fibo-marcado", label: "Preço rompeu resistência e está acima de niveis com confluência (ex.Fib.+EMA)", required: true },
+					{ id: "pot-pi-RSI-Breakout", label: "RSI rompeu a linha de tendência num TF maior (confirmação de força)", required: true },
+                    { id: "pot-pi-alarmes", label: "Colocar alarme em suporte", required: true }
                 ]
             }
         ],
         armedPhases: [
             {
-                title: "Fase 2: Confirmação e Gatilho (1h ou 15min.)",
-                exampleImageUrl: "pic/fib_val_breakout_f2.png", 
-                
+                title: "Fase 2: Confirmação (15 ou 5min.)",
+                exampleImageUrl: "pic/Resistencia-suporte_15m.png", 
+                inputs: [{ id: "exec-id-tf", label: "Timeframe de Execução:", type: "select", options: ["15min", "5min"], required: true }],                
                 checks: [
-                    { id: "armed-pi-fibo-ext-marcado", label: "Do <strong> topo até à base da correção antes da entrada</strong>, marcar alvos com <strong> extensões de Fibonacci: 1.272 / 1.414 / 1.618</strong>", required: true },
-                    { id: "armed-pi-volume-ok", label: "Volume da subida <strong> é maior </strong> que o volume da correção (análise com Date Range).", required: true },
-                    { id: "armed-pi-stoch-reset", label: "Estocástico fez reset (sobrevenda)", required: true },
-                    { id: "armed-pi-rsi-break", label: "RSI quebrou a LTB (linha de tendência de baixa)", required: true },
-                    { id: "armed-pi-alarmes-gatilho", label: "Alarmes de gatilho colocados (RSI, Stoch)?", required: true }
+                    { id: "armed-pi-fibo-ext-marcado", label: "Do <strong> topo até à base da correção antes da entrada</strong>, verificar suportes 0.25, 0.382 ou 0.5, e marcar alvos com <strong> extensões de Fibonacci: 1.272 / 1.414 / 1.618</strong>", required: true },
+                    { id: "armed-pi-stoch-reset", label: "Estocástico está em (sobrevenda)", required: false },
+                    { id: "armed-pi-price-line", label: "Linha de tendência descendente do preço marcada", required: true },
+                    { id: "armed-pi-alarmes-gatilho", label: "Alarmes criado (Rompimento do RSI em MA, ou stocastico", required: true }
                 ]
             }
         ],
         executionPhases: [
             {
-                title: "Fase 3: Registo dos Alvos de Gestão",
+                title: "Fase 3: Gatilho e Registo dos Alvos de Gestão",
                 // Nota: Os campos de Entrada, Stop Loss e Quantidade virão do GESTAO_PADRAO automaticamente.
-                inputs: [
-                    { id: "exec-pi-alarmes-alvo", label: "Alarmes colocados em cada alvo para gestão ativa (1.272 / 1.414 / 1.618)?", type: "checkbox", required: true }
+                checks: [
+                    { id: "armed-pi-preco-resistencia", label: "Preço rompeu resistências (tendência, VAL)", required: true },
+                    { id: "armed-pi-stoch-bull", label: "Estocástico cruzou bullish", required: true },
+                    { id: "armed-pi-RSI-MA", label: "RSI passou MA", required: true }
                 ]
             }
         ]
