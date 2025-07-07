@@ -52,7 +52,7 @@ async function fetchAndDisplayMarketData() {
 
             // Links dinâmicos
             const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${ticker.symbol}`;
-            const createAlarmUrl = `alarms.html?assetSymbol=${baseAsset}`;
+            const createAlarmUrl = `alarms.html?assetName=${baseAsset}USDC&assetId=${baseAsset.toLowerCase()}`;
 
             return `
                 <tr>
