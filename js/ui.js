@@ -167,6 +167,8 @@ finalTradingViewUrl = `intent://${httpUrl}#Intent;scheme=https;package=com.tradi
         // Não adicionamos target="_blank" para permitir que os deep links funcionem corretamente
         tvLink.className = 'btn edit-btn';
         tvLink.textContent = 'Gráfico';
+        tvLink.target = '_blank'; // Abre numa nova aba
+        tvLink.rel = 'noopener noreferrer'; // Boas práticas de segurança
         actionsWrapper.appendChild(tvLink);
 
         actionButton = document.createElement('button');
