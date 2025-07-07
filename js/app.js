@@ -1,6 +1,6 @@
-// js/app.js
+// js/app.js (VERSÃO 6.2.5 - FLUXO DE TRABALHO CORRIGIDO)
 
-import { supabase } from './services.js'; // **** ADICIONE ESTA LINHA ****
+import { supabase } from './services.js'; // Garante que a dependência da Supabase está disponível para o utils.js
 import { listenToTrades } from './firebase-service.js';
 import { addModal, armModal, execModal, closeModalObj, imageModal, closeImageModalBtn } from './dom-elements.js';
 import { openAddModal, closeAddModal, closeArmModal, closeExecModal, closeCloseTradeModal, closeImageModal } from './modals.js';
@@ -18,13 +18,14 @@ document.addEventListener('DOMContentLoaded', () => {
     addModal.form.addEventListener('submit', handleAddSubmit);
     addModal.strategySelect.addEventListener('change', () => generateDynamicChecklist(addModal.checklistContainer, STRATEGIES[addModal.strategySelect.value]?.potentialPhases));
 
-    // ... (outros listeners de modais inalterados) ...
     armModal.closeBtn.addEventListener('click', closeArmModal);
     armModal.container.addEventListener('click', e => { if (e.target.id === 'arm-trade-modal') closeArmModal(); });
     armModal.form.addEventListener('submit', handleArmSubmit);
+
     execModal.closeBtn.addEventListener('click', closeExecModal);
     execModal.container.addEventListener('click', e => { if (e.target.id === 'execution-modal') closeExecModal(); });
     execModal.form.addEventListener('submit', handleExecSubmit);
+
     closeModalObj.closeBtn.addEventListener('click', closeCloseTradeModal);
     closeModalObj.container.addEventListener('click', e => { if (e.target.id === 'close-trade-modal') closeCloseTradeModal(); });
     closeModalObj.form.addEventListener('submit', handleCloseSubmit);
@@ -40,16 +41,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- LÓGICA RESTAURADA: Verifica o URL para pré-preencher o modal ---
-const urlParams = new URLSearchParams(window.location.search);
-const assetNameFromUrl = urlParams.get('assetName'); // Lê o novo parâmetro
-if (assetNameFromUrl) {
-    openAddModal();
-    modalAssetInput.value = assetNameFromUrl;
-    // Não disparamos o input aqui, pois o autocomplete não é essencial
-    // se já temos o nome exato.
-}
-    // ... (Listeners do Modal de Imagem inalterados) ...
+    // --- LÓGICA CORRIGIDA: Verifica o URL para o parâmetro 'assetSymbol' ---
+    const urlParams = new URLSearchParams(window.location.search);
+    const assetSymbolFromUrl = urlParams.get('assetSymbol'); // Lê o parâmetro correto
+    if (assetSymbolFromUrl && modalAssetInput) {
+        openAddModal();
+        modalAssetInput.value = assetSymbolFromUrl; // Pré-preenche com o símbolo
+        // Dispara o evento de input para ativar a busca do autocomplete
+        modalAssetInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    // Listeners do Modal de Imagem
     if (closeImageModalBtn) { closeImageModalBtn.addEventListener('click', closeImageModal); }
     if (imageModal) { imageModal.addEventListener('click', (e) => { if (e.target === imageModal) { closeImageModal(); } }); }
     document.addEventListener('click', function (e) {
@@ -73,7 +75,7 @@ if (assetNameFromUrl) {
     }
 
     // --- LÓGICA DA VERSÃO ---
-    const APP_VERSION = '6.2.4';
+    const APP_VERSION = '6.2.5'; // Incremento de versão para a correção
     const versionDisplay = document.getElementById('app-version-display');
     if (versionDisplay) {
         versionDisplay.textContent = `Versão: ${APP_VERSION}`;
