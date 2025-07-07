@@ -17,8 +17,10 @@ export const STRATEGIES = {
                     { id: "pot-pi-tendencia", label: "Preço acima de EMA50, ou 200", required: true },
                     { id: "pot-pi-HL_RSI", label: "RSI está com Higher Low, ou divergência bullish", required: true },
                     { id: "pot-pi-fibo-marcado", label: "Preço rompeu resistência e está acima de niveis com confluência (ex.Fib.+EMA)", required: true },
-					{ id: "pot-pi-RSI-Breakout", label: "RSI rompeu a linha de tendência num TF maior (confirmação de força)", required: true },
-                    { id: "pot-pi-alarmes", label: "Colocar alarme em suporte", required: true }
+		    { id: "pot-pi-RSI-Breakout", label: "RSI rompeu a linha de tendência num TF maior (confirmação de força)", required: true },
+                    { id: "pot-pi-alarmes", label: "Colocar alarme em suporte", required: true },
+	       inputs: [ { id: "pot-id-image-url", label: "Link da Imagem do Gráfico (Fase Pontencial):", type: "text", required: false } ]
+
                 ]
             }
         ],
@@ -31,7 +33,9 @@ export const STRATEGIES = {
                     { id: "armed-pi-fibo-ext-marcado", label: "Do <strong> topo até à base da correção antes da entrada</strong>, verificar suportes 0.25, 0.382 ou 0.5, e marcar alvos com <strong> extensões de Fibonacci: 1.272 / 1.414 / 1.618</strong>", required: true },
                     { id: "armed-pi-stoch-reset", label: "Estocástico está em (sobrevenda)", required: false },
                     { id: "armed-pi-price-line", label: "Linha de tendência descendente do preço marcada", required: true },
-                    { id: "armed-pi-alarmes-gatilho", label: "Alarmes criado (Rompimento do RSI em MA, ou stocastico", required: true }
+                    { id: "armed-pi-alarmes-gatilho", label: "Alarmes criado (Rompimento do RSI em MA, ou stocastico", required: true },
+		inputs: [ { id: "pot-id-image-url", label: "Link da Imagem do Gráfico (Fase Armed):", type: "text", required: false } ]
+
                 ]
             }
         ],
