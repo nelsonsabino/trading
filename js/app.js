@@ -1,6 +1,7 @@
-// js/app.js (VERSÃO 6.2.5 - FLUXO DE TRABALHO CORRIGIDO)
+// js/app.js (VERSÃO FINAL E CORRIGIDA, INDEPENDENTE)
 
-import { supabase } from './services.js'; // Garante que a dependência da Supabase está disponível para o utils.js
+import { supabaseUrl, supabaseAnonKey } from './config.js';
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 import { listenToTrades } from './firebase-service.js';
 import { addModal, armModal, execModal, closeModalObj, imageModal, closeImageModalBtn } from './dom-elements.js';
 import { openAddModal, closeAddModal, closeArmModal, closeExecModal, closeCloseTradeModal, closeImageModal } from './modals.js';
@@ -8,6 +9,9 @@ import { displayTrades, populateStrategySelect, generateDynamicChecklist } from 
 import { handleAddSubmit, handleArmSubmit, handleExecSubmit, handleCloseSubmit, loadAndOpenForEditing } from './handlers.js';
 import { STRATEGIES } from './strategies.js';
 import { setupAutocomplete } from './utils.js';
+
+// Cria uma instância local do cliente Supabase para esta página
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -34,20 +38,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalAssetInput = document.getElementById('asset');
     const modalResultsDiv = document.getElementById('modal-autocomplete-results');
     if (modalAssetInput && modalResultsDiv) {
-        setupAutocomplete(modalAssetInput, modalResultsDiv, (coin) => {
+        // Passamos a nossa instância local da supabase para a função
+        setupAutocomplete(supabase, modalAssetInput, modalResultsDiv, (coin) => {
             if (coin) {
                 modalAssetInput.value = `${coin.name} (${coin.symbol.toUpperCase()})`;
             }
         });
     }
 
-    // --- LÓGICA CORRIGIDA: Verifica o URL para o parâmetro 'assetSymbol' ---
+    // Lógica para ler o URL e pré-preencher o modal
     const urlParams = new URLSearchParams(window.location.search);
-    const assetSymbolFromUrl = urlParams.get('assetSymbol'); // Lê o parâmetro correto
+    const assetSymbolFromUrl = urlParams.get('assetSymbol');
     if (assetSymbolFromUrl && modalAssetInput) {
         openAddModal();
-        modalAssetInput.value = assetSymbolFromUrl; // Pré-preenche com o símbolo
-        // Dispara o evento de input para ativar a busca do autocomplete
+        modalAssetInput.value = assetSymbolFromUrl;
         modalAssetInput.dispatchEvent(new Event('input', { bubbles: true }));
     }
 
@@ -75,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- LÓGICA DA VERSÃO ---
-    const APP_VERSION = '6.2.5'; // Incremento de versão para a correção
+    const APP_VERSION = '6.3 (Refatoração Final)';
     const versionDisplay = document.getElementById('app-version-display');
     if (versionDisplay) {
         versionDisplay.textContent = `Versão: ${APP_VERSION}`;
