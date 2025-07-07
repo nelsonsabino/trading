@@ -41,21 +41,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- LÓGICA RESTAURADA: Verifica o URL para pré-preencher o modal ---
 const urlParams = new URLSearchParams(window.location.search);
-const assetSymbolFromUrl = urlParams.get('assetSymbol');
-const pairFromUrl = urlParams.get('pair'); // NOVO: Lê o par completo
-
-if (assetSymbolFromUrl) {
+const assetNameFromUrl = urlParams.get('assetName'); // Lê o novo parâmetro
+if (assetNameFromUrl) {
     openAddModal();
-    if (pairFromUrl) {
-        // Se o par foi passado, usamos o nome completo para garantir a consistência
-        modalAssetInput.value = pairFromUrl.replace('USDC', '/USDC'); // Transforma "SOLUSDC" em "SOL/USDC"
-    } else {
-        // Fallback se só o símbolo for passado
-        modalAssetInput.value = assetSymbolFromUrl;
-    }
-    // Não disparamos o autocomplete, pois já temos o nome exato.
+    modalAssetInput.value = assetNameFromUrl;
+    // Não disparamos o input aqui, pois o autocomplete não é essencial
+    // se já temos o nome exato.
 }
-
     // ... (Listeners do Modal de Imagem inalterados) ...
     if (closeImageModalBtn) { closeImageModalBtn.addEventListener('click', closeImageModal); }
     if (imageModal) { imageModal.addEventListener('click', (e) => { if (e.target === imageModal) { closeImageModal(); } }); }
