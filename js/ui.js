@@ -104,22 +104,36 @@ export function createTradeCard(trade) {
     const card = document.createElement('div');
     card.className = 'trade-card';
 
-    const assetName = trade.data.asset;
-    let tradingViewPair = '';
+    
+// ... no início de createTradeCard ...
+const assetName = trade.data.asset; // Pode ser "SOL/USDC" ou "Bitcoin (BTC)"
+let tradingViewPair = '';
 
-    // Lógica robusta para determinar o par do TradingView
-    if (assetName.includes('/')) {
-        tradingViewPair = `BINANCE:${assetName.replace('/', '')}`;
+if (assetName.includes('/')) {
+    // Se o nome já é um par, ex: "SOL/USDC", usamos diretamente
+    const parts = assetName.split('/');
+    const base = parts[0].trim().toUpperCase();
+    const quote = parts[1].trim().toUpperCase();
+    tradingViewPair = `BINANCE:${base}${quote}`; // Resulta em "BINANCE:SOLUSDC"
+} else {
+    // Se não, é um nome como "Bitcoin (BTC)"
+    let symbol = '';
+    const match = assetName.match(/\(([^)]+)\)/); // Extrai "BTC"
+    if (match && match[1]) {
+        symbol = match[1].toUpperCase();
     } else {
-        let symbol = '';
-        const match = assetName.match(/\(([^)]+)\)/);
-        if (match && match[1]) {
-            symbol = match[1];
-        } else {
-            symbol = assetName.trim();
-        }
-        tradingViewPair = `BINANCE:${symbol.toUpperCase()}USDT`;
+        // Fallback se não houver parênteses
+        symbol = assetName.trim().toUpperCase();
     }
+    // Assume USDT como par padrão para nomes genéricos
+    tradingViewPair = `BINANCE:${symbol}USDT`;
+}
+
+// O resto da lógica que constrói o intent:// continua a mesma
+// let finalTradingViewUrl;
+// if (isAndroid()) { ... }
+
+    
 
     // Lógica inteligente para construir o link correto para cada plataforma
     let finalTradingViewUrl;
