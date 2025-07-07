@@ -1,7 +1,10 @@
 // js/alarms.js (VERSÃO COM PRÉ-PREENCHIMENTO CORRIGIDO E COMPLETO)
 
-import { supabase } from './services.js';
+import { supabaseUrl, supabaseAnonKey } from './config.js';
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 import { setupAutocomplete } from './utils.js';
+
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 let selectedCoin = null;
 let editingAlarmId = null;
