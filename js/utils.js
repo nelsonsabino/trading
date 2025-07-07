@@ -73,3 +73,12 @@ export function setupAutocomplete(inputElement, resultsContainer, onCoinSelect) 
         }
     });
 }
+
+
+/**
+ * Verifica se o utilizador está a aceder a partir de um dispositivo móvel.
+ * @returns {boolean} - True se for um dispositivo móvel, caso contrário false.
+ */
+export function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
