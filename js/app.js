@@ -80,7 +80,7 @@ if (assetSymbolFromUrl) {
     }
 
     // --- LÓGICA DA VERSÃO ---
-    const APP_VERSION = '6.2.1';
+    const APP_VERSION = '6.2.2';
     const versionDisplay = document.getElementById('app-version-display');
     if (versionDisplay) {
         versionDisplay.textContent = `Versão: ${APP_VERSION}`;
