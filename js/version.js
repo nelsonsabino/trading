@@ -1,18 +1,31 @@
 // js/version.js - Ponto central de controlo de versão e changelog
 
 export const changelogData = {
-   current: {
-        number: '6.5.0', // <-- VERSÃO ATUALIZADA
+    current: {
+        number: '6.5.1',
         changes: [
-            "Adicionado botão 'Gráfico' no histórico de alarmes para análise rápida do momento do disparo.",
+            "Tornada a página de alarmes totalmente responsiva para telemóveis, convertendo as tabelas em 'cards' para evitar scroll horizontal.",
         ]
     },
     releases: [
+        {
+            number: '6.5.0',
+            changes: [
+                "Adicionado botão 'Gráfico' no histórico de alarmes para análise rápida do momento do disparo.",
+            ]
+        },
         {
             number: '6.4.2',
             changes: [
                 "Melhoria da UX na página de alarmes: o preço atual agora é carregado automaticamente quando o ativo é pré-preenchido.",
                 "Correção das notificações do Telegram para exibirem detalhes para todos os tipos de alarme.",
+            ]
+        },
+        {
+            number: '6.4.1',
+            changes: [
+                "Correção do redirecionamento da checkbox 'Criar Alarme' no modal de oportunidades.",
+                "Correção do link 'Gráfico' nos cards do dashboard para evitar o erro de 'símbolo inválido'.",
             ]
         },
         {
