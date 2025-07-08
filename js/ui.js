@@ -100,7 +100,6 @@ export function populateStrategySelect() {
     }
 }
 
-// js/ui.js
 
 export function createTradeCard(trade) {
     const card = document.createElement('div');
@@ -149,28 +148,30 @@ export function createTradeCard(trade) {
         card.appendChild(img);
     }
     
-    // --- INÍCIO DAS ALTERAÇÕES ---
+    // --- INÍCIO DA CORREÇÃO DEFINITIVA ---
 
     const actionsWrapper = document.createElement('div');
     actionsWrapper.className = 'card-actions';
     
-    // 1. CRIAMOS SEMPRE O BOTÃO 'GRÁFICO' PRIMEIRO
+    // 1. Criamos SEMPRE o botão 'Gráfico' para todos os estados.
     const tvLink = document.createElement('a');
     tvLink.href = finalTradingViewUrl;
     tvLink.className = 'btn edit-btn';
     tvLink.textContent = 'Gráfico';
-    // Não adicionamos target="_blank" para o deep link funcionar, mas se for desktop, podemos querer
+    tvLink.rel = 'noopener noreferrer'; // Boa prática de segurança
+
+    // 2. AQUI ESTÁ A LÓGICA CHAVE: só adicionamos target="_blank" se NÃO for mobile.
+    // Isto permite que os deep links funcionem corretamente em Android/iOS.
     if (!isAndroid() && !isIOS()) {
         tvLink.target = '_blank';
     }
-    tvLink.rel = 'noopener noreferrer';
+    
     actionsWrapper.appendChild(tvLink);
 
-    // 2. AGORA, ADICIONAMOS O BOTÃO DE AÇÃO ESPECÍFICO DO ESTADO
+    // 3. Agora, adicionamos o botão de ação específico do estado.
     let actionButton;
 
     if (trade.data.status === 'POTENTIAL') {
-        // O botão do gráfico já foi criado, só precisamos do botão de ação
         actionButton = document.createElement('button');
         actionButton.className = 'trigger-btn btn-potential';
         actionButton.textContent = 'Validar Setup (Armar)';
@@ -203,7 +204,7 @@ export function createTradeCard(trade) {
 
     card.appendChild(actionsWrapper);
     
-    // --- FIM DAS ALTERAÇÕES ---
+    // --- FIM DA CORREÇÃO ---
 
     card.querySelector('.card-edit-btn').addEventListener('click', (e) => { e.stopPropagation(); loadAndOpenForEditing(trade.id); });
     return card;
