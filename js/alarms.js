@@ -1,15 +1,12 @@
-// js/alarms.js - VERSÃO ADAPTADA PARA PARES DA BINANCE (ex: BTCUSDC)
+// js/alarms.js
 
 import { supabase } from './services.js';
 import { setupAutocomplete } from './utils.js';
 
 let editingAlarmId = null;
-window.alarmsData = []; // Para manter os dados para edição
+window.alarmsData = [];
 
-
-
-
-// ---- NOVA FUNÇÃO REUTILIZÁVEL ----
+// ---- FUNÇÃO REUTILIZÁVEL PARA BUSCAR PREÇO ----
 async function fetchPriceForPair(pair) {
     const priceDisplay = document.getElementById('asset-current-price');
     if (!priceDisplay || !pair) {
@@ -27,8 +24,6 @@ async function fetchPriceForPair(pair) {
         priceDisplay.textContent = 'Preço não disponível.';
     }
 }
-
-
 
 // ---- FUNÇÕES DE DADOS (CRUD) ----
 
@@ -48,13 +43,13 @@ async function fetchAndDisplayAlarms() {
 
         for (const alarm of data) {
             const isBullish = ['above', 'test_support'].includes(alarm.condition);
-            const conditionClass = isBullisth ? 'condition-above' : 'condition-below';
-            const formattedDate = new Date(alarm.created_at).toLocaleString('pt-PT');
+            // --- CORREÇÃO APLICADA AQUI ---
+            const conditionClass = isBullish ? 'condition-above' : 'condition-below';
             
+            const formattedDate = new Date(alarm.created_at).toLocaleString('pt-PT');
             const assetDisplay = alarm.asset_pair || `${alarm.asset_id} (${alarm.asset_symbol})`;
 
             let alarmDescription = '';
-            // A lógica para a descrição do alarme permanece a mesma...
             if (alarm.alarm_type === 'stochastic') { alarmDescription = `Estocástico(${alarm.indicator_period}) ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} no ${alarm.indicator_timeframe}`; } 
             else if (alarm.alarm_type === 'stochastic_crossover') { alarmDescription = `Estocástico %K(${alarm.indicator_period}) cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} de %D(${alarm.combo_period}) no ${alarm.indicator_timeframe}`; } 
             else if (alarm.alarm_type === 'rsi_crossover') { alarmDescription = `RSI(${alarm.rsi_period}) cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} da MA(${alarm.rsi_ma_period}) no ${alarm.indicator_timeframe}`; } 
@@ -65,35 +60,22 @@ async function fetchAndDisplayAlarms() {
             if (alarm.status === 'active') {
                 activeAlarmsHtml.push(`<tr><td><strong>${assetDisplay}</strong></td><td class="${conditionClass}">${alarmDescription}</td><td>${formattedDate}</td><td><div class="action-buttons"><button class="btn edit-btn" data-id="${alarm.id}">Editar</button><button class="btn delete-btn" data-id="${alarm.id}">Apagar</button></div></td></tr>`);
             } else {
-                // --- INÍCIO DA ALTERAÇÃO ---
                 const triggeredDate = alarm.triggered_at ? new Date(alarm.triggered_at).toLocaleString('pt-PT') : new Date(alarm.created_at).toLocaleString('pt-PT');
-                
-                // Construir o link para o TradingView
-                let tradingViewUrl = '#'; // URL padrão caso falhe
+                let tradingViewUrl = '#';
                 if (alarm.asset_pair) {
-                    // Adiciona o timeframe ao URL se for um alarme de indicador
                     const timeframeParam = alarm.indicator_timeframe ? `&interval=${alarm.indicator_timeframe}` : '';
                     tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${alarm.asset_pair}${timeframeParam}`;
                 }
-
                 const chartButtonHtml = `<a href="${tradingViewUrl}" target="_blank" class="btn edit-btn" style="margin-right: 5px;">Gráfico</a>`;
                 const deleteButtonHtml = `<button class="btn delete-btn" data-id="${alarm.id}">Apagar</button>`;
-
                 triggeredAlarmsHtml.push(`
                     <tr>
                         <td><strong>${assetDisplay}</strong></td>
                         <td class="${conditionClass}">${alarmDescription}</td>
                         <td><span class="status-badge status-closed">Disparado</span></td>
                         <td>${triggeredDate}</td>
-                        <td>
-                            <div class="action-buttons">
-                                ${chartButtonHtml}
-                                ${deleteButtonHtml}
-                            </div>
-                        </td>
-                    </tr>
-                `);
-                // --- FIM DA ALTERAÇÃO ---
+                        <td><div class="action-buttons">${chartButtonHtml}${deleteButtonHtml}</div></td>
+                    </tr>`);
             }
         }
         activeTbody.innerHTML = activeAlarmsHtml.length > 0 ? activeAlarmsHtml.join('') : '<tr><td colspan="4" style="text-align:center;">Nenhum alarme ativo.</td></tr>';
@@ -101,14 +83,18 @@ async function fetchAndDisplayAlarms() {
     } catch (error) { console.error("Erro ao buscar alarmes:", error); }
 }
 
-
-
-
-async function deleteAlarm(alarmId) { if (!confirm("Tem a certeza que quer apagar este registo?")) return; try { await supabase.from('alarms').delete().eq('id', alarmId); fetchAndDisplayAlarms(); } catch (error) { console.error("Erro ao apagar alarme:", error); } }
+async function deleteAlarm(alarmId) {
+    if (!confirm("Tem a certeza que quer apagar este registo?")) return;
+    try {
+        await supabase.from('alarms').delete().eq('id', alarmId);
+        fetchAndDisplayAlarms();
+    } catch (error) {
+        console.error("Erro ao apagar alarme:", error);
+    }
+}
 
 function enterEditMode(alarm) {
     editingAlarmId = alarm.id;
-    // O campo agora guarda o par completo
     document.getElementById('alarm-asset').value = alarm.asset_pair;
     
     const alarmType = alarm.alarm_type || 'price';
@@ -157,8 +143,6 @@ function exitEditMode() {
 }
 
 // ---- EVENT LISTENERS E INICIALIZAÇÃO ----
-
-
 document.addEventListener('DOMContentLoaded', () => {
     fetchAndDisplayAlarms();
 
@@ -169,7 +153,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainContainer = document.querySelector('main');
     const alarmTypeSelect = document.getElementById('alarm-type-select');
     
-    // ... (a lógica de esconder/mostrar campos permanece igual) ...
     const fields = { price: document.getElementById('price-fields'), stochastic: document.getElementById('stochastic-fields'), stochastic_crossover: document.getElementById('stoch-crossover-fields'), rsi_crossover: document.getElementById('rsi-fields'), ema_touch: document.getElementById('ema-fields'), combo: document.getElementById('combo-fields') };
     alarmTypeSelect.addEventListener('change', () => {
         const selectedType = alarmTypeSelect.value;
@@ -178,18 +161,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ---- LÓGICA ATUALIZADA ----
     const urlParams = new URLSearchParams(window.location.search);
     const assetPairFromUrl = urlParams.get('assetPair');
     
     if (assetPairFromUrl && assetInput) {
         const pair = assetPairFromUrl.toUpperCase();
         assetInput.value = pair;
-        // Chama diretamente a nossa nova função para buscar o preço
         fetchPriceForPair(pair); 
     }
 
-    // Event delegation
     mainContainer.addEventListener('click', (e) => {
         const target = e.target;
         if (target.classList.contains('delete-btn')) deleteAlarm(target.getAttribute('data-id'));
@@ -201,13 +181,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     document.getElementById('cancel-edit-btn').addEventListener('click', exitEditMode);
 
-    // ---- LÓGICA ATUALIZADA ----
-    // O autocomplete agora também usa a nossa função reutilizável
     setupAutocomplete(assetInput, resultsDiv, async (selectedPair) => {
         fetchPriceForPair(selectedPair);
     });
 
-    // ... (a lógica de submissão do formulário permanece a mesma) ...
     alarmForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const submitButton = alarmForm.querySelector('button[type="submit"]');
