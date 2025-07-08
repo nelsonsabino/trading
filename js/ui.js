@@ -202,6 +202,7 @@ export function populateStrategySelect() {
 }
 
 
+
 export function createTradeCard(trade) {
     const card = document.createElement('div');
     card.className = 'trade-card';
