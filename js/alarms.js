@@ -43,18 +43,18 @@ async function fetchAndDisplayAlarms() {
         const { data, error } = await supabase.from('alarms').select('*').order('created_at', { ascending: false });
         if (error) throw error;
 
-        window.alarmsData = data; // Guarda os dados para edição
+        window.alarmsData = data;
         const activeAlarmsHtml = [], triggeredAlarmsHtml = [];
 
         for (const alarm of data) {
             const isBullish = ['above', 'test_support'].includes(alarm.condition);
-            const conditionClass = isBullish ? 'condition-above' : 'condition-below';
+            const conditionClass = isBullisth ? 'condition-above' : 'condition-below';
             const formattedDate = new Date(alarm.created_at).toLocaleString('pt-PT');
             
-            // O campo agora é 'asset_pair' e contém o par completo, ex: BTCUSDC
-            const assetDisplay = alarm.asset_pair || `${alarm.asset_id} (${alarm.asset_symbol})`; // Fallback para dados antigos
+            const assetDisplay = alarm.asset_pair || `${alarm.asset_id} (${alarm.asset_symbol})`;
 
             let alarmDescription = '';
+            // A lógica para a descrição do alarme permanece a mesma...
             if (alarm.alarm_type === 'stochastic') { alarmDescription = `Estocástico(${alarm.indicator_period}) ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} no ${alarm.indicator_timeframe}`; } 
             else if (alarm.alarm_type === 'stochastic_crossover') { alarmDescription = `Estocástico %K(${alarm.indicator_period}) cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} de %D(${alarm.combo_period}) no ${alarm.indicator_timeframe}`; } 
             else if (alarm.alarm_type === 'rsi_crossover') { alarmDescription = `RSI(${alarm.rsi_period}) cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} da MA(${alarm.rsi_ma_period}) no ${alarm.indicator_timeframe}`; } 
@@ -62,13 +62,47 @@ async function fetchAndDisplayAlarms() {
             else if (alarm.alarm_type === 'combo') { const primaryTriggerText = alarm.condition === 'test_support' ? `testa a EMA (Suporte)` : `testa a EMA (Resistência)`; const secondaryTriggerText = `Estocástico(${alarm.combo_period}) ${alarm.combo_condition === 'below' ? 'abaixo de' : 'acima de'} ${alarm.combo_target_price}`; alarmDescription = `CONFLUÊNCIA: ${primaryTriggerText} E ${secondaryTriggerText} no ${alarm.indicator_timeframe}`; } 
             else { alarmDescription = `Preço ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} USD`; }
             
-            if (alarm.status === 'active') { activeAlarmsHtml.push(`<tr><td><strong>${assetDisplay}</strong></td><td class="${conditionClass}">${alarmDescription}</td><td>${formattedDate}</td><td><div class="action-buttons"><button class="btn edit-btn" data-id="${alarm.id}">Editar</button><button class="btn delete-btn" data-id="${alarm.id}">Apagar</button></div></td></tr>`); } 
-            else { const triggeredDate = alarm.triggered_at ? new Date(alarm.triggered_at).toLocaleString('pt-PT') : new Date(alarm.created_at).toLocaleString('pt-PT'); triggeredAlarmsHtml.push(`<tr><td><strong>${assetDisplay}</strong></td><td class="${conditionClass}">${alarmDescription}</td><td><span class="status-badge status-closed">Disparado</span></td><td>${triggeredDate}</td><td><div class="action-buttons"><button class="btn delete-btn" data-id="${alarm.id}">Apagar</button></div></td></tr>`); }
+            if (alarm.status === 'active') {
+                activeAlarmsHtml.push(`<tr><td><strong>${assetDisplay}</strong></td><td class="${conditionClass}">${alarmDescription}</td><td>${formattedDate}</td><td><div class="action-buttons"><button class="btn edit-btn" data-id="${alarm.id}">Editar</button><button class="btn delete-btn" data-id="${alarm.id}">Apagar</button></div></td></tr>`);
+            } else {
+                // --- INÍCIO DA ALTERAÇÃO ---
+                const triggeredDate = alarm.triggered_at ? new Date(alarm.triggered_at).toLocaleString('pt-PT') : new Date(alarm.created_at).toLocaleString('pt-PT');
+                
+                // Construir o link para o TradingView
+                let tradingViewUrl = '#'; // URL padrão caso falhe
+                if (alarm.asset_pair) {
+                    // Adiciona o timeframe ao URL se for um alarme de indicador
+                    const timeframeParam = alarm.indicator_timeframe ? `&interval=${alarm.indicator_timeframe}` : '';
+                    tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${alarm.asset_pair}${timeframeParam}`;
+                }
+
+                const chartButtonHtml = `<a href="${tradingViewUrl}" target="_blank" class="btn edit-btn" style="margin-right: 5px;">Gráfico</a>`;
+                const deleteButtonHtml = `<button class="btn delete-btn" data-id="${alarm.id}">Apagar</button>`;
+
+                triggeredAlarmsHtml.push(`
+                    <tr>
+                        <td><strong>${assetDisplay}</strong></td>
+                        <td class="${conditionClass}">${alarmDescription}</td>
+                        <td><span class="status-badge status-closed">Disparado</span></td>
+                        <td>${triggeredDate}</td>
+                        <td>
+                            <div class="action-buttons">
+                                ${chartButtonHtml}
+                                ${deleteButtonHtml}
+                            </div>
+                        </td>
+                    </tr>
+                `);
+                // --- FIM DA ALTERAÇÃO ---
+            }
         }
         activeTbody.innerHTML = activeAlarmsHtml.length > 0 ? activeAlarmsHtml.join('') : '<tr><td colspan="4" style="text-align:center;">Nenhum alarme ativo.</td></tr>';
         triggeredTbody.innerHTML = triggeredAlarmsHtml.length > 0 ? triggeredAlarmsHtml.join('') : '<tr><td colspan="5" style="text-align:center;">Nenhum alarme no histórico.</td></tr>';
     } catch (error) { console.error("Erro ao buscar alarmes:", error); }
 }
+
+
+
 
 async function deleteAlarm(alarmId) { if (!confirm("Tem a certeza que quer apagar este registo?")) return; try { await supabase.from('alarms').delete().eq('id', alarmId); fetchAndDisplayAlarms(); } catch (error) { console.error("Erro ao apagar alarme:", error); } }
 
