@@ -8,12 +8,18 @@ import { getCurrentTrade, setCurrentTrade } from './state.js';
 import { closeAddModal, closeArmModal, closeExecModal, closeCloseTradeModal, openAddModal, openArmModal, openExecModal } from './modals.js';
 import { generateDynamicChecklist } from './ui.js';
 
+
+
+
+
 export async function handleAddSubmit(e) {
     e.preventDefault();
     
     // 1. Recolha de dados e guardar no Firebase
     const assetInput = document.getElementById('asset');
-    const assetName = assetInput.value;
+    // 'assetName' agora será sempre o par correto, ex: "BTCUSDC"
+    const assetName = assetInput.value.trim().toUpperCase(); 
+    
     const strategyId = addModal.strategySelect.value;
     const checklistData = {};
     if (STRATEGIES[strategyId] && STRATEGIES[strategyId].potentialPhases) {
@@ -23,7 +29,8 @@ export async function handleAddSubmit(e) {
         });
     }
     const tradeData = {
-        asset: assetName,
+        // Guardamos o par completo e padronizado
+        asset: assetName, 
         imageUrl: document.getElementById('image-url').value,
         notes: document.getElementById('notes').value,
         strategyId: strategyId,
@@ -43,24 +50,21 @@ export async function handleAddSubmit(e) {
     // 2. Fechar o modal
     closeAddModal();
 
-    // 3. *** LÓGICA DE REDIRECIONAMENTO RESTAURADA ***
+    // 3. *** LÓGICA DE REDIRECIONAMENTO SIMPLIFICADA ***
     const redirectToAlarmCheckbox = document.getElementById('redirect-to-alarm-checkbox');
     if (redirectToAlarmCheckbox && redirectToAlarmCheckbox.checked) {
-        
-        let symbol = '';
-        const match = assetName.match(/\(([^)]+)\)/); 
-        
-        if (match && match[1]) {
-            symbol = match[1];
+        if (assetName) {
+            // Redireciona para a página de alarmes com o par completo
+            window.location.href = `alarms.html?assetPair=${assetName}`;
         } else {
-            symbol = assetName.split('/')[0].trim();
-        }
-        
-        if (symbol) {
-            window.location.href = `alarms.html?assetSymbol=${symbol.toUpperCase()}`;
+            window.location.href = 'alarms.html';
         }
     }
 }
+
+
+
+
 
 export async function handleArmSubmit(e) {
     e.preventDefault();
