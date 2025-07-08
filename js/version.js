@@ -1,12 +1,19 @@
 // js/version.js - Ponto central de controlo de versão e changelog
 
 export const changelogData = {
-    current: {
-        number: '6.5.1',
+     current: {
+        number: '6.5.2', // <-- VERSÃO ATUALIZADA
         changes: [
-            "Tornada a página de alarmes totalmente responsiva para telemóveis, convertendo as tabelas em 'cards' para evitar scroll horizontal.",
+            "Correção do bug que impedia a edição de alarmes existentes (devido a política de RLS do Supabase).",
         ]
     },
+    releases: [
+        {
+            number: '6.5.1',
+            changes: [
+                "Tornada a página de alarmes totalmente responsiva para telemóveis, convertendo as tabelas em 'cards' para evitar scroll horizontal.",
+            ]
+        },
     releases: [
         {
             number: '6.5.0',
