@@ -100,46 +100,38 @@ export function populateStrategySelect() {
     }
 }
 
+// js/ui.js
+
 export function createTradeCard(trade) {
     const card = document.createElement('div');
     card.className = 'trade-card';
 
-const assetName = trade.data.asset; // Ex: "SOL/USDC" ou "Bitcoin (BTC)"
-let tradingViewSymbol = '';
+    const assetName = trade.data.asset;
+    let tradingViewSymbol = '';
 
-// Verifica se o ativo contém uma barra (ex: SOL/USDC)
-if (assetName.includes('/')) {
-    // Constrói o símbolo para o TradingView, ex: "BINANCE:SOLUSDC"
-    tradingViewSymbol = `BINANCE:${assetName.replace('/', '')}`;
-} else {
-    // Se não tiver barra, usa a lógica antiga de extrair de parênteses
-    let symbol = '';
-    const match = assetName.match(/\(([^)]+)\)/);
-    if (match && match[1]) {
-        symbol = match[1];
+    if (assetName.includes('/')) {
+        tradingViewSymbol = `BINANCE:${assetName.replace('/', '')}`;
     } else {
-        symbol = assetName.trim();
+        let symbol = '';
+        const match = assetName.match(/\(([^)]+)\)/);
+        if (match && match[1]) {
+            symbol = match[1];
+        } else {
+            symbol = assetName.trim();
+        }
+        tradingViewSymbol = `BINANCE:${symbol.toUpperCase()}USDT`;
     }
-    // Assume USDT como par padrão se não for especificado
-    tradingViewSymbol = `BINANCE:${symbol.toUpperCase()}USDT`;
-}
 
-    // **** AQUI ESTÁ A NOVA LÓGICA INTELIGENTE ****
     let finalTradingViewUrl;
     if (isAndroid()) {
-
-        // Link especial para Android
-const httpUrl = `https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}`;
-finalTradingViewUrl = `intent://${httpUrl}#Intent;scheme=https;package=com.tradingview.tradingviewapp;S.browser_fallback_url=${encodeURIComponent(httpUrl)};end`;
-
+        const httpUrl = `https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}`;
+        finalTradingViewUrl = `intent://${httpUrl}#Intent;scheme=https;package=com.tradingview.tradingviewapp;S.browser_fallback_url=${encodeURIComponent(httpUrl)};end`;
     } else if (isIOS()) {
-        // Deep link para iOS
         finalTradingViewUrl = `tradingview://chart?symbol=${tradingViewSymbol}`;
     } else {
-        // Link padrão para browsers de desktop
         finalTradingViewUrl = `https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}`;
     }
-    
+
     card.innerHTML = `<button class="card-edit-btn">Editar</button><h3>${assetName}</h3><p style="color: #007bff; font-weight: 500;">Estratégia: ${trade.data.strategyName || 'N/A'}</p><p><strong>Status:</strong> ${trade.data.status}</p><p><strong>Notas:</strong> ${trade.data.notes || ''}</p>`;
     
     const potentialImageUrl = trade.data.imageUrl;
@@ -157,20 +149,28 @@ finalTradingViewUrl = `intent://${httpUrl}#Intent;scheme=https;package=com.tradi
         card.appendChild(img);
     }
     
+    // --- INÍCIO DAS ALTERAÇÕES ---
+
     const actionsWrapper = document.createElement('div');
     actionsWrapper.className = 'card-actions';
+    
+    // 1. CRIAMOS SEMPRE O BOTÃO 'GRÁFICO' PRIMEIRO
+    const tvLink = document.createElement('a');
+    tvLink.href = finalTradingViewUrl;
+    tvLink.className = 'btn edit-btn';
+    tvLink.textContent = 'Gráfico';
+    // Não adicionamos target="_blank" para o deep link funcionar, mas se for desktop, podemos querer
+    if (!isAndroid() && !isIOS()) {
+        tvLink.target = '_blank';
+    }
+    tvLink.rel = 'noopener noreferrer';
+    actionsWrapper.appendChild(tvLink);
+
+    // 2. AGORA, ADICIONAMOS O BOTÃO DE AÇÃO ESPECÍFICO DO ESTADO
     let actionButton;
 
     if (trade.data.status === 'POTENTIAL') {
-        const tvLink = document.createElement('a');
-        tvLink.href = finalTradingViewUrl; // Usa a nova URL dinâmica
-        // Não adicionamos target="_blank" para permitir que os deep links funcionem corretamente
-        tvLink.className = 'btn edit-btn';
-        tvLink.textContent = 'Gráfico';
-        tvLink.target = '_blank'; // Abre numa nova aba
-        tvLink.rel = 'noopener noreferrer'; // Boas práticas de segurança
-        actionsWrapper.appendChild(tvLink);
-
+        // O botão do gráfico já foi criado, só precisamos do botão de ação
         actionButton = document.createElement('button');
         actionButton.className = 'trigger-btn btn-potential';
         actionButton.textContent = 'Validar Setup (Armar)';
@@ -182,10 +182,15 @@ finalTradingViewUrl = `intent://${httpUrl}#Intent;scheme=https;package=com.tradi
         actionButton.className = 'trigger-btn btn-armed';
         actionButton.textContent = 'Executar Gatilho';
         actionButton.addEventListener('click', () => openExecModal(trade));
+
     } else if (trade.data.status === 'LIVE') {
         card.classList.add('live');
         const details = trade.data.executionDetails;
-        if (details) { const p = document.createElement('p'); p.innerHTML = `<strong>Entrada:</strong> ${details['entry-price'] || 'N/A'} | <strong>Quantidade:</strong> ${details['quantity'] || 'N/A'}`; card.appendChild(p); }
+        if (details) { 
+            const p = document.createElement('p'); 
+            p.innerHTML = `<strong>Entrada:</strong> ${details['entry-price'] || 'N/A'} | <strong>Quantidade:</strong> ${details['quantity'] || 'N/A'}`; 
+            card.appendChild(p); 
+        }
         actionButton = document.createElement('button');
         actionButton.className = 'trigger-btn btn-live';
         actionButton.textContent = 'Fechar Trade';
@@ -197,6 +202,9 @@ finalTradingViewUrl = `intent://${httpUrl}#Intent;scheme=https;package=com.tradi
     }
 
     card.appendChild(actionsWrapper);
+    
+    // --- FIM DAS ALTERAÇÕES ---
+
     card.querySelector('.card-edit-btn').addEventListener('click', (e) => { e.stopPropagation(); loadAndOpenForEditing(trade.id); });
     return card;
 }
