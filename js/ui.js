@@ -1,10 +1,10 @@
-// js/ui.js (VERSÃO FINAL COM DEEP LINKING E LÓGICA DE PAR ROBUSTA)
+// js/ui.js (VERSÃO FINAL COM LINKS INTELIGENTES PARA ANDROID/IOS)
 
 import { STRATEGIES } from './strategies.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openImageModal } from './modals.js';
 import { loadAndOpenForEditing } from './handlers.js';
-import { isAndroid, isIOS } from './utils.js'; // Importa as novas funções de deteção
+import { isAndroid, isIOS } from './utils.js'; // NOVO: Importa as novas funções de deteção
 
 function getIconForLabel(labelText) {
     const text = labelText.toLowerCase();
@@ -104,45 +104,40 @@ export function createTradeCard(trade) {
     const card = document.createElement('div');
     card.className = 'trade-card';
 
-    
-// ... no início de createTradeCard ...
-const assetName = trade.data.asset; // Pode ser "SOL/USDC" ou "Bitcoin (BTC)"
-let tradingViewPair = '';
+const assetName = trade.data.asset; // Ex: "SOL/USDC" ou "Bitcoin (BTC)"
+let tradingViewSymbol = '';
 
+// Verifica se o ativo contém uma barra (ex: SOL/USDC)
 if (assetName.includes('/')) {
-    // Se o nome já é um par, ex: "SOL/USDC", usamos diretamente
-    const parts = assetName.split('/');
-    const base = parts[0].trim().toUpperCase();
-    const quote = parts[1].trim().toUpperCase();
-    tradingViewPair = `BINANCE:${base}${quote}`; // Resulta em "BINANCE:SOLUSDC"
+    // Constrói o símbolo para o TradingView, ex: "BINANCE:SOLUSDC"
+    tradingViewSymbol = `BINANCE:${assetName.replace('/', '')}`;
 } else {
-    // Se não, é um nome como "Bitcoin (BTC)"
+    // Se não tiver barra, usa a lógica antiga de extrair de parênteses
     let symbol = '';
-    const match = assetName.match(/\(([^)]+)\)/); // Extrai "BTC"
+    const match = assetName.match(/\(([^)]+)\)/);
     if (match && match[1]) {
-        symbol = match[1].toUpperCase();
+        symbol = match[1];
     } else {
-        // Fallback se não houver parênteses
-        symbol = assetName.trim().toUpperCase();
+        symbol = assetName.trim();
     }
-    // Assume USDT como par padrão para nomes genéricos
-    tradingViewPair = `BINANCE:${symbol}USDT`;
+    // Assume USDT como par padrão se não for especificado
+    tradingViewSymbol = `BINANCE:${symbol.toUpperCase()}USDT`;
 }
 
-// O resto da lógica que constrói o intent:// continua a mesma
-// let finalTradingViewUrl;
-// if (isAndroid()) { ... }
-
-    
-
-    // Lógica inteligente para construir o link correto para cada plataforma
+    // **** AQUI ESTÁ A NOVA LÓGICA INTELIGENTE ****
     let finalTradingViewUrl;
     if (isAndroid()) {
-        finalTradingViewUrl = `intent://chart?symbol=${tradingViewPair}#Intent;scheme=tradingview;package=com.tradingview.tradingviewapp;end`;
+
+        // Link especial para Android
+const httpUrl = `https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}`;
+finalTradingViewUrl = `intent://${httpUrl}#Intent;scheme=https;package=com.tradingview.tradingviewapp;S.browser_fallback_url=${encodeURIComponent(httpUrl)};end`;
+
     } else if (isIOS()) {
-        finalTradingViewUrl = `tradingview://chart?symbol=${tradingViewPair}`;
+        // Deep link para iOS
+        finalTradingViewUrl = `tradingview://chart?symbol=${tradingViewSymbol}`;
     } else {
-        finalTradingViewUrl = `https://www.tradingview.com/chart/?symbol=${tradingViewPair}`;
+        // Link padrão para browsers de desktop
+        finalTradingViewUrl = `https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}`;
     }
     
     card.innerHTML = `<button class="card-edit-btn">Editar</button><h3>${assetName}</h3><p style="color: #007bff; font-weight: 500;">Estratégia: ${trade.data.strategyName || 'N/A'}</p><p><strong>Status:</strong> ${trade.data.status}</p><p><strong>Notas:</strong> ${trade.data.notes || ''}</p>`;
@@ -168,13 +163,12 @@ if (assetName.includes('/')) {
 
     if (trade.data.status === 'POTENTIAL') {
         const tvLink = document.createElement('a');
-        tvLink.href = finalTradingViewUrl;
-        if (!isAndroid() && !isIOS()) {
-            tvLink.target = '_blank';
-            tvLink.rel = 'noopener noreferrer';
-        }
+        tvLink.href = finalTradingViewUrl; // Usa a nova URL dinâmica
+        // Não adicionamos target="_blank" para permitir que os deep links funcionem corretamente
         tvLink.className = 'btn edit-btn';
         tvLink.textContent = 'Gráfico';
+        tvLink.target = '_blank'; // Abre numa nova aba
+        tvLink.rel = 'noopener noreferrer'; // Boas práticas de segurança
         actionsWrapper.appendChild(tvLink);
 
         actionButton = document.createElement('button');

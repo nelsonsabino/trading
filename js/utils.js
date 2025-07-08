@@ -1,27 +1,24 @@
-// js/utils.js (VERSÃO FINAL E INDEPENDENTE)
+// js/utils.js (VERSÃO COM DETEÇÃO DE ANDROID/IOS)
+
+import { supabase } from './services.js';
 
 /**
  * Anexa a funcionalidade de autocomplete a um campo de input.
- * @param {object} supabase - A instância do cliente Supabase.
- * @param {HTMLInputElement} inputElement - O campo de input.
- * @param {HTMLDivElement} resultsContainer - O div para os resultados.
- * @param {function(object | null): void} onCoinSelect - O callback.
+ * (Esta função permanece inalterada)
  */
-export function setupAutocomplete(supabase, inputElement, resultsContainer, onCoinSelect) {
+export function setupAutocomplete(inputElement, resultsContainer, onCoinSelect) {
     let debounceTimer;
 
     inputElement.addEventListener('input', () => {
         clearTimeout(debounceTimer);
         const query = inputElement.value.trim();
-        if (onCoinSelect) onCoinSelect(null);
+        if (onCoinSelect) { onCoinSelect(null); }
         if (query.length < 2) { resultsContainer.style.display = 'none'; return; }
 
         debounceTimer = setTimeout(async () => {
             try {
-                // Chama a Edge Function 'search-coins'
                 const { data: results, error } = await supabase.functions.invoke('search-coins', { body: { query } });
                 if (error) throw error;
-
                 resultsContainer.innerHTML = '';
                 if (results && results.length > 0) {
                     results.forEach(coin => {
@@ -31,7 +28,7 @@ export function setupAutocomplete(supabase, inputElement, resultsContainer, onCo
                         item.addEventListener('click', () => {
                             inputElement.value = `${coin.name} (${coin.symbol.toUpperCase()})`;
                             resultsContainer.style.display = 'none';
-                            if (onCoinSelect) onCoinSelect(coin);
+                            if (onCoinSelect) { onCoinSelect(coin); }
                         });
                         resultsContainer.appendChild(item);
                     });
@@ -40,7 +37,8 @@ export function setupAutocomplete(supabase, inputElement, resultsContainer, onCo
                     resultsContainer.style.display = 'none';
                 }
             } catch (err) {
-                console.error("Erro no autocomplete:", err);
+                console.error("Erro ao buscar moedas para o autocomplete:", err);
+                resultsContainer.style.display = 'none';
             }
         }, 300);
     });
@@ -50,4 +48,20 @@ export function setupAutocomplete(supabase, inputElement, resultsContainer, onCo
             resultsContainer.style.display = 'none';
         }
     });
+}
+
+/**
+ * NOVO: Verifica se o utilizador está num dispositivo Android.
+ * @returns {boolean}
+ */
+export function isAndroid() {
+    return /Android/i.test(navigator.userAgent);
+}
+
+/**
+ * NOVO: Verifica se o utilizador está num dispositivo iOS (iPhone, iPad, iPod).
+ * @returns {boolean}
+ */
+export function isIOS() {
+    return /iPhone|iPad|iPod/i.test(navigator.userAgent);
 }

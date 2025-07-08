@@ -50,10 +50,9 @@ export async function handleAddSubmit(e) {
         let symbol = '';
         const match = assetName.match(/\(([^)]+)\)/); 
         
-        if (match) {
-            symbol = match[1]; // Se encontrar, o símbolo é BTC
+        if (match && match[1]) {
+            symbol = match[1];
         } else {
-            // Se não, assume que é um par como BTC/USDT e pega na primeira parte
             symbol = assetName.split('/')[0].trim();
         }
         
