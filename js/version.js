@@ -1,12 +1,19 @@
 // js/version.js - Ponto central de controlo de versão e changelog
 
 export const changelogData = {
-     current: {
-        number: '6.5.2', // <-- VERSÃO ATUALIZADA
+    current: {
+        number: '6.5.3', // <-- VERSÃO ATUALIZADA
         changes: [
-            "Correção do bug que impedia a edição de alarmes existentes (devido a política de RLS do Supabase).",
+            "Correção do link 'Gráfico' no histórico de alarmes para garantir a compatibilidade com a app móvel do TradingView.",
         ]
     },
+    releases: [
+        {
+            number: '6.5.2',
+            changes: [
+                "Correção do bug que impedia a edição de alarmes existentes (devido a política de RLS do Supabase).",
+            ]
+        },
     releases: [
         {
             number: '6.5.1',
