@@ -277,10 +277,11 @@
 
     </main>
 
-    <!-- ORDEM DE SCRIPTS FINAL E CORRETA -->
+    <!-- Scripts necessários para esta página (ORDEM CORRETA) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script type="module" src="js/utils.js"></script>
-    <script type="module" src="js/alarms.js"></script>
+    <script type="module" src="js/services.js"></script> <!-- Carrega os serviços primeiro -->
+    <script type="module" src="js/utils.js"></script>     <!-- Carrega as utilidades depois -->
+    <script type="module" src="js/alarms.js"></script>   <!-- Carrega o script da página por último -->
 
 </body>
 </html>
