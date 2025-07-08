@@ -59,14 +59,13 @@ async function fetchAndDisplayAlarms() {
             else { alarmDescription = `Preço ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} USD`; }
             
             if (alarm.status === 'active') {
-                // Adicionamos os atributos data-label aqui
                 activeAlarmsHtml.push(`
                     <tr>
-                        <td data-label="Ativo"><strong>${assetDisplay}</strong></td>
-                        <td data-label="Condição" class="${conditionClass}">${alarmDescription}</td>
-                        <td data-label="Data Criação">${formattedDate}</td>
+                        <td data-label="Ativo"><span class="cell-value"><strong>${assetDisplay}</strong></span></td>
+                        <td data-label="Condição" class="${conditionClass}"><span class="cell-value description">${alarmDescription}</span></td>
+                        <td data-label="Data Criação"><span class="cell-value">${formattedDate}</span></td>
                         <td data-label="Ações">
-                            <div class="action-buttons">
+                            <div class="action-buttons cell-value">
                                 <button class="btn edit-btn" data-id="${alarm.id}">Editar</button>
                                 <button class="btn delete-btn" data-id="${alarm.id}">Apagar</button>
                             </div>
@@ -83,15 +82,14 @@ async function fetchAndDisplayAlarms() {
                 const chartButtonHtml = `<a href="${tradingViewUrl}" target="_blank" class="btn edit-btn" style="margin-right: 5px;">Gráfico</a>`;
                 const deleteButtonHtml = `<button class="btn delete-btn" data-id="${alarm.id}">Apagar</button>`;
                 
-                // Adicionamos os atributos data-label aqui também
                 triggeredAlarmsHtml.push(`
                     <tr>
-                        <td data-label="Ativo"><strong>${assetDisplay}</strong></td>
-                        <td data-label="Condição" class="${conditionClass}">${alarmDescription}</td>
-                        <td data-label="Status"><span class="status-badge status-closed">Disparado</span></td>
-                        <td data-label="Data Disparo">${triggeredDate}</td>
+                        <td data-label="Ativo"><span class="cell-value"><strong>${assetDisplay}</strong></span></td>
+                        <td data-label="Condição" class="${conditionClass}"><span class="cell-value description">${alarmDescription}</span></td>
+                        <td data-label="Status"><span class="cell-value"><span class="status-badge status-closed">Disparado</span></span></td>
+                        <td data-label="Data Disparo"><span class="cell-value">${triggeredDate}</span></td>
                         <td data-label="Ações">
-                            <div class="action-buttons">${chartButtonHtml}${deleteButtonHtml}</div>
+                            <div class="action-buttons cell-value">${chartButtonHtml}${deleteButtonHtml}</div>
                         </td>
                     </tr>
                 `);
