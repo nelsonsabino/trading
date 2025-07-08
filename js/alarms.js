@@ -27,6 +27,9 @@ async function fetchPriceForPair(pair) {
 
 // ---- FUNÇÕES DE DADOS (CRUD) ----
 
+
+
+
 async function fetchAndDisplayAlarms() {
     const activeTbody = document.getElementById('active-alarms-tbody');
     const triggeredTbody = document.getElementById('triggered-alarms-tbody');
@@ -43,9 +46,7 @@ async function fetchAndDisplayAlarms() {
 
         for (const alarm of data) {
             const isBullish = ['above', 'test_support'].includes(alarm.condition);
-            // --- CORREÇÃO APLICADA AQUI ---
             const conditionClass = isBullish ? 'condition-above' : 'condition-below';
-            
             const formattedDate = new Date(alarm.created_at).toLocaleString('pt-PT');
             const assetDisplay = alarm.asset_pair || `${alarm.asset_id} (${alarm.asset_symbol})`;
 
@@ -58,7 +59,20 @@ async function fetchAndDisplayAlarms() {
             else { alarmDescription = `Preço ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} USD`; }
             
             if (alarm.status === 'active') {
-                activeAlarmsHtml.push(`<tr><td><strong>${assetDisplay}</strong></td><td class="${conditionClass}">${alarmDescription}</td><td>${formattedDate}</td><td><div class="action-buttons"><button class="btn edit-btn" data-id="${alarm.id}">Editar</button><button class="btn delete-btn" data-id="${alarm.id}">Apagar</button></div></td></tr>`);
+                // Adicionamos os atributos data-label aqui
+                activeAlarmsHtml.push(`
+                    <tr>
+                        <td data-label="Ativo"><strong>${assetDisplay}</strong></td>
+                        <td data-label="Condição" class="${conditionClass}">${alarmDescription}</td>
+                        <td data-label="Data Criação">${formattedDate}</td>
+                        <td data-label="Ações">
+                            <div class="action-buttons">
+                                <button class="btn edit-btn" data-id="${alarm.id}">Editar</button>
+                                <button class="btn delete-btn" data-id="${alarm.id}">Apagar</button>
+                            </div>
+                        </td>
+                    </tr>
+                `);
             } else {
                 const triggeredDate = alarm.triggered_at ? new Date(alarm.triggered_at).toLocaleString('pt-PT') : new Date(alarm.created_at).toLocaleString('pt-PT');
                 let tradingViewUrl = '#';
@@ -68,20 +82,29 @@ async function fetchAndDisplayAlarms() {
                 }
                 const chartButtonHtml = `<a href="${tradingViewUrl}" target="_blank" class="btn edit-btn" style="margin-right: 5px;">Gráfico</a>`;
                 const deleteButtonHtml = `<button class="btn delete-btn" data-id="${alarm.id}">Apagar</button>`;
+                
+                // Adicionamos os atributos data-label aqui também
                 triggeredAlarmsHtml.push(`
                     <tr>
-                        <td><strong>${assetDisplay}</strong></td>
-                        <td class="${conditionClass}">${alarmDescription}</td>
-                        <td><span class="status-badge status-closed">Disparado</span></td>
-                        <td>${triggeredDate}</td>
-                        <td><div class="action-buttons">${chartButtonHtml}${deleteButtonHtml}</div></td>
-                    </tr>`);
+                        <td data-label="Ativo"><strong>${assetDisplay}</strong></td>
+                        <td data-label="Condição" class="${conditionClass}">${alarmDescription}</td>
+                        <td data-label="Status"><span class="status-badge status-closed">Disparado</span></td>
+                        <td data-label="Data Disparo">${triggeredDate}</td>
+                        <td data-label="Ações">
+                            <div class="action-buttons">${chartButtonHtml}${deleteButtonHtml}</div>
+                        </td>
+                    </tr>
+                `);
             }
         }
         activeTbody.innerHTML = activeAlarmsHtml.length > 0 ? activeAlarmsHtml.join('') : '<tr><td colspan="4" style="text-align:center;">Nenhum alarme ativo.</td></tr>';
         triggeredTbody.innerHTML = triggeredAlarmsHtml.length > 0 ? triggeredAlarmsHtml.join('') : '<tr><td colspan="5" style="text-align:center;">Nenhum alarme no histórico.</td></tr>';
     } catch (error) { console.error("Erro ao buscar alarmes:", error); }
 }
+
+
+
+
 
 async function deleteAlarm(alarmId) {
     if (!confirm("Tem a certeza que quer apagar este registo?")) return;
