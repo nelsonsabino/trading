@@ -1,10 +1,10 @@
-// js/ui.js (VERSÃO FINAL COM LINKS INTELIGENTES PARA ANDROID/IOS)
+// js/ui.js
 
 import { STRATEGIES } from './strategies.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openImageModal } from './modals.js';
 import { loadAndOpenForEditing } from './handlers.js';
-import { isAndroid, isIOS } from './utils.js'; // NOVO: Importa as novas funções de deteção
+import { isAndroid, isIOS } from './utils.js';
 
 function getIconForLabel(labelText) {
     const text = labelText.toLowerCase();
@@ -149,22 +149,17 @@ export function createTradeCard(trade) {
     
     const actionsWrapper = document.createElement('div');
     actionsWrapper.className = 'card-actions';
-    
-    // 1. Criamos SEMPRE o botão 'Gráfico' para todos os estados.
+
+    // 1. CRIAMOS O BOTÃO 'GRÁFICO'
     const tvLink = document.createElement('a');
     tvLink.href = finalTradingViewUrl;
     tvLink.className = 'btn edit-btn';
     tvLink.textContent = 'Gráfico';
     tvLink.rel = 'noopener noreferrer';
-
-    // 2. LÓGICA CHAVE: só adicionamos target="_blank" se NÃO for mobile.
-    if (!isAndroid() && !isIOS()) {
-        tvLink.target = '_blank';
-    }
-    
+    // A LINHA tvLink.target = '_blank'; FOI COMPLETAMENTE REMOVIDA
     actionsWrapper.appendChild(tvLink);
 
-    // 3. Agora, adicionamos o botão de ação específico do estado.
+    // 2. ADICIONAMOS O BOTÃO DE AÇÃO ESPECÍFICO
     let actionButton;
 
     if (trade.data.status === 'POTENTIAL') {
@@ -172,7 +167,6 @@ export function createTradeCard(trade) {
         actionButton.className = 'trigger-btn btn-potential';
         actionButton.textContent = 'Validar Setup (Armar)';
         actionButton.addEventListener('click', () => openArmModal(trade));
-
     } else if (trade.data.status === 'ARMED') {
         card.classList.add('armed');
         actionButton = document.createElement('button');
@@ -198,6 +192,7 @@ export function createTradeCard(trade) {
     }
 
     card.appendChild(actionsWrapper);
+    
     card.querySelector('.card-edit-btn').addEventListener('click', (e) => { e.stopPropagation(); loadAndOpenForEditing(trade.id); });
     return card;
 }
