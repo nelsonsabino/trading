@@ -120,15 +120,10 @@ export function createTradeCard(trade) {
         tradingViewSymbol = `BINANCE:${symbol.toUpperCase()}USDT`;
     }
 
-    let finalTradingViewUrl;
-    if (isAndroid()) {
-        const httpUrl = `https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}`;
-        finalTradingViewUrl = `intent://${httpUrl}#Intent;scheme=https;package=com.tradingview.tradingviewapp;S.browser_fallback_url=${encodeURIComponent(httpUrl)};end`;
-    } else if (isIOS()) {
-        finalTradingViewUrl = `tradingview://chart?symbol=${tradingViewSymbol}`;
-    } else {
-        finalTradingViewUrl = `https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}`;
-    }
+    // --- INÍCIO DA CORREÇÃO ---
+    // REMOVEMOS A LÓGICA DE isAndroid/isIOS E USAMOS UM LINK SIMPLES, IGUAL AO DO market-scan.js
+    const finalTradingViewUrl = `https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}`;
+    // --- FIM DA CORREÇÃO ---
     
     card.innerHTML = `<button class="card-edit-btn">Editar</button><h3>${assetName}</h3><p style="color: #007bff; font-weight: 500;">Estratégia: ${trade.data.strategyName || 'N/A'}</p><p><strong>Status:</strong> ${trade.data.status}</p><p><strong>Notas:</strong> ${trade.data.notes || ''}</p>`;
     
@@ -150,16 +145,15 @@ export function createTradeCard(trade) {
     const actionsWrapper = document.createElement('div');
     actionsWrapper.className = 'card-actions';
 
-    // 1. CRIAMOS O BOTÃO 'GRÁFICO'
     const tvLink = document.createElement('a');
     tvLink.href = finalTradingViewUrl;
     tvLink.className = 'btn edit-btn';
     tvLink.textContent = 'Gráfico';
     tvLink.rel = 'noopener noreferrer';
-    // A LINHA tvLink.target = '_blank'; FOI COMPLETAMENTE REMOVIDA
+    // Adicionamos o target="_blank" porque o exemplo que funciona (market-scan) também o tem.
+    tvLink.target = '_blank';
     actionsWrapper.appendChild(tvLink);
 
-    // 2. ADICIONAMOS O BOTÃO DE AÇÃO ESPECÍFICO
     let actionButton;
 
     if (trade.data.status === 'POTENTIAL') {
