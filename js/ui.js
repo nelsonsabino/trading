@@ -100,109 +100,6 @@ export function populateStrategySelect() {
     }
 }
 
-
-import { STRATEGIES } from './strategies.js';
-import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
-import { openArmModal, openExecModal, openCloseTradeModal, openImageModal } from './modals.js';
-import { loadAndOpenForEditing } from './handlers.js';
-import { isAndroid, isIOS } from './utils.js'; // NOVO: Importa as novas funções de deteção
-
-function getIconForLabel(labelText) {
-    const text = labelText.toLowerCase();
-    if (text.includes('tendência')) return 'fa-solid fa-chart-line';
-    if (text.includes('rsi')) return 'fa-solid fa-wave-square';
-    if (text.includes('stochastic') || text.includes('estocástico')) return 'fa-solid fa-arrows-down-to-line';
-    if (text.includes('suporte')) return 'fa-solid fa-arrow-down';
-    if (text.includes('resistência')) return 'fa-solid fa-arrow-up';
-    if (text.includes('fibo')) return 'fa-solid fa-ruler-vertical';
-    if (text.includes('volume')) return 'fa-solid fa-database';
-    if (text.includes('ema')) return 'fa-solid fa-chart-simple';
-    if (text.includes('alarme')) return 'fa-solid fa-bell';
-    if (text.includes('preço')) return 'fa-solid fa-dollar-sign';
-    if (text.includes('candle')) return 'fa-solid fa-bars-staggered';
-    if (text.includes('timeframe')) return 'fa-solid fa-clock';
-    if (text.includes('val ')) return 'fa-solid fa-magnet';
-    if (text.includes('alvo')) return 'fa-solid fa-crosshairs';
-    return 'fa-solid fa-check';
-}
-
-function createChecklistItem(check, data) {
-    const isRequired = check.required === false ? '' : 'required';
-    const labelText = check.required === false ? check.label : `${check.label} <span class="required-asterisk">*</span>`;
-    const isChecked = data && data[check.id] ? 'checked' : '';
-    const item = document.createElement('div');
-    item.className = 'checklist-item';
-    item.innerHTML = `<i class="${getIconForLabel(check.label)}"></i><input type="checkbox" id="${check.id}" ${isChecked} ${isRequired}><label for="${check.id}">${labelText}</label>`;
-    return item;
-}
-
-function createInputItem(input, data) {
-    const item = document.createElement('div');
-    item.className = 'input-item-styled'; 
-    const isRequired = input.required === false ? '' : 'required';
-    const labelText = input.required === false ? input.label : `${input.label} <span class="required-asterisk">*</span>`;
-    const value = data && data[input.id] ? data[input.id] : '';
-    let fieldHtml = '';
-    if (input.type === 'select') {
-        const optionsHtml = input.options.map(opt => `<option value="${opt}" ${value === opt ? 'selected' : ''}>${opt}</option>`).join('');
-        fieldHtml = `<select id="${input.id}" ${isRequired} class="input-item-field"><option value="">-- Selecione --</option>${optionsHtml}</select>`;
-    } else {
-        fieldHtml = `<input type="${input.type}" id="${input.id}" value="${value}" step="any" ${isRequired} class="input-item-field" placeholder="${input.placeholder || ''}">`;
-    }
-    item.innerHTML = `<i class="${getIconForLabel(input.label)}"></i><div style="flex-grow: 1;"><label for="${input.id}">${labelText}</label>${fieldHtml}</div>`;
-    return item;
-}
-
-function createRadioGroup(radioInfo, data) {
-    const group = document.createElement('div');
-    group.className = 'radio-group';
-    group.innerHTML = `<h4><i class="fa-solid fa-bullseye" style="margin-right: 10px; color: #007bff;"></i><strong>${radioInfo.label}</strong></h4>`;
-    const checkedValue = data && data[radioInfo.name];
-    radioInfo.options.forEach(opt => {
-        const isChecked = checkedValue === opt.id ? 'checked' : '';
-        const item = document.createElement('div');
-        item.className = 'checklist-item';
-        item.innerHTML = `<i class="${getIconForLabel(opt.label)}"></i><input type="radio" id="${opt.id}" name="${radioInfo.name}" value="${opt.id}" ${isChecked} required><label for="${opt.id}">${opt.label}</label>`;
-        group.appendChild(item);
-    });
-    return group;
-}
-
-export function generateDynamicChecklist(container, phases, data = {}) {
-    container.innerHTML = '';
-    if (!phases) return;
-    phases.forEach(phase => {
-        const phaseDiv = document.createElement('div');
-        if (phase.exampleImageUrl) {
-            const exampleContainer = document.createElement('div');
-            exampleContainer.className = 'example-image-container';
-            exampleContainer.innerHTML = `<p>Exemplo Visual:</p><img src="${phase.exampleImageUrl}" alt="Exemplo para ${phase.title}">`;
-            exampleContainer.querySelector('img').addEventListener('click', (e) => { e.stopPropagation(); openImageModal(phase.exampleImageUrl); });
-            phaseDiv.appendChild(exampleContainer);
-        }
-        const titleEl = document.createElement('h4');
-        titleEl.textContent = phase.title;
-        phaseDiv.appendChild(titleEl);
-        if (phase.inputs) phase.inputs.forEach(input => phaseDiv.appendChild(createInputItem(input, data)));
-        if (phase.checks) phase.checks.forEach(check => phaseDiv.appendChild(createChecklistItem(check, data)));
-        if (phase.radios) phaseDiv.appendChild(createRadioGroup(phase.radios, data));
-        container.appendChild(phaseDiv);
-    });
-}
-
-export function populateStrategySelect() {
-    if (!addModal.strategySelect) return;
-    addModal.strategySelect.innerHTML = '<option value="">-- Selecione --</option>';
-    for (const id in STRATEGIES) {
-        const option = document.createElement('option');
-        option.value = id;
-        option.textContent = STRATEGIES[id].name;
-        addModal.strategySelect.appendChild(option);
-    }
-}
-
-
-
 export function createTradeCard(trade) {
     const card = document.createElement('div');
     card.className = 'trade-card';
@@ -232,7 +129,7 @@ export function createTradeCard(trade) {
     } else {
         finalTradingViewUrl = `https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}`;
     }
-
+    
     card.innerHTML = `<button class="card-edit-btn">Editar</button><h3>${assetName}</h3><p style="color: #007bff; font-weight: 500;">Estratégia: ${trade.data.strategyName || 'N/A'}</p><p><strong>Status:</strong> ${trade.data.status}</p><p><strong>Notas:</strong> ${trade.data.notes || ''}</p>`;
     
     const potentialImageUrl = trade.data.imageUrl;
@@ -250,8 +147,6 @@ export function createTradeCard(trade) {
         card.appendChild(img);
     }
     
-    // --- INÍCIO DA CORREÇÃO DEFINITIVA ---
-
     const actionsWrapper = document.createElement('div');
     actionsWrapper.className = 'card-actions';
     
@@ -260,10 +155,9 @@ export function createTradeCard(trade) {
     tvLink.href = finalTradingViewUrl;
     tvLink.className = 'btn edit-btn';
     tvLink.textContent = 'Gráfico';
-    tvLink.rel = 'noopener noreferrer'; // Boa prática de segurança
+    tvLink.rel = 'noopener noreferrer';
 
-    // 2. AQUI ESTÁ A LÓGICA CHAVE: só adicionamos target="_blank" se NÃO for mobile.
-    // Isto permite que os deep links funcionem corretamente em Android/iOS.
+    // 2. LÓGICA CHAVE: só adicionamos target="_blank" se NÃO for mobile.
     if (!isAndroid() && !isIOS()) {
         tvLink.target = '_blank';
     }
@@ -285,7 +179,6 @@ export function createTradeCard(trade) {
         actionButton.className = 'trigger-btn btn-armed';
         actionButton.textContent = 'Executar Gatilho';
         actionButton.addEventListener('click', () => openExecModal(trade));
-
     } else if (trade.data.status === 'LIVE') {
         card.classList.add('live');
         const details = trade.data.executionDetails;
@@ -305,14 +198,9 @@ export function createTradeCard(trade) {
     }
 
     card.appendChild(actionsWrapper);
-    
-    // --- FIM DA CORREÇÃO ---
-
     card.querySelector('.card-edit-btn').addEventListener('click', (e) => { e.stopPropagation(); loadAndOpenForEditing(trade.id); });
     return card;
 }
-
-
 
 export function displayTrades(trades) {
     if (!potentialTradesContainer) return;
