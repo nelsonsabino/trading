@@ -30,6 +30,7 @@ async function fetchPriceForPair(pair) {
 
 
 
+
 async function fetchAndDisplayAlarms() {
     const activeTbody = document.getElementById('active-alarms-tbody');
     const triggeredTbody = document.getElementById('triggered-alarms-tbody');
@@ -76,8 +77,9 @@ async function fetchAndDisplayAlarms() {
                 const triggeredDate = alarm.triggered_at ? new Date(alarm.triggered_at).toLocaleString('pt-PT') : new Date(alarm.created_at).toLocaleString('pt-PT');
                 let tradingViewUrl = '#';
                 if (alarm.asset_pair) {
-                    const timeframeParam = alarm.indicator_timeframe ? `&interval=${alarm.indicator_timeframe}` : '';
-                    tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${alarm.asset_pair}${timeframeParam}`;
+                    // --- CORREÇÃO APLICADA AQUI ---
+                    // Removemos a lógica do timeframe para garantir a compatibilidade com a app móvel.
+                    tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${alarm.asset_pair}`;
                 }
                 const chartButtonHtml = `<a href="${tradingViewUrl}" target="_blank" class="btn edit-btn" style="margin-right: 5px;">Gráfico</a>`;
                 const deleteButtonHtml = `<button class="btn delete-btn" data-id="${alarm.id}">Apagar</button>`;
