@@ -308,16 +308,14 @@ footer { text-align: center; padding: 1rem 0; margin-top: 2rem; color: #6c757d; 
     flex-grow: 0; 
 }
 
-/* style.css */
 
-/* --- NOVOS ESTILOS: Tabela de Alarmes Responsiva (Card View) --- */
+
+/* --- Tabela de Alarmes Responsiva (Card View com FLEXBOX) --- */
 @media (max-width: 768px) {
-    /* Esconde o cabeçalho original da tabela em ecrãs pequenos */
     .alarms-table thead {
         display: none;
     }
 
-    /* Transforma cada linha da tabela num "card" */
     .alarms-table tr {
         display: block;
         margin-bottom: 1.5rem;
@@ -327,33 +325,40 @@ footer { text-align: center; padding: 1rem 0; margin-top: 2rem; color: #6c757d; 
         background-color: #fff;
     }
 
-    /* Transforma cada célula numa linha dentro do card */
     .alarms-table td {
-        display: block;
+        display: flex; /* <-- A magia começa aqui */
+        justify-content: space-between; /* <-- Empurra o rótulo para a esquerda e o valor para a direita */
+        align-items: center; /* <-- Alinha tudo verticalmente */
         padding: 0.8rem 1rem;
-        text-align: right; /* Alinha o valor à direita */
         border-bottom: 1px solid #f1f1f1;
-        position: relative; /* Essencial para o posicionamento do rótulo */
+        /* Removemos o posicionamento relativo e o alinhamento de texto */
     }
 
-    /* Cria um rótulo (o nome da coluna) à esquerda da célula */
     .alarms-table td::before {
-        content: attr(data-label); /* Lê o rótulo do atributo 'data-label' que vamos adicionar no JS */
-        position: absolute;
-        left: 1rem;
+        content: attr(data-label);
         font-weight: 600;
         color: #495057;
-        text-align: left;
+        padding-right: 1rem; /* Adiciona um espaço para respirar */
     }
 
-    /* Remove a linha inferior da última célula do card */
+    /* O valor da célula (o conteúdo à direita) */
+    .alarms-table td .cell-value {
+        text-align: right;
+        flex-shrink: 0; /* Impede que os botões encolham e quebrem a linha */
+        max-width: 60%; /* Evita que a descrição da condição seja demasiado longa e empurre tudo */
+    }
+
+    /* Caso especial para a descrição, para que possa quebrar a linha */
+    .alarms-table td .cell-value.description {
+        white-space: normal;
+        text-align: right;
+    }
+    
     .alarms-table tr td:last-child {
         border-bottom: none;
     }
 
-    /* Garante que os botões na última célula ocupem o espaço todo */
     .alarms-table td .action-buttons {
-        width: 100%;
-        text-align: right; /* Alinha os botões à direita */
+        text-align: right;
     }
 }
