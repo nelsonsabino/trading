@@ -124,6 +124,7 @@ function exitEditMode() {
 
 // ---- EVENT LISTENERS E INICIALIZAÇÃO ----
 
+
 document.addEventListener('DOMContentLoaded', () => {
     fetchAndDisplayAlarms();
 
@@ -131,39 +132,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const feedbackDiv = document.getElementById('alarm-feedback');
     const assetInput = document.getElementById('alarm-asset');
     const resultsDiv = document.getElementById('autocomplete-results');
-    const priceDisplay = document.getElementById('asset-current-price');
     const mainContainer = document.querySelector('main');
     const alarmTypeSelect = document.getElementById('alarm-type-select');
     
-    // Esconder/Mostrar campos do formulário
-    const fields = {
-        price: document.getElementById('price-fields'),
-        stochastic: document.getElementById('stochastic-fields'),
-        stochastic_crossover: document.getElementById('stoch-crossover-fields'),
-        rsi_crossover: document.getElementById('rsi-fields'),
-        ema_touch: document.getElementById('ema-fields'),
-        combo: document.getElementById('combo-fields')
-    };
-
+    // ... (a lógica de esconder/mostrar campos permanece igual) ...
+    const fields = { price: document.getElementById('price-fields'), stochastic: document.getElementById('stochastic-fields'), stochastic_crossover: document.getElementById('stoch-crossover-fields'), rsi_crossover: document.getElementById('rsi-fields'), ema_touch: document.getElementById('ema-fields'), combo: document.getElementById('combo-fields') };
     alarmTypeSelect.addEventListener('change', () => {
         const selectedType = alarmTypeSelect.value;
         for (const type in fields) {
-            if (fields[type]) {
-                fields[type].style.display = type === selectedType ? 'block' : 'none';
-            }
+            if (fields[type]) fields[type].style.display = type === selectedType ? 'block' : 'none';
         }
     });
 
-    // Lógica para pré-preenchimento vindo do URL
+    // ---- LÓGICA ATUALIZADA ----
     const urlParams = new URLSearchParams(window.location.search);
-    const assetPairFromUrl = urlParams.get('assetPair'); // <-- MUDOU PARA assetPair
+    const assetPairFromUrl = urlParams.get('assetPair');
     
     if (assetPairFromUrl && assetInput) {
-        assetInput.value = assetPairFromUrl.toUpperCase();
-        assetInput.dispatchEvent(new Event('input', { bubbles: true })); // Ativa a busca de preço
+        const pair = assetPairFromUrl.toUpperCase();
+        assetInput.value = pair;
+        // Chama diretamente a nossa nova função para buscar o preço
+        fetchPriceForPair(pair); 
     }
 
-    // Event delegation para botões de apagar/editar
+    // Event delegation
     mainContainer.addEventListener('click', (e) => {
         const target = e.target;
         if (target.classList.contains('delete-btn')) deleteAlarm(target.getAttribute('data-id'));
@@ -175,96 +167,37 @@ document.addEventListener('DOMContentLoaded', () => {
     
     document.getElementById('cancel-edit-btn').addEventListener('click', exitEditMode);
 
-    // Configura o Autocomplete e a busca de preço
+    // ---- LÓGICA ATUALIZADA ----
+    // O autocomplete agora também usa a nossa função reutilizável
     setupAutocomplete(assetInput, resultsDiv, async (selectedPair) => {
-        if (selectedPair) {
-            priceDisplay.textContent = 'A obter preço...';
-            try {
-                // A API da Binance aceita o par diretamente, ex: BTCUSDC
-                const response = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${selectedPair}`);
-                if (!response.ok) throw new Error('Par não encontrado na Binance');
-                const data = await response.json();
-                priceDisplay.innerHTML = `Preço Atual: <span style="color: #28a745;">${parseFloat(data.price).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</span>`;
-            } catch (error) { 
-                priceDisplay.textContent = 'Preço não disponível.';
-            }
-        } else {
-            priceDisplay.textContent = '';
-        }
+        fetchPriceForPair(selectedPair);
     });
 
-    // Submissão do Formulário
+    // ... (a lógica de submissão do formulário permanece a mesma) ...
     alarmForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const submitButton = alarmForm.querySelector('button[type="submit"]');
         submitButton.disabled = true;
         feedbackDiv.textContent = 'A processar...';
-
         try {
             const assetPair = assetInput.value.trim().toUpperCase();
             if (!assetPair) throw new Error("Por favor, selecione um par válido.");
-
             const alarmType = alarmTypeSelect.value;
-            // Objeto base para os dados do alarme
-            let alarmData = {
-                asset_pair: assetPair, // NOVO CAMPO
-                alarm_type: alarmType,
-            };
-
-            // Preenche os dados específicos de cada tipo de alarme
-            if (alarmType === 'price') {
-                alarmData.condition = document.getElementById('alarm-condition-standalone').value;
-                alarmData.target_price = parseFloat(document.getElementById('alarm-price-standalone').value);
-            } else if (alarmType === 'stochastic') {
-                alarmData.condition = document.getElementById('stoch-condition').value;
-                alarmData.target_price = parseFloat(document.getElementById('stoch-value').value);
-                alarmData.indicator_period = parseInt(document.getElementById('stoch-period').value);
-                alarmData.indicator_timeframe = document.getElementById('stoch-timeframe').value;
-            } else if (alarmType === 'stochastic_crossover') {
-                alarmData.condition = document.getElementById('stoch-cross-condition').value;
-                alarmData.indicator_period = parseInt(document.getElementById('stoch-cross-k-period').value);
-                alarmData.combo_period = parseInt(document.getElementById('stoch-cross-d-period').value);
-                alarmData.indicator_timeframe = document.getElementById('stoch-cross-timeframe').value;
-            } else if (alarmType === 'rsi_crossover') {
-                alarmData.condition = document.getElementById('rsi-condition').value;
-                alarmData.indicator_timeframe = document.getElementById('rsi-timeframe').value;
-                alarmData.rsi_period = 14;
-                alarmData.rsi_ma_period = 14;
-            } else if (alarmType === 'ema_touch') {
-                alarmData.condition = document.getElementById('ema-condition').value;
-                alarmData.indicator_timeframe = document.getElementById('ema-timeframe').value;
-                alarmData.ema_period = parseInt(document.getElementById('ema-period').value);
-            } else if (alarmType === 'combo') {
-                alarmData.condition = document.getElementById('combo-primary-trigger').value;
-                alarmData.indicator_timeframe = document.getElementById('combo-timeframe').value;
-                alarmData.ema_period = parseInt(document.getElementById('combo-ema-period').value);
-                alarmData.combo_indicator = 'stochastic';
-                alarmData.combo_condition = document.getElementById('combo-stoch-condition').value;
-                alarmData.combo_target_price = parseInt(document.getElementById('combo-stoch-value').value);
-                alarmData.combo_period = 14;
-            }
-            
-            // Lógica para inserir ou atualizar
+            let alarmData = { asset_pair: assetPair, alarm_type: alarmType, };
+            if (alarmType === 'price') { alarmData.condition = document.getElementById('alarm-condition-standalone').value; alarmData.target_price = parseFloat(document.getElementById('alarm-price-standalone').value); } 
+            else if (alarmType === 'stochastic') { alarmData.condition = document.getElementById('stoch-condition').value; alarmData.target_price = parseFloat(document.getElementById('stoch-value').value); alarmData.indicator_period = parseInt(document.getElementById('stoch-period').value); alarmData.indicator_timeframe = document.getElementById('stoch-timeframe').value; } 
+            else if (alarmType === 'stochastic_crossover') { alarmData.condition = document.getElementById('stoch-cross-condition').value; alarmData.indicator_period = parseInt(document.getElementById('stoch-cross-k-period').value); alarmData.combo_period = parseInt(document.getElementById('stoch-cross-d-period').value); alarmData.indicator_timeframe = document.getElementById('stoch-cross-timeframe').value; } 
+            else if (alarmType === 'rsi_crossover') { alarmData.condition = document.getElementById('rsi-condition').value; alarmData.indicator_timeframe = document.getElementById('rsi-timeframe').value; alarmData.rsi_period = 14; alarmData.rsi_ma_period = 14; } 
+            else if (alarmType === 'ema_touch') { alarmData.condition = document.getElementById('ema-condition').value; alarmData.indicator_timeframe = document.getElementById('ema-timeframe').value; alarmData.ema_period = parseInt(document.getElementById('ema-period').value); } 
+            else if (alarmType === 'combo') { alarmData.condition = document.getElementById('combo-primary-trigger').value; alarmData.indicator_timeframe = document.getElementById('combo-timeframe').value; alarmData.ema_period = parseInt(document.getElementById('combo-ema-period').value); alarmData.combo_indicator = 'stochastic'; alarmData.combo_condition = document.getElementById('combo-stoch-condition').value; alarmData.combo_target_price = parseInt(document.getElementById('combo-stoch-value').value); alarmData.combo_period = 14; }
             let error;
-            if (editingAlarmId) {
-                const { error: updateError } = await supabase.from('alarms').update(alarmData).eq('id', editingAlarmId);
-                error = updateError;
-            } else {
-                alarmData.status = 'active';
-                const { error: insertError } = await supabase.from('alarms').insert([alarmData]);
-                error = insertError;
-            }
-
+            if (editingAlarmId) { const { error: updateError } = await supabase.from('alarms').update(alarmData).eq('id', editingAlarmId); error = updateError; } 
+            else { alarmData.status = 'active'; const { error: insertError } = await supabase.from('alarms').insert([alarmData]); error = insertError; }
             if (error) throw error;
             feedbackDiv.textContent = `✅ Operação concluída com sucesso!`;
             exitEditMode();
             fetchAndDisplayAlarms();
-
-        } catch (error) {
-            console.error("Erro na operação do alarme:", error);
-            feedbackDiv.textContent = `Erro: ${error.message}`;
-        } finally {
-            submitButton.disabled = false;
-        }
+        } catch (error) { console.error("Erro na operação do alarme:", error); feedbackDiv.textContent = `Erro: ${error.message}`; } 
+        finally { submitButton.disabled = false; }
     });
 });
