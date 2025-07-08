@@ -12,14 +12,18 @@ import { generateDynamicChecklist } from './ui.js';
 
 
 
+
 export async function handleAddSubmit(e) {
     e.preventDefault();
-    
-    // 1. Recolha de dados e guardar no Firebase
+
+    // --- LÓGICA DE REDIRECIONAMENTO (LIDA PRIMEIRO) ---
+    // Capturamos o estado da checkbox e o nome do ativo ANTES de qualquer outra coisa.
+    const redirectToAlarmCheckbox = document.getElementById('redirect-to-alarm-checkbox');
+    const shouldRedirect = redirectToAlarmCheckbox.checked;
     const assetInput = document.getElementById('asset');
-    // 'assetName' agora será sempre o par correto, ex: "BTCUSDC"
-    const assetName = assetInput.value.trim().toUpperCase(); 
-    
+    const assetName = assetInput.value.trim().toUpperCase();
+
+    // --- RECOLHA DE DADOS E GUARDAR NO FIREBASE ---
     const strategyId = addModal.strategySelect.value;
     const checklistData = {};
     if (STRATEGIES[strategyId] && STRATEGIES[strategyId].potentialPhases) {
@@ -29,8 +33,7 @@ export async function handleAddSubmit(e) {
         });
     }
     const tradeData = {
-        // Guardamos o par completo e padronizado
-        asset: assetName, 
+        asset: assetName,
         imageUrl: document.getElementById('image-url').value,
         notes: document.getElementById('notes').value,
         strategyId: strategyId,
@@ -47,14 +50,13 @@ export async function handleAddSubmit(e) {
         await addTrade(tradeData);
     }
     
-    // 2. Fechar o modal
+    // --- FINALIZAÇÃO E REDIRECIONAMENTO ---
+    // Agora que os dados estão guardados, fechamos o modal.
     closeAddModal();
 
-    // 3. *** LÓGICA DE REDIRECIONAMENTO SIMPLIFICADA ***
-    const redirectToAlarmCheckbox = document.getElementById('redirect-to-alarm-checkbox');
-    if (redirectToAlarmCheckbox && redirectToAlarmCheckbox.checked) {
+    // E finalmente, se a checkbox ESTAVA marcada, fazemos o redirecionamento.
+    if (shouldRedirect) {
         if (assetName) {
-            // Redireciona para a página de alarmes com o par completo
             window.location.href = `alarms.html?assetPair=${assetName}`;
         } else {
             window.location.href = 'alarms.html';
