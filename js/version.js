@@ -5,17 +5,18 @@
 // cole-o no início do array 'releases', e atualize o novo bloco 'current'.
 export const changelogData = {
     current: {
-        number: '6.4.0', // A versão mais recente
+        number: '6.4.1',
         changes: [
-            "Refatoração do sistema de autocomplete para usar a API da Binance, padronizando os pares de moedas em toda a aplicação.",
-            "Adicionado autocomplete de pares no modal de 'Adicionar Oportunidade'.",
+            "Correção do redirecionamento da checkbox 'Criar Alarme' no modal de oportunidades.",
+            "Correção do link 'Gráfico' nos cards do dashboard para evitar o erro de 'símbolo inválido'.",
         ]
     },
     releases: [
         {
-            number: '6.3.1',
+            number: '6.4.0',
             changes: [
-                "Correção do fluxo de 'Criar Alarme' para ser consistente em toda a aplicação, resolvendo bugs de pré-preenchimento.",
+                "Refatoração do sistema de autocomplete para usar a API da Binance, padronizando os pares de moedas em toda a aplicação.",
+                "Adicionado autocomplete de pares no modal de 'Adicionar Oportunidade'.",
             ]
         },
         {
