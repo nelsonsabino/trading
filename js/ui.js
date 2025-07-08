@@ -101,7 +101,13 @@ export function populateStrategySelect() {
 }
 
 
+// js/ui.js
+
 export function createTradeCard(trade) {
+    // --- INÍCIO DOS ESPIÕES ---
+    console.log(`--- A criar card para: ${trade.data.asset} (Status: ${trade.data.status}) ---`);
+    // --- FIM DOS ESPIÕES ---
+
     const card = document.createElement('div');
     card.className = 'trade-card';
 
@@ -122,14 +128,25 @@ export function createTradeCard(trade) {
     }
 
     let finalTradingViewUrl;
-    if (isAndroid()) {
+    
+    // --- INÍCIO DOS ESPIÕES ---
+    const isMobileAndroid = isAndroid();
+    const isMobileIOS = isIOS();
+    console.log(`Deteção de Dispositivo: é Android? ${isMobileAndroid}, é iOS? ${isMobileIOS}`);
+    // --- FIM DOS ESPIÕES ---
+
+    if (isMobileAndroid) {
         const httpUrl = `https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}`;
         finalTradingViewUrl = `intent://${httpUrl}#Intent;scheme=https;package=com.tradingview.tradingviewapp;S.browser_fallback_url=${encodeURIComponent(httpUrl)};end`;
-    } else if (isIOS()) {
+    } else if (isMobileIOS) {
         finalTradingViewUrl = `tradingview://chart?symbol=${tradingViewSymbol}`;
     } else {
         finalTradingViewUrl = `https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}`;
     }
+
+    // --- INÍCIO DOS ESPIÕES ---
+    console.log(`URL Final gerado: ${finalTradingViewUrl}`);
+    // --- FIM DOS ESPIÕES ---
 
     card.innerHTML = `<button class="card-edit-btn">Editar</button><h3>${assetName}</h3><p style="color: #007bff; font-weight: 500;">Estratégia: ${trade.data.strategyName || 'N/A'}</p><p><strong>Status:</strong> ${trade.data.status}</p><p><strong>Notas:</strong> ${trade.data.notes || ''}</p>`;
     
@@ -148,29 +165,29 @@ export function createTradeCard(trade) {
         card.appendChild(img);
     }
     
-    // --- INÍCIO DA CORREÇÃO DEFINITIVA ---
-
     const actionsWrapper = document.createElement('div');
     actionsWrapper.className = 'card-actions';
     
-    // 1. Criamos SEMPRE o botão 'Gráfico' para todos os estados.
     const tvLink = document.createElement('a');
     tvLink.href = finalTradingViewUrl;
     tvLink.className = 'btn edit-btn';
     tvLink.textContent = 'Gráfico';
-    tvLink.rel = 'noopener noreferrer'; // Boa prática de segurança
+    tvLink.rel = 'noopener noreferrer';
 
-    // 2. AQUI ESTÁ A LÓGICA CHAVE: só adicionamos target="_blank" se NÃO for mobile.
-    // Isto permite que os deep links funcionem corretamente em Android/iOS.
-    if (!isAndroid() && !isIOS()) {
+    if (!isMobileAndroid && !isMobileIOS) {
+        // --- INÍCIO DOS ESPIÕES ---
+        console.log('Dispositivo é Desktop. A adicionar target="_blank".');
+        // --- FIM DOS ESPIÕES ---
         tvLink.target = '_blank';
+    } else {
+        // --- INÍCIO DOS ESPIÕES ---
+        console.log('Dispositivo é Mobile. NÃO foi adicionado target="_blank".');
+        // --- FIM DOS ESPIÕES ---
     }
     
     actionsWrapper.appendChild(tvLink);
 
-    // 3. Agora, adicionamos o botão de ação específico do estado.
     let actionButton;
-
     if (trade.data.status === 'POTENTIAL') {
         actionButton = document.createElement('button');
         actionButton.className = 'trigger-btn btn-potential';
@@ -204,9 +221,12 @@ export function createTradeCard(trade) {
 
     card.appendChild(actionsWrapper);
     
-    // --- FIM DA CORREÇÃO ---
-
     card.querySelector('.card-edit-btn').addEventListener('click', (e) => { e.stopPropagation(); loadAndOpenForEditing(trade.id); });
+
+    // --- INÍCIO DOS ESPIÕES ---
+    console.log('--- Card criado com sucesso. --- \n\n');
+    // --- FIM DOS ESPIÕES ---
+
     return card;
 }
 
