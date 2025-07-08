@@ -6,6 +6,30 @@ import { setupAutocomplete } from './utils.js';
 let editingAlarmId = null;
 window.alarmsData = []; // Para manter os dados para edição
 
+
+
+
+// ---- NOVA FUNÇÃO REUTILIZÁVEL ----
+async function fetchPriceForPair(pair) {
+    const priceDisplay = document.getElementById('asset-current-price');
+    if (!priceDisplay || !pair) {
+        if (priceDisplay) priceDisplay.textContent = '';
+        return;
+    }
+
+    priceDisplay.textContent = 'A obter preço...';
+    try {
+        const response = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${pair}`);
+        if (!response.ok) throw new Error('Par não encontrado na Binance');
+        const data = await response.json();
+        priceDisplay.innerHTML = `Preço Atual: <span style="color: #28a745;">${parseFloat(data.price).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</span>`;
+    } catch (error) { 
+        priceDisplay.textContent = 'Preço não disponível.';
+    }
+}
+
+
+
 // ---- FUNÇÕES DE DADOS (CRUD) ----
 
 async function fetchAndDisplayAlarms() {
