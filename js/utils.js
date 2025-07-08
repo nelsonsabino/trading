@@ -1,34 +1,41 @@
-// js/utils.js (VERSÃO COM DETEÇÃO DE ANDROID/IOS)
+// js/utils.js
 
 import { supabase } from './services.js';
 
 /**
  * Anexa a funcionalidade de autocomplete a um campo de input.
- * (Esta função permanece inalterada)
+ * ADAPTADO PARA A NOVA API DA BINANCE (lista de strings).
  */
-export function setupAutocomplete(inputElement, resultsContainer, onCoinSelect) {
+export function setupAutocomplete(inputElement, resultsContainer, onItemSelect) {
     let debounceTimer;
 
     inputElement.addEventListener('input', () => {
         clearTimeout(debounceTimer);
-        const query = inputElement.value.trim();
-        if (onCoinSelect) { onCoinSelect(null); }
+        const query = inputElement.value.trim().toUpperCase(); // Convertemos para maiúsculas
+        if (onItemSelect) { onItemSelect(null); }
         if (query.length < 2) { resultsContainer.style.display = 'none'; return; }
 
         debounceTimer = setTimeout(async () => {
             try {
+                // A chamada à função é a mesma, mas a resposta é diferente
                 const { data: results, error } = await supabase.functions.invoke('search-coins', { body: { query } });
                 if (error) throw error;
+                
                 resultsContainer.innerHTML = '';
                 if (results && results.length > 0) {
-                    results.forEach(coin => {
+                    // 'results' agora é um array de strings, ex: ["BTCUSDC", "BTCDOMUSDC"]
+                    results.forEach(pair => {
                         const item = document.createElement('div');
                         item.className = 'autocomplete-item';
-                        item.innerHTML = `<img src="${coin.thumb}" width="20" height="20" style="margin-right: 10px;"> <strong>${coin.name}</strong> (${coin.symbol.toUpperCase()})`;
+                        // Mostramos o par diretamente
+                        item.innerHTML = `<strong>${pair}</strong>`;
                         item.addEventListener('click', () => {
-                            inputElement.value = `${coin.name} (${coin.symbol.toUpperCase()})`;
+                            inputElement.value = pair; // Preenche o input com o par, ex: "BTCUSDC"
                             resultsContainer.style.display = 'none';
-                            if (onCoinSelect) { onCoinSelect(coin); }
+                            if (onItemSelect) { 
+                                // Passamos o par selecionado para a função de callback
+                                onItemSelect(pair); 
+                            }
                         });
                         resultsContainer.appendChild(item);
                     });
@@ -37,7 +44,7 @@ export function setupAutocomplete(inputElement, resultsContainer, onCoinSelect) 
                     resultsContainer.style.display = 'none';
                 }
             } catch (err) {
-                console.error("Erro ao buscar moedas para o autocomplete:", err);
+                console.error("Erro ao buscar pares para o autocomplete:", err);
                 resultsContainer.style.display = 'none';
             }
         }, 300);
@@ -50,17 +57,18 @@ export function setupAutocomplete(inputElement, resultsContainer, onCoinSelect) 
     });
 }
 
+
 /**
- * NOVO: Verifica se o utilizador está num dispositivo Android.
- * @returns {boolean}
+ * Verifica se o utilizador está num dispositivo Android.
+ * (Esta função permanece inalterada)
  */
 export function isAndroid() {
     return /Android/i.test(navigator.userAgent);
 }
 
 /**
- * NOVO: Verifica se o utilizador está num dispositivo iOS (iPhone, iPad, iPod).
- * @returns {boolean}
+ * Verifica se o utilizador está num dispositivo iOS (iPhone, iPad, iPod).
+ * (Esta função permanece inalterada)
  */
 export function isIOS() {
     return /iPhone|iPad|iPod/i.test(navigator.userAgent);
