@@ -2,7 +2,7 @@
 
 export const changelogData = {
     current: {
-        number: '6.5.3', // <-- VERSÃO ATUALIZADA
+        number: '6.5.3',
         changes: [
             "Correção do link 'Gráfico' no histórico de alarmes para garantir a compatibilidade com a app móvel do TradingView.",
         ]
@@ -14,14 +14,12 @@ export const changelogData = {
                 "Correção do bug que impedia a edição de alarmes existentes (devido a política de RLS do Supabase).",
             ]
         },
-    releases: [
         {
             number: '6.5.1',
             changes: [
                 "Tornada a página de alarmes totalmente responsiva para telemóveis, convertendo as tabelas em 'cards' para evitar scroll horizontal.",
             ]
         },
-    releases: [
         {
             number: '6.5.0',
             changes: [
