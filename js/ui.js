@@ -100,30 +100,21 @@ export function populateStrategySelect() {
     }
 }
 
+
+
+
 export function createTradeCard(trade) {
     const card = document.createElement('div');
     card.className = 'trade-card';
 
+    // trade.data.asset já contém o par correto, ex: "BTCUSDC"
     const assetName = trade.data.asset;
-    let tradingViewSymbol = '';
 
-    if (assetName.includes('/')) {
-        tradingViewSymbol = `BINANCE:${assetName.replace('/', '')}`;
-    } else {
-        let symbol = '';
-        const match = assetName.match(/\(([^)]+)\)/);
-        if (match && match[1]) {
-            symbol = match[1];
-        } else {
-            symbol = assetName.trim();
-        }
-        tradingViewSymbol = `BINANCE:${symbol.toUpperCase()}USDT`;
-    }
-
-    // --- INÍCIO DA CORREÇÃO ---
-    // REMOVEMOS A LÓGICA DE isAndroid/isIOS E USAMOS UM LINK SIMPLES, IGUAL AO DO market-scan.js
+    // --- LÓGICA CORRIGIDA E SIMPLIFICADA ---
+    // Já não precisamos de adivinhar ou construir o símbolo.
+    // O 'assetName' guardado na base de dados É o símbolo da Binance.
+    const tradingViewSymbol = `BINANCE:${assetName}`;
     const finalTradingViewUrl = `https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}`;
-    // --- FIM DA CORREÇÃO ---
     
     card.innerHTML = `<button class="card-edit-btn">Editar</button><h3>${assetName}</h3><p style="color: #007bff; font-weight: 500;">Estratégia: ${trade.data.strategyName || 'N/A'}</p><p><strong>Status:</strong> ${trade.data.status}</p><p><strong>Notas:</strong> ${trade.data.notes || ''}</p>`;
     
@@ -150,7 +141,6 @@ export function createTradeCard(trade) {
     tvLink.className = 'btn edit-btn';
     tvLink.textContent = 'Gráfico';
     tvLink.rel = 'noopener noreferrer';
-    // Adicionamos o target="_blank" porque o exemplo que funciona (market-scan) também o tem.
     tvLink.target = '_blank';
     actionsWrapper.appendChild(tvLink);
 
@@ -190,6 +180,9 @@ export function createTradeCard(trade) {
     card.querySelector('.card-edit-btn').addEventListener('click', (e) => { e.stopPropagation(); loadAndOpenForEditing(trade.id); });
     return card;
 }
+
+
+
 
 export function displayTrades(trades) {
     if (!potentialTradesContainer) return;
