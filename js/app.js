@@ -1,4 +1,4 @@
-// js/app.js (VERSÃO CORRIGIDA COM PRÉ-PREENCHIMENTO DE MODAL)
+// js/app.js
 
 import { listenToTrades } from './firebase-service.js';
 import { addModal, armModal, execModal, closeModalObj, imageModal, closeImageModalBtn } from './dom-elements.js';
@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
     addModal.form.addEventListener('submit', handleAddSubmit);
     addModal.strategySelect.addEventListener('change', () => generateDynamicChecklist(addModal.checklistContainer, STRATEGIES[addModal.strategySelect.value]?.potentialPhases));
 
-    // ... (outros listeners de modais inalterados) ...
     armModal.closeBtn.addEventListener('click', closeArmModal);
     armModal.container.addEventListener('click', e => { if (e.target.id === 'arm-trade-modal') closeArmModal(); });
     armModal.form.addEventListener('submit', handleArmSubmit);
@@ -32,31 +31,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalAssetInput = document.getElementById('asset');
     const modalResultsDiv = document.getElementById('modal-autocomplete-results');
     if (modalAssetInput && modalResultsDiv) {
-        setupAutocomplete(modalAssetInput, modalResultsDiv, (coin) => {
-            if (coin) {
-                modalAssetInput.value = `${coin.name} (${coin.symbol.toUpperCase()})`;
+        // Usamos a mesma função de autocomplete dos alarmes
+        setupAutocomplete(modalAssetInput, modalResultsDiv, (selectedPair) => {
+            if (selectedPair) {
+                // Quando um par é selecionado, o valor já é o correto. Não precisamos fazer nada.
             }
         });
     }
 
-    // --- LÓGICA RESTAURADA: Verifica o URL para pré-preencher o modal ---
-const urlParams = new URLSearchParams(window.location.search);
-const assetSymbolFromUrl = urlParams.get('assetSymbol');
-const pairFromUrl = urlParams.get('pair'); // NOVO: Lê o par completo
+    // --- LÓGICA ATUALIZADA: Verifica o URL para pré-preencher o modal ---
+    const urlParams = new URLSearchParams(window.location.search);
+    const assetPairFromUrl = urlParams.get('assetPair'); // <-- LÊ O NOVO PARÂMETRO
 
-if (assetSymbolFromUrl) {
-    openAddModal();
-    if (pairFromUrl) {
-        // Se o par foi passado, usamos o nome completo para garantir a consistência
-        modalAssetInput.value = pairFromUrl.replace('USDC', '/USDC'); // Transforma "SOLUSDC" em "SOL/USDC"
-    } else {
-        // Fallback se só o símbolo for passado
-        modalAssetInput.value = assetSymbolFromUrl;
+    if (assetPairFromUrl) {
+        openAddModal();
+        // Preenche o campo de ativo com o par completo vindo do URL
+        modalAssetInput.value = assetPairFromUrl; 
     }
-    // Não disparamos o autocomplete, pois já temos o nome exato.
-}
 
-    // ... (Listeners do Modal de Imagem inalterados) ...
+    // Listeners do Modal de Imagem
     if (closeImageModalBtn) { closeImageModalBtn.addEventListener('click', closeImageModal); }
     if (imageModal) { imageModal.addEventListener('click', (e) => { if (e.target === imageModal) { closeImageModal(); } }); }
     document.addEventListener('click', function (e) {
@@ -78,6 +71,4 @@ if (assetSymbolFromUrl) {
         localStorage.removeItem('tradeToEdit');
         loadAndOpenForEditing(tradeIdToEdit);
     }
-
-
 });
