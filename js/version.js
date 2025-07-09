@@ -1,13 +1,19 @@
 // js/version.js - Ponto central de controlo de versão e changelog
 
 export const changelogData = {
-    current: {
-        number: '6.5.3',
+   current: {
+        number: '6.5.4', // <-- VERSÃO ATUALIZADA
         changes: [
-            "Correção do link 'Gráfico' no histórico de alarmes para garantir a compatibilidade com a app móvel do TradingView.",
+            "Melhorada a exibição do preço atual na página de alarmes para mostrar mais casas decimais em ativos de baixo valor.",
         ]
     },
     releases: [
+        {
+            number: '6.5.3',
+            changes: [
+                "Correção do link 'Gráfico' no histórico de alarmes para garantir a compatibilidade com a app móvel do TradingView.",
+            ]
+        },
         {
             number: '6.5.2',
             changes: [
