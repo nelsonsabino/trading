@@ -7,6 +7,9 @@ let editingAlarmId = null;
 window.alarmsData = [];
 
 // ---- FUNÇÃO REUTILIZÁVEL PARA BUSCAR PREÇO ----
+// js/alarms.js
+
+// ---- NOVA FUNÇÃO REUTILIZÁVEL ----
 async function fetchPriceForPair(pair) {
     const priceDisplay = document.getElementById('asset-current-price');
     if (!priceDisplay || !pair) {
@@ -19,7 +22,30 @@ async function fetchPriceForPair(pair) {
         const response = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${pair}`);
         if (!response.ok) throw new Error('Par não encontrado na Binance');
         const data = await response.json();
-        priceDisplay.innerHTML = `Preço Atual: <span style="color: #28a745;">${parseFloat(data.price).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</span>`;
+        const price = parseFloat(data.price);
+
+        // --- INÍCIO DA MELHORIA: FORMATAÇÃO INTELIGENTE DE PREÇO ---
+        let formattedPrice;
+        if (price >= 1.0) {
+            // Para preços acima de $1, usa a formatação de moeda padrão.
+            formattedPrice = price.toLocaleString('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            });
+        } else {
+            // Para preços abaixo de $1, usa a formatação de número com alta precisão.
+            // O 'maximumSignificantDigits' é a chave aqui. Ele tenta mostrar até 8 dígitos significativos.
+            formattedPrice = '$' + price.toLocaleString('en-US', {
+                minimumFractionDigits: 4,
+                maximumSignificantDigits: 8 
+            });
+        }
+        // --- FIM DA MELHORIA ---
+        
+        priceDisplay.innerHTML = `Preço Atual: <span style="color: #28a745;">${formattedPrice}</span>`;
+
     } catch (error) { 
         priceDisplay.textContent = 'Preço não disponível.';
     }
