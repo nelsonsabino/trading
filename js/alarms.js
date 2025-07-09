@@ -7,9 +7,7 @@ let editingAlarmId = null;
 window.alarmsData = [];
 
 // ---- FUNÇÃO REUTILIZÁVEL PARA BUSCAR PREÇO ----
-// js/alarms.js
 
-// ---- NOVA FUNÇÃO REUTILIZÁVEL ----
 async function fetchPriceForPair(pair) {
     const priceDisplay = document.getElementById('asset-current-price');
     if (!priceDisplay || !pair) {
