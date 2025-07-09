@@ -1,14 +1,20 @@
 // js/version.js - Ponto central de controlo de versão e changelog
 
 export const changelogData = {
-   current: {
-        number: '6.5.4', // <-- VERSÃO ATUALIZADA
+     current: {
+        number: '6.6.0', // <-- VERSÃO ATUALIZADA
         changes: [
-            "Melhorada a exibição do preço atual na página de alarmes para mostrar mais casas decimais em ativos de baixo valor.",
+            "Adicionado novo tipo de alarme: Nível de RSI (sobrecompra/sobrevenda).",
         ]
     },
     releases: [
         {
+            number: '6.5.4',
+            changes: [
+                "Melhorada a exibição do preço atual na página de alarmes para mostrar mais casas decimais em ativos de baixo valor.",
+            ]
+        },
+            {
             number: '6.5.3',
             changes: [
                 "Correção do link 'Gráfico' no histórico de alarmes para garantir a compatibilidade com a app móvel do TradingView.",
