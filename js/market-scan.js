@@ -22,7 +22,7 @@ function openChartModal(symbol) {
         "symbol": `BINANCE:${symbol}`,
         "interval": "60",
         "timezone": "Etc/UTC",
-        "theme": "dark",
+        "theme": "light",
         "style": "1",
         "locale": "pt",
         "toolbar_bg": "#f1f5f9",
