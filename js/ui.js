@@ -96,6 +96,10 @@ export function populateStrategySelect() {
 }
 
 
+
+
+// js/ui.js
+
 export function createTradeCard(trade) {
     const card = document.createElement('div');
     card.className = 'trade-card';
@@ -126,37 +130,46 @@ export function createTradeCard(trade) {
     chartContainer.id = `advanced-chart-${trade.id}`;
     card.appendChild(chartContainer);
 
+    // --- INÍCIO DA ALTERAÇÃO: REESCRITA DA SECÇÃO DE AÇÕES ---
     const actionsWrapper = document.createElement('div');
     actionsWrapper.className = 'card-actions';
 
-    const fullChartLink = document.createElement('a');
-    fullChartLink.href = `https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}`;
-    fullChartLink.className = 'btn edit-btn';
-    fullChartLink.textContent = 'Gráfico';
-    fullChartLink.target = '_blank';
-    fullChartLink.rel = 'noopener noreferrer';
-    actionsWrapper.appendChild(fullChartLink);
-    
+    // Botão 1: Ver Gráfico (Pré-visualização)
     const summaryBtn = document.createElement('button');
-    summaryBtn.className = 'btn btn-summary';
-    summaryBtn.textContent = 'Ver Gráfico';
+    summaryBtn.className = 'icon-action-btn action-summary';
+    summaryBtn.innerHTML = `<i class="fa-solid fa-eye"></i> <span>Resumo</span>`;
+    summaryBtn.title = "Ver pré-visualização do gráfico";
     summaryBtn.addEventListener('click', () => {
         toggleAdvancedChart(trade.id, tradingViewSymbol, summaryBtn);
     });
     actionsWrapper.appendChild(summaryBtn);
 
-    let actionButton;
+    // Botão 2: Gráfico Completo (App TV)
+    const fullChartLink = document.createElement('a');
+    fullChartLink.href = `https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}`;
+    fullChartLink.className = 'icon-action-btn action-full-chart';
+    fullChartLink.innerHTML = `<i class="fa-solid fa-arrow-up-right-from-square"></i> <span>App TV</span>`;
+    fullChartLink.title = "Abrir no TradingView";
+    fullChartLink.target = '_blank';
+    fullChartLink.rel = 'noopener noreferrer';
+    actionsWrapper.appendChild(fullChartLink);
+
+    // Botão 3: Ação Principal (Armar, Executar, Fechar)
+    let mainActionButton;
     if (trade.data.status === 'POTENTIAL') {
-        actionButton = document.createElement('button');
-        actionButton.className = 'trigger-btn btn-potential';
-        actionButton.textContent = 'Validar Setup (Armar)';
-        actionButton.addEventListener('click', () => openArmModal(trade));
+        card.classList.remove('armed', 'live');
+        mainActionButton = document.createElement('button');
+        mainActionButton.className = 'icon-action-btn action-arm';
+        mainActionButton.innerHTML = `<i class="fa-solid fa-bolt"></i> <span>Armar</span>`;
+        mainActionButton.title = "Validar e Armar Setup";
+        mainActionButton.addEventListener('click', () => openArmModal(trade));
     } else if (trade.data.status === 'ARMED') {
         card.classList.add('armed');
-        actionButton = document.createElement('button');
-        actionButton.className = 'trigger-btn btn-armed';
-        actionButton.textContent = 'Executar Gatilho';
-        actionButton.addEventListener('click', () => openExecModal(trade));
+        mainActionButton = document.createElement('button');
+        mainActionButton.className = 'icon-action-btn action-execute';
+        mainActionButton.innerHTML = `<i class="fa-solid fa-play"></i> <span>Executar</span>`;
+        mainActionButton.title = "Executar Trade";
+        mainActionButton.addEventListener('click', () => openExecModal(trade));
     } else if (trade.data.status === 'LIVE') {
         card.classList.add('live');
         const details = trade.data.executionDetails;
@@ -165,14 +178,15 @@ export function createTradeCard(trade) {
             p.innerHTML = `<strong>Entrada:</strong> ${details['entry-price'] || 'N/A'} | <strong>Quantidade:</strong> ${details['quantity'] || 'N/A'}`; 
             card.appendChild(p); 
         }
-        actionButton = document.createElement('button');
-        actionButton.className = 'trigger-btn btn-live';
-        actionButton.textContent = 'Fechar Trade';
-        actionButton.addEventListener('click', () => openCloseTradeModal(trade));
+        mainActionButton = document.createElement('button');
+        mainActionButton.className = 'icon-action-btn action-close';
+        mainActionButton.innerHTML = `<i class="fa-solid fa-stop"></i> <span>Fechar</span>`;
+        mainActionButton.title = "Fechar Trade";
+        mainActionButton.addEventListener('click', () => openCloseTradeModal(trade));
     }
     
-    if (actionButton) {
-        actionsWrapper.appendChild(actionButton);
+    if (mainActionButton) {
+        actionsWrapper.appendChild(mainActionButton);
     }
 
     card.appendChild(actionsWrapper);
@@ -180,6 +194,7 @@ export function createTradeCard(trade) {
     card.querySelector('.card-edit-btn').addEventListener('click', (e) => { e.stopPropagation(); loadAndOpenForEditing(trade.id); });
     return card;
 }
+
 
 
 // --- FUNÇÃO CORRIGIDA PARA USAR O CONSTRUTOR DE BIBLIOTECA COM AS OPÇÕES CERTAS ---
