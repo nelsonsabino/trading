@@ -27,7 +27,8 @@ function openChartModal(symbol) {
         "save_image": false,
         "allow_symbol_change": true,
         "studies": [
-             "STD;MA%Ribbon"
+            "STD;MA%Ribbon",
+            "STD;RSI"
         ]
     });
 
