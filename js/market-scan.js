@@ -7,17 +7,17 @@ const chartContainer = document.getElementById('chart-modal-container');
 let chartWidget = null;
 
 
+
 function openChartModal(symbol) {
     if (!chartModal || !chartContainer) return;
 
     chartContainer.innerHTML = ''; 
 
-    // --- APLICAÇÃO DAS NOVAS CONFIGURAÇÕES ---
     chartWidget = new TradingView.widget({
         "container_id": "chart-modal-container",
         "autosize": true,
         "symbol": `BINANCE:${symbol}`,
-        "interval": "240", // "240" minutos = 4 Horas
+        "interval": "240", // 4 Horas
         "timezone": "Etc/UTC",
         "theme": "dark",
         "style": "1",
@@ -27,18 +27,24 @@ function openChartModal(symbol) {
         "hide_side_toolbar": true,
         "save_image": false,
         "allow_symbol_change": true,
-        "studies": [
-            {
-                "id": "MovingAverageExponential@tv-basicstudies",
-                "inputs": { "length": 50 } // Adiciona a EMA de 50 períodos
-            }
-        ]
+        // O array 'studies' aqui muitas vezes é ignorado, por isso vamos usar onChartReady
+        "studies": [] 
     });
 
+    // --- CORREÇÃO APLICADA AQUI ---
+    // Usamos o evento onChartReady para adicionar o indicador de forma fiável
+    chartWidget.onChartReady(function() {
+        // O método createStudy recebe o nome do estudo, se deve ser forçado no painel principal,
+        // e um objeto com os parâmetros.
+        chartWidget.chart().createStudy('Moving Average Exponential', false, false, {
+            length: 50
+        });
+    });
 
-    
     chartModal.style.display = 'flex';
 }
+
+
 
 function closeChartModal() {
     if (!chartModal || !chartContainer) return;
