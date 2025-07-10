@@ -414,3 +414,51 @@ footer { text-align: center; padding: 1rem 0; margin-top: 2rem; color: #6c757d; 
     height: 40px; /* Altura para o mini widget */
     width: 100%;
 }
+
+/* style.css */
+
+/* --- NOVOS ESTILOS: BOTÕES DE AÇÃO NOS CARDS (ICONS) --- */
+
+.card-actions {
+    /* Mantém o flex, mas ajusta o alinhamento */
+    display: flex;
+    justify-content: flex-end; /* Alinha os botões à direita */
+    align-items: center;
+    gap: 1rem; /* Aumenta o espaço entre os ícones */
+    margin-top: 1rem;
+}
+
+/* Estilo base para cada link/botão de ação com ícone */
+.icon-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem; /* Espaço entre o ícone e o texto */
+    padding: 6px 10px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.9em;
+    font-weight: 500;
+    color: #495057; /* Cor de texto padrão */
+    background-color: #f1f3f5; /* Fundo subtil */
+    border: 1px solid #dee2e6;
+    transition: all 0.2s ease;
+}
+
+.icon-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+    background-color: #e9ecef;
+}
+
+/* Ícones dentro dos botões */
+.icon-action-btn i {
+    font-size: 1.1em;
+    margin-right: 2px;
+}
+
+/* Cores específicas para cada ação */
+.icon-action-btn.action-summary { color: #198754; } /* Verde para Ver Gráfico */
+.icon-action-btn.action-full-chart { color: #0d6efd; } /* Azul para Gráfico Completo */
+.icon-action-btn.action-arm { color: #ffc107; } /* Amarelo para Armar */
+.icon-action-btn.action-execute { color: #20c997; } /* Teal para Executar */
+.icon-action-btn.action-close { color: #dc3545; } /* Vermelho para Fechar */
