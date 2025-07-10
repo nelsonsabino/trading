@@ -6,16 +6,18 @@ const closeChartModalBtn = document.getElementById('close-chart-modal');
 const chartContainer = document.getElementById('chart-modal-container');
 let chartWidget = null;
 
+
 function openChartModal(symbol) {
     if (!chartModal || !chartContainer) return;
 
-    chartContainer.innerHTML = ''; // Limpa qualquer gráfico anterior
+    chartContainer.innerHTML = ''; 
 
+    // --- APLICAÇÃO DAS NOVAS CONFIGURAÇÕES ---
     chartWidget = new TradingView.widget({
         "container_id": "chart-modal-container",
         "autosize": true,
         "symbol": `BINANCE:${symbol}`,
-        "interval": "60",
+        "interval": "240", // "240" minutos = 4 Horas
         "timezone": "Etc/UTC",
         "theme": "dark",
         "style": "1",
@@ -24,9 +26,17 @@ function openChartModal(symbol) {
         "enable_publishing": false,
         "hide_side_toolbar": true,
         "save_image": false,
-        "allow_symbol_change": true
+        "allow_symbol_change": true,
+        "studies": [
+            {
+                "id": "MovingAverageExponential@tv-basicstudies",
+                "inputs": { "length": 50 } // Adiciona a EMA de 50 períodos
+            }
+        ]
     });
 
+
+    
     chartModal.style.display = 'flex';
 }
 
