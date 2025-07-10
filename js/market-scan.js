@@ -27,8 +27,7 @@ function openChartModal(symbol) {
         "save_image": false,
         "allow_symbol_change": true,
         "studies": [
-            // Este é o formato correto para adicionar um estudo na configuração inicial
-        "Moving Average Exponential"
+                   "MASeries@tv-basicstudies"
         ]
     });
 
