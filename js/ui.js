@@ -1,4 +1,4 @@
-// js/ui.js - VERSÃO COM O WIDGET EMBED PERSONALIZADO DO UTILIZADOR
+// js/ui.js - VERSÃO FINAL COM O WIDGET CORRETO E CONFIGURAÇÃO DO UTILIZADOR
 
 import { STRATEGIES } from './strategies.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
@@ -182,7 +182,7 @@ export function createTradeCard(trade) {
 }
 
 
-// --- FUNÇÃO ATUALIZADA PARA USAR O WIDGET EMBED ---
+// --- FUNÇÃO CORRIGIDA PARA USAR O CONSTRUTOR DE BIBLIOTECA COM AS OPÇÕES CERTAS ---
 function toggleAdvancedChart(tradeId, symbol, button) {
     const chartContainer = document.getElementById(`advanced-chart-${tradeId}`);
     if (!chartContainer) return;
@@ -196,47 +196,42 @@ function toggleAdvancedChart(tradeId, symbol, button) {
     } else {
         button.textContent = 'A Carregar...';
 
-        // 1. Limpa o contentor e adiciona os divs internos que o widget espera
-        chartContainer.innerHTML = `
-            <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
-        `;
-        
-        // 2. Cria o objeto de configuração com base no seu código
-        const widgetConfig = {
+        new TradingView.widget({
+            // Opções de estrutura
+            "container_id": chartContainer.id,
+            "autosize": true,
+            "symbol": symbol,
+            "interval": "60",
+            "timezone": "Etc/UTC",
+            "theme": "dark",
+            "style": "1",
+            "locale": "pt",
+            "withdateranges": false,
+            "save_image": false,
             "allow_symbol_change": false,
-            "calendar": false,
-            "details": false,
+
+            // Opções para esconder/mostrar elementos da UI
             "hide_side_toolbar": true,
-            "hide_top_toolbar": false,
             "hide_legend": true,
             "hide_volume": true,
+            // Para mostrar a top toolbar, simplesmente não usamos 'hide_top_toolbar: true'
+            
+            // Opções de dados
+            "details": false,
             "hotlist": false,
-            "interval": "60",
-            "locale": "pt", // Alterei para 'pt' para consistência
-            "save_image": false,
-            "style": "1",
-            "symbol": symbol, // Usa o símbolo dinâmico
-            "theme": "dark",
-            "timezone": "Etc/UTC",
-            "backgroundColor": "#0F0F0F",
-            "gridColor": "rgba(242, 242, 242, 0.06)",
-            "watchlist": [],
-            "withdateranges": false,
-            "compareSymbols": [],
-            "studies": [], // Você pode adicionar EMAs aqui se quiser, ex: ["MASimple@tv-basicstudies"]
-            "autosize": true
-        };
+            "calendar": false,
 
-        // 3. Cria a tag <script> dinamicamente
-        const script = document.createElement('script');
-        script.type = 'text/javascript';
-        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
-        script.async = true;
-        // Injeta a configuração JSON dentro do script
-        script.innerHTML = JSON.stringify(widgetConfig);
+            // Opções de cor (forma correta de as aplicar na biblioteca)
+            "overrides": {
+                "paneProperties.background": "#0F0F0F",
+                "paneProperties.gridProperties.color": "rgba(242, 242, 242, 0.06)"
+            },
 
-        // 4. Anexa o script ao contentor para o carregar e executar
-        chartContainer.appendChild(script);
+            // Indicadores (pode adicionar as EMAs aqui se quiser)
+            "studies": [
+                // "MAExp@tv-basicstudies"
+            ]
+        });
 
         chartContainer.classList.add('visible');
         button.textContent = 'Esconder Gráfico';
