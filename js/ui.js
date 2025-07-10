@@ -1,4 +1,4 @@
-// js/ui.js - VERSÃO SIMPLIFICADA SEM TIMEFRAME DINÂMICO
+// js/ui.js - VERSÃO COM CORREÇÃO DO WIDGET AVANÇADO
 
 import { STRATEGIES } from './strategies.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
@@ -6,7 +6,6 @@ import { openArmModal, openExecModal, openCloseTradeModal, openImageModal } from
 import { loadAndOpenForEditing } from './handlers.js';
 import { isAndroid, isIOS } from './utils.js';
 
-// As funções helper (getIconForLabel, etc.) permanecem exatamente as mesmas
 function getIconForLabel(labelText) {
     const text = labelText.toLowerCase();
     if (text.includes('tendência')) return 'fa-solid fa-chart-line';
@@ -142,7 +141,6 @@ export function createTradeCard(trade) {
     summaryBtn.className = 'btn btn-summary';
     summaryBtn.textContent = 'Ver Gráfico';
     summaryBtn.addEventListener('click', () => {
-        // Agora passamos apenas o ID do trade e o símbolo
         toggleAdvancedChart(trade.id, tradingViewSymbol, summaryBtn);
     });
     actionsWrapper.appendChild(summaryBtn);
@@ -184,7 +182,7 @@ export function createTradeCard(trade) {
 }
 
 
-// --- FUNÇÃO ATUALIZADA E SIMPLIFICADA PARA O GRÁFICO AVANÇADO ---
+// --- FUNÇÃO DO GRÁFICO AVANÇADO CORRIGIDA ---
 function toggleAdvancedChart(tradeId, symbol, button) {
     const chartContainer = document.getElementById(`advanced-chart-${tradeId}`);
     if (!chartContainer) return;
@@ -198,26 +196,36 @@ function toggleAdvancedChart(tradeId, symbol, button) {
     } else {
         button.textContent = 'A Carregar...';
 
-        // Cria o widget com as suas configurações específicas, mas com timeframe FIXO
+        // Cria o widget com a configuração corrigida
         new TradingView.widget({
             "container_id": chartContainer.id,
             "autosize": true,
             "symbol": symbol,
-            "interval": "60", // Timeframe fixo de 1 Hora ("60" minutos)
+            "interval": "60", // 1 Hora
             "timezone": "Etc/UTC",
             "theme": "dark",
             "style": "1", // Velas
             "locale": "pt",
-            "toolbar_bg": "#f1f5f9",
             "enable_publishing": false,
-            "hide_top_toolbar": true,
             "hide_volume": true,
             "save_image": false,
             "allow_symbol_change": false,
-            "details": true,
+            "withdateranges": true,
+            // A "top toolbar" é mostrada por defeito quando não se especifica "hide_top_toolbar"
             "studies": [
-                { "id": "MovingAverageExponential@tv-basicstudies", "inputs": { "length": 50 } },
-                { "id": "MovingAverageExponential@tv-basicstudies", "inputs": { "length": 200 } }
+                // Este é o formato correto para adicionar indicadores
+                {
+                    "id": "MASimple@tv-basicstudies", // Média Móvel Simples (apenas como exemplo, vamos sobrepor com EMA)
+                    "show_ta": false, // Esconde os valores para não poluir
+                },
+                {
+                    "id": "MovingAverageExponential@tv-basicstudies",
+                    "inputs": { "length": 50 }
+                },
+                {
+                    "id": "MovingAverageExponential@tv-basicstudies",
+                    "inputs": { "length": 200 }
+                }
             ]
         });
 
