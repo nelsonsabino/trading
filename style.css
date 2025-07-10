@@ -379,7 +379,7 @@ footer { text-align: center; padding: 1rem 0; margin-top: 2rem; color: #6c757d; 
 
 /* Classe adicionada via JS para mostrar o gráfico */
 .mini-chart-container.visible {
-    height: 250px; /* Altura do gráfico. Pode ajustar se quiser. */
+    height: 400px; /* Aumentado de 250px para 400px para o gráfico avançado */
 }
 
 /* O div dentro do contentor que o TradingView usa */
