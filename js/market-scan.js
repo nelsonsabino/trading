@@ -20,7 +20,7 @@ function openChartModal(symbol) {
         "container_id": "chart-modal-container",
         "autosize": true,
         "symbol": `BINANCE:${symbol}`,
-        "interval": "240",
+        "interval": "60",
         "timezone": "Etc/UTC",
         "theme": "dark",
         "style": "1",
