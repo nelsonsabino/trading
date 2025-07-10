@@ -206,21 +206,22 @@ function toggleAdvancedChart(tradeId, symbol, button) {
     } else {
         button.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>A Carregar...</span>`;
         
-        new TradingView.widget({
+         new TradingView.widget({
             "container_id": chartContainer.id,
             "autosize": true,
             "symbol": symbol,
-            "interval": "60",
+            "interval": "60", // Default 1H
             "timezone": "Etc/UTC",
             "theme": "light",
-            "style": "1",
+            "style": "1", // Velas
             "locale": "pt",
-            "hide_side_toolbar": true,
-            "hide_volume": true,
-            "studies": [
-                "STD;MA%Ribbon",
-                "STD;RSI"
-            ]
+            "toolbar_bg": "#f1f5f9",
+            "enable_publishing": false,
+            "hide_side_toolbar": true, // Esconde a barra lateral de desenhos
+            "hide_top_toolbar": true,  // Esconde a barra de topo (timeframes, etc)
+            "hide_legend": true,
+            "save_image": false,
+            "allow_symbol_change": false
         });
 
         chartContainer.classList.add('visible');
