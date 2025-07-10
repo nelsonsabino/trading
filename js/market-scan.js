@@ -1,4 +1,4 @@
-// js/market-scan.js - VERSÃO ATUALIZADA COM ANÁLISE TÉCNICA
+// js/market-scan.js - VERSÃO COM O WIDGET DE ANÁLISE CORRETO (TICKER)
 
 // --- Lógica do Modal do Gráfico ---
 const chartModal = document.getElementById('chart-modal');
@@ -10,8 +10,8 @@ function openChartModal(symbol) {
     chartContainer.innerHTML = '';
     new TradingView.widget({
         "container_id": "chart-modal-container",
-        "allow_symbol_change": true, // Alterado para true para flexibilidade no modal
-        "hide_side_toolbar": false, // Alterado para false para permitir desenhos
+        "allow_symbol_change": true,
+        "hide_side_toolbar": false,
         "hide_top_toolbar": false,
         "autosize": true,
         "symbol": `BINANCE:${symbol}`,
@@ -34,17 +34,17 @@ function closeChartModal() {
 }
 if (chartModal) {
     closeChartModalBtn.addEventListener('click', closeChartModal);
-    chartModal.addEventListener('click', (e) => { if (e.target.id === 'chart-modal') closeChartModal(); });
+    chartModal.addEventListener('click', (e) => { if (e.target.id === 'tech-analysis-modal') closeChartModal(); });
 }
 
-// --- NOVA LÓGICA: Modal da Análise Técnica ---
+// --- Lógica do Modal da Análise Técnica ---
 const techAnalysisModal = document.getElementById('tech-analysis-modal');
 const closeTechAnalysisBtn = document.getElementById('close-tech-analysis-modal');
 const techAnalysisContainer = document.getElementById('tech-analysis-container');
 
 function openTechAnalysisModal(symbol) {
     if (!techAnalysisModal || !techAnalysisContainer) return;
-    techAnalysisContainer.innerHTML = ''; // Limpa antes de adicionar
+    techAnalysisContainer.innerHTML = '';
 
     const script = document.createElement('script');
     script.type = 'text/javascript';
@@ -80,14 +80,13 @@ async function fetchAndDisplayMarketData() {
     const tbody = document.getElementById('market-scan-tbody');
     if (!tbody) return;
 
-    // Listener de eventos unificado para a tabela
     tbody.addEventListener('click', function(e) {
         const chartBtn = e.target.closest('.view-chart-btn');
         if (chartBtn) {
             openChartModal(chartBtn.dataset.symbol);
             return;
         }
-        const analysisWidget = e.target.closest('.tech-summary-widget-wrapper');
+        const analysisWidget = e.target.closest('.ticker-widget-wrapper');
         if (analysisWidget) {
             openTechAnalysisModal(analysisWidget.dataset.symbol);
             return;
@@ -118,10 +117,6 @@ async function fetchAndDisplayMarketData() {
             const priceChangePercent = parseFloat(ticker.priceChangePercent);
             const priceChangeClass = priceChangePercent >= 0 ? 'positive-pnl' : 'negative-pnl';
 
-            const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${ticker.symbol}`;
-            const createAlarmUrl = `alarms.html?assetPair=${ticker.symbol}`;
-            const addOpportunityUrl = `index.html?assetPair=${ticker.symbol}`;
-
             tableRowsHtml += `
                 <tr>
                     <td>${index + 1}</td>
@@ -130,16 +125,16 @@ async function fetchAndDisplayMarketData() {
                     <td>${formatVolume(volume)}</td>
                     <td class="${priceChangeClass}">${priceChangePercent.toFixed(2)}%</td>
                     <td class="tech-analysis-cell">
-                        <div class="tech-summary-widget-wrapper" data-symbol="${ticker.symbol}" id="tech-summary-${ticker.symbol}">
-                            <!-- Mini-widget será carregado aqui -->
+                        <div class="ticker-widget-wrapper" data-symbol="${ticker.symbol}" id="ticker-widget-${ticker.symbol}">
+                            <!-- O widget Ticker será carregado aqui -->
                         </div>
                     </td>
                     <td>
                         <div class="action-buttons">
                             <button class="btn btn-secondary view-chart-btn" data-symbol="${ticker.symbol}">Gráfico</button>
-                            <a href="${tradingViewUrl}" target="_blank" class="btn edit-btn">App TV</a>
-                            <a href="${createAlarmUrl}" class="btn">Alarme</a>
-                            <a href="${addOpportunityUrl}" class="btn btn-primary">Add</a>
+                            <a href="https://www.tradingview.com/chart/?symbol=BINANCE:${ticker.symbol}" target="_blank" class="btn edit-btn">App TV</a>
+                            <a href="alarms.html?assetPair=${ticker.symbol}" class="btn">Alarme</a>
+                            <a href="index.html?assetPair=${ticker.symbol}" class="btn btn-primary">Add</a>
                         </div>
                     </td>
                 </tr>
@@ -147,17 +142,25 @@ async function fetchAndDisplayMarketData() {
         });
         tbody.innerHTML = tableRowsHtml;
 
-        // DEPOIS de a tabela estar no DOM, carrega todos os mini-widgets
         top30Usdc.forEach(ticker => {
-            const container = document.getElementById(`tech-summary-${ticker.symbol}`);
+            const container = document.getElementById(`ticker-widget-${ticker.symbol}`);
             if (container) {
                 const script = document.createElement('script');
                 script.type = 'text/javascript';
-                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js';
+                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-tickers.js';
                 script.async = true;
                 script.innerHTML = JSON.stringify({
-                    "symbol": `BINANCE:${ticker.symbol}`, "width": "100%", "locale": "pt",
-                    "colorTheme": "light", "isTransparent": true
+                    "symbols": [
+                        {
+                            "description": "",
+                            "proName": `BINANCE:${ticker.symbol}`
+                        }
+                    ],
+                    "showSymbolLogo": false,
+                    "isTransparent": true,
+                    "displayMode": "adaptive",
+                    "colorTheme": "light",
+                    "locale": "pt"
                 });
                 container.appendChild(script);
             }
