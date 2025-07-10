@@ -1,4 +1,4 @@
-// js/ui.js - VERSÃO FINAL COM O WIDGET CORRETO E CONFIGURAÇÃO DO UTILIZADOR
+// js/ui.js - VERSÃO COM BOTÕES DE ÍCONE ATUALIZADOS NO DASHBOARD
 
 import { STRATEGIES } from './strategies.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
@@ -96,10 +96,6 @@ export function populateStrategySelect() {
 }
 
 
-
-
-// js/ui.js
-
 export function createTradeCard(trade) {
     const card = document.createElement('div');
     card.className = 'trade-card';
@@ -130,29 +126,30 @@ export function createTradeCard(trade) {
     chartContainer.id = `advanced-chart-${trade.id}`;
     card.appendChild(chartContainer);
 
-    // --- INÍCIO DA ALTERAÇÃO: REESCRITA DA SECÇÃO DE AÇÕES ---
     const actionsWrapper = document.createElement('div');
     actionsWrapper.className = 'card-actions';
 
-    // Botão 1: Ver Gráfico (Pré-visualização)
-    const summaryBtn = document.createElement('button');
-    summaryBtn.className = 'icon-action-btn action-summary';
-    summaryBtn.innerHTML = `<i class="fa-solid fa-eye"></i> <span>Resumo</span>`;
-    summaryBtn.title = "Ver pré-visualização do gráfico";
-    summaryBtn.addEventListener('click', () => {
-        toggleAdvancedChart(trade.id, tradingViewSymbol, summaryBtn);
-    });
-    actionsWrapper.appendChild(summaryBtn);
+    // --- BOTÕES DE AÇÃO ATUALIZADOS ---
 
-    // Botão 2: Gráfico Completo (App TV)
-    const fullChartLink = document.createElement('a');
-    fullChartLink.href = `https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}`;
-    fullChartLink.className = 'icon-action-btn action-full-chart';
-    fullChartLink.innerHTML = `<i class="fa-solid fa-arrow-up-right-from-square"></i> <span>App TV</span>`;
-    fullChartLink.title = "Abrir no TradingView";
-    fullChartLink.target = '_blank';
-    fullChartLink.rel = 'noopener noreferrer';
-    actionsWrapper.appendChild(fullChartLink);
+    // Botão 1: Gráfico (abre o widget no card)
+    const chartBtn = document.createElement('button');
+    chartBtn.className = 'icon-action-btn action-summary';
+    chartBtn.innerHTML = `<i class="fa-solid fa-chart-simple"></i> <span>Gráfico</span>`;
+    chartBtn.title = "Ver gráfico interativo";
+    chartBtn.addEventListener('click', () => {
+        toggleAdvancedChart(trade.id, tradingViewSymbol, chartBtn);
+    });
+    actionsWrapper.appendChild(chartBtn);
+
+    // Botão 2: Análise (abre o TradingView)
+    const analysisLink = document.createElement('a');
+    analysisLink.href = `https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}`;
+    analysisLink.className = 'icon-action-btn action-full-chart';
+    analysisLink.innerHTML = `<i class="fa-solid fa-arrow-up-right-from-square"></i> <span>Análise</span>`;
+    analysisLink.title = "Abrir no TradingView para análise completa";
+    analysisLink.target = '_blank';
+    analysisLink.rel = 'noopener noreferrer';
+    actionsWrapper.appendChild(analysisLink);
 
     // Botão 3: Ação Principal (Armar, Executar, Fechar)
     let mainActionButton;
@@ -196,8 +193,6 @@ export function createTradeCard(trade) {
 }
 
 
-
-// --- FUNÇÃO CORRIGIDA PARA USAR O CONSTRUTOR DE BIBLIOTECA COM AS OPÇÕES CERTAS ---
 function toggleAdvancedChart(tradeId, symbol, button) {
     const chartContainer = document.getElementById(`advanced-chart-${tradeId}`);
     if (!chartContainer) return;
@@ -207,12 +202,11 @@ function toggleAdvancedChart(tradeId, symbol, button) {
     if (isVisible) {
         chartContainer.innerHTML = '';
         chartContainer.classList.remove('visible');
-        button.textContent = 'Ver Gráfico';
+        button.innerHTML = `<i class="fa-solid fa-chart-simple"></i> <span>Gráfico</span>`;
     } else {
-        button.textContent = 'A Carregar...';
-
+        button.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>A Carregar...</span>`;
+        
         new TradingView.widget({
-            // Opções de estrutura
             "container_id": chartContainer.id,
             "autosize": true,
             "symbol": symbol,
@@ -221,35 +215,16 @@ function toggleAdvancedChart(tradeId, symbol, button) {
             "theme": "light",
             "style": "1",
             "locale": "pt",
-            "withdateranges": false,
-            "save_image": false,
-            "allow_symbol_change": false,
-
-            // Opções para esconder/mostrar elementos da UI
             "hide_side_toolbar": true,
-            "hide_legend": true,
             "hide_volume": true,
-            // Para mostrar a top toolbar, simplesmente não usamos 'hide_top_toolbar: true'
-            
-            // Opções de dados
-            "details": false,
-            "hotlist": false,
-            "calendar": false,
-
-            // Opções de cor (forma correta de as aplicar na biblioteca)
-            "overrides": {
-                "paneProperties.background": "#0F0F0F",
-                "paneProperties.gridProperties.color": "rgba(242, 242, 242, 0.06)"
-            },
-
-            // Indicadores (pode adicionar as EMAs aqui se quiser)
             "studies": [
-                // "MAExp@tv-basicstudies"
+                "STD;MA%Ribbon",
+                "STD;RSI"
             ]
         });
 
         chartContainer.classList.add('visible');
-        button.textContent = 'Esconder Gráfico';
+        button.innerHTML = `<i class="fa-solid fa-eye-slash"></i> <span>Esconder</span>`;
     }
 }
 
