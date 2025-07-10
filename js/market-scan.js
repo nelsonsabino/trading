@@ -1,66 +1,74 @@
-// js/market-scan.js - VERSÃO COM A CORREÇÃO FINAL DO WIDGET
+// js/market-scan.js - VERSÃO ATUALIZADA COM ANÁLISE TÉCNICA
 
 // --- Lógica do Modal do Gráfico ---
 const chartModal = document.getElementById('chart-modal');
 const closeChartModalBtn = document.getElementById('close-chart-modal');
 const chartContainer = document.getElementById('chart-modal-container');
-// Removida a variável global 'chartWidget' que não era necessária aqui
 
 function openChartModal(symbol) {
     if (!chartModal || !chartContainer) return;
-
-    chartContainer.innerHTML = ''; 
-
-    // A criação do widget agora está toda aqui, com a configuração correta
-    new TradingView.widget({          
+    chartContainer.innerHTML = '';
+    new TradingView.widget({
         "container_id": "chart-modal-container",
-
-        "allow_symbol_change": false,
-        "calendar": false,
-        "details": false,
-        "hide_side_toolbar": true,
+        "allow_symbol_change": true, // Alterado para true para flexibilidade no modal
+        "hide_side_toolbar": false, // Alterado para false para permitir desenhos
         "hide_top_toolbar": false,
-        "hide_legend": true,
-        "hide_volume": true,
-        "hotlist": false,
-
         "autosize": true,
         "symbol": `BINANCE:${symbol}`,
-        "interval": "240", // 4 Horas
+        "interval": "240",
         "timezone": "Etc/UTC",
         "theme": "dark",
-        "style": "1", // Velas
+        "style": "1",
         "locale": "pt",
-        "toolbar_bg": "#f1f5f9",
-        "enable_publishing": false,
-        "save_image": false,
-        "allow_symbol_change": false,
         "studies": [
             "STD;MA%Ribbon",
             "STD;RSI"
         ]
     });
-
     chartModal.style.display = 'flex';
 }
-
 function closeChartModal() {
     if (!chartModal || !chartContainer) return;
-    chartContainer.innerHTML = ''; // Ao limpar o HTML, o widget é destruído
+    chartContainer.innerHTML = '';
     chartModal.style.display = 'none';
 }
-
 if (chartModal) {
     closeChartModalBtn.addEventListener('click', closeChartModal);
-    chartModal.addEventListener('click', (e) => {
-        if (e.target.id === 'chart-modal') {
-            closeChartModal();
-        }
-    });
+    chartModal.addEventListener('click', (e) => { if (e.target.id === 'chart-modal') closeChartModal(); });
 }
 
-// --- Lógica Principal da Página ---
+// --- NOVA LÓGICA: Modal da Análise Técnica ---
+const techAnalysisModal = document.getElementById('tech-analysis-modal');
+const closeTechAnalysisBtn = document.getElementById('close-tech-analysis-modal');
+const techAnalysisContainer = document.getElementById('tech-analysis-container');
 
+function openTechAnalysisModal(symbol) {
+    if (!techAnalysisModal || !techAnalysisContainer) return;
+    techAnalysisContainer.innerHTML = ''; // Limpa antes de adicionar
+
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js';
+    script.async = true;
+    script.innerHTML = JSON.stringify({
+        "interval": "1D", "width": "100%", "isTransparent": false, "height": "100%",
+        "symbol": `BINANCE:${symbol}`, "showIntervalTabs": true, "locale": "pt", "colorTheme": "dark"
+    });
+    techAnalysisContainer.appendChild(script);
+    techAnalysisModal.style.display = 'flex';
+}
+function closeTechAnalysisModal() {
+    if (!techAnalysisModal || !techAnalysisContainer) return;
+    techAnalysisContainer.innerHTML = '';
+    techAnalysisModal.style.display = 'none';
+}
+if (techAnalysisModal) {
+    closeTechAnalysisBtn.addEventListener('click', closeTechAnalysisModal);
+    techAnalysisModal.addEventListener('click', (e) => { if (e.target.id === 'tech-analysis-modal') closeTechAnalysisModal(); });
+}
+
+
+// --- Lógica Principal da Página ---
 function formatVolume(volume) {
     if (volume >= 1_000_000_000) return (volume / 1_000_000_000).toFixed(2) + 'B';
     if (volume >= 1_000_000) return (volume / 1_000_000).toFixed(2) + 'M';
@@ -72,16 +80,22 @@ async function fetchAndDisplayMarketData() {
     const tbody = document.getElementById('market-scan-tbody');
     if (!tbody) return;
 
+    // Listener de eventos unificado para a tabela
     tbody.addEventListener('click', function(e) {
-        const button = e.target.closest('.view-chart-btn');
-        if (button) {
-            const symbol = button.dataset.symbol;
-            openChartModal(symbol);
+        const chartBtn = e.target.closest('.view-chart-btn');
+        if (chartBtn) {
+            openChartModal(chartBtn.dataset.symbol);
+            return;
+        }
+        const analysisWidget = e.target.closest('.tech-summary-widget-wrapper');
+        if (analysisWidget) {
+            openTechAnalysisModal(analysisWidget.dataset.symbol);
+            return;
         }
     });
 
     try {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">A carregar dados...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">A carregar dados...</td></tr>';
         const response = await fetch('https://api.binance.com/api/v3/ticker/24hr');
         if (!response.ok) throw new Error('Falha ao comunicar com a API da Binance.');
         const allTickers = await response.json();
@@ -92,7 +106,7 @@ async function fetchAndDisplayMarketData() {
             .slice(0, 30);
 
         if (top30Usdc.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Não foram encontrados pares com USDC com volume significativo.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Nenhum par encontrado.</td></tr>';
             return;
         }
 
@@ -115,9 +129,14 @@ async function fetchAndDisplayMarketData() {
                     <td>${price.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</td>
                     <td>${formatVolume(volume)}</td>
                     <td class="${priceChangeClass}">${priceChangePercent.toFixed(2)}%</td>
+                    <td class="tech-analysis-cell">
+                        <div class="tech-summary-widget-wrapper" data-symbol="${ticker.symbol}" id="tech-summary-${ticker.symbol}">
+                            <!-- Mini-widget será carregado aqui -->
+                        </div>
+                    </td>
                     <td>
                         <div class="action-buttons">
-                            <button class="btn btn-secondary view-chart-btn" data-symbol="${ticker.symbol}">Ver Gráfico</button>
+                            <button class="btn btn-secondary view-chart-btn" data-symbol="${ticker.symbol}">Gráfico</button>
                             <a href="${tradingViewUrl}" target="_blank" class="btn edit-btn">App TV</a>
                             <a href="${createAlarmUrl}" class="btn">Alarme</a>
                             <a href="${addOpportunityUrl}" class="btn btn-primary">Add</a>
@@ -126,12 +145,27 @@ async function fetchAndDisplayMarketData() {
                 </tr>
             `;
         });
-
         tbody.innerHTML = tableRowsHtml;
+
+        // DEPOIS de a tabela estar no DOM, carrega todos os mini-widgets
+        top30Usdc.forEach(ticker => {
+            const container = document.getElementById(`tech-summary-${ticker.symbol}`);
+            if (container) {
+                const script = document.createElement('script');
+                script.type = 'text/javascript';
+                script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js';
+                script.async = true;
+                script.innerHTML = JSON.stringify({
+                    "symbol": `BINANCE:${ticker.symbol}`, "width": "100%", "locale": "pt",
+                    "colorTheme": "light", "isTransparent": true
+                });
+                container.appendChild(script);
+            }
+        });
 
     } catch (error) {
         console.error("Erro ao carregar dados do mercado:", error);
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: red;">Não foi possível carregar os dados. Tente novamente.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: red;">Não foi possível carregar os dados.</td></tr>';
     }
 }
 
