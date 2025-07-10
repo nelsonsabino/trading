@@ -2,19 +2,19 @@
 
 export const changelogData = {
       current: {
-        number: '6.9.0',
+        number: '6.8.1', 
         changes: [
-                "Adicionada a funcionalidade de 'Ver Gráfico' em um modal na página do Market Scanner para análise rápida.",
-            ]
+            "Redesenhados os botões de ação nos cards do dashboard para um design mais compacto com ícones e texto.",
+        ]
     },
     releases: [
         {
-            number: '6.8.0', 
-        changes: [
-            "Substituído o 'Mini-Gráfico' por um 'Gráfico Avançado' interativo dentro dos cards do dashboard.",
-            "O gráfico agora carrega com o timeframe de análise do trade, EMAs 50/200 e tema escuro por defeito.",
-        ]
-        },            
+            number: '6.8.0',
+            changes: [
+                "Substituído o 'Mini-Gráfico' por um 'Gráfico Avançado' interativo dentro dos cards do dashboard.",
+                "O gráfico agora carrega com o timeframe de análise do trade, EMAs 50/200 e tema escuro por defeito.",
+            ]
+        }, 
        {
         number: '6.7.0', 
         changes: [
