@@ -1,22 +1,64 @@
-// js/market-scan.js
+// js/market-scan.js - VERSÃO COM GRÁFICO EM MODAL
+
+// --- Lógica do Modal do Gráfico ---
+const chartModal = document.getElementById('chart-modal');
+const closeChartModalBtn = document.getElementById('close-chart-modal');
+const chartContainer = document.getElementById('chart-modal-container');
+let chartWidget = null;
+
+function openChartModal(symbol) {
+    if (!chartModal || !chartContainer) return;
+
+    chartContainer.innerHTML = ''; // Limpa qualquer gráfico anterior
+
+    chartWidget = new TradingView.widget({
+        "container_id": "chart-modal-container",
+        "autosize": true,
+        "symbol": `BINANCE:${symbol}`,
+        "interval": "60",
+        "timezone": "Etc/UTC",
+        "theme": "dark",
+        "style": "1",
+        "locale": "pt",
+        "toolbar_bg": "#f1f5f9",
+        "enable_publishing": false,
+        "hide_side_toolbar": true,
+        "save_image": false,
+        "allow_symbol_change": true
+    });
+
+    chartModal.style.display = 'flex';
+}
+
+function closeChartModal() {
+    if (!chartModal || !chartContainer) return;
+    chartContainer.innerHTML = ''; // Destrói o widget para libertar recursos
+    chartWidget = null;
+    chartModal.style.display = 'none';
+}
+
+if (chartModal) {
+    closeChartModalBtn.addEventListener('click', closeChartModal);
+    chartModal.addEventListener('click', (e) => {
+        if (e.target.id === 'chart-modal') {
+            closeChartModal();
+        }
+    });
+}
+
+
+// --- Lógica Principal da Página ---
 
 function formatVolume(volume) {
-    if (volume >= 1_000_000_000) {
-        return (volume / 1_000_000_000).toFixed(2) + 'B';
-    } else if (volume >= 1_000_000) {
-        return (volume / 1_000_000).toFixed(2) + 'M';
-    } else if (volume >= 1_000) {
-        return (volume / 1_000).toFixed(2) + 'K';
-    }
+    if (volume >= 1_000_000_000) return (volume / 1_000_000_000).toFixed(2) + 'B';
+    if (volume >= 1_000_000) return (volume / 1_000_000).toFixed(2) + 'M';
+    if (volume >= 1_000) return (volume / 1_000).toFixed(2) + 'K';
     return volume.toFixed(2);
 }
 
 async function fetchAndDisplayMarketData() {
     const tbody = document.getElementById('market-scan-tbody');
-    if (!tbody) {
-        console.error("Elemento <tbody> da tabela não encontrado.");
-        return;
-    }
+    if (!tbody) return;
 
     try {
         const response = await fetch('https://api.binance.com/api/v3/ticker/24hr');
@@ -24,7 +66,7 @@ async function fetchAndDisplayMarketData() {
         const allTickers = await response.json();
 
         const top30Usdc = allTickers
-            .filter(ticker => ticker.symbol.endsWith('USDC'))
+            .filter(ticker => ticker.symbol.endsWith('USDC') && parseFloat(ticker.quoteVolume) > 0)
             .sort((a, b) => parseFloat(b.quoteVolume) - parseFloat(a.quoteVolume))
             .slice(0, 30);
 
@@ -34,21 +76,18 @@ async function fetchAndDisplayMarketData() {
         }
 
         const tableRowsHtml = top30Usdc.map((ticker, index) => {
-            // 'ticker.symbol' já é o par completo, ex: "BTCUSDC"
-            const baseAsset = ticker.symbol.replace('USDC', ''); // Apenas para exibição
+            const baseAsset = ticker.symbol.replace('USDC', '');
             const price = parseFloat(ticker.lastPrice);
             const volume = parseFloat(ticker.quoteVolume);
             const priceChangePercent = parseFloat(ticker.priceChangePercent);
-            
             const priceChangeClass = priceChangePercent >= 0 ? 'positive-pnl' : 'negative-pnl';
 
+            // Links para outras páginas
             const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${ticker.symbol}`;
-            
-            // --- ALTERAÇÕES APLICADAS AQUI ---
-            // Enviamos o par completo para ambas as páginas
             const createAlarmUrl = `alarms.html?assetPair=${ticker.symbol}`;
             const addOpportunityUrl = `index.html?assetPair=${ticker.symbol}`;
 
+            // O botão do gráfico agora tem um atributo 'data-symbol'
             return `
                 <tr>
                     <td>${index + 1}</td>
@@ -58,9 +97,10 @@ async function fetchAndDisplayMarketData() {
                     <td class="${priceChangeClass}">${priceChangePercent.toFixed(2)}%</td>
                     <td>
                         <div class="action-buttons">
-                            <a href="${tradingViewUrl}" target="_blank" class="btn edit-btn">Gráfico</a>
-                            <a href="${createAlarmUrl}" class="btn btn-secondary">Criar Alarme</a>
-                            <a href="${addOpportunityUrl}" class="btn btn-primary">Add Oportunidade</a>
+                            <button class="btn btn-secondary view-chart-btn" data-symbol="${ticker.symbol}">Ver Gráfico</button>
+                            <a href="${tradingViewUrl}" target="_blank" class="btn edit-btn">App TV</a>
+                            <a href="${createAlarmUrl}" class="btn">Alarme</a>
+                            <a href="${addOpportunityUrl}" class="btn btn-primary">Add</a>
                         </div>
                     </td>
                 </tr>
@@ -69,9 +109,17 @@ async function fetchAndDisplayMarketData() {
 
         tbody.innerHTML = tableRowsHtml;
 
+        // Adiciona os event listeners aos novos botões DEPOIS de os inserir no DOM
+        document.querySelectorAll('.view-chart-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const symbol = e.currentTarget.dataset.symbol;
+                openChartModal(symbol);
+            });
+        });
+
     } catch (error) {
-        console.error("Erro ao carregar os dados do mercado:", error);
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Não foi possível carregar os dados. Tente novamente.</td></tr>';
+        console.error("Erro ao carregar dados do mercado:", error);
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: red;">Não foi possível carregar os dados. Tente novamente.</td></tr>';
     }
 }
 
