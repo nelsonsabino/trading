@@ -362,3 +362,38 @@ footer { text-align: center; padding: 1rem 0; margin-top: 2rem; color: #6c757d; 
         text-align: right;
     }
 }
+
+
+/* style.css */
+
+/* --- NOVOS ESTILOS: MINI-GRÁFICO NOS CARDS --- */
+
+/* Contentor que irá receber o mini-gráfico. Começa escondido. */
+.mini-chart-container {
+    height: 0;
+    overflow: hidden;
+    transition: height 0.35s ease-in-out; /* Animação suave de expansão */
+    margin-top: 1rem;
+    border-radius: 6px;
+}
+
+/* Classe adicionada via JS para mostrar o gráfico */
+.mini-chart-container.visible {
+    height: 250px; /* Altura do gráfico. Pode ajustar se quiser. */
+}
+
+/* O div dentro do contentor que o TradingView usa */
+.mini-chart-container > div {
+    height: 100%;
+    width: 100%;
+}
+
+/* Ajustes no botão de resumo para o diferenciar */
+.card-actions .btn-summary {
+    background-color: #198754; /* Um verde para se destacar */
+    color: white;
+}
+
+.card-actions .btn-summary:hover {
+    background-color: #157347;
+}
