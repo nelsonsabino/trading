@@ -1,14 +1,21 @@
 // js/version.js - Ponto central de controlo de versão e changelog
 
 export const changelogData = {
-    current: {
-        number: '6.9.0', // <-- VERSÃO ATUALIZADA
+      current: {
+        number: '7.0.0', // <-- VERSÃO ATUALIZADA
         changes: [
-            "Adicionada a funcionalidade de 'Ver Gráfico' em um modal na página do Market Scanner para análise rápida.",
+            "Adicionada coluna de 'Análise Técnica' ao Market Scanner com resumo visual.",
+            "Implementado modal com o widget 'Technical Analysis' completo no Market Scanner.",
         ]
     },
     releases: [
         {
+            number: '6.9.0',
+            changes: [
+                "Adicionada a funcionalidade de 'Ver Gráfico' em um modal na página do Market Scanner para análise rápida.",
+            ]
+        },
+            {
         number: '6.8.0', 
         changes: [
             "Substituído o 'Mini-Gráfico' por um 'Gráfico Avançado' interativo dentro dos cards do dashboard.",
