@@ -12,8 +12,18 @@ function openChartModal(symbol) {
     chartContainer.innerHTML = ''; 
 
     // A criação do widget agora está toda aqui, com a configuração correta
-    new TradingView.widget({
+    new TradingView.widget({          
         "container_id": "chart-modal-container",
+
+        "allow_symbol_change": false,
+        "calendar": false,
+        "details": false,
+        "hide_side_toolbar": true,
+        "hide_top_toolbar": false,
+        "hide_legend": true,
+        "hide_volume": true,
+        "hotlist": false,
+
         "autosize": true,
         "symbol": `BINANCE:${symbol}`,
         "interval": "240", // 4 Horas
@@ -23,9 +33,8 @@ function openChartModal(symbol) {
         "locale": "pt",
         "toolbar_bg": "#f1f5f9",
         "enable_publishing": false,
-        "hide_side_toolbar": true,
         "save_image": false,
-        "allow_symbol_change": true,
+        "allow_symbol_change": false,
         "studies": [
             "STD;MA%Ribbon",
             "STD;RSI"
