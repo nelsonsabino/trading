@@ -462,3 +462,12 @@ footer { text-align: center; padding: 1rem 0; margin-top: 2rem; color: #6c757d; 
 .icon-action-btn.action-arm { color: #ffc107; } /* Amarelo para Armar */
 .icon-action-btn.action-execute { color: #20c997; } /* Teal para Executar */
 .icon-action-btn.action-close { color: #dc3545; } /* Vermelho para Fechar */
+
+
+
+/* Garante que os novos botões de ícone se alinham bem dentro da tabela */
+#market-scan-tbody .action-buttons {
+    display: flex;
+    justify-content: flex-end; /* Alinha os botões à direita da célula */
+    gap: 0.5rem; /* Um espaçamento menor para a tabela */
+}
