@@ -27,7 +27,7 @@ function openChartModal(symbol) {
         "save_image": false,
         "allow_symbol_change": true,
         "studies": [
-                   "MASeries@tv-basicstudies"
+             "STD;MA%Ribbon"
         ]
     });
 
