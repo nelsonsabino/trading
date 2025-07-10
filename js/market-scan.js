@@ -1,37 +1,35 @@
-// js/market-scan.js - VERSÃO COM DELEGAÇÃO DE EVENTOS
+// js/market-scan.js - VERSÃO COM A CORREÇÃO FINAL DO WIDGET
 
 // --- Lógica do Modal do Gráfico ---
 const chartModal = document.getElementById('chart-modal');
 const closeChartModalBtn = document.getElementById('close-chart-modal');
 const chartContainer = document.getElementById('chart-modal-container');
-let chartWidget = null;
+// Removida a variável global 'chartWidget' que não era necessária aqui
 
 function openChartModal(symbol) {
     if (!chartModal || !chartContainer) return;
 
     chartContainer.innerHTML = ''; 
 
-    chartWidget = new TradingView.widget({
+    // A criação do widget agora está toda aqui, com a configuração correta
+    new TradingView.widget({
         "container_id": "chart-modal-container",
         "autosize": true,
         "symbol": `BINANCE:${symbol}`,
-        "interval": "240",
+        "interval": "240", // 4 Horas
         "timezone": "Etc/UTC",
         "theme": "dark",
-        "style": "1",
+        "style": "1", // Velas
         "locale": "pt",
         "toolbar_bg": "#f1f5f9",
         "enable_publishing": false,
         "hide_side_toolbar": true,
         "save_image": false,
         "allow_symbol_change": true,
-        "studies": []
-    });
-
-    chartWidget.onChartReady(function() {
-        chartWidget.chart().createStudy('Moving Average Exponential', false, false, {
-            length: 50
-        });
+        "studies": [
+            // Este é o formato correto para adicionar um estudo na configuração inicial
+            "EMA@tv-basicstudies;50" 
+        ]
     });
 
     chartModal.style.display = 'flex';
@@ -39,8 +37,7 @@ function openChartModal(symbol) {
 
 function closeChartModal() {
     if (!chartModal || !chartContainer) return;
-    chartContainer.innerHTML = '';
-    chartWidget = null;
+    chartContainer.innerHTML = ''; // Ao limpar o HTML, o widget é destruído
     chartModal.style.display = 'none';
 }
 
@@ -66,17 +63,13 @@ async function fetchAndDisplayMarketData() {
     const tbody = document.getElementById('market-scan-tbody');
     if (!tbody) return;
 
-    // --- INÍCIO DA CORREÇÃO (DELEGAÇÃO DE EVENTOS) ---
-    // Adicionamos o listener à tabela UMA SÓ VEZ.
     tbody.addEventListener('click', function(e) {
-        // Verificamos se o elemento clicado (ou um seu "pai") é o botão que queremos.
         const button = e.target.closest('.view-chart-btn');
         if (button) {
             const symbol = button.dataset.symbol;
             openChartModal(symbol);
         }
     });
-    // --- FIM DA CORREÇÃO ---
 
     try {
         tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">A carregar dados...</td></tr>';
