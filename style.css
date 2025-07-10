@@ -397,3 +397,20 @@ footer { text-align: center; padding: 1rem 0; margin-top: 2rem; color: #6c757d; 
 .card-actions .btn-summary:hover {
     background-color: #157347;
 }
+
+
+
+/* --- NOVOS ESTILOS: WIDGET DE ANÁLISE TÉCNICA --- */
+
+.tech-analysis-cell {
+    /* Define uma largura mínima para a célula não ficar muito apertada */
+    min-width: 120px;
+    text-align: center !important; /* Centraliza o conteúdo */
+}
+
+.tech-summary-widget-wrapper {
+    cursor: pointer; /* Indica que o elemento é clicável */
+    display: inline-block;
+    height: 40px; /* Altura para o mini widget */
+    width: 100%;
+}
