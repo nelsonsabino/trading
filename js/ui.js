@@ -203,7 +203,7 @@ function toggleAdvancedChart(tradeId, symbol, button) {
             "symbol": symbol,
             "interval": "60",
             "timezone": "Etc/UTC",
-            "theme": "dark",
+            "theme": "light",
             "style": "1",
             "locale": "pt",
             "withdateranges": false,
