@@ -100,11 +100,6 @@ export function populateStrategySelect() {
     }
 }
 
-
-
-
-// js/ui.js
-
 export function createTradeCard(trade) {
     const card = document.createElement('div');
     card.className = 'trade-card';
@@ -123,7 +118,8 @@ export function createTradeCard(trade) {
     `;
 
     // --- IMAGEM DE SCREENSHOT (se existir) ---
-    const imageUrlToShow = trade.data.imageUrl; // Mostra apenas a imagem inicial
+    // Decidimos manter a imagem estática como fallback visual inicial
+    const imageUrlToShow = trade.data.imageUrl;
     if (imageUrlToShow) {
         const img = document.createElement('img');
         img.src = imageUrlToShow;
@@ -135,7 +131,6 @@ export function createTradeCard(trade) {
     // --- CONTENTOR DO MINI-GRÁFICO (escondido por defeito) ---
     const chartContainer = document.createElement('div');
     chartContainer.className = 'mini-chart-container';
-    // Damos um ID único a cada contentor para o widget saber onde se desenhar
     chartContainer.id = `mini-chart-${trade.id}`;
     card.appendChild(chartContainer);
 
@@ -163,10 +158,31 @@ export function createTradeCard(trade) {
 
     // Botão 3: Ação principal (Armar, Executar, Fechar)
     let actionButton;
-    if (trade.data.status === 'POTENTIAL') { /*...*/ }
-    else if (trade.data.status === 'ARMED') { /*...*/ }
-    else if (trade.data.status === 'LIVE') { /*...*/ }
-    // (a lógica destes botões permanece a mesma, pode copiá-la da sua versão atual)
+    if (trade.data.status === 'POTENTIAL') {
+        actionButton = document.createElement('button');
+        actionButton.className = 'trigger-btn btn-potential';
+        actionButton.textContent = 'Validar Setup (Armar)';
+        actionButton.addEventListener('click', () => openArmModal(trade));
+    } else if (trade.data.status === 'ARMED') {
+        card.classList.add('armed');
+        actionButton = document.createElement('button');
+        actionButton.className = 'trigger-btn btn-armed';
+        actionButton.textContent = 'Executar Gatilho';
+        actionButton.addEventListener('click', () => openExecModal(trade));
+    } else if (trade.data.status === 'LIVE') {
+        card.classList.add('live');
+        const details = trade.data.executionDetails;
+        if (details) { 
+            const p = document.createElement('p'); 
+            p.innerHTML = `<strong>Entrada:</strong> ${details['entry-price'] || 'N/A'} | <strong>Quantidade:</strong> ${details['quantity'] || 'N/A'}`; 
+            card.appendChild(p); 
+        }
+        actionButton = document.createElement('button');
+        actionButton.className = 'trigger-btn btn-live';
+        actionButton.textContent = 'Fechar Trade';
+        actionButton.addEventListener('click', () => openCloseTradeModal(trade));
+    }
+    
     if (actionButton) {
         actionsWrapper.appendChild(actionButton);
     }
@@ -182,19 +198,15 @@ function toggleMiniChart(tradeId, symbol, button) {
     const chartContainer = document.getElementById(`mini-chart-${tradeId}`);
     if (!chartContainer) return;
 
-    // Verifica se o gráfico já está visível
     const isVisible = chartContainer.classList.contains('visible');
 
     if (isVisible) {
-        // Se está visível, esconde-o
         chartContainer.innerHTML = ''; // Limpa o conteúdo para destruir o widget
         chartContainer.classList.remove('visible');
         button.textContent = 'Ver Resumo';
     } else {
-        // Se está escondido, mostra-o
         button.textContent = 'A Carregar...';
         
-        // Cria o widget do TradingView
         new TradingView.widget({
             "container_id": chartContainer.id,
             "width": "100%",
@@ -204,6 +216,7 @@ function toggleMiniChart(tradeId, symbol, button) {
             "timezone": "Etc/UTC",
             "theme": "light",
             "style": "3", // Gráfico de Área
+            "autosize": true,
             "hide_top_toolbar": true,
             "hide_legend": true,
             "save_image": false,
@@ -214,9 +227,6 @@ function toggleMiniChart(tradeId, symbol, button) {
         button.textContent = 'Esconder Resumo';
     }
 }
-
-
-
 
 export function displayTrades(trades) {
     if (!potentialTradesContainer) return;
