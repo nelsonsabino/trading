@@ -561,3 +561,40 @@ body.dark-mode {
 .dark-mode .mini-chart-container.visible {
     background-color: #1e1e1e;
 }
+
+
+ 
+
+.dark-mode .market-table,
+.dark-mode #trades-table,
+.dark-mode .alarms-table {
+    background-color: #1e1e1e; /* Fundo escuro para a tabela */
+    color: #e0e0e0; /* Texto claro */
+}
+
+/* Cabeçalho da tabela */
+.dark-mode .market-table thead tr,
+.dark-mode #trades-table thead tr,
+.dark-mode .alarms-table thead tr {
+    background-color: #2c2c2c; /* Um cinza um pouco mais escuro para o cabeçalho */
+}
+
+/* Texto do cabeçalho */
+.dark-mode .market-table th,
+.dark-mode #trades-table th,
+.dark-mode .alarms-table th {
+    color: #ffffff; /* Texto branco para maior contraste */
+    border-bottom-color: #444;
+}
+
+/* Linhas e bordas da tabela */
+.dark-mode .market-table td,
+.dark-mode #trades-table td,
+.dark-mode .alarms-table td {
+    border-bottom-color: #333; /* Linha separadora mais escura */
+}
+
+/* O texto dentro dos links nos botões */
+.dark-mode .action-buttons .btn {
+    color: #e0e0e0;
+}
