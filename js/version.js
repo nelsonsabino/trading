@@ -1,27 +1,40 @@
 // js/version.js - Ponto central de controlo de versão e changelog
 
 export const changelogData = {
-      current: {
-        number: '6.8.1', 
+    current: {
+        number: '7.1.1', // <-- VERSÃO ATUALIZADA
         changes: [
-            "Redesenhados os botões de ação nos cards do dashboard para um design mais compacto com ícones e texto.",
+            "Correção dos estilos das tabelas no Modo Escuro para garantir a legibilidade.",
         ]
     },
     releases: [
+        {
+            number: '7.1.0',
+            changes: [
+                "Implementado Modo Escuro (Dark Mode) em toda a aplicação.",
+                "Adicionado botão para alternar entre temas, com a preferência guardada no browser.",
+            ]
+        },
+        {
+            number: '6.8.1',
+            changes: [
+                "Redesenhados os botões de ação nos cards do dashboard para um design mais compacto com ícones e texto.",
+            ]
+        },
         {
             number: '6.8.0',
             changes: [
                 "Substituído o 'Mini-Gráfico' por um 'Gráfico Avançado' interativo dentro dos cards do dashboard.",
                 "O gráfico agora carrega com o timeframe de análise do trade, EMAs 50/200 e tema escuro por defeito.",
             ]
-        }, 
-       {
-        number: '6.7.0', 
-        changes: [
-            "Adicionada a funcionalidade de 'Mini-Gráfico' em tempo real nos cards do dashboard.",
-        ]
-    },
-       {
+        },
+        {
+            number: '6.7.0',
+            changes: [
+                "Adicionada a funcionalidade de 'Mini-Gráfico' em tempo real nos cards do dashboard.",
+            ]
+        },
+        {
             number: '6.6.0',
             changes: [
                 "Adicionado novo tipo de alarme: Nível de RSI (sobrecompra/sobrevenda).",
