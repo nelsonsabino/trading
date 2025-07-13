@@ -312,11 +312,29 @@
             </div>
         </section>
 
+
+<!-- alarms.html -->
+    ...
+    </section>
+
+    <!-- NOVO: Modal para o Gráfico Avançado -->
+    <div id="chart-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 90%; height: 90%; padding: 1rem;">
+            <span id="close-chart-modal" style="position: absolute; top: 15px; right: 25px; font-size: 2.5rem; color: #adb5bd; font-weight: 300; cursor: pointer; z-index: 10;">×</span>
+            <div id="chart-modal-container" style="height: 100%; width: 100%;">
+                <!-- O widget do TradingView será inserido aqui -->
+            </div>
+        </div>
+    </div>
+    
+
+        
     </main>
 
     <footer></footer>
 
     <!-- Scripts necessários para esta página (ORDEM CORRETA) -->
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="js/services.js"></script> <!-- Carrega os serviços primeiro -->
     <script type="module" src="js/utils.js"></script>     <!-- Carrega as utilidades depois -->
