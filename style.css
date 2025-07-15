@@ -612,3 +612,15 @@ body.dark-mode {
     height: 50px; /* Altura do gráfico */
     margin: auto; /* Centraliza o gráfico na célula */
 }
+
+/* style.css */
+
+/* --- CORREÇÃO ADICIONAL PARA O MODO ESCURO --- */
+
+/* Garante que os cards de alarme no mobile ficam com o fundo escuro */
+@media (max-width: 768px) {
+    .dark-mode .alarms-table tr {
+        background-color: #1e1e1e;
+        border-color: #2c2c2c;
+    }
+}
