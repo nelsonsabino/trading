@@ -598,3 +598,17 @@ body.dark-mode {
 .dark-mode .action-buttons .btn {
     color: #e0e0e0;
 }
+
+/* style.css */
+
+/* --- NOVOS ESTILOS: SPARKLINE CHARTS --- */
+.sparkline-cell {
+    padding: 0 !important; /* Remove o padding para o gráfico ocupar todo o espaço */
+    vertical-align: middle !important;
+}
+
+.sparkline-container {
+    width: 150px; /* Largura do gráfico */
+    height: 50px; /* Altura do gráfico */
+    margin: auto; /* Centraliza o gráfico na célula */
+}
