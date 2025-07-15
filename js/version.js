@@ -2,17 +2,43 @@
 
 export const changelogData = {
     current: {
-        number: '6.8.0',
+        number: '7.1.2',
         changes: [
-            "Substituído o 'Mini-Gráfico' por um 'Gráfico Avançado' interativo dentro dos cards do dashboard.",
-            "O gráfico agora carrega com uma configuração limpa e minimalista por defeito.",
+            "Gráficos do TradingView agora adaptam o seu tema (claro/escuro) ao tema da aplicação.",
+            "Corrigido bug visual nos cards de alarme no modo escuro em ecrãs de telemóvel.",
         ]
     },
     releases: [
         {
+            number: '7.1.1',
+            changes: [
+                "Correção dos estilos das tabelas no Modo Escuro para garantir a legibilidade.",
+            ]
+        },
+        {
+            number: '7.1.0',
+            changes: [
+                "Implementado Modo Escuro (Dark Mode) em toda a aplicação.",
+                "Adicionado botão para alternar entre temas, com a preferência guardada no browser.",
+            ]
+        },
+        {
+            number: '6.8.1',
+            changes: [
+                "Redesenhados os botões de ação nos cards do dashboard para um design mais compacto com ícones e texto.",
+            ]
+        },
+        {
+            number: '6.8.0',
+            changes: [
+                "Substituído o 'Mini-Gráfico' por um 'Gráfico Avançado' interativo dentro dos cards do dashboard.",
+                "O gráfico agora carrega com uma configuração limpa e minimalista por defeito.",
+            ]
+        },
+        {
             number: '6.7.0',
             changes: [
-                "Adicionada a funcionalidade de 'Mini-Gráfico' em tempo real nos cards do dashboard.", // Esta versão foi superada pela 6.8.0
+                "Adicionada a funcionalidade de 'Mini-Gráfico' em tempo real nos cards do dashboard.",
             ]
         },
         {
@@ -51,7 +77,40 @@ export const changelogData = {
                 "Adicionado botão 'Gráfico' no histórico de alarmes para análise rápida do momento do disparo.",
             ]
         },
-        // ... (o resto do seu histórico) ...
+        {
+            number: '6.4.2',
+            changes: [
+                "Melhoria da UX na página de alarmes: o preço atual agora é carregado automaticamente quando o ativo é pré-preenchido.",
+                "Correção das notificações do Telegram para exibirem detalhes para todos os tipos de alarme.",
+            ]
+        },
+        {
+            number: '6.4.1',
+            changes: [
+                "Correção do redirecionamento da checkbox 'Criar Alarme' no modal de oportunidades.",
+                "Correção do link 'Gráfico' nos cards do dashboard para evitar o erro de 'símbolo inválido'.",
+            ]
+        },
+        {
+            number: '6.4.0',
+            changes: [
+                "Refatoração do sistema de autocomplete para usar a API da Binance, padronizando os pares de moedas em toda a aplicação.",
+                "Adicionado autocomplete de pares no modal de 'Adicionar Oportunidade'.",
+            ]
+        },
+        {
+            number: '6.3.1',
+            changes: [
+                "Correção do fluxo de 'Criar Alarme' para ser consistente em toda a aplicação, resolvendo bugs de pré-preenchimento.",
+            ]
+        },
+        {
+            number: '6.3.0',
+            changes: [
+                "Centralização do sistema de versões e criação da página de changelog.",
+                "Correção do link 'Gráfico' nos cards da página inicial para abrir a app TradingView no telemóvel.",
+            ]
+        },
     ]
 };
 
