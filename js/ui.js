@@ -1,4 +1,4 @@
-// js/ui.js - VERSÃO COM BOTÕES DE ÍCONE ATUALIZADOS NO DASHBOARD
+// js/ui.js - VERSÃO COM TEMA DINÂMICO NO GRÁFICO
 
 import { STRATEGIES } from './strategies.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
@@ -129,9 +129,6 @@ export function createTradeCard(trade) {
     const actionsWrapper = document.createElement('div');
     actionsWrapper.className = 'card-actions';
 
-    // --- BOTÕES DE AÇÃO ATUALIZADOS ---
-
-    // Botão 1: Gráfico (abre o widget no card)
     const chartBtn = document.createElement('button');
     chartBtn.className = 'icon-action-btn action-summary';
     chartBtn.innerHTML = `<i class="fa-solid fa-chart-simple"></i> <span>Gráfico</span>`;
@@ -141,7 +138,6 @@ export function createTradeCard(trade) {
     });
     actionsWrapper.appendChild(chartBtn);
 
-    // Botão 2: Análise (abre o TradingView)
     const analysisLink = document.createElement('a');
     analysisLink.href = `https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}`;
     analysisLink.className = 'icon-action-btn action-full-chart';
@@ -151,7 +147,6 @@ export function createTradeCard(trade) {
     analysisLink.rel = 'noopener noreferrer';
     actionsWrapper.appendChild(analysisLink);
 
-    // Botão 3: Ação Principal (Armar, Executar, Fechar)
     let mainActionButton;
     if (trade.data.status === 'POTENTIAL') {
         card.classList.remove('armed', 'live');
@@ -192,7 +187,6 @@ export function createTradeCard(trade) {
     return card;
 }
 
-
 function toggleAdvancedChart(tradeId, symbol, button) {
     const chartContainer = document.getElementById(`advanced-chart-${tradeId}`);
     if (!chartContainer) return;
@@ -206,19 +200,21 @@ function toggleAdvancedChart(tradeId, symbol, button) {
     } else {
         button.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>A Carregar...</span>`;
         
-         new TradingView.widget({
+        const currentTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+
+        new TradingView.widget({
             "container_id": chartContainer.id,
             "autosize": true,
             "symbol": symbol,
-            "interval": "60", // Default 1H
+            "interval": "60",
             "timezone": "Etc/UTC",
-            "theme": "light",
-            "style": "1", // Velas
+            "theme": currentTheme,
+            "style": "1",
             "locale": "pt",
             "toolbar_bg": "#f1f5f9",
             "enable_publishing": false,
-            "hide_side_toolbar": true, // Esconde a barra lateral de desenhos
-            "hide_top_toolbar": true,  // Esconde a barra de topo (timeframes, etc)
+            "hide_side_toolbar": true,
+            "hide_top_toolbar": true,
             "hide_legend": true,
             "save_image": false,
             "allow_symbol_change": false
