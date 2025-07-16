@@ -1,4 +1,4 @@
-// js/alarms.js - VERSÃO COM NOVOS BOTÕES DE AÇÃO E GRÁFICO EM MODAL
+// js/alarms.js - VERSÃO COM MELHORIA NO ALARME DE ESTOCÁSTICO
 
 import { supabase } from './services.js';
 import { setupAutocomplete } from './utils.js';
@@ -14,9 +14,10 @@ const chartContainer = document.getElementById('chart-modal-container');
 function openChartModal(symbol) {
     if (!chartModal || !chartContainer) return;
     chartContainer.innerHTML = '';
+    const currentTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
     new TradingView.widget({
         "container_id": "chart-modal-container", "autosize": true, "symbol": `BINANCE:${symbol}`,
-        "interval": "240", "timezone": "Etc/UTC", "theme": "dark", "style": "1", "locale": "pt",
+        "interval": "240", "timezone": "Etc/UTC", "theme": currentTheme, "style": "1", "locale": "pt",
         "hide_side_toolbar": false, "allow_symbol_change": true,
         "studies": ["STD;MA%Ribbon", "STD;RSI"]
     });
@@ -111,7 +112,6 @@ async function fetchAndDisplayAlarms() {
                     </tr>`);
             } else {
                 const triggeredDate = alarm.triggered_at ? new Date(alarm.triggered_at).toLocaleString('pt-PT') : new Date(alarm.created_at).toLocaleString('pt-PT');
-                
                 triggeredAlarmsHtml.push(`
                     <tr>
                         <td data-label="Ativo"><span class="cell-value"><strong>${assetDisplay}</strong></span></td>
@@ -202,18 +202,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const alarmTypeSelect = document.getElementById('alarm-type-select');
     
     const fields = { price: document.getElementById('price-fields'), rsi_level: document.getElementById('rsi-level-fields'), stochastic: document.getElementById('stochastic-fields'), stochastic_crossover: document.getElementById('stoch-crossover-fields'), rsi_crossover: document.getElementById('rsi-fields'), ema_touch: document.getElementById('ema-fields'), combo: document.getElementById('combo-fields') };
+    
     alarmTypeSelect.addEventListener('change', () => {
         const selectedType = alarmTypeSelect.value;
         for (const type in fields) { if (fields[type]) { fields[type].style.display = type === selectedType ? 'block' : 'none'; } }
+        
         if (selectedType === 'rsi_level') {
-            const rsiCondition = document.getElementById('rsi-level-condition');
-            const rsiValueInput = document.getElementById('rsi-level-value');
-            if (rsiCondition.value === 'below') { rsiValueInput.value = 35; } else { rsiValueInput.value = 70; }
+            document.getElementById('rsi-level-condition').dispatchEvent(new Event('change'));
+        }
+        if (selectedType === 'stochastic') {
+            document.getElementById('stoch-condition').dispatchEvent(new Event('change'));
         }
     });
 
     const rsiLevelConditionSelect = document.getElementById('rsi-level-condition');
     if(rsiLevelConditionSelect) { rsiLevelConditionSelect.addEventListener('change', (e) => { const rsiValueInput = document.getElementById('rsi-level-value'); if(e.target.value === 'below') { rsiValueInput.value = 35; } else { rsiValueInput.value = 70; } }); }
+
+    const stochConditionSelect = document.getElementById('stoch-condition');
+    if (stochConditionSelect) {
+        stochConditionSelect.addEventListener('change', (e) => {
+            const stochValueInput = document.getElementById('stoch-value');
+            if (e.target.value === 'below') {
+                stochValueInput.value = 30;
+            } else {
+                stochValueInput.value = 70;
+            }
+        });
+    }
 
     const urlParams = new URLSearchParams(window.location.search);
     const assetPairFromUrl = urlParams.get('assetPair');
