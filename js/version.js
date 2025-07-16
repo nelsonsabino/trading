@@ -1,14 +1,20 @@
 // js/version.js - Ponto central de controlo de versão e changelog
 
 export const changelogData = {
-    current: {
-        number: '7.1.2',
+   current: {
+        number: '7.1.3', // <-- VERSÃO ATUALIZADA
         changes: [
-            "Gráficos do TradingView agora adaptam o seu tema (claro/escuro) ao tema da aplicação.",
-            "Corrigido bug visual nos cards de alarme no modo escuro em ecrãs de telemóvel.",
+            "Melhorada a UX do alarme de nível de Estocástico com rótulos mais claros e valores alvo automáticos (30/70).",
         ]
     },
     releases: [
+        {
+            number: '7.1.2',
+            changes: [
+                "Gráficos do TradingView agora adaptam o seu tema (claro/escuro) ao tema da aplicação.",
+                "Corrigido bug visual nos cards de alarme no modo escuro em ecrãs de telemóvel.",
+            ]
+        },
         {
             number: '7.1.1',
             changes: [
