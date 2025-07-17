@@ -1,6 +1,6 @@
-// js/strategies-manager.js
+// js/strategies-manager.js - VERSÃO FINAL COM LÓGICA DE GUARDAR
 
-import { listenToStrategies, deleteStrategy } from './firebase-service.js';
+import { listenToStrategies, deleteStrategy, addStrategy, updateStrategy } from './firebase-service.js';
 
 // --- ELEMENTOS DO DOM ---
 const strategiesContainer = document.getElementById('strategies-container');
@@ -20,14 +20,24 @@ const addItemModal = {
     cancelBtn: document.getElementById('cancel-add-item')
 };
 let currentPhaseItemsContainer = null;
+let editingStrategyId = null;
 
 
-// --- FUNÇÕES DE GESTÃO DOS MODAIS ---
-function openStrategyModal() {
-    strategyModal.container.style.display = 'flex';
-    strategyModal.title.textContent = 'Criar Nova Estratégia';
+// --- FUNÇÕES DE GESTÃO DO MODAL ---
+function openStrategyModal(strategy = null) {
     strategyModal.form.reset();
     strategyModal.phasesContainer.innerHTML = '';
+    
+    if (strategy) {
+        editingStrategyId = strategy.id;
+        strategyModal.title.textContent = `Editar Estratégia: ${strategy.data.name}`;
+        strategyModal.nameInput.value = strategy.data.name;
+        // (A lógica de preenchimento para edição será implementada a seguir)
+    } else {
+        editingStrategyId = null;
+        strategyModal.title.textContent = 'Criar Nova Estratégia';
+    }
+    strategyModal.container.style.display = 'flex';
 }
 function closeStrategyModal() {
     strategyModal.container.style.display = 'none';
@@ -43,7 +53,6 @@ function closeAddItemModal() {
 
 
 // --- LÓGICA DO CONSTRUTOR VISUAL ---
-
 function createItemBlock(type) {
     const itemDiv = document.createElement('div');
     itemDiv.className = 'phase-block';
@@ -112,6 +121,65 @@ function addPhaseBlock() {
     strategyModal.phasesContainer.appendChild(phaseDiv);
 }
 
+function buildStrategyDataFromForm() {
+    const strategyData = {
+        name: strategyModal.nameInput.value.trim(),
+        isActive: true,
+        phases: []
+    };
+
+    const phaseBlocks = strategyModal.phasesContainer.querySelectorAll('.phase-block');
+    phaseBlocks.forEach(phaseBlock => {
+        const phaseObject = {
+            id: phaseBlock.querySelector('.phase-id').value.trim(),
+            title: phaseBlock.querySelector('.phase-title').value.trim(),
+            items: []
+        };
+
+        const itemBlocks = phaseBlock.querySelectorAll('.items-list .phase-block');
+        itemBlocks.forEach(itemBlock => {
+            const itemObject = {
+                type: itemBlock.dataset.type,
+                id: itemBlock.querySelector('.item-id').value.trim(),
+                label: itemBlock.querySelector('.item-label').value.trim(),
+                required: itemBlock.querySelector('.item-required').checked
+            };
+
+            if (itemObject.type === 'select') {
+                const optionsInput = itemBlock.querySelector('.item-options');
+                if (optionsInput) {
+                    itemObject.options = optionsInput.value.split(',').map(opt => opt.trim()).filter(Boolean);
+                }
+            }
+
+            phaseObject.items.push(itemObject);
+        });
+
+        strategyData.phases.push(phaseObject);
+    });
+
+    return strategyData;
+}
+
+async function handleSaveStrategy(e) {
+    e.preventDefault();
+    const strategyData = buildStrategyDataFromForm();
+
+    try {
+        if (editingStrategyId) {
+            await updateStrategy(editingStrategyId, strategyData);
+            alert('Estratégia atualizada com sucesso!');
+        } else {
+            await addStrategy(strategyData);
+            alert('Estratégia criada com sucesso!');
+        }
+        closeStrategyModal();
+    } catch (error) {
+        alert('Ocorreu um erro ao guardar a estratégia. Verifique a consola.');
+        console.error("Erro ao guardar estratégia:", error);
+    }
+}
+
 
 // --- FUNÇÕES DE RENDERIZAÇÃO ---
 function createStrategyCard(strategy) {
@@ -137,18 +205,15 @@ function createStrategyCard(strategy) {
 
 function loadAndDisplayStrategies() {
     if (!strategiesContainer) return;
-
     listenToStrategies((strategies, error) => {
         if (error) {
             strategiesContainer.innerHTML = '<p class="empty-state-message" style="color: red;">Ocorreu um erro ao carregar as estratégias.</p>';
             return;
         }
-
         if (strategies.length === 0) {
             strategiesContainer.innerHTML = '<p class="empty-state-message">Nenhuma estratégia encontrada. Clique em "Criar Nova Estratégia" para começar.</p>';
             return;
         }
-
         const cardsHtml = strategies.map(createStrategyCard).join('');
         strategiesContainer.innerHTML = cardsHtml;
     });
@@ -158,9 +223,10 @@ function loadAndDisplayStrategies() {
 // --- PONTO DE ENTRADA DO SCRIPT ---
 document.addEventListener('DOMContentLoaded', () => {
     
-    if (createBtn) { createBtn.addEventListener('click', openStrategyModal); }
+    if (createBtn) { createBtn.addEventListener('click', () => openStrategyModal()); }
     if (strategyModal.closeBtn) { strategyModal.closeBtn.addEventListener('click', closeStrategyModal); }
     if (strategyModal.container) { strategyModal.container.addEventListener('click', (e) => { if (e.target.id === 'strategy-modal') closeStrategyModal(); }); }
+    if (strategyModal.form) { strategyModal.form.addEventListener('submit', handleSaveStrategy); }
     
     if (addItemModal.cancelBtn) { addItemModal.cancelBtn.addEventListener('click', closeAddItemModal); }
     if (addItemModal.buttonsContainer) {
@@ -192,10 +258,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             } else if (editButton) {
-                alert('A funcionalidade de editar será implementada a seguir!');
+                // (Ainda não implementado, apenas abre o modal vazio)
+                openStrategyModal(); 
             }
         });
     }
-
     loadAndDisplayStrategies();
 });
