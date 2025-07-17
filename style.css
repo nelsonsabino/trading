@@ -613,7 +613,6 @@ body.dark-mode {
     margin: auto; /* Centraliza o gráfico na célula */
 }
 
-/* style.css */
 
 /* --- CORREÇÃO ADICIONAL PARA O MODO ESCURO --- */
 
@@ -623,4 +622,44 @@ body.dark-mode {
         background-color: #1e1e1e;
         border-color: #2c2c2c;
     }
+}
+
+
+
+/* --- NOVOS ESTILOS: CONSTRUTOR DE ESTRATÉGIAS --- */
+
+.phase-block {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.phase-block-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.phase-block-header h5 {
+    margin: 0;
+    color: #0d6efd;
+}
+
+.phase-block .form-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.phase-block .input-item {
+    flex: 1;
+}
+
+.phase-items-container {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px dashed #ced4da;
 }
