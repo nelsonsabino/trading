@@ -1,12 +1,11 @@
 // js/strategies-manager.js
 
-// Importa a nova função que acabámos de criar.
-import { listenToStrategies } from './firebase-service.js';
+// Importa a função de apagar que acabámos de criar.
+import { listenToStrategies, deleteStrategy } from './firebase-service.js';
 
 /**
  * Cria o HTML para um único card de estratégia.
- * @param {object} strategy - O objeto da estratégia vindo do Firebase.
- * @returns {string} A string HTML para o card.
+ * (Função inalterada)
  */
 function createStrategyCard(strategy) {
     const phaseCount = strategy.data.phases ? strategy.data.phases.length : 0;
@@ -21,7 +20,7 @@ function createStrategyCard(strategy) {
                 <button class="icon-action-btn action-edit" data-id="${strategy.id}" title="Editar Estratégia">
                     <i class="fas fa-pencil"></i> <span>Editar</span>
                 </button>
-                <button class="icon-action-btn action-close" data-id="${strategy.id}" title="Apagar Estratégia">
+                <button class="icon-action-btn action-close delete-btn" data-id="${strategy.id}" title="Apagar Estratégia">
                     <i class="fas fa-trash"></i> <span>Apagar</span>
                 </button>
             </div>
@@ -31,6 +30,7 @@ function createStrategyCard(strategy) {
 
 /**
  * Carrega as estratégias do Firebase e exibe-as na página.
+ * (Função inalterada)
  */
 function loadAndDisplayStrategies() {
     const container = document.getElementById('strategies-container');
@@ -47,22 +47,49 @@ function loadAndDisplayStrategies() {
             return;
         }
 
-        // Gera o HTML para cada card e junta tudo.
         const cardsHtml = strategies.map(createStrategyCard).join('');
         container.innerHTML = cardsHtml;
     });
 }
 
+
 // Ponto de entrada do script
 document.addEventListener('DOMContentLoaded', () => {
-    // Adiciona o listener de eventos ao botão de criar (por enquanto, só mostra um alerta).
     const createBtn = document.getElementById('create-strategy-btn');
+    const container = document.getElementById('strategies-container');
+
     if (createBtn) {
         createBtn.addEventListener('click', () => {
             alert('A funcionalidade de criar/editar será implementada na próxima fase!');
         });
     }
 
-    // Carrega as estratégias existentes.
+    // --- LÓGICA DE EVENTOS ATUALIZADA ---
+    if (container) {
+        container.addEventListener('click', async (e) => {
+            const deleteButton = e.target.closest('.delete-btn');
+            
+            if (deleteButton) {
+                const strategyId = deleteButton.dataset.id;
+                
+                if (confirm('Tem a certeza que quer apagar esta estratégia? Esta ação é irreversível.')) {
+                    try {
+                        await deleteStrategy(strategyId);
+                        // A lista irá atualizar-se automaticamente graças ao onSnapshot!
+                        console.log('Estratégia apagada com sucesso.');
+                    } catch (error) {
+                        alert('Ocorreu um erro ao apagar a estratégia.');
+                    }
+                }
+            }
+
+            // (Aqui, no futuro, adicionaremos a lógica para o botão de editar)
+            const editButton = e.target.closest('.action-edit');
+            if (editButton) {
+                alert('A funcionalidade de editar será implementada a seguir!');
+            }
+        });
+    }
+
     loadAndDisplayStrategies();
 });
