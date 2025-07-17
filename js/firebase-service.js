@@ -8,7 +8,7 @@ import {
     doc, 
     updateDoc, 
     getDoc, 
-    deleteDoc, // Garanta que deleteDoc está importado do firebase
+    deleteDoc,
     query, 
     orderBy, 
     onSnapshot, 
@@ -112,7 +112,6 @@ export async function deleteTransaction(transactionId, amount, type) {
 }
 
 // --- FUNÇÃO PARA ATUALIZAR O PORTFÓLIO DIRETAMENTE ---
-// (Esta função pode ser usada para o fecho de trades no app.js)
 
 export async function closeTradeAndUpdateBalance(tradeId, closeDetails) {
     const tradeRef = doc(db, 'trades', tradeId);
@@ -143,24 +142,29 @@ export async function closeTradeAndUpdateBalance(tradeId, closeDetails) {
 }
 
 
-
 // --- FUNÇÕES PARA A NOVA COLEÇÃO "STRATEGIES" ---
 
 export function listenToStrategies(callback) {
-    // Cria uma query para a coleção 'strategies', ordenada pela data de criação.
     const q = query(collection(db, 'strategies'), orderBy('createdAt', 'desc'));
 
-    // onSnapshot escuta por alterações em tempo real.
     onSnapshot(q, (snapshot) => {
         const strategies = [];
         snapshot.forEach(docSnapshot => {
-            // Para cada estratégia, guarda o seu ID e os seus dados.
             strategies.push({ id: docSnapshot.id, data: docSnapshot.data() });
         });
-        // Chama a função de callback, passando a lista de estratégias.
         callback(strategies);
     }, (error) => {
         console.error("Erro ao escutar por estratégias:", error);
-        callback([], error); // Devolve um array vazio em caso de erro.
+        callback([], error);
     });
+}
+
+export async function deleteStrategy(strategyId) {
+    try {
+        const strategyRef = doc(db, 'strategies', strategyId);
+        await deleteDoc(strategyRef);
+    } catch (error) {
+        console.error("Erro no serviço ao apagar estratégia:", error);
+        throw error;
+    }
 }
