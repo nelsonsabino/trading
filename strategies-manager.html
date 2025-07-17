@@ -28,6 +28,41 @@
                 <!-- As estratégias serão listadas aqui pelo JavaScript -->
             </div>
         </section>
+
+
+
+    <!-- NOVO: Modal para Criar/Editar Estratégia -->
+    <div id="strategy-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 800px;">
+            <span id="close-strategy-modal">×</span>
+            <form id="strategy-form">
+                <h3 id="strategy-modal-title">Criar Nova Estratégia</h3>
+                
+                <div class="input-item">
+                    <label for="strategy-name">Nome da Estratégia:</label>
+                    <input type="text" id="strategy-name" required placeholder="Ex: EMA50 Breakout">
+                </div>
+
+                <hr style="margin: 2rem 0;">
+
+                <h4>Fases da Estratégia</h4>
+                <div id="phases-container">
+                    <!-- As fases serão adicionadas dinamicamente aqui -->
+                </div>
+
+                <button type="button" id="add-phase-btn" class="btn btn-secondary" style="margin-top: 1rem;">
+                    <i class="fas fa-plus"></i> Adicionar Fase
+                </button>
+
+                <hr style="margin: 2rem 0;">
+                
+                <button type="submit" id="save-strategy-btn">Guardar Estratégia</button>
+            </form>
+        </div>
+    </div>
+
+        
+        
     </main>
 
     <footer></footer>
