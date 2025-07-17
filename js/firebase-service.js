@@ -168,3 +168,43 @@ export async function deleteStrategy(strategyId) {
         throw error;
     }
 }
+
+
+// firebase-service.js
+
+// ... (funções listenToStrategies e deleteStrategy existentes) ...
+
+// --- NOVAS FUNÇÕES A ADICIONAR ---
+
+/**
+ * Adiciona um novo documento de estratégia à coleção 'strategies'.
+ * @param {object} strategyData - O objeto JSON que descreve a estratégia.
+ */
+export async function addStrategy(strategyData) {
+    try {
+        // Adiciona um timestamp de criação do lado do servidor
+        const dataToSave = {
+            ...strategyData,
+            createdAt: new Date()
+        };
+        await addDoc(collection(db, 'strategies'), dataToSave);
+    } catch (error) {
+        console.error("Erro no serviço ao adicionar estratégia:", error);
+        throw error;
+    }
+}
+
+/**
+ * Atualiza um documento de estratégia existente.
+ * @param {string} strategyId - O ID do documento a ser atualizado.
+ * @param {object} strategyData - O objeto JSON com os novos dados da estratégia.
+ */
+export async function updateStrategy(strategyId, strategyData) {
+    try {
+        const strategyRef = doc(db, 'strategies', strategyId);
+        await updateDoc(strategyRef, strategyData);
+    } catch (error) {
+        console.error("Erro no serviço ao atualizar estratégia:", error);
+        throw error;
+    }
+}
