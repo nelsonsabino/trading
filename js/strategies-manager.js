@@ -19,12 +19,54 @@ const strategyModal = {
 function openStrategyModal() {
     strategyModal.container.style.display = 'flex';
     strategyModal.title.textContent = 'Criar Nova Estratégia';
-    strategyModal.form.reset(); // Limpa o formulário para uma nova entrada
-    strategyModal.phasesContainer.innerHTML = ''; // Limpa as fases
+    strategyModal.form.reset();
+    strategyModal.phasesContainer.innerHTML = '';
 }
 
 function closeStrategyModal() {
     strategyModal.container.style.display = 'none';
+}
+
+
+// --- LÓGICA DO CONSTRUTOR VISUAL ---
+
+/**
+ * Adiciona um novo bloco de fase ao formulário do modal.
+ */
+function addPhaseBlock() {
+    const phaseIndex = strategyModal.phasesContainer.children.length;
+
+    const phaseDiv = document.createElement('div');
+    phaseDiv.className = 'phase-block';
+    phaseDiv.innerHTML = `
+        <div class="phase-block-header">
+            <h5>Fase ${phaseIndex + 1}</h5>
+            <button type="button" class="btn delete-btn" style="padding: 4px 8px; font-size: 0.8em;">Remover Fase</button>
+        </div>
+        <div class="form-row">
+            <div class="input-item">
+                <label>ID da Fase (ex: potential, armed)</label>
+                <input type="text" class="phase-id" required>
+            </div>
+            <div class="input-item">
+                <label>Título da Fase</label>
+                <input type="text" class="phase-title" required>
+            </div>
+        </div>
+        <div class="phase-items-container">
+            <h6>Itens da Checklist</h6>
+            <!-- Os itens (checkbox, select, etc.) serão adicionados aqui -->
+            <button type="button" class="btn btn-secondary" style="font-size: 0.9em; padding: 6px 10px;">
+                <i class="fas fa-plus"></i> Adicionar Item
+            </button>
+        </div>
+    `;
+
+    phaseDiv.querySelector('.delete-btn').addEventListener('click', () => {
+        phaseDiv.remove();
+    });
+
+    strategyModal.phasesContainer.appendChild(phaseDiv);
 }
 
 
@@ -73,7 +115,6 @@ function loadAndDisplayStrategies() {
 // --- PONTO DE ENTRADA DO SCRIPT ---
 document.addEventListener('DOMContentLoaded', () => {
     
-    // Listeners para abrir e fechar o modal
     if (createBtn) {
         createBtn.addEventListener('click', openStrategyModal);
     }
@@ -81,7 +122,6 @@ document.addEventListener('DOMContentLoaded', () => {
         strategyModal.closeBtn.addEventListener('click', closeStrategyModal);
     }
     if (strategyModal.container) {
-        // Permite fechar o modal clicando fora dele
         strategyModal.container.addEventListener('click', (e) => {
             if (e.target.id === 'strategy-modal') {
                 closeStrategyModal();
@@ -89,7 +129,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Listener de eventos para os botões nos cards (delegação)
+    if (strategyModal.addPhaseBtn) {
+        strategyModal.addPhaseBtn.addEventListener('click', addPhaseBlock);
+    }
+
     if (strategiesContainer) {
         strategiesContainer.addEventListener('click', async (e) => {
             const deleteButton = e.target.closest('.delete-btn');
@@ -110,6 +153,5 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Carrega as estratégias na página
     loadAndDisplayStrategies();
 });
