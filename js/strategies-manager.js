@@ -1,12 +1,34 @@
 // js/strategies-manager.js
 
-// Importa a função de apagar que acabámos de criar.
 import { listenToStrategies, deleteStrategy } from './firebase-service.js';
 
-/**
- * Cria o HTML para um único card de estratégia.
- * (Função inalterada)
- */
+// --- ELEMENTOS DO DOM ---
+const strategiesContainer = document.getElementById('strategies-container');
+const createBtn = document.getElementById('create-strategy-btn');
+const strategyModal = {
+    container: document.getElementById('strategy-modal'),
+    closeBtn: document.getElementById('close-strategy-modal'),
+    form: document.getElementById('strategy-form'),
+    title: document.getElementById('strategy-modal-title'),
+    nameInput: document.getElementById('strategy-name'),
+    phasesContainer: document.getElementById('phases-container'),
+    addPhaseBtn: document.getElementById('add-phase-btn')
+};
+
+// --- FUNÇÕES DE GESTÃO DO MODAL ---
+function openStrategyModal() {
+    strategyModal.container.style.display = 'flex';
+    strategyModal.title.textContent = 'Criar Nova Estratégia';
+    strategyModal.form.reset(); // Limpa o formulário para uma nova entrada
+    strategyModal.phasesContainer.innerHTML = ''; // Limpa as fases
+}
+
+function closeStrategyModal() {
+    strategyModal.container.style.display = 'none';
+}
+
+
+// --- FUNÇÕES DE RENDERIZAÇÃO ---
 function createStrategyCard(strategy) {
     const phaseCount = strategy.data.phases ? strategy.data.phases.length : 0;
     const date = strategy.data.createdAt?.toDate().toLocaleDateString('pt-PT') || 'N/A';
@@ -28,68 +50,66 @@ function createStrategyCard(strategy) {
     `;
 }
 
-/**
- * Carrega as estratégias do Firebase e exibe-as na página.
- * (Função inalterada)
- */
 function loadAndDisplayStrategies() {
-    const container = document.getElementById('strategies-container');
-    if (!container) return;
+    if (!strategiesContainer) return;
 
     listenToStrategies((strategies, error) => {
         if (error) {
-            container.innerHTML = '<p class="empty-state-message" style="color: red;">Ocorreu um erro ao carregar as estratégias.</p>';
+            strategiesContainer.innerHTML = '<p class="empty-state-message" style="color: red;">Ocorreu um erro ao carregar as estratégias.</p>';
             return;
         }
 
         if (strategies.length === 0) {
-            container.innerHTML = '<p class="empty-state-message">Nenhuma estratégia encontrada. Clique em "Criar Nova Estratégia" para começar.</p>';
+            strategiesContainer.innerHTML = '<p class="empty-state-message">Nenhuma estratégia encontrada. Clique em "Criar Nova Estratégia" para começar.</p>';
             return;
         }
 
         const cardsHtml = strategies.map(createStrategyCard).join('');
-        container.innerHTML = cardsHtml;
+        strategiesContainer.innerHTML = cardsHtml;
     });
 }
 
 
-// Ponto de entrada do script
+// --- PONTO DE ENTRADA DO SCRIPT ---
 document.addEventListener('DOMContentLoaded', () => {
-    const createBtn = document.getElementById('create-strategy-btn');
-    const container = document.getElementById('strategies-container');
-
+    
+    // Listeners para abrir e fechar o modal
     if (createBtn) {
-        createBtn.addEventListener('click', () => {
-            alert('A funcionalidade de criar/editar será implementada na próxima fase!');
+        createBtn.addEventListener('click', openStrategyModal);
+    }
+    if (strategyModal.closeBtn) {
+        strategyModal.closeBtn.addEventListener('click', closeStrategyModal);
+    }
+    if (strategyModal.container) {
+        // Permite fechar o modal clicando fora dele
+        strategyModal.container.addEventListener('click', (e) => {
+            if (e.target.id === 'strategy-modal') {
+                closeStrategyModal();
+            }
         });
     }
 
-    // --- LÓGICA DE EVENTOS ATUALIZADA ---
-    if (container) {
-        container.addEventListener('click', async (e) => {
+    // Listener de eventos para os botões nos cards (delegação)
+    if (strategiesContainer) {
+        strategiesContainer.addEventListener('click', async (e) => {
             const deleteButton = e.target.closest('.delete-btn');
-            
+            const editButton = e.target.closest('.action-edit');
+
             if (deleteButton) {
                 const strategyId = deleteButton.dataset.id;
-                
                 if (confirm('Tem a certeza que quer apagar esta estratégia? Esta ação é irreversível.')) {
                     try {
                         await deleteStrategy(strategyId);
-                        // A lista irá atualizar-se automaticamente graças ao onSnapshot!
-                        console.log('Estratégia apagada com sucesso.');
                     } catch (error) {
                         alert('Ocorreu um erro ao apagar a estratégia.');
                     }
                 }
-            }
-
-            // (Aqui, no futuro, adicionaremos a lógica para o botão de editar)
-            const editButton = e.target.closest('.action-edit');
-            if (editButton) {
+            } else if (editButton) {
                 alert('A funcionalidade de editar será implementada a seguir!');
             }
         });
     }
 
+    // Carrega as estratégias na página
     loadAndDisplayStrategies();
 });
