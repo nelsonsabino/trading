@@ -8,7 +8,9 @@ import {
     doc, 
     updateDoc, 
     getDoc, 
+    getDocs,
     deleteDoc,
+    where,
     query, 
     orderBy, 
     onSnapshot, 
@@ -170,11 +172,6 @@ export async function deleteStrategy(strategyId) {
 }
 
 
-// firebase-service.js
-
-// ... (funções listenToStrategies e deleteStrategy existentes) ...
-
-// --- NOVAS FUNÇÕES A ADICIONAR ---
 
 /**
  * Adiciona um novo documento de estratégia à coleção 'strategies'.
@@ -210,9 +207,6 @@ export async function updateStrategy(strategyId, strategyData) {
 }
 
 
-// firebase-service.js
-
-// ... (outras funções de estratégia) ...
 
 /**
  * Busca os dados de um único documento de estratégia.
@@ -226,5 +220,27 @@ export async function getStrategy(strategyId) {
     } catch (error) {
         console.error("Erro ao buscar estratégia:", error);
         return null;
+    }
+}
+
+
+
+/**
+ * Busca todas as estratégias ativas da base de dados UMA ÚNICA VEZ.
+ * @returns {Array} Um array de objetos de estratégia.
+ */
+export async function fetchActiveStrategies() {
+    try {
+        const q = query(collection(db, 'strategies'), where("isActive", "==", true), orderBy('createdAt', 'desc'));
+        const querySnapshot = await getDocs(q);
+        
+        const strategies = [];
+        querySnapshot.forEach((doc) => {
+            strategies.push({ id: doc.id, data: doc.data() });
+        });
+        return strategies;
+    } catch (error) {
+        console.error("Erro ao buscar estratégias ativas:", error);
+        return []; // Retorna um array vazio em caso de erro
     }
 }
