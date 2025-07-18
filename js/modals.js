@@ -24,8 +24,11 @@ export function openArmModal(trade) {
 }
 export function closeArmModal() { if (armModal.container) { armModal.container.style.display = 'none'; armModal.form.reset(); setCurrentTrade({}); } }
 
+
+
+
 export function openExecModal(trade) {
-    const strategies = getStrategies(); // Pega as estratégias do estado
+    const strategies = getStrategies();
     const selectedStrategy = strategies.find(s => s.id === trade.data.strategyId);
     if (!selectedStrategy) return;
 
@@ -34,18 +37,29 @@ export function openExecModal(trade) {
     execModal.strategyNameSpan.textContent = trade.data.strategyName;
     
     const executionPhase = selectedStrategy.data.phases.find(p => p.id === 'execution');
-    // Converte a nossa estrutura para a que a função generateDynamicChecklist espera
     const phasesForChecklist = [];
+    
     if (executionPhase) {
-        phasesForChecklist.push({ title: executionPhase.title, items: executionPhase.items });
+        phasesForChecklist.push(executionPhase); // Passa a fase inteira
     }
-    // Adiciona o plano de gestão padrão
-    phasesForChecklist.push({ title: GESTAO_PADRAO.title, items: GESTAO_PADRAO.inputs.map(i => ({...i, type: i.type})) });
+    
+    // Converte o GESTAO_PADRAO para a nossa nova estrutura de fase
+    const gestaoPhase = {
+        title: GESTAO_PADRAO.title,
+        items: GESTAO_PADRAO.inputs.map(input => ({
+            ...input,
+            type: input.type // Garante que o tipo está presente
+        }))
+    };
+    phasesForChecklist.push(gestaoPhase);
     
     generateDynamicChecklist(execModal.checklistContainer, phasesForChecklist, trade.data.executionDetails);
     
     if (execModal.container) execModal.container.style.display = 'flex';
 }
+
+
+
 export function closeExecModal() { if (execModal.container) { execModal.container.style.display = 'none'; execModal.form.reset(); setCurrentTrade({}); } }
 
 export function openCloseTradeModal(trade) { setCurrentTrade({ id: trade.id, data: trade.data }); closeModalObj.assetNameSpan.textContent = trade.data.asset; if (closeModalObj.container) closeModalObj.container.style.display = 'flex'; }
