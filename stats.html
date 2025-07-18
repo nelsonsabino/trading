@@ -6,6 +6,24 @@
     <title>Dashboard de Estatísticas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <script>
+        (function() {
+            try {
+                const theme = localStorage.getItem('theme');
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark-mode');
+                } else {
+                    // Opcional: verifica a preferência do sistema se não houver nada guardado
+                    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    if (prefersDark && theme !== 'light') {
+                        document.documentElement.classList.add('dark-mode');
+                    }
+                }
+            } catch (e) {
+                // Ignora erros (ex: localStorage desativado)
+            }
+        })();
+    </script>
 </head>
 <body>
 
