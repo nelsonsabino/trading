@@ -1,11 +1,8 @@
-// js/market-scan.js - VERSÃO COMPLETA COM SPARKLINE (TOP 50), MODAL E ÍCONES
+// js/market-scan.js - VERSÃO COMPLETA E CORRIGIDA
 
 import { supabase } from './services.js';
 
-// =================================================================================
-// 1. LÓGICA E INICIALIZAÇÃO DOS MODAIS
-// =================================================================================
-
+// --- LÓGICA E INICIALIZAÇÃO DOS MODAIS ---
 const chartModal = document.getElementById('chart-modal');
 const closeChartModalBtn = document.getElementById('close-chart-modal');
 const chartContainer = document.getElementById('chart-modal-container');
@@ -13,9 +10,7 @@ const chartContainer = document.getElementById('chart-modal-container');
 function openChartModal(symbol) {
     if (!chartModal || !chartContainer) return;
     chartContainer.innerHTML = ''; 
-
     const currentTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
-
     new TradingView.widget({
         "container_id": "chart-modal-container",
         "autosize": true,
@@ -44,17 +39,12 @@ if (chartModal) {
 }
 
 
-// =================================================================================
-// 2. LÓGICA DO SPARKLINE
-// =================================================================================
-
+// --- LÓGICA DO SPARKLINE ---
 function renderSparkline(containerId, dataSeries) {
     if (!dataSeries || dataSeries.length < 2) return;
-
     const firstPrice = dataSeries[0];
     const lastPrice = dataSeries[dataSeries.length - 1];
     const chartColor = lastPrice >= firstPrice ? '#28a745' : '#dc3545';
-
     const options = {
         series: [{ data: dataSeries }],
         chart: { type: 'line', height: 50, sparkline: { enabled: true }},
@@ -72,10 +62,7 @@ function renderSparkline(containerId, dataSeries) {
 }
 
 
-// =================================================================================
-// 3. LÓGICA PRINCIPAL DA PÁGINA
-// =================================================================================
-
+// --- LÓGICA PRINCIPAL DA PÁGINA ---
 function formatVolume(volume) {
     if (volume >= 1_000_000_000) return (volume / 1_000_000_000).toFixed(2) + 'B';
     if (volume >= 1_000_000) return (volume / 1_000_000).toFixed(2) + 'M';
@@ -130,7 +117,7 @@ async function fetchAndDisplayMarketData() {
         const top50Usdc = allTickers
             .filter(ticker => ticker.symbol.endsWith('USDC') && parseFloat(ticker.quoteVolume) > 0)
             .sort((a, b) => parseFloat(b.quoteVolume) - parseFloat(a.quoteVolume))
-            .slice(0, 50); // <-- ALTERAÇÃO APLICADA AQUI
+            .slice(0, 50);
 
         if (top50Usdc.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Não foram encontrados pares com USDC com volume significativo.</td></tr>';
@@ -158,10 +145,7 @@ async function fetchAndDisplayMarketData() {
 }
 
 
-// =================================================================================
-// 4. PONTO DE ENTRADA DA PÁGINA
-// =================================================================================
-
+// --- PONTO DE ENTRADA DA PÁGINA ---
 document.addEventListener('DOMContentLoaded', () => {
     const tbody = document.getElementById('market-scan-tbody');
     if (tbody) {
