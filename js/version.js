@@ -1,14 +1,20 @@
 // js/version.js - Ponto central de controlo de versão e changelog
 
 export const changelogData = {
-    current: {
-        number: '8.0.2',
+     current: {
+        number: '8.0.3', // <-- VERSÃO ATUALIZADA
         changes: [
-            "Otimizado o construtor de estratégias: as fases (Potential, Armed, Execution) são agora adicionadas automaticamente, simplificando a criação.",
-            "Corrigido bug que impedia o construtor de guardar estratégias com itens de checklist.",
+            "Corrigido bug que impedia o redirecionamento para a página de alarmes após guardar uma nova oportunidade.",
         ]
     },
     releases: [
+        {
+            number: '8.0.2',
+            changes: [
+                "Otimizado o construtor de estratégias: as fases (Potential, Armed, Execution) são agora adicionadas automaticamente, simplificando a criação.",
+                "Corrigido bug que impedia o construtor de guardar estratégias com itens de checklist.",
+            ]
+        },
         {
             number: '8.0.1',
             changes: [
