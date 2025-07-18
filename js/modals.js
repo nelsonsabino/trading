@@ -1,15 +1,15 @@
-// js/modals.js - VERSÃO COM ESTRATÉGIAS DINÂMICAS
+// js/modals.js - VERSÃO COM ESTRATÉGIAS DINÂMICAS E LÓGICA DE FASES ROBUSTA
 
 import { addModal, armModal, execModal, closeModalObj, imageModal, modalImg } from './dom-elements.js';
 import { generateDynamicChecklist } from './ui.js';
 import { GESTAO_PADRAO } from './config.js';
-import { setCurrentTrade, getStrategies } from './state.js'; // Importa getStrategies
+import { setCurrentTrade, getStrategies } from './state.js';
 
 export function openAddModal() { if (addModal.container) addModal.container.style.display = 'flex'; }
 export function closeAddModal() { if (addModal.container) { addModal.container.style.display = 'none'; addModal.form.reset(); addModal.checklistContainer.innerHTML = ''; setCurrentTrade({}); } }
 
 export function openArmModal(trade) {
-    const strategies = getStrategies(); // Pega as estratégias do estado
+    const strategies = getStrategies();
     const selectedStrategy = strategies.find(s => s.id === trade.data.strategyId);
     if (!selectedStrategy) return;
 
@@ -17,15 +17,13 @@ export function openArmModal(trade) {
     armModal.assetNameSpan.textContent = trade.data.asset;
     armModal.strategyNameSpan.textContent = trade.data.strategyName;
     
-    const armedPhase = selectedStrategy.data.phases.find(p => p.id === 'armed');
+    // Pega a segunda fase (armed) pela ordem
+    const armedPhase = (selectedStrategy.data.phases && selectedStrategy.data.phases.length > 1) ? selectedStrategy.data.phases[1] : null;
     generateDynamicChecklist(armModal.checklistContainer, [armedPhase], trade.data.armedSetup);
     
     if (armModal.container) armModal.container.style.display = 'flex';
 }
 export function closeArmModal() { if (armModal.container) { armModal.container.style.display = 'none'; armModal.form.reset(); setCurrentTrade({}); } }
-
-
-
 
 export function openExecModal(trade) {
     const strategies = getStrategies();
@@ -36,20 +34,17 @@ export function openExecModal(trade) {
     execModal.assetNameSpan.textContent = trade.data.asset;
     execModal.strategyNameSpan.textContent = trade.data.strategyName;
     
-    const executionPhase = selectedStrategy.data.phases.find(p => p.id === 'execution');
+    // Pega a terceira fase (execution) pela ordem
+    const executionPhase = (selectedStrategy.data.phases && selectedStrategy.data.phases.length > 2) ? selectedStrategy.data.phases[2] : null;
     const phasesForChecklist = [];
     
     if (executionPhase) {
-        phasesForChecklist.push(executionPhase); // Passa a fase inteira
+        phasesForChecklist.push(executionPhase);
     }
     
-    // Converte o GESTAO_PADRAO para a nossa nova estrutura de fase
     const gestaoPhase = {
         title: GESTAO_PADRAO.title,
-        items: GESTAO_PADRAO.inputs.map(input => ({
-            ...input,
-            type: input.type // Garante que o tipo está presente
-        }))
+        items: GESTAO_PADRAO.inputs.map(input => ({ ...input, type: input.type }))
     };
     phasesForChecklist.push(gestaoPhase);
     
@@ -57,9 +52,6 @@ export function openExecModal(trade) {
     
     if (execModal.container) execModal.container.style.display = 'flex';
 }
-
-
-
 export function closeExecModal() { if (execModal.container) { execModal.container.style.display = 'none'; execModal.form.reset(); setCurrentTrade({}); } }
 
 export function openCloseTradeModal(trade) { setCurrentTrade({ id: trade.id, data: trade.data }); closeModalObj.assetNameSpan.textContent = trade.data.asset; if (closeModalObj.container) closeModalObj.container.style.display = 'flex'; }
