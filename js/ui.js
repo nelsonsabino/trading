@@ -1,10 +1,11 @@
-// js/ui.js - VERSÃO COM TEMA DINÂMICO NO GRÁFICO
+// js/ui.js - VERSÃO COM generateDynamicChecklist CORRIGIDO
 
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openImageModal } from './modals.js';
 import { loadAndOpenForEditing } from './handlers.js';
 import { isAndroid, isIOS } from './utils.js';
 
+// --- FUNÇÕES HELPER PARA CRIAR ELEMENTOS DE FORMULÁRIO ---
 function getIconForLabel(labelText) {
     const text = labelText.toLowerCase();
     if (text.includes('tendência')) return 'fa-solid fa-chart-line';
@@ -23,79 +24,77 @@ function getIconForLabel(labelText) {
     if (text.includes('alvo')) return 'fa-solid fa-crosshairs';
     return 'fa-solid fa-check';
 }
-function createChecklistItem(check, data) {
-    const isRequired = check.required === false ? '' : 'required';
-    const labelText = check.required === false ? check.label : `${check.label} <span class="required-asterisk">*</span>`;
-    const isChecked = data && data[check.id] ? 'checked' : '';
-    const item = document.createElement('div');
-    item.className = 'checklist-item';
-    item.innerHTML = `<i class="${getIconForLabel(check.label)}"></i><input type="checkbox" id="${check.id}" ${isChecked} ${isRequired}><label for="${check.id}">${labelText}</label>`;
-    return item;
+
+function createChecklistItem(item, data) {
+    const isRequired = item.required ? 'required' : '';
+    const labelText = item.required ? `${item.label} <span class="required-asterisk">*</span>` : item.label;
+    const isChecked = data && data[item.id] ? 'checked' : '';
+    const element = document.createElement('div');
+    element.className = 'checklist-item';
+    element.innerHTML = `<i class="${getIconForLabel(item.label)}"></i><input type="checkbox" id="${item.id}" ${isChecked} ${isRequired}><label for="${item.id}">${labelText}</label>`;
+    return element;
 }
-function createInputItem(input, data) {
-    const item = document.createElement('div');
-    item.className = 'input-item-styled'; 
-    const isRequired = input.required === false ? '' : 'required';
-    const labelText = input.required === false ? input.label : `${input.label} <span class="required-asterisk">*</span>`;
-    const value = data && data[input.id] ? data[input.id] : '';
+
+function createInputItem(item, data) {
+    const element = document.createElement('div');
+    element.className = 'input-item-styled'; 
+    const isRequired = item.required ? 'required' : '';
+    const labelText = item.required ? `${item.label} <span class="required-asterisk">*</span>` : item.label;
+    const value = data && data[item.id] ? data[item.id] : '';
     let fieldHtml = '';
-    if (input.type === 'select') {
-        const optionsHtml = input.options.map(opt => `<option value="${opt}" ${value === opt ? 'selected' : ''}>${opt}</option>`).join('');
-        fieldHtml = `<select id="${input.id}" ${isRequired} class="input-item-field"><option value="">-- Selecione --</option>${optionsHtml}</select>`;
+
+    if (item.type === 'select') {
+        const optionsHtml = item.options.map(opt => `<option value="${opt}" ${value === opt ? 'selected' : ''}>${opt}</option>`).join('');
+        fieldHtml = `<select id="${item.id}" ${isRequired} class="input-item-field"><option value="">-- Selecione --</option>${optionsHtml}</select>`;
     } else {
-        fieldHtml = `<input type="${input.type}" id="${input.id}" value="${value}" step="any" ${isRequired} class="input-item-field" placeholder="${input.placeholder || ''}">`;
+        fieldHtml = `<input type="${item.type}" id="${item.id}" value="${value}" step="any" ${isRequired} class="input-item-field" placeholder="${item.placeholder || ''}">`;
     }
-    item.innerHTML = `<i class="${getIconForLabel(input.label)}"></i><div style="flex-grow: 1;"><label for="${input.id}">${labelText}</label>${fieldHtml}</div>`;
-    return item;
-}
-function createRadioGroup(radioInfo, data) {
-    const group = document.createElement('div');
-    group.className = 'radio-group';
-    group.innerHTML = `<h4><i class="fa-solid fa-bullseye" style="margin-right: 10px; color: #007bff;"></i><strong>${radioInfo.label}</strong></h4>`;
-    const checkedValue = data && data[radioInfo.name];
-    radioInfo.options.forEach(opt => {
-        const isChecked = checkedValue === opt.id ? 'checked' : '';
-        const item = document.createElement('div');
-        item.className = 'checklist-item';
-        item.innerHTML = `<i class="${getIconForLabel(opt.label)}"></i><input type="radio" id="${opt.id}" name="${radioInfo.name}" value="${opt.id}" ${isChecked} required><label for="${opt.id}">${opt.label}</label>`;
-        group.appendChild(item);
-    });
-    return group;
+    element.innerHTML = `<i class="${getIconForLabel(item.label)}"></i><div style="flex-grow: 1;"><label for="${item.id}">${labelText}</label>${fieldHtml}</div>`;
+    return element;
 }
 
-
-
+// --- FUNÇÃO PRINCIPAL DE GERAÇÃO DE CHECKLIST (CORRIGIDA) ---
 export function generateDynamicChecklist(container, phases, data = {}) {
     container.innerHTML = '';
     if (!phases || phases.length === 0) return;
 
     phases.forEach(phase => {
-        if (!phase || !phase.items) return; // Verificação de segurança
+        // Verifica se a fase e os itens existem
+        if (!phase || !Array.isArray(phase.items)) return; 
         
         const phaseDiv = document.createElement('div');
         const titleEl = document.createElement('h4');
         titleEl.textContent = phase.title;
         phaseDiv.appendChild(titleEl);
 
-        // Agora iteramos sobre 'phase.items' em vez de 'phase.inputs' e 'phase.checks'
+        // Itera sobre o array 'items' da nossa nova estrutura de dados
         phase.items.forEach(item => {
-            if (item.type === 'select') {
-                phaseDiv.appendChild(createInputItem(item, data));
-            } else if (item.type === 'checkbox') {
-                phaseDiv.appendChild(createChecklistItem(item, data));
+            let element;
+            switch (item.type) {
+                case 'checkbox':
+                    element = createChecklistItem(item, data);
+                    break;
+                case 'select':
+                case 'text':
+                case 'number':
+                    element = createInputItem(item, data);
+                    break;
+                default:
+                    console.warn(`Tipo de item desconhecido: ${item.type}`);
             }
-            // (Adicione aqui 'else if' para 'text', 'number', etc. no futuro)
+            if (element) {
+                phaseDiv.appendChild(element);
+            }
         });
 
         container.appendChild(phaseDiv);
     });
 }
 
-
-export function populateStrategySelect(strategies) { // <-- AGORA RECEBE UM PARÂMETRO
+// --- OUTRAS FUNÇÕES ---
+export function populateStrategySelect(strategies) {
     if (!addModal.strategySelect) return;
     addModal.strategySelect.innerHTML = '<option value="">-- Selecione --</option>';
-    
     strategies.forEach(strategy => {
         const option = document.createElement('option');
         option.value = strategy.id;
@@ -103,7 +102,6 @@ export function populateStrategySelect(strategies) { // <-- AGORA RECEBE UM PAR�
         addModal.strategySelect.appendChild(option);
     });
 }
-
 
 export function createTradeCard(trade) {
     const card = document.createElement('div');
