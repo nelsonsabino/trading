@@ -1,6 +1,6 @@
-// js/strategies-manager.js - VERSÃO FINAL COM LÓGICA DE GUARDAR
+// js/strategies-manager.js - VERSÃO FINAL COM EDIÇÃO
 
-import { listenToStrategies, deleteStrategy, addStrategy, updateStrategy } from './firebase-service.js';
+import { listenToStrategies, deleteStrategy, addStrategy, updateStrategy, getStrategy } from './firebase-service.js';
 
 // --- ELEMENTOS DO DOM ---
 const strategiesContainer = document.getElementById('strategies-container');
@@ -28,11 +28,29 @@ function openStrategyModal(strategy = null) {
     strategyModal.form.reset();
     strategyModal.phasesContainer.innerHTML = '';
     
-    if (strategy) {
+    if (strategy && strategy.data) {
         editingStrategyId = strategy.id;
-        strategyModal.title.textContent = `Editar Estratégia: ${strategy.data.name}`;
+        strategyModal.title.textContent = `Editar Estratégia`;
         strategyModal.nameInput.value = strategy.data.name;
-        // (A lógica de preenchimento para edição será implementada a seguir)
+        
+        strategy.data.phases.forEach(phase => {
+            const phaseBlock = addPhaseBlock();
+            phaseBlock.querySelector('.phase-id').value = phase.id;
+            phaseBlock.querySelector('.phase-title').value = phase.title;
+
+            const itemsListContainer = phaseBlock.querySelector('.items-list');
+            phase.items.forEach(item => {
+                const itemBlock = createItemBlock(item.type);
+                itemBlock.querySelector('.item-id').value = item.id;
+                itemBlock.querySelector('.item-label').value = item.label;
+                itemBlock.querySelector('.item-required').checked = item.required;
+
+                if (item.type === 'select' && item.options) {
+                    itemBlock.querySelector('.item-options').value = item.options.join(', ');
+                }
+                itemsListContainer.appendChild(itemBlock);
+            });
+        });
     } else {
         editingStrategyId = null;
         strategyModal.title.textContent = 'Criar Nova Estratégia';
@@ -119,6 +137,7 @@ function addPhaseBlock() {
     });
 
     strategyModal.phasesContainer.appendChild(phaseDiv);
+    return phaseDiv;
 }
 
 function buildStrategyDataFromForm() {
@@ -258,8 +277,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             } else if (editButton) {
-                // (Ainda não implementado, apenas abre o modal vazio)
-                openStrategyModal(); 
+                const strategyId = editButton.dataset.id;
+                const strategy = await getStrategy(strategyId);
+                if (strategy) {
+                    openStrategyModal(strategy);
+                } else {
+                    alert('Não foi possível encontrar a estratégia para editar.');
+                }
             }
         });
     }
