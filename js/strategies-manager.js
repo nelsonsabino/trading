@@ -1,4 +1,4 @@
-// js/strategies-manager.js - VERSÃO COM CONSTRUTOR COMPLETO
+// js/strategies-manager.js - VERSÃO COM FASES AUTOMÁTICAS
 
 import { listenToStrategies, deleteStrategy, addStrategy, updateStrategy, getStrategy } from './firebase-service.js';
 
@@ -29,7 +29,6 @@ function openStrategyModal(strategy = null) {
     strategyModal.phasesContainer.innerHTML = '';
     
     if (strategy && strategy.data) {
-        // MODO EDIÇÃO
         editingStrategyId = strategy.id;
         strategyModal.title.textContent = `Editar Estratégia`;
         strategyModal.nameInput.value = strategy.data.name;
@@ -37,8 +36,7 @@ function openStrategyModal(strategy = null) {
         if (strategy.data.phases && Array.isArray(strategy.data.phases)) {
             strategy.data.phases.forEach(phase => {
                 const phaseBlock = addPhaseBlock();
-                phaseBlock.querySelector('.phase-id').value = phase.id || '';
-                phaseBlock.querySelector('.phase-title').value = phase.title || '';
+                if (!phaseBlock) return; // Não adiciona mais de 3 fases
 
                 const itemsListContainer = phaseBlock.querySelector('.items-list');
                 if (phase.items && Array.isArray(phase.items)) {
@@ -57,22 +55,17 @@ function openStrategyModal(strategy = null) {
             });
         }
     } else {
-        // MODO CRIAÇÃO
         editingStrategyId = null;
         strategyModal.title.textContent = 'Criar Nova Estratégia';
     }
     strategyModal.container.style.display = 'flex';
 }
 
-function closeStrategyModal() {
-    strategyModal.container.style.display = 'none';
-}
-
+function closeStrategyModal() { strategyModal.container.style.display = 'none'; }
 function openAddItemModal(targetContainer) {
     currentPhaseItemsContainer = targetContainer;
     addItemModal.container.style.display = 'flex';
 }
-
 function closeAddItemModal() {
     currentPhaseItemsContainer = null;
     addItemModal.container.style.display = 'none';
@@ -85,7 +78,6 @@ function createItemBlock(type) {
     itemDiv.className = 'phase-block';
     itemDiv.style.backgroundColor = '#fff';
     itemDiv.dataset.type = type;
-
     let fieldsHtml = `
         <div class="phase-block-header">
             <h5>Item: ${type.charAt(0).toUpperCase() + type.slice(1)}</h5>
@@ -100,16 +92,9 @@ function createItemBlock(type) {
             <label style="margin: 0;">Obrigatório?</label>
         </div>
     `;
-
     if (type === 'select') {
-        fieldsHtml += `
-            <div class="input-item">
-                <label>Opções (separadas por vírgula)</label>
-                <input type="text" class="item-options" placeholder="Ex: Opção 1, Opção 2">
-            </div>
-        `;
+        fieldsHtml += `<div class="input-item"><label>Opções (separadas por vírgula)</label><input type="text" class="item-options" placeholder="Ex: Opção 1, Opção 2"></div>`;
     }
-
     itemDiv.innerHTML = fieldsHtml;
     itemDiv.querySelector('.delete-btn').addEventListener('click', () => itemDiv.remove());
     return itemDiv;
@@ -117,17 +102,25 @@ function createItemBlock(type) {
 
 function addPhaseBlock() {
     const phaseIndex = strategyModal.phasesContainer.children.length;
+    const phaseTitles = ["Fase Potencial", "Fase Armada", "Fase de Execução"];
+    const phaseIds = ["potential", "armed", "execution"];
+    
+    if (phaseIndex >= phaseIds.length) {
+        alert("Só pode adicionar um máximo de 3 fases.");
+        return null;
+    }
+    
+    const phaseTitle = phaseTitles[phaseIndex];
+    const phaseId = phaseIds[phaseIndex];
 
     const phaseDiv = document.createElement('div');
     phaseDiv.className = 'phase-block';
+    phaseDiv.dataset.phaseId = phaseId;
+
     phaseDiv.innerHTML = `
         <div class="phase-block-header">
-            <h5>Fase ${phaseIndex + 1}</h5>
+            <h5>${phaseTitle}</h5>
             <button type="button" class="btn delete-btn" style="padding: 4px 8px; font-size: 0.8em;">Remover Fase</button>
-        </div>
-        <div class="form-row">
-            <div class="input-item"><label>ID da Fase</label><input type="text" class="phase-id" required placeholder="potential, armed..."></div>
-            <div class="input-item"><label>Título da Fase</label><input type="text" class="phase-title" required></div>
         </div>
         <div class="phase-items-container">
             <h6>Itens da Checklist</h6>
@@ -139,7 +132,6 @@ function addPhaseBlock() {
     `;
 
     phaseDiv.querySelector('.delete-btn').addEventListener('click', () => phaseDiv.remove());
-    
     phaseDiv.querySelector('.add-item-btn').addEventListener('click', (e) => {
         const itemsContainer = e.target.closest('.phase-items-container').querySelector('.items-list');
         openAddItemModal(itemsContainer);
@@ -150,20 +142,16 @@ function addPhaseBlock() {
 }
 
 function buildStrategyDataFromForm() {
-    const strategyData = {
-        name: strategyModal.nameInput.value.trim(),
-        phases: []
-    };
-
+    const strategyData = { name: strategyModal.nameInput.value.trim(), phases: [] };
+    const phaseTitles = ["Fase Potencial", "Fase Armada", "Fase de Execução"];
+    
     const phaseBlocks = strategyModal.phasesContainer.querySelectorAll(':scope > .phase-block');
-
-    phaseBlocks.forEach(phaseBlock => {
+    phaseBlocks.forEach((phaseBlock, index) => {
         const phaseObject = {
-            id: phaseBlock.querySelector('.phase-id').value.trim(),
-            title: phaseBlock.querySelector('.phase-title').value.trim(),
+            id: phaseBlock.dataset.phaseId,
+            title: phaseTitles[index], // Usa o título correspondente à ordem
             items: []
         };
-
         const itemBlocks = phaseBlock.querySelectorAll('.items-list .phase-block');
         itemBlocks.forEach(itemBlock => {
             const itemObject = {
@@ -172,27 +160,20 @@ function buildStrategyDataFromForm() {
                 label: itemBlock.querySelector('.item-label').value.trim(),
                 required: itemBlock.querySelector('.item-required').checked
             };
-
             if (itemObject.type === 'select') {
                 const optionsInput = itemBlock.querySelector('.item-options');
-                if (optionsInput) {
-                    itemObject.options = optionsInput.value.split(',').map(opt => opt.trim()).filter(Boolean);
-                }
+                if (optionsInput) itemObject.options = optionsInput.value.split(',').map(opt => opt.trim()).filter(Boolean);
             }
-
             phaseObject.items.push(itemObject);
         });
-
         strategyData.phases.push(phaseObject);
     });
-
     return strategyData;
 }
 
 async function handleSaveStrategy(e) {
     e.preventDefault();
     const strategyData = buildStrategyDataFromForm();
-
     try {
         if (editingStrategyId) {
             await updateStrategy(editingStrategyId, strategyData);
@@ -213,7 +194,6 @@ async function handleSaveStrategy(e) {
 function createStrategyCard(strategy) {
     const phaseCount = strategy.data.phases ? strategy.data.phases.length : 0;
     const date = strategy.data.createdAt?.toDate().toLocaleDateString('pt-PT') || 'N/A';
-
     return `
         <div class="trade-card">
             <h3>${strategy.data.name}</h3>
