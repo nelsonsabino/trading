@@ -1,4 +1,4 @@
-// js/strategies-manager.js - VERSÃO FINAL COM FUNCIONALIDADE DE EDITAR COMPLETA
+// js/strategies-manager.js - VERSÃO COM CONSTRUTOR COMPLETO
 
 import { listenToStrategies, deleteStrategy, addStrategy, updateStrategy, getStrategy } from './firebase-service.js';
 
@@ -29,15 +29,14 @@ function openStrategyModal(strategy = null) {
     strategyModal.phasesContainer.innerHTML = '';
     
     if (strategy && strategy.data) {
-        // --- MODO EDIÇÃO ---
+        // MODO EDIÇÃO
         editingStrategyId = strategy.id;
         strategyModal.title.textContent = `Editar Estratégia`;
         strategyModal.nameInput.value = strategy.data.name;
         
-        // Preenche as fases e itens existentes
         if (strategy.data.phases && Array.isArray(strategy.data.phases)) {
             strategy.data.phases.forEach(phase => {
-                const phaseBlock = addPhaseBlock(); // Adiciona um bloco de fase visual
+                const phaseBlock = addPhaseBlock();
                 phaseBlock.querySelector('.phase-id').value = phase.id || '';
                 phaseBlock.querySelector('.phase-title').value = phase.title || '';
 
@@ -58,19 +57,22 @@ function openStrategyModal(strategy = null) {
             });
         }
     } else {
-        // --- MODO CRIAÇÃO ---
+        // MODO CRIAÇÃO
         editingStrategyId = null;
         strategyModal.title.textContent = 'Criar Nova Estratégia';
     }
     strategyModal.container.style.display = 'flex';
 }
+
 function closeStrategyModal() {
     strategyModal.container.style.display = 'none';
 }
+
 function openAddItemModal(targetContainer) {
     currentPhaseItemsContainer = targetContainer;
     addItemModal.container.style.display = 'flex';
 }
+
 function closeAddItemModal() {
     currentPhaseItemsContainer = null;
     addItemModal.container.style.display = 'none';
@@ -150,7 +152,6 @@ function addPhaseBlock() {
 function buildStrategyDataFromForm() {
     const strategyData = {
         name: strategyModal.nameInput.value.trim(),
-        isActive: true,
         phases: []
     };
 
@@ -202,7 +203,7 @@ async function handleSaveStrategy(e) {
         }
         closeStrategyModal();
     } catch (error) {
-        alert('Ocorreu um erro ao guardar a estratégia. Verifique a consola.');
+        alert('Ocorreu um erro ao guardar a estratégia.');
         console.error("Erro ao guardar estratégia:", error);
     }
 }
