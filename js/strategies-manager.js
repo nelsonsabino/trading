@@ -1,4 +1,4 @@
-// js/strategies-manager.js - VERSÃO COM CORREÇÃO DO SELETOR
+// js/strategies-manager.js - VERSÃO FINAL COM FUNCIONALIDADE DE EDITAR COMPLETA
 
 import { listenToStrategies, deleteStrategy, addStrategy, updateStrategy, getStrategy } from './firebase-service.js';
 
@@ -29,29 +29,36 @@ function openStrategyModal(strategy = null) {
     strategyModal.phasesContainer.innerHTML = '';
     
     if (strategy && strategy.data) {
+        // --- MODO EDIÇÃO ---
         editingStrategyId = strategy.id;
         strategyModal.title.textContent = `Editar Estratégia`;
         strategyModal.nameInput.value = strategy.data.name;
         
-        strategy.data.phases.forEach(phase => {
-            const phaseBlock = addPhaseBlock();
-            phaseBlock.querySelector('.phase-id').value = phase.id;
-            phaseBlock.querySelector('.phase-title').value = phase.title;
+        // Preenche as fases e itens existentes
+        if (strategy.data.phases && Array.isArray(strategy.data.phases)) {
+            strategy.data.phases.forEach(phase => {
+                const phaseBlock = addPhaseBlock(); // Adiciona um bloco de fase visual
+                phaseBlock.querySelector('.phase-id').value = phase.id || '';
+                phaseBlock.querySelector('.phase-title').value = phase.title || '';
 
-            const itemsListContainer = phaseBlock.querySelector('.items-list');
-            phase.items.forEach(item => {
-                const itemBlock = createItemBlock(item.type);
-                itemBlock.querySelector('.item-id').value = item.id;
-                itemBlock.querySelector('.item-label').value = item.label;
-                itemBlock.querySelector('.item-required').checked = item.required;
+                const itemsListContainer = phaseBlock.querySelector('.items-list');
+                if (phase.items && Array.isArray(phase.items)) {
+                    phase.items.forEach(item => {
+                        const itemBlock = createItemBlock(item.type);
+                        itemBlock.querySelector('.item-id').value = item.id || '';
+                        itemBlock.querySelector('.item-label').value = item.label || '';
+                        itemBlock.querySelector('.item-required').checked = item.required || false;
 
-                if (item.type === 'select' && item.options) {
-                    itemBlock.querySelector('.item-options').value = item.options.join(', ');
+                        if (item.type === 'select' && item.options) {
+                            itemBlock.querySelector('.item-options').value = item.options.join(', ');
+                        }
+                        itemsListContainer.appendChild(itemBlock);
+                    });
                 }
-                itemsListContainer.appendChild(itemBlock);
             });
-        });
+        }
     } else {
+        // --- MODO CRIAÇÃO ---
         editingStrategyId = null;
         strategyModal.title.textContent = 'Criar Nova Estratégia';
     }
@@ -147,9 +154,6 @@ function buildStrategyDataFromForm() {
         phases: []
     };
 
-    // --- CORREÇÃO APLICADA AQUI ---
-    // Usamos o seletor de filho direto ('>') para apanhar apenas os blocos de fase,
-    // e não os blocos de item que estão aninhados.
     const phaseBlocks = strategyModal.phasesContainer.querySelectorAll(':scope > .phase-block');
 
     phaseBlocks.forEach(phaseBlock => {
