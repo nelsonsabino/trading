@@ -244,3 +244,42 @@ export async function fetchActiveStrategies() {
         return []; // Retorna um array vazio em caso de erro
     }
 }
+
+
+
+// firebase-service.js
+
+// ... (funções existentes) ...
+
+/**
+ * Adiciona um novo documento de estratégia à coleção 'strategies'.
+ * @param {object} strategyData - O objeto JSON que descreve a estratégia.
+ */
+export async function addStrategy(strategyData) {
+    try {
+        const dataToSave = {
+            ...strategyData,
+            createdAt: new Date(), // Adiciona o timestamp no momento da criação
+            isActive: true
+        };
+        await addDoc(collection(db, 'strategies'), dataToSave);
+    } catch (error) {
+        console.error("Erro no serviço ao adicionar estratégia:", error);
+        throw error;
+    }
+}
+
+/**
+ * Atualiza um documento de estratégia existente.
+ * @param {string} strategyId - O ID do documento a ser atualizado.
+ * @param {object} strategyData - O objeto JSON com os novos dados da estratégia.
+ */
+export async function updateStrategy(strategyId, strategyData) {
+    try {
+        const strategyRef = doc(db, 'strategies', strategyId);
+        await updateDoc(strategyRef, strategyData);
+    } catch (error) {
+        console.error("Erro no serviço ao atualizar estratégia:", error);
+        throw error;
+    }
+}
