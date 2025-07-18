@@ -1,7 +1,10 @@
 // js/state.js
 
+// Declaração ÚNICA das variáveis de estado no topo.
 let currentTrade = {};
+let strategies = [];
 
+// Funções para gerir o trade atual
 export function getCurrentTrade() {
     return currentTrade;
 }
@@ -10,12 +13,11 @@ export function setCurrentTrade(trade) {
     currentTrade = trade;
 }
 
-let currentTrade = {};
-let strategies = []; // <-- NOVA VARIÁVEL GLOBAL
+// Funções para gerir as estratégias carregadas
+export function getStrategies() {
+    return strategies;
+}
 
-export function getCurrentTrade() { return currentTrade; }
-export function setCurrentTrade(trade) { currentTrade = trade; }
-
-// --- NOVAS FUNÇÕES ---
-export function getStrategies() { return strategies; }
-export function setCurrentStrategies(loadedStrategies) { strategies = loadedStrategies; }
+export function setCurrentStrategies(loadedStrategies) {
+    strategies = loadedStrategies;
+}
