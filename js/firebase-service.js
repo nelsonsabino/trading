@@ -8,13 +8,13 @@ import {
     doc, 
     updateDoc, 
     getDoc, 
-    getDocs,
     deleteDoc,
-    where,
     query, 
     orderBy, 
     onSnapshot, 
-    runTransaction 
+    runTransaction,
+    getDocs,
+    where
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 import { firebaseConfig } from './config.js';
 
@@ -148,7 +148,6 @@ export async function closeTradeAndUpdateBalance(tradeId, closeDetails) {
 
 export function listenToStrategies(callback) {
     const q = query(collection(db, 'strategies'), orderBy('createdAt', 'desc'));
-
     onSnapshot(q, (snapshot) => {
         const strategies = [];
         snapshot.forEach(docSnapshot => {
@@ -161,58 +160,6 @@ export function listenToStrategies(callback) {
     });
 }
 
-export async function deleteStrategy(strategyId) {
-    try {
-        const strategyRef = doc(db, 'strategies', strategyId);
-        await deleteDoc(strategyRef);
-    } catch (error) {
-        console.error("Erro no serviço ao apagar estratégia:", error);
-        throw error;
-    }
-}
-
-
-
-/**
- * Adiciona um novo documento de estratégia à coleção 'strategies'.
- * @param {object} strategyData - O objeto JSON que descreve a estratégia.
- */
-export async function addStrategy(strategyData) {
-    try {
-        // Adiciona um timestamp de criação do lado do servidor
-        const dataToSave = {
-            ...strategyData,
-            createdAt: new Date()
-        };
-        await addDoc(collection(db, 'strategies'), dataToSave);
-    } catch (error) {
-        console.error("Erro no serviço ao adicionar estratégia:", error);
-        throw error;
-    }
-}
-
-/**
- * Atualiza um documento de estratégia existente.
- * @param {string} strategyId - O ID do documento a ser atualizado.
- * @param {object} strategyData - O objeto JSON com os novos dados da estratégia.
- */
-export async function updateStrategy(strategyId, strategyData) {
-    try {
-        const strategyRef = doc(db, 'strategies', strategyId);
-        await updateDoc(strategyRef, strategyData);
-    } catch (error) {
-        console.error("Erro no serviço ao atualizar estratégia:", error);
-        throw error;
-    }
-}
-
-
-
-/**
- * Busca os dados de um único documento de estratégia.
- * @param {string} strategyId - O ID do documento a ser buscado.
- * @returns {object|null} O objeto da estratégia ou nulo se não for encontrado.
- */
 export async function getStrategy(strategyId) {
     try {
         const docSnap = await getDoc(doc(db, 'strategies', strategyId));
@@ -223,12 +170,6 @@ export async function getStrategy(strategyId) {
     }
 }
 
-
-
-/**
- * Busca todas as estratégias ativas da base de dados UMA ÚNICA VEZ.
- * @returns {Array} Um array de objetos de estratégia.
- */
 export async function fetchActiveStrategies() {
     try {
         const q = query(collection(db, 'strategies'), where("isActive", "==", true), orderBy('createdAt', 'desc'));
@@ -241,25 +182,15 @@ export async function fetchActiveStrategies() {
         return strategies;
     } catch (error) {
         console.error("Erro ao buscar estratégias ativas:", error);
-        return []; // Retorna um array vazio em caso de erro
+        return [];
     }
 }
 
-
-
-// firebase-service.js
-
-// ... (funções existentes) ...
-
-/**
- * Adiciona um novo documento de estratégia à coleção 'strategies'.
- * @param {object} strategyData - O objeto JSON que descreve a estratégia.
- */
 export async function addStrategy(strategyData) {
     try {
         const dataToSave = {
             ...strategyData,
-            createdAt: new Date(), // Adiciona o timestamp no momento da criação
+            createdAt: new Date(),
             isActive: true
         };
         await addDoc(collection(db, 'strategies'), dataToSave);
@@ -269,17 +200,22 @@ export async function addStrategy(strategyData) {
     }
 }
 
-/**
- * Atualiza um documento de estratégia existente.
- * @param {string} strategyId - O ID do documento a ser atualizado.
- * @param {object} strategyData - O objeto JSON com os novos dados da estratégia.
- */
 export async function updateStrategy(strategyId, strategyData) {
     try {
         const strategyRef = doc(db, 'strategies', strategyId);
         await updateDoc(strategyRef, strategyData);
     } catch (error) {
         console.error("Erro no serviço ao atualizar estratégia:", error);
+        throw error;
+    }
+}
+
+export async function deleteStrategy(strategyId) {
+    try {
+        const strategyRef = doc(db, 'strategies', strategyId);
+        await deleteDoc(strategyRef);
+    } catch (error) {
+        console.error("Erro no serviço ao apagar estratégia:", error);
         throw error;
     }
 }
