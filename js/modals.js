@@ -2,7 +2,6 @@
 
 import { addModal, armModal, execModal, closeModalObj, imageModal, modalImg } from './dom-elements.js';
 import { generateDynamicChecklist } from './ui.js';
-import { STRATEGIES } from './strategies.js';
 import { GESTAO_PADRAO } from './config.js';
 import { setCurrentTrade } from './state.js';
 
