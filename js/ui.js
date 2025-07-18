@@ -92,15 +92,20 @@ export function generateDynamicChecklist(container, phases, data = {}) {
 }
 
 // --- OUTRAS FUNÇÕES ---
+
 export function populateStrategySelect(strategies) {
     if (!addModal.strategySelect) return;
-    addModal.strategySelect.innerHTML = '<option value="">-- Selecione --</option>';
-    strategies.forEach(strategy => {
-        const option = document.createElement('option');
-        option.value = strategy.id;
-        option.textContent = strategy.data.name;
-        addModal.strategySelect.appendChild(option);
-    });
+    addModal.strategySelect.innerHTML = '<option value="">-- Selecione uma Estratégia --</option>'; // Texto melhorado
+    
+    // Adiciona uma verificação para garantir que 'strategies' é um array
+    if (strategies && Array.isArray(strategies)) {
+        strategies.forEach(strategy => {
+            const option = document.createElement('option');
+            option.value = strategy.id;
+            option.textContent = strategy.data.name;
+            addModal.strategySelect.appendChild(option);
+        });
+    }
 }
 
 export function createTradeCard(trade) {
