@@ -477,7 +477,7 @@ footer { text-align: center; padding: 1rem 0; margin-top: 2rem; color: #6c757d; 
 
 /* --- DARK MODE STYLES --- */
 
-body.dark-mode {
+.dark-mode {
     background-color: #121212;
     color: #e0e0e0;
 }
