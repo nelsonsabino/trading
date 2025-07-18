@@ -1,4 +1,4 @@
-// js/handlers.js - VERSÃO COM ESTRATÉGIAS DINÂMICAS
+// js/handlers.js - VERSÃO COM LÓGICA DE FASES ROBUSTA
 
 import { addModal } from './dom-elements.js';
 import { GESTAO_PADRAO } from './config.js';
@@ -23,7 +23,9 @@ export async function handleAddSubmit(e) {
     }
     
     const checklistData = {};
-    const potentialPhase = selectedStrategy.data.phases.find(p => p.id === 'potential');
+    // Pega a primeira fase (potential) pela ordem
+    const potentialPhase = (selectedStrategy.data.phases && selectedStrategy.data.phases.length > 0) ? selectedStrategy.data.phases[0] : null;
+    
     if (potentialPhase && potentialPhase.items) {
         potentialPhase.items.forEach(item => {
             const element = document.getElementById(item.id);
@@ -73,7 +75,9 @@ export async function handleArmSubmit(e) {
     if (!selectedStrategy) return;
 
     const checklistData = {};
-    const armedPhase = selectedStrategy.data.phases.find(p => p.id === 'armed');
+    // Pega a segunda fase (armed) pela ordem
+    const armedPhase = (selectedStrategy.data.phases && selectedStrategy.data.phases.length > 1) ? selectedStrategy.data.phases[1] : null;
+
     if (armedPhase && armedPhase.items) {
         armedPhase.items.forEach(item => {
             const element = document.getElementById(item.id);
@@ -96,9 +100,9 @@ export async function handleExecSubmit(e) {
     if (!selectedStrategy) return;
 
     const executionData = {};
-    const executionPhase = selectedStrategy.data.phases.find(p => p.id === 'execution');
+    // Pega a terceira fase (execution) pela ordem
+    const executionPhase = (selectedStrategy.data.phases && selectedStrategy.data.phases.length > 2) ? selectedStrategy.data.phases[2] : null;
     
-    // Processa os itens da fase de execução da nossa estratégia dinâmica
     if (executionPhase && executionPhase.items) {
         executionPhase.items.forEach(item => {
             const element = document.getElementById(item.id);
@@ -108,7 +112,6 @@ export async function handleExecSubmit(e) {
         });
     }
 
-    // Processa os itens da gestão padrão estática
     GESTAO_PADRAO.inputs.forEach(input => {
         const element = document.getElementById(input.id);
         if(element) {
@@ -155,7 +158,8 @@ export async function loadAndOpenForEditing(tradeId) {
         if (trade.data.status === 'POTENTIAL') {
             openAddModal();
             addModal.strategySelect.value = trade.data.strategyId;
-            const potentialPhase = selectedStrategy.data.phases.find(p => p.id === 'potential');
+            // Pega a primeira fase (potential) pela ordem
+            const potentialPhase = (selectedStrategy.data.phases && selectedStrategy.data.phases.length > 0) ? selectedStrategy.data.phases[0] : null;
             generateDynamicChecklist(addModal.checklistContainer, [potentialPhase], trade.data.potentialSetup);
             
             const modalAssetInput = document.getElementById('asset');
