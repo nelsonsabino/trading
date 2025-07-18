@@ -1,4 +1,4 @@
-// js/strategies-manager.js - VERSÃO FINAL COM EDIÇÃO
+// js/strategies-manager.js - VERSÃO COM CORREÇÃO DO SELETOR
 
 import { listenToStrategies, deleteStrategy, addStrategy, updateStrategy, getStrategy } from './firebase-service.js';
 
@@ -147,7 +147,11 @@ function buildStrategyDataFromForm() {
         phases: []
     };
 
-    const phaseBlocks = strategyModal.phasesContainer.querySelectorAll('.phase-block');
+    // --- CORREÇÃO APLICADA AQUI ---
+    // Usamos o seletor de filho direto ('>') para apanhar apenas os blocos de fase,
+    // e não os blocos de item que estão aninhados.
+    const phaseBlocks = strategyModal.phasesContainer.querySelectorAll(':scope > .phase-block');
+
     phaseBlocks.forEach(phaseBlock => {
         const phaseObject = {
             id: phaseBlock.querySelector('.phase-id').value.trim(),
