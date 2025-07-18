@@ -1,6 +1,5 @@
 // js/ui.js - VERSÃO COM TEMA DINÂMICO NO GRÁFICO
 
-import { STRATEGIES } from './strategies.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openImageModal } from './modals.js';
 import { loadAndOpenForEditing } from './handlers.js';
