@@ -1,46 +1,49 @@
-// js/handlers.js (VERSÃO COM REDIRECIONAMENTO RESTAURADO)
+// js/handlers.js - VERSÃO COM ESTRATÉGIAS DINÂMICAS
 
 import { addModal } from './dom-elements.js';
-import { STRATEGIES } from './strategies.js';
 import { GESTAO_PADRAO } from './config.js';
 import { getTrade, addTrade, updateTrade, closeTradeAndUpdateBalance } from './firebase-service.js';
-import { getCurrentTrade, setCurrentTrade } from './state.js';
+import { getCurrentTrade, setCurrentTrade, getStrategies } from './state.js';
 import { closeAddModal, closeArmModal, closeExecModal, closeCloseTradeModal, openAddModal, openArmModal, openExecModal } from './modals.js';
 import { generateDynamicChecklist } from './ui.js';
 
-
-
-
-
-
 export async function handleAddSubmit(e) {
     e.preventDefault();
-
-    // --- LÓGICA DE REDIRECIONAMENTO (LIDA PRIMEIRO) ---
-    // Capturamos o estado da checkbox e o nome do ativo ANTES de qualquer outra coisa.
-    const redirectToAlarmCheckbox = document.getElementById('redirect-to-alarm-checkbox');
-    const shouldRedirect = redirectToAlarmCheckbox.checked;
+    
+    // Pega as estratégias do novo estado global
+    const strategies = getStrategies();
+    
     const assetInput = document.getElementById('asset');
     const assetName = assetInput.value.trim().toUpperCase();
-
-    // --- RECOLHA DE DADOS E GUARDAR NO FIREBASE ---
     const strategyId = addModal.strategySelect.value;
+    
+    const selectedStrategy = strategies.find(s => s.id === strategyId);
+    if (!selectedStrategy) {
+        alert("Por favor, selecione uma estratégia válida.");
+        return;
+    }
+    
     const checklistData = {};
-    if (STRATEGIES[strategyId] && STRATEGIES[strategyId].potentialPhases) {
-        STRATEGIES[strategyId].potentialPhases.forEach(p => {
-            if (p.inputs) p.inputs.forEach(i => checklistData[i.id] = document.getElementById(i.id).value);
-            if (p.checks) p.checks.forEach(c => checklistData[c.id] = document.getElementById(c.id).checked);
+    const potentialPhase = selectedStrategy.data.phases.find(p => p.id === 'potential');
+    if (potentialPhase && potentialPhase.items) {
+        potentialPhase.items.forEach(item => {
+            const element = document.getElementById(item.id);
+            if (element) {
+                checklistData[item.id] = item.type === 'checkbox' ? element.checked : element.value;
+            }
         });
     }
+
     const tradeData = {
         asset: assetName,
         imageUrl: document.getElementById('image-url').value,
         notes: document.getElementById('notes').value,
         strategyId: strategyId,
-        strategyName: STRATEGIES[strategyId]?.name || 'N/A',
+        strategyName: selectedStrategy.data.name || 'N/A',
         status: "POTENTIAL",
         potentialSetup: checklistData
     };
+
     const currentTrade = getCurrentTrade();
     if (currentTrade.id) {
         tradeData.dateAdded = currentTrade.data.dateAdded;
@@ -50,12 +53,10 @@ export async function handleAddSubmit(e) {
         await addTrade(tradeData);
     }
     
-    // --- FINALIZAÇÃO E REDIRECIONAMENTO ---
-    // Agora que os dados estão guardados, fechamos o modal.
     closeAddModal();
 
-    // E finalmente, se a checkbox ESTAVA marcada, fazemos o redirecionamento.
-    if (shouldRedirect) {
+    const redirectToAlarmCheckbox = document.getElementById('redirect-to-alarm-checkbox');
+    if (redirectToAlarmCheckbox && redirectToAlarmCheckbox.checked) {
         if (assetName) {
             window.location.href = `alarms.html?assetPair=${assetName}`;
         } else {
@@ -64,37 +65,52 @@ export async function handleAddSubmit(e) {
     }
 }
 
-
-
-
-
 export async function handleArmSubmit(e) {
     e.preventDefault();
+    const strategies = getStrategies();
     const currentTrade = getCurrentTrade();
+    
+    const selectedStrategy = strategies.find(s => s.id === currentTrade.data.strategyId);
+    if (!selectedStrategy) return;
+
     const checklistData = {};
-    const strategy = STRATEGIES[currentTrade.data.strategyId];
-    strategy.armedPhases.forEach(p => {
-        if (p.inputs) p.inputs.forEach(i => checklistData[i.id] = document.getElementById(i.id).value);
-        if (p.checks) p.checks.forEach(c => checklistData[c.id] = document.getElementById(c.id).checked);
-    });
+    const armedPhase = selectedStrategy.data.phases.find(p => p.id === 'armed');
+    if (armedPhase && armedPhase.items) {
+        armedPhase.items.forEach(item => {
+            const element = document.getElementById(item.id);
+            if (element) {
+                checklistData[item.id] = item.type === 'checkbox' ? element.checked : element.value;
+            }
+        });
+    }
+
     await updateTrade(currentTrade.id, { status: "ARMED", armedSetup: checklistData, dateArmed: new Date() });
     closeArmModal();
 }
 
 export async function handleExecSubmit(e) {
     e.preventDefault();
+    const strategies = getStrategies();
     const currentTrade = getCurrentTrade();
+    
+    const selectedStrategy = strategies.find(s => s.id === currentTrade.data.strategyId);
+    if (!selectedStrategy) return;
+
     const executionData = {};
-    const strategy = STRATEGIES[currentTrade.data.strategyId];
-    const phasesToProcess = [...(strategy.executionPhases || []), GESTAO_PADRAO];
+    const executionPhase = selectedStrategy.data.phases.find(p => p.id === 'execution');
+    const phasesToProcess = [];
+    
+    if (executionPhase && executionPhase.items) {
+        // Converte a nossa estrutura para a estrutura que generateDynamicChecklist espera
+        phasesToProcess.push({ title: executionPhase.title, inputs: executionPhase.items.filter(i => i.type !== 'checkbox'), checks: executionPhase.items.filter(i => i.type === 'checkbox') });
+    }
+    phasesToProcess.push(GESTAO_PADRAO); // Adiciona a gestão padrão
+
     phasesToProcess.forEach(p => {
         if (p.inputs) p.inputs.forEach(i => executionData[i.id] = document.getElementById(i.id).value);
         if (p.checks) p.checks.forEach(c => executionData[c.id] = document.getElementById(c.id).checked);
-        if (p.radios) {
-            const checkedRadio = document.querySelector(`input[name="${p.radios.name}"]:checked`);
-            executionData[p.radios.name] = checkedRadio ? checkedRadio.value : null;
-        }
     });
+
     await updateTrade(currentTrade.id, { status: "LIVE", executionDetails: executionData, dateExecuted: new Date() });
     closeExecModal();
 }
@@ -124,20 +140,24 @@ export async function handleCloseSubmit(e) {
 }
 
 export async function loadAndOpenForEditing(tradeId) {
+    const strategies = getStrategies();
     const trade = await getTrade(tradeId);
     if (trade) {
         setCurrentTrade(trade);
+        const selectedStrategy = strategies.find(s => s.id === trade.data.strategyId);
+        if (!selectedStrategy) return;
+
         if (trade.data.status === 'POTENTIAL') {
             openAddModal();
             addModal.strategySelect.value = trade.data.strategyId;
-            generateDynamicChecklist(addModal.checklistContainer, STRATEGIES[trade.data.strategyId]?.potentialPhases, trade.data.potentialSetup);
+            const potentialPhase = selectedStrategy.data.phases.find(p => p.id === 'potential');
+            generateDynamicChecklist(addModal.checklistContainer, [potentialPhase], trade.data.potentialSetup);
             
             const modalAssetInput = document.getElementById('asset');
             modalAssetInput.value = trade.data.asset;
-            modalAssetInput.dispatchEvent(new Event('input', { bubbles: true }));
-
             document.getElementById('image-url').value = trade.data.imageUrl || '';
             document.getElementById('notes').value = trade.data.notes;
+
         } else if (trade.data.status === 'ARMED') {
             openArmModal(trade);
         } else if (trade.data.status === 'LIVE') {
