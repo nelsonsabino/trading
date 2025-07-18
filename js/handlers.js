@@ -1,4 +1,4 @@
-// js/handlers.js - VERSÃO COM LÓGICA DE FASES ROBUSTA
+// js/handlers.js - VERSÃO COM CORREÇÃO NO REDIRECIONAMENTO PARA ALARMES
 
 import { addModal } from './dom-elements.js';
 import { GESTAO_PADRAO } from './config.js';
@@ -10,12 +10,16 @@ import { generateDynamicChecklist } from './ui.js';
 export async function handleAddSubmit(e) {
     e.preventDefault();
     
-    const strategies = getStrategies();
-    
+    // --- CORREÇÃO APLICADA AQUI ---
+    // 1. Captura o estado da checkbox e o nome do ativo ANTES de qualquer outra coisa.
+    const redirectToAlarmCheckbox = document.getElementById('redirect-to-alarm-checkbox');
+    const shouldRedirect = redirectToAlarmCheckbox.checked;
     const assetInput = document.getElementById('asset');
     const assetName = assetInput.value.trim().toUpperCase();
+
+    // 2. Pega as estratégias e processa o formulário
+    const strategies = getStrategies();
     const strategyId = addModal.strategySelect.value;
-    
     const selectedStrategy = strategies.find(s => s.id === strategyId);
     if (!selectedStrategy) {
         alert("Por favor, selecione uma estratégia válida.");
@@ -23,9 +27,7 @@ export async function handleAddSubmit(e) {
     }
     
     const checklistData = {};
-    // Pega a primeira fase (potential) pela ordem
     const potentialPhase = (selectedStrategy.data.phases && selectedStrategy.data.phases.length > 0) ? selectedStrategy.data.phases[0] : null;
-    
     if (potentialPhase && potentialPhase.items) {
         potentialPhase.items.forEach(item => {
             const element = document.getElementById(item.id);
@@ -45,6 +47,7 @@ export async function handleAddSubmit(e) {
         potentialSetup: checklistData
     };
 
+    // 3. Guarda os dados no Firebase
     const currentTrade = getCurrentTrade();
     if (currentTrade.id) {
         tradeData.dateAdded = currentTrade.data.dateAdded;
@@ -54,10 +57,11 @@ export async function handleAddSubmit(e) {
         await addTrade(tradeData);
     }
     
+    // 4. Fecha o modal (o que vai limpar a checkbox)
     closeAddModal();
 
-    const redirectToAlarmCheckbox = document.getElementById('redirect-to-alarm-checkbox');
-    if (redirectToAlarmCheckbox && redirectToAlarmCheckbox.checked) {
+    // 5. AGORA, verifica a variável que guardámos no início
+    if (shouldRedirect) {
         if (assetName) {
             window.location.href = `alarms.html?assetPair=${assetName}`;
         } else {
@@ -66,6 +70,7 @@ export async function handleAddSubmit(e) {
     }
 }
 
+// O resto das funções permanece inalterado
 export async function handleArmSubmit(e) {
     e.preventDefault();
     const strategies = getStrategies();
@@ -75,7 +80,6 @@ export async function handleArmSubmit(e) {
     if (!selectedStrategy) return;
 
     const checklistData = {};
-    // Pega a segunda fase (armed) pela ordem
     const armedPhase = (selectedStrategy.data.phases && selectedStrategy.data.phases.length > 1) ? selectedStrategy.data.phases[1] : null;
 
     if (armedPhase && armedPhase.items) {
@@ -100,7 +104,6 @@ export async function handleExecSubmit(e) {
     if (!selectedStrategy) return;
 
     const executionData = {};
-    // Pega a terceira fase (execution) pela ordem
     const executionPhase = (selectedStrategy.data.phases && selectedStrategy.data.phases.length > 2) ? selectedStrategy.data.phases[2] : null;
     
     if (executionPhase && executionPhase.items) {
@@ -158,7 +161,6 @@ export async function loadAndOpenForEditing(tradeId) {
         if (trade.data.status === 'POTENTIAL') {
             openAddModal();
             addModal.strategySelect.value = trade.data.strategyId;
-            // Pega a primeira fase (potential) pela ordem
             const potentialPhase = (selectedStrategy.data.phases && selectedStrategy.data.phases.length > 0) ? selectedStrategy.data.phases[0] : null;
             generateDynamicChecklist(addModal.checklistContainer, [potentialPhase], trade.data.potentialSetup);
             
