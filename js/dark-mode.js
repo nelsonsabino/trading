@@ -2,50 +2,37 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     const themeToggleButton = document.getElementById('theme-toggle-btn');
-    const body = document.body;
+    const rootElement = document.documentElement; // Agora usamos o <html>
     const themeIcon = themeToggleButton ? themeToggleButton.querySelector('i') : null;
 
-    // Função para aplicar o tema e guardar a preferência
-    const applyTheme = (theme) => {
-        if (theme === 'dark') {
-            body.classList.add('dark-mode');
-            if (themeIcon) themeIcon.className = 'fas fa-sun'; // Mostra o sol
-            localStorage.setItem('theme', 'dark');
+    // Função para atualizar o ícone com base no tema atual
+    const updateIcon = () => {
+        if (!themeIcon) return;
+        if (rootElement.classList.contains('dark-mode')) {
+            themeIcon.className = 'fas fa-sun';
         } else {
-            body.classList.remove('dark-mode');
-            if (themeIcon) themeIcon.className = 'fas fa-moon'; // Mostra a lua
-            localStorage.setItem('theme', 'light');
+            themeIcon.className = 'fas fa-moon';
         }
     };
-
+    
     // Função para alternar o tema
     const toggleTheme = () => {
-        if (body.classList.contains('dark-mode')) {
-            applyTheme('light');
-        } else {
-            applyTheme('dark');
-        }
+        rootElement.classList.toggle('dark-mode');
+        
+        // Guarda a nova preferência
+        const newTheme = rootElement.classList.contains('dark-mode') ? 'dark' : 'light';
+        localStorage.setItem('theme', newTheme);
+        
+        updateIcon(); // Atualiza o ícone
     };
 
-    // Adiciona o evento de clique ao botão, se ele existir na página
+    // Adiciona o evento de clique ao botão
     if (themeToggleButton) {
         themeToggleButton.addEventListener('click', toggleTheme);
     }
 
-    // --- LÓGICA DE INICIALIZAÇÃO ---
-    // Verifica a preferência guardada no localStorage
-    const savedTheme = localStorage.getItem('theme');
-    
-    if (savedTheme) {
-        // Se houver uma preferência guardada, aplica-a
-        applyTheme(savedTheme);
-    } else {
-        // Se não, verifica a preferência do sistema operativo
-        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (prefersDark) {
-            applyTheme('dark');
-        } else {
-            applyTheme('light'); // Padrão
-        }
-    }
+    // --- LÓGICA DE INICIALIZAÇÃO SIMPLIFICADA ---
+    // Apenas precisamos de garantir que o ícone está correto quando a página carrega.
+    // O tema já foi aplicado pelo script "anti-flash" no <head>.
+    updateIcon();
 });
