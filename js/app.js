@@ -43,25 +43,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- CORREÇÃO APLICADA AQUI ---
     // O event listener para a mudança da estratégia.
-    addModal.strategySelect.addEventListener('change', () => {
-        // Pega as estratégias do estado global, garantindo que estão sempre disponíveis.
-        const strategies = getStrategies(); 
-        const selectedStrategyId = addModal.strategySelect.value;
-        const selectedStrategy = strategies.find(s => s.id === selectedStrategyId);
-        
-        if (selectedStrategy && selectedStrategy.data.phases) {
-            // Encontra a fase "potential" para exibir no modal
-            const potentialPhase = selectedStrategy.data.phases.find(p => p.id === 'potential');
-            if (potentialPhase) {
-                generateDynamicChecklist(addModal.checklistContainer, [potentialPhase]);
-            } else {
-                addModal.checklistContainer.innerHTML = ''; // Limpa se não houver fase potencial
-            }
-        } else {
-            addModal.checklistContainer.innerHTML = ''; // Limpa se nenhuma estratégia for selecionada
-        }
-    });
 
+addModal.strategySelect.addEventListener('change', () => {
+    const strategies = getStrategies(); 
+    const selectedStrategyId = addModal.strategySelect.value;
+    const selectedStrategy = strategies.find(s => s.id === selectedStrategyId);
+    
+    // VERIFICAÇÕES DE SEGURANÇA ADICIONAIS
+    if (selectedStrategy && selectedStrategy.data.phases && Array.isArray(selectedStrategy.data.phases)) {
+        const potentialPhase = selectedStrategy.data.phases.find(p => p.id === 'potential');
+        if (potentialPhase) {
+            generateDynamicChecklist(addModal.checklistContainer, [potentialPhase]);
+        } else {
+            addModal.checklistContainer.innerHTML = ''; // Não há fase 'potential'
+        }
+    } else {
+        // Se a estratégia não tiver fases (como a nossa de teste), limpa a checklist
+        addModal.checklistContainer.innerHTML = ''; 
+    }
+});
+
+
+    
     // Restantes listeners de modais
     armModal.closeBtn.addEventListener('click', closeArmModal);
     armModal.container.addEventListener('click', e => { if (e.target.id === 'arm-trade-modal') closeArmModal(); });
