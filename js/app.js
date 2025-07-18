@@ -1,4 +1,4 @@
-// js/app.js - VERSÃO COM CORREÇÃO NO EVENT LISTENER DO DROPDOWN
+// js/app.js - VERSÃO COM DEBUG LOGS
 
 import { listenToTrades, fetchActiveStrategies } from './firebase-service.js';
 import { addModal, armModal, execModal, closeModalObj, imageModal, closeImageModalBtn } from './dom-elements.js';
@@ -6,23 +6,16 @@ import { openAddModal, closeAddModal, closeArmModal, closeExecModal, closeCloseT
 import { displayTrades, populateStrategySelect, generateDynamicChecklist } from './ui.js';
 import { handleAddSubmit, handleArmSubmit, handleExecSubmit, handleCloseSubmit, loadAndOpenForEditing } from './handlers.js';
 import { setupAutocomplete } from './utils.js';
-import { setCurrentStrategies, getStrategies } from './state.js'; // Importar getStrategies
+import { setCurrentStrategies, getStrategies } from './state.js';
 
-/**
- * Função principal que inicializa a aplicação.
- */
 async function initializeApp() {
-    // 1. Busca as estratégias da base de dados e guarda-as no estado global.
+    console.log("Inicializando a aplicação...");
     const strategies = await fetchActiveStrategies();
+    console.log("Estratégias carregadas do Firebase:", strategies);
     setCurrentStrategies(strategies);
-
-    // 2. Popula o dropdown com as estratégias que acabámos de buscar.
     populateStrategySelect(strategies);
-
-    // 3. Inicia a escuta por alterações nos trades para atualizar o dashboard.
     listenToTrades(displayTrades);
     
-    // 4. Lida com a edição de trades vindos de outras páginas.
     const tradeIdToEdit = localStorage.getItem('tradeToEdit');
     if (tradeIdToEdit) {
         localStorage.removeItem('tradeToEdit');
@@ -30,42 +23,39 @@ async function initializeApp() {
     }
 }
 
-
-// --- PONTO DE ENTRADA DO SCRIPT ---
-
 document.addEventListener('DOMContentLoaded', () => {
     
-    // Configura os listeners que não dependem de dados assíncronos
     document.getElementById('add-opportunity-btn').addEventListener('click', openAddModal);
     addModal.closeBtn.addEventListener('click', closeAddModal);
     addModal.container.addEventListener('click', e => { if (e.target.id === 'add-opportunity-modal') closeAddModal(); });
     addModal.form.addEventListener('submit', handleAddSubmit);
 
-    // --- CORREÇÃO APLICADA AQUI ---
-    // O event listener para a mudança da estratégia.
+    addModal.strategySelect.addEventListener('change', () => {
+        console.log("Dropdown da estratégia mudou.");
+        const strategies = getStrategies(); 
+        const selectedStrategyId = addModal.strategySelect.value;
+        const selectedStrategy = strategies.find(s => s.id === selectedStrategyId);
+        
+        console.log("Estratégia selecionada:", selectedStrategy);
 
-addModal.strategySelect.addEventListener('change', () => {
-    const strategies = getStrategies(); 
-    const selectedStrategyId = addModal.strategySelect.value;
-    const selectedStrategy = strategies.find(s => s.id === selectedStrategyId);
-    
-    // VERIFICAÇÕES DE SEGURANÇA ADICIONAIS
-    if (selectedStrategy && selectedStrategy.data.phases && Array.isArray(selectedStrategy.data.phases)) {
-        const potentialPhase = selectedStrategy.data.phases.find(p => p.id === 'potential');
-        if (potentialPhase) {
-            generateDynamicChecklist(addModal.checklistContainer, [potentialPhase]);
+        if (selectedStrategy && selectedStrategy.data.phases && Array.isArray(selectedStrategy.data.phases)) {
+            const potentialPhase = selectedStrategy.data.phases.find(p => p.id === 'potential');
+            
+            console.log("Fase 'potential' encontrada:", potentialPhase);
+            
+            if (potentialPhase) {
+                generateDynamicChecklist(addModal.checklistContainer, [potentialPhase]);
+            } else {
+                console.log("Nenhuma fase 'potential' encontrada para esta estratégia.");
+                addModal.checklistContainer.innerHTML = '';
+            }
         } else {
-            addModal.checklistContainer.innerHTML = ''; // Não há fase 'potential'
+            console.log("Estratégia inválida ou sem fases.");
+            addModal.checklistContainer.innerHTML = ''; 
         }
-    } else {
-        // Se a estratégia não tiver fases (como a nossa de teste), limpa a checklist
-        addModal.checklistContainer.innerHTML = ''; 
-    }
-});
+    });
 
-
-    
-    // Restantes listeners de modais
+    // Restantes listeners...
     armModal.closeBtn.addEventListener('click', closeArmModal);
     armModal.container.addEventListener('click', e => { if (e.target.id === 'arm-trade-modal') closeArmModal(); });
     armModal.form.addEventListener('submit', handleArmSubmit);
@@ -76,14 +66,12 @@ addModal.strategySelect.addEventListener('change', () => {
     closeModalObj.container.addEventListener('click', e => { if (e.target.id === 'close-trade-modal') closeCloseTradeModal(); });
     closeModalObj.form.addEventListener('submit', handleCloseSubmit);
 
-    // Autocomplete
     const modalAssetInput = document.getElementById('asset');
     const modalResultsDiv = document.getElementById('modal-autocomplete-results');
     if (modalAssetInput && modalResultsDiv) {
         setupAutocomplete(modalAssetInput, modalResultsDiv, (selectedPair) => {});
     }
 
-    // Pré-preenchimento via URL
     const urlParams = new URLSearchParams(window.location.search);
     const assetPairFromUrl = urlParams.get('assetPair');
     if (assetPairFromUrl) {
@@ -91,6 +79,5 @@ addModal.strategySelect.addEventListener('change', () => {
         if(modalAssetInput) modalAssetInput.value = assetPairFromUrl; 
     }
     
-    // Inicia a aplicação (busca dados, etc.)
     initializeApp();
 });
