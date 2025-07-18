@@ -208,3 +208,23 @@ export async function updateStrategy(strategyId, strategyData) {
         throw error;
     }
 }
+
+
+// firebase-service.js
+
+// ... (outras funções de estratégia) ...
+
+/**
+ * Busca os dados de um único documento de estratégia.
+ * @param {string} strategyId - O ID do documento a ser buscado.
+ * @returns {object|null} O objeto da estratégia ou nulo se não for encontrado.
+ */
+export async function getStrategy(strategyId) {
+    try {
+        const docSnap = await getDoc(doc(db, 'strategies', strategyId));
+        return docSnap.exists() ? { id: docSnap.id, data: docSnap.data() } : null;
+    } catch (error) {
+        console.error("Erro ao buscar estratégia:", error);
+        return null;
+    }
+}
