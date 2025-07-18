@@ -10,7 +10,6 @@ import { generateDynamicChecklist } from './ui.js';
 export async function handleAddSubmit(e) {
     e.preventDefault();
     
-    // Pega as estratégias do novo estado global
     const strategies = getStrategies();
     
     const assetInput = document.getElementById('asset');
@@ -98,17 +97,23 @@ export async function handleExecSubmit(e) {
 
     const executionData = {};
     const executionPhase = selectedStrategy.data.phases.find(p => p.id === 'execution');
-    const phasesToProcess = [];
     
+    // Processa os itens da fase de execução da nossa estratégia dinâmica
     if (executionPhase && executionPhase.items) {
-        // Converte a nossa estrutura para a estrutura que generateDynamicChecklist espera
-        phasesToProcess.push({ title: executionPhase.title, inputs: executionPhase.items.filter(i => i.type !== 'checkbox'), checks: executionPhase.items.filter(i => i.type === 'checkbox') });
+        executionPhase.items.forEach(item => {
+            const element = document.getElementById(item.id);
+            if(element) {
+                executionData[item.id] = item.type === 'checkbox' ? element.checked : element.value;
+            }
+        });
     }
-    phasesToProcess.push(GESTAO_PADRAO); // Adiciona a gestão padrão
 
-    phasesToProcess.forEach(p => {
-        if (p.inputs) p.inputs.forEach(i => executionData[i.id] = document.getElementById(i.id).value);
-        if (p.checks) p.checks.forEach(c => executionData[c.id] = document.getElementById(c.id).checked);
+    // Processa os itens da gestão padrão estática
+    GESTAO_PADRAO.inputs.forEach(input => {
+        const element = document.getElementById(input.id);
+        if(element) {
+            executionData[input.id] = element.value;
+        }
     });
 
     await updateTrade(currentTrade.id, { status: "LIVE", executionDetails: executionData, dateExecuted: new Date() });
