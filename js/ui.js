@@ -63,36 +63,46 @@ function createRadioGroup(radioInfo, data) {
     });
     return group;
 }
+
+
+
 export function generateDynamicChecklist(container, phases, data = {}) {
     container.innerHTML = '';
-    if (!phases) return;
+    if (!phases || phases.length === 0) return;
+
     phases.forEach(phase => {
+        if (!phase || !phase.items) return; // Verificação de segurança
+        
         const phaseDiv = document.createElement('div');
-        if (phase.exampleImageUrl) {
-            const exampleContainer = document.createElement('div');
-            exampleContainer.className = 'example-image-container';
-            exampleContainer.innerHTML = `<p>Exemplo Visual:</p><img src="${phase.exampleImageUrl}" alt="Exemplo para ${phase.title}">`;
-            exampleContainer.querySelector('img').addEventListener('click', (e) => { e.stopPropagation(); openImageModal(phase.exampleImageUrl); });
-            phaseDiv.appendChild(exampleContainer);
-        }
         const titleEl = document.createElement('h4');
         titleEl.textContent = phase.title;
         phaseDiv.appendChild(titleEl);
-        if (phase.inputs) phase.inputs.forEach(input => phaseDiv.appendChild(createInputItem(input, data)));
-        if (phase.checks) phase.checks.forEach(check => phaseDiv.appendChild(createChecklistItem(check, data)));
-        if (phase.radios) phaseDiv.appendChild(createRadioGroup(phase.radios, data));
+
+        // Agora iteramos sobre 'phase.items' em vez de 'phase.inputs' e 'phase.checks'
+        phase.items.forEach(item => {
+            if (item.type === 'select') {
+                phaseDiv.appendChild(createInputItem(item, data));
+            } else if (item.type === 'checkbox') {
+                phaseDiv.appendChild(createChecklistItem(item, data));
+            }
+            // (Adicione aqui 'else if' para 'text', 'number', etc. no futuro)
+        });
+
         container.appendChild(phaseDiv);
     });
 }
-export function populateStrategySelect() {
+
+
+export function populateStrategySelect(strategies) { // <-- AGORA RECEBE UM PARÂMETRO
     if (!addModal.strategySelect) return;
     addModal.strategySelect.innerHTML = '<option value="">-- Selecione --</option>';
-    for (const id in STRATEGIES) {
+    
+    strategies.forEach(strategy => {
         const option = document.createElement('option');
-        option.value = id;
-        option.textContent = STRATEGIES[id].name;
+        option.value = strategy.id;
+        option.textContent = strategy.data.name;
         addModal.strategySelect.appendChild(option);
-    }
+    });
 }
 
 
