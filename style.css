@@ -140,17 +140,22 @@ header nav { margin-top: 1.5rem; display: flex; justify-content: center; align-i
 
 
 
-/* --- CORREÇÃO PARA BOTÕES DE ÍCONE NA TABELA DO SCANNER --- */
+/* --- CORREÇÃO PARA BOTÕES DE ÍCONE NAS TABELAS --- */
 
-#market-scan-tbody .action-buttons {
+/* Aplica a regra a AMBAS as tabelas */
+#market-scan-tbody .action-buttons,
+#active-alarms-tbody .action-buttons,
+#triggered-alarms-tbody .action-buttons {
     display: flex;
-    flex-direction: row; /* Garante o alinhamento horizontal */
-    justify-content: flex-end; /* Alinha o grupo de botões à direita da célula */
-    gap: 0.5rem; /* Espaço entre os botões */
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 0.5rem;
 }
 
-/* Garante que os botões individuais não ocupam a largura toda */
-#market-scan-tbody .icon-action-btn {
-    flex-grow: 0; /* Impede que os botões se estiquem */
-    padding: 8px 12px; /* Um padding um pouco maior para toque */
+/* Aplica a regra a AMBAS as tabelas */
+#market-scan-tbody .icon-action-btn,
+#active-alarms-tbody .icon-action-btn,
+#triggered-alarms-tbody .icon-action-btn {
+    flex-grow: 0;
+    padding: 8px 12px;
 }
