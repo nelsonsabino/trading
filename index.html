@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     
-    <!-- SCRIPT ANTI-FLASH -->
+    <!-- NOVO SCRIPT ANTI-FLASH -->
     <script>
         (function() {
             try {
@@ -31,7 +31,8 @@
         <p class="mantra">Tem paciência, usa alarmes, espera que os setups venham.</p>
        
         <nav>
-            <button id="add-opportunity-btn" class="btn btn-primary">Adicionar Ativo à Watchlist</button> <!-- ALTERADO -->
+            <!-- ALTERADO -->
+            <button id="add-opportunity-btn" class="btn btn-primary">Adicionar Ativo à Watchlist</button>
             <a href="strategies-manager.html" class="nav-link">Gerir Estratégias</a>
             <a href="manage.html" class="nav-link">Gerir Todas as Operações</a>
             <a href="stats.html" class="nav-link">Ver Estatísticas</a>
@@ -63,12 +64,12 @@
         </div>
     </main>
 
-    <!-- Modal de Adicionar Ativo -->
+    <!-- Modal de Adicionar Ativo (o nome "opportunity" mantém-se nos IDs por razões de código) -->
     <div id="add-opportunity-modal" class="modal-overlay">
         <div class="modal-content">
             <span id="close-modal-btn">×</span>
             <form id="add-opportunity-form">
-                <h3>Adicionar Ativo à Watchlist</h3> <!-- JÁ ESTAVA CORRETO -->
+                <h3>Adicionar Ativo à Watchlist</h3>
                 <div class="input-item">
                     <label for="strategy-select">Estratégia:</label>
                     <select id="strategy-select" name="strategy-select" required></select>
@@ -94,27 +95,23 @@
                     <label for="redirect-to-alarm-checkbox"><strong>Criar um alarme para este ativo após guardar?</strong></label>
                 </div>
                 
-                <button type="submit">Guardar na Watchlist</button> <!-- JÁ ESTAVA CORRETO -->
+                <button type="submit">Guardar na Watchlist</button>
             </form>
         </div>
     </div>
 
-    <!-- Restante dos modais (Armar, Executar, Fechar, Imagem) permanecem inalterados -->
+    <!-- Modais de Armar, Executar, Fechar, Imagem (inalterados) -->
     <div id="arm-trade-modal" class="modal-overlay"> ... </div>
     <div id="execution-modal" class="modal-overlay"> ... </div>
     <div id="close-trade-modal" class="modal-overlay"> ... </div>
     <div id="image-modal" class="modal-overlay"> ... </div>
-     
+
     <footer></footer>    
 
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="js/services.js"></script>
     <script type="module" src="js/utils.js"></script>
-    <script type="module" src="js/state.js"></script>
-    <script type="module" src="js/ui.js"></script>
-    <script type="module" src="js/handlers.js"></script>
-    <script type="module" src="js/modals.js"></script>
     <script type="module" src="js/app.js"></script>
     <script type="module" src="js/version.js"></script>
     <script type="module" src="js/dark-mode.js"></script>
