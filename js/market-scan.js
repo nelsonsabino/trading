@@ -1,8 +1,11 @@
-// js/market-scan.js - VERSÃO COMPLETA E CORRIGIDA
+// js/market-scan.js
 
 import { supabase } from './services.js';
 
-// --- LÓGICA E INICIALIZAÇÃO DOS MODAIS ---
+// =================================================================================
+// 1. LÓGICA E INICIALIZAÇÃO DOS MODAIS
+// =================================================================================
+
 const chartModal = document.getElementById('chart-modal');
 const closeChartModalBtn = document.getElementById('close-chart-modal');
 const chartContainer = document.getElementById('chart-modal-container');
@@ -10,7 +13,9 @@ const chartContainer = document.getElementById('chart-modal-container');
 function openChartModal(symbol) {
     if (!chartModal || !chartContainer) return;
     chartContainer.innerHTML = ''; 
+
     const currentTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+
     new TradingView.widget({
         "container_id": "chart-modal-container",
         "autosize": true,
@@ -39,12 +44,17 @@ if (chartModal) {
 }
 
 
-// --- LÓGICA DO SPARKLINE ---
+// =================================================================================
+// 2. LÓGICA DO SPARKLINE
+// =================================================================================
+
 function renderSparkline(containerId, dataSeries) {
     if (!dataSeries || dataSeries.length < 2) return;
+
     const firstPrice = dataSeries[0];
     const lastPrice = dataSeries[dataSeries.length - 1];
     const chartColor = lastPrice >= firstPrice ? '#28a745' : '#dc3545';
+
     const options = {
         series: [{ data: dataSeries }],
         chart: { type: 'line', height: 50, sparkline: { enabled: true }},
@@ -62,7 +72,10 @@ function renderSparkline(containerId, dataSeries) {
 }
 
 
-// --- LÓGICA PRINCIPAL DA PÁGINA ---
+// =================================================================================
+// 3. LÓGICA PRINCIPAL DA PÁGINA
+// =================================================================================
+
 function formatVolume(volume) {
     if (volume >= 1_000_000_000) return (volume / 1_000_000_000).toFixed(2) + 'B';
     if (volume >= 1_000_000) return (volume / 1_000_000).toFixed(2) + 'M';
@@ -96,7 +109,7 @@ function createTableRow(ticker, index) {
                     <button class="icon-action-btn view-chart-btn" data-symbol="${ticker.symbol}" title="Ver Gráfico no Modal"><i class="fa-solid fa-chart-simple"></i></button>
                     <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn" title="Abrir no TradingView"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
                     <a href="${createAlarmUrl}" class="icon-action-btn" title="Criar Alarme"><i class="fa-solid fa-bell"></i></a>
-                    <a href="${addOpportunityUrl}" class="icon-action-btn" title="Adicionar Oportunidade"><i class="fa-solid fa-plus"></i></a>
+                    <a href="${addOpportunityUrl}" class="icon-action-btn" title="Adicionar à Watchlist"><i class="fa-solid fa-plus"></i></a>
                 </div>
             </td>
         </tr>
@@ -145,7 +158,10 @@ async function fetchAndDisplayMarketData() {
 }
 
 
-// --- PONTO DE ENTRADA DA PÁGINA ---
+// =================================================================================
+// 4. PONTO DE ENTRADA DA PÁGINA
+// =================================================================================
+
 document.addEventListener('DOMContentLoaded', () => {
     const tbody = document.getElementById('market-scan-tbody');
     if (tbody) {
