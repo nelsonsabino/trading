@@ -137,3 +137,20 @@ header nav { margin-top: 1.5rem; display: flex; justify-content: center; align-i
 #theme-toggle-btn:hover { background-color: #e9ecef; }
 .dark-mode #theme-toggle-btn { background-color: #2c2c2c; border-color: #444; color: #e0e0e0; }
 .dark-mode #theme-toggle-btn:hover { background-color: #3a3a3a; }
+
+
+
+/* --- CORREÇÃO PARA BOTÕES DE ÍCONE NA TABELA DO SCANNER --- */
+
+#market-scan-tbody .action-buttons {
+    display: flex;
+    flex-direction: row; /* Garante o alinhamento horizontal */
+    justify-content: flex-end; /* Alinha o grupo de botões à direita da célula */
+    gap: 0.5rem; /* Espaço entre os botões */
+}
+
+/* Garante que os botões individuais não ocupam a largura toda */
+#market-scan-tbody .icon-action-btn {
+    flex-grow: 0; /* Impede que os botões se estiquem */
+    padding: 8px 12px; /* Um padding um pouco maior para toque */
+}
