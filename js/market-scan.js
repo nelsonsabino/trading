@@ -2,8 +2,13 @@
 
 import { supabase } from './services.js';
 
+// --- NOVO: Constantes para o Cache ---
+const CACHE_KEY_DATA = 'marketScannerCache';
+const CACHE_KEY_TIMESTAMP = 'marketScannerCacheTime';
+const CACHE_DURATION_MS = 2 * 60 * 1000; // 2 minutos
+
 // =================================================================================
-// 1. LÓGICA E INICIALIZAÇÃO DOS MODAIS
+// LÓGICA E INICIALIZAÇÃO DOS MODAIS (sem alterações)
 // =================================================================================
 
 const chartModal = document.getElementById('chart-modal');
@@ -17,16 +22,9 @@ function openChartModal(symbol) {
     const currentTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
 
     new TradingView.widget({
-        "container_id": "chart-modal-container",
-        "autosize": true,
-        "symbol": `BINANCE:${symbol}`,
-        "interval": "240",
-        "timezone": "Etc/UTC",
-        "theme": currentTheme,
-        "style": "1",
-        "locale": "pt",
-        "hide_side_toolbar": false,
-        "allow_symbol_change": true,
+        "container_id": "chart-modal-container", "autosize": true, "symbol": `BINANCE:${symbol}`,
+        "interval": "240", "timezone": "Etc/UTC", "theme": currentTheme, "style": "1", "locale": "pt",
+        "hide_side_toolbar": false, "allow_symbol_change": true,
         "studies": ["STD;MA%Ribbon", "STD;RSI"]
     });
     chartModal.style.display = 'flex';
@@ -45,35 +43,52 @@ if (chartModal) {
 
 
 // =================================================================================
-// 2. LÓGICA DO SPARKLINE
+// LÓGICA DE RENDERIZAÇÃO (agora separada para reutilização)
 // =================================================================================
 
 function renderSparkline(containerId, dataSeries) {
     if (!dataSeries || dataSeries.length < 2) return;
+    const container = document.getElementById(containerId);
+    if (!container) return; // Garante que o container existe
+    container.innerHTML = ''; // Limpa antes de renderizar
 
     const firstPrice = dataSeries[0];
     const lastPrice = dataSeries[dataSeries.length - 1];
     const chartColor = lastPrice >= firstPrice ? '#28a745' : '#dc3545';
 
     const options = {
-        series: [{ data: dataSeries }],
-        chart: { type: 'line', height: 50, sparkline: { enabled: true }},
-        stroke: { curve: 'smooth', width: 2 },
-        colors: [chartColor],
-        tooltip: {
-            fixed: { enabled: false },
-            x: { show: false },
-            y: { title: { formatter: () => '' }, formatter: (val) => val.toFixed(5) },
-            marker: { show: false }
-        }
+        series: [{ data: dataSeries }], chart: { type: 'line', height: 50, sparkline: { enabled: true }},
+        stroke: { curve: 'smooth', width: 2 }, colors: [chartColor],
+        tooltip: { fixed: { enabled: false }, x: { show: false }, y: { title: { formatter: () => '' }, formatter: (val) => val.toFixed(5) }, marker: { show: false }}
     };
-    const chart = new ApexCharts(document.getElementById(containerId), options);
+    const chart = new ApexCharts(container, options);
     chart.render();
+}
+
+function renderPageContent(tickers, sparklinesData) {
+    const tbody = document.getElementById('market-scan-tbody');
+    if (!tbody) return;
+
+    if (tickers.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Não foram encontrados pares com USDC com volume significativo.</td></tr>';
+        return;
+    }
+
+    const tableRowsHtml = tickers.map((ticker, index) => createTableRow(ticker, index)).join('');
+    tbody.innerHTML = tableRowsHtml;
+
+    tickers.forEach(ticker => {
+        const symbol = ticker.symbol || ticker; // Lida com o formato do ticker
+        const data = sparklinesData[symbol];
+        if (data) {
+            renderSparkline(`sparkline-${symbol}`, data);
+        }
+    });
 }
 
 
 // =================================================================================
-// 3. LÓGICA PRINCIPAL DA PÁGINA
+// LÓGICA PRINCIPAL DA PÁGINA (agora com cache)
 // =================================================================================
 
 function formatVolume(volume) {
@@ -89,7 +104,6 @@ function createTableRow(ticker, index) {
     const volume = parseFloat(ticker.quoteVolume);
     const priceChangePercent = parseFloat(ticker.priceChangePercent);
     const priceChangeClass = priceChangePercent >= 0 ? 'positive-pnl' : 'negative-pnl';
-
     const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${ticker.symbol}`;
     const createAlarmUrl = `alarms.html?assetPair=${ticker.symbol}`;
     const addOpportunityUrl = `index.html?assetPair=${ticker.symbol}`;
@@ -99,9 +113,7 @@ function createTableRow(ticker, index) {
             <td>${index + 1}</td>
             <td><div class="asset-name"><span>${baseAsset}</span></div></td>
             <td>${price.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</td>
-            <td class="sparkline-cell">
-                <div class="sparkline-container" id="sparkline-${ticker.symbol}"></div>
-            </td>
+            <td class="sparkline-cell"><div class="sparkline-container" id="sparkline-${ticker.symbol}"></div></td>
             <td>${formatVolume(volume)}</td>
             <td class="${priceChangeClass}">${priceChangePercent.toFixed(2)}%</td>
             <td>
@@ -112,17 +124,28 @@ function createTableRow(ticker, index) {
                     <a href="${addOpportunityUrl}" class="icon-action-btn" title="Adicionar à Watchlist"><i class="fa-solid fa-plus"></i></a>
                 </div>
             </td>
-        </tr>
-    `;
+        </tr>`;
 }
 
 async function fetchAndDisplayMarketData() {
     const tbody = document.getElementById('market-scan-tbody');
     if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">A carregar dados...</td></tr>';
 
+    // --- 1. VERIFICAR O CACHE PRIMEIRO ---
+    const cachedDataJSON = sessionStorage.getItem(CACHE_KEY_DATA);
+    const cacheTimestamp = sessionStorage.getItem(CACHE_KEY_TIMESTAMP);
+
+    if (cachedDataJSON && cacheTimestamp && (Date.now() - cacheTimestamp < CACHE_DURATION_MS)) {
+        console.log("A carregar dados do scanner a partir do cache.");
+        const cachedData = JSON.parse(cachedDataJSON);
+        renderPageContent(cachedData.tickers, cachedData.sparklines);
+        return; // Termina a função aqui se usar o cache
+    }
+    
+    // --- 2. SE O CACHE FOR INVÁLIDO OU NÃO EXISTIR, BUSCAR NOVOS DADOS ---
+    console.log("Cache do scanner inválido. A buscar novos dados da API.");
     try {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">A carregar dados...</td></tr>';
-        
         const response = await fetch('https://api.binance.com/api/v3/ticker/24hr');
         if (!response.ok) throw new Error('Falha ao comunicar com a API da Binance.');
         const allTickers = await response.json();
@@ -138,18 +161,19 @@ async function fetchAndDisplayMarketData() {
         }
 
         const symbols = top50Usdc.map(t => t.symbol);
-        const { data: sparklinesData, error: sparklinesError } = await supabase.functions.invoke('get-sparklines-data', {
-            body: { symbols },
-        });
+        const { data: sparklinesData, error: sparklinesError } = await supabase.functions.invoke('get-sparklines-data', { body: { symbols } });
         if (sparklinesError) throw sparklinesError;
 
-        const tableRowsHtml = top50Usdc.map(createTableRow).join('');
-        tbody.innerHTML = tableRowsHtml;
+        // --- 3. GUARDAR OS NOVOS DADOS NO CACHE ANTES DE RENDERIZAR ---
+        const dataToCache = {
+            tickers: top50Usdc,
+            sparklines: sparklinesData
+        };
+        sessionStorage.setItem(CACHE_KEY_DATA, JSON.stringify(dataToCache));
+        sessionStorage.setItem(CACHE_KEY_TIMESTAMP, Date.now());
 
-        top50Usdc.forEach(ticker => {
-            const data = sparklinesData[ticker.symbol];
-            renderSparkline(`sparkline-${ticker.symbol}`, data);
-        });
+        // --- 4. RENDERIZAR O CONTEÚDO DA PÁGINA ---
+        renderPageContent(top50Usdc, sparklinesData);
 
     } catch (error) {
         console.error("Erro ao carregar dados do mercado:", error);
@@ -159,7 +183,7 @@ async function fetchAndDisplayMarketData() {
 
 
 // =================================================================================
-// 4. PONTO DE ENTRADA DA PÁGINA
+// PONTO DE ENTRADA DA PÁGINA (sem alterações)
 // =================================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
