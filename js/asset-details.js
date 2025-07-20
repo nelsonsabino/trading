@@ -3,6 +3,9 @@
 import { supabase } from './services.js';
 import { getTradesForAsset } from './firebase-service.js';
 
+// NOTA: Obtenha a sua chave de API gratuita em https://min-api.cryptocompare.com/
+const CRYPTOCOMPARE_API_KEY = "// COLOQUE A SUA CHAVE DA API DA CRYPTOCOMPARE AQUI";
+
 /**
  * Renderiza os widgets do TradingView na página.
  * @param {string} symbol - O símbolo do ativo (ex: "BTCUSDC").
@@ -13,64 +16,80 @@ function renderTradingViewWidgets(symbol) {
     const currentTheme = document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light';
 
     if (mainChartContainer) {
-        // --- CORREÇÃO 1: Removidos os parâmetros incompatíveis (backgroundColor, gridColor) ---
-        // A propriedade "theme" já controla as cores de forma correta.
         new TradingView.widget({
-            "autosize": true,
-            "symbol": `BINANCE:${symbol}`,
-            "interval": "240",
-            "timezone": "Etc/UTC",
-            "theme": currentTheme,
-            "style": "1",
-            "locale": "pt",
-            "hide_side_toolbar": true,
-            "hide_top_toolbar": false,
-            "allow_symbol_change": false,
-            "save_image": false,
-            "calendar": false,
-            "details": false,
-            "hide_legend": true,
-            "hide_volume": true,
-            "hotlist": false,
-            "withdateranges": false,
-            "studies": [
-                "STD;RSI",
-                "STD;Supertrend"
-            ],
-            "container_id": "main-chart-container"
+            "autosize": true, "symbol": `BINANCE:${symbol}`, "interval": "240", "timezone": "Etc/UTC",
+            "theme": currentTheme, "style": "1", "locale": "pt", "hide_side_toolbar": true, "hide_top_toolbar": false,
+            "allow_symbol_change": false, "save_image": false, "calendar": false, "details": false,
+            "hide_legend": true, "hide_volume": true, "hotlist": false, "withdateranges": false,
+            "studies": ["STD;RSI", "STD;Supertrend"], "container_id": "main-chart-container"
         });
     }
 
     if (techAnalysisContainer) {
-        // --- CORREÇÃO 2: Implementado o carregamento dinâmico para o widget de Análise Técnica ---
-        techAnalysisContainer.innerHTML = ''; // Limpa o container
+        techAnalysisContainer.innerHTML = '';
         const script = document.createElement('script');
         script.type = 'text/javascript';
         script.async = true;
         script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js';
-        
         const config = {
-            "width": "100%",
-            "height": "100%",
-            "symbol": `BINANCE:${symbol}`,
-            "interval": "1h",
-            "showIntervalTabs": true,
-            "displayMode": "multiple",
-            "locale": "pt",
-            "colorTheme": currentTheme,
-            "isTransparent": false
+            "width": "100%", "height": "100%", "symbol": `BINANCE:${symbol}`, "interval": "1h",
+            "showIntervalTabs": true, "displayMode": "multiple", "locale": "pt",
+            "colorTheme": currentTheme, "isTransparent": false
         };
-
         script.innerHTML = JSON.stringify(config);
         techAnalysisContainer.appendChild(script);
     }
 }
 
 /**
+ * Busca e exibe as últimas notícias para o símbolo do ativo.
+ * @param {string} baseAssetSymbol - O símbolo base do ativo (ex: "BTC").
+ */
+async function displayNewsForAsset(baseAssetSymbol) {
+    const newsContainer = document.getElementById('asset-news-container');
+    if (!newsContainer) return;
+
+    if (!CRYPTOCOMPARE_API_KEY || CRYPTOCOMPARE_API_KEY.includes("COLOQUE A SUA CHAVE")) {
+        newsContainer.innerHTML = `<p style="color: #ffc107;">Por favor, adicione uma chave de API da CryptoCompare no ficheiro 'asset-details.js' para ver as notícias.</p>`;
+        return;
+    }
+
+    const apiUrl = `https://min-api.cryptocompare.com/data/v2/news/?lang=PT&categories=${baseAssetSymbol}&api_key=${CRYPTOCOMPARE_API_KEY}`;
+
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error(`Erro da API: ${response.statusText}`);
+        const newsData = await response.json();
+
+        if (newsData.Type !== 100 || newsData.Data.length === 0) {
+            newsContainer.innerHTML = '<p>Nenhuma notícia recente encontrada para este ativo.</p>';
+            return;
+        }
+
+        const newsHtml = newsData.Data.slice(0, 3).map(article => {
+            const timeAgo = new Date(article.published_on * 1000).toLocaleString('pt-PT');
+            return `
+                <div class="news-article stat-card" style="text-align: left; margin-bottom: 1rem;">
+                    <h4 style="margin-bottom: 0.5rem;"><a href="${article.url}" target="_blank" rel="noopener noreferrer" class="asset-link">${article.title}</a></h4>
+                    <p style="font-size: 0.9em; color: #6c757d;"><strong>${article.source_info.name}</strong> - ${timeAgo}</p>
+                </div>
+            `;
+        }).join('');
+
+        newsContainer.innerHTML = newsHtml;
+    } catch (err) {
+        console.error("Erro ao buscar notícias:", err);
+        newsContainer.innerHTML = '<p style="color:red;">Não foi possível carregar as notícias.</p>';
+    }
+}
+
+
+/**
  * Busca e exibe os alarmes ativos para o símbolo especificado.
  * @param {string} symbol - O símbolo do ativo.
  */
 async function displayAlarmsForAsset(symbol) {
+    // (Esta função permanece sem alterações)
     const tbody = document.getElementById('asset-alarms-tbody');
     if (!tbody) return;
     tbody.innerHTML = '<tr><td colspan="3">A carregar alarmes...</td></tr>';
@@ -99,6 +118,7 @@ async function displayAlarmsForAsset(symbol) {
  * @param {string} symbol - O símbolo do ativo.
  */
 async function displayTradesForAsset(symbol) {
+    // (Esta função permanece sem alterações)
     const tbody = document.getElementById('asset-trades-tbody');
     if (!tbody) return;
     tbody.innerHTML = '<tr><td colspan="5">A carregar trades...</td></tr>';
@@ -122,10 +142,6 @@ async function displayTradesForAsset(symbol) {
     }
 }
 
-/**
- * Lógica para redirecionar para a página principal para editar um trade.
- * @param {string} tradeId - O ID do trade a ser editado.
- */
 function editTrade(tradeId) {
     localStorage.setItem('tradeToEdit', tradeId);
     window.location.href = 'index.html';
@@ -148,6 +164,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('asset-title').textContent = `Análise de ${assetSymbol}`;
     renderTradingViewWidgets(assetSymbol);
     
+    // Extrai o símbolo base para as notícias (ex: "BTC" de "BTCUSDC")
+    const baseAsset = assetSymbol.replace(/USDC|USDT|BUSD/, '');
+
+    // Busca todos os dados em paralelo
+    displayNewsForAsset(baseAsset);
     displayAlarmsForAsset(assetSymbol);
     displayTradesForAsset(assetSymbol);
 
