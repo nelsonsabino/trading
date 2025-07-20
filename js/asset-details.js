@@ -4,7 +4,7 @@ import { supabase } from './services.js';
 import { getTradesForAsset } from './firebase-service.js';
 
 // NOTA: Obtenha a sua chave de API gratuita em https://min-api.cryptocompare.com/
-const CRYPTOCOMPARE_API_KEY = "// COLOQUE A SUA CHAVE DA API DA CRYPTOCOMPARE AQUI";
+const CRYPTOCOMPARE_API_KEY = "92d8c73125edcc9a95da0a5f30a6ca4720e5fdba544dba9bae2cd3495039aba7";
 
 /**
  * Renderiza os widgets do TradingView na página.
