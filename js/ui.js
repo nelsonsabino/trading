@@ -1,32 +1,28 @@
-// js/ui.js - VERSÃO COM ANIMAÇÃO DE DESTAQUE
+// js/ui.js - VERSÃO COM LINK PARA A PÁGINA DE DETALHES
 
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openImageModal } from './modals.js';
 import { loadAndOpenForEditing } from './handlers.js';
-import { getLastCreatedTradeId, setLastCreatedTradeId } from './state.js'; // Importa as funções de estado
+import { getLastCreatedTradeId, setLastCreatedTradeId } from './state.js';
 
 // --- FUNÇÃO PARA RENDERIZAR SPARKLINE ---
 function renderSparkline(containerId, dataSeries) {
     const container = document.getElementById(containerId);
     if (!container || !dataSeries || dataSeries.length < 2) return;
-    container.innerHTML = ''; // Limpa antes de renderizar
-
+    container.innerHTML = '';
     const firstPrice = dataSeries[0];
     const lastPrice = dataSeries[dataSeries.length - 1];
     const chartColor = lastPrice >= firstPrice ? '#28a745' : '#dc3545';
-
     const options = {
-        series: [{ data: dataSeries }],
-        chart: { type: 'line', height: 40, width: 100, sparkline: { enabled: true }},
-        stroke: { curve: 'smooth', width: 2 },
-        colors: [chartColor],
-        tooltip: { enabled: false }
+        series: [{ data: dataSeries }], chart: { type: 'line', height: 40, width: 100, sparkline: { enabled: true }},
+        stroke: { curve: 'smooth', width: 2 }, colors: [chartColor], tooltip: { enabled: false }
     };
     const chart = new ApexCharts(container, options);
     chart.render();
 }
 
 // --- FUNÇÕES DE GERAÇÃO DE FORMULÁRIO ---
+// ... (sem alterações nesta secção) ...
 function getIconForLabel(labelText) {
     const text = labelText.toLowerCase();
     if (text.includes('tendência')) return 'fa-solid fa-chart-line';
@@ -119,9 +115,13 @@ export function createTradeCard(trade, marketData = {}) {
     if (trade.data.status === 'POTENTIAL') { mainActionButtonHtml = `<button class="icon-action-btn action-arm" data-action="arm" title="Validar e Armar Setup"><i class="fa-solid fa-bolt"></i> <span>Armar</span></button>`; } 
     else if (trade.data.status === 'ARMED') { mainActionButtonHtml = `<button class="icon-action-btn action-execute" data-action="execute" title="Executar Trade"><i class="fa-solid fa-play"></i> <span>Executar</span></button>`; } 
     else if (trade.data.status === 'LIVE') { mainActionButtonHtml = `<button class="icon-action-btn action-close" data-action="close" title="Fechar Trade"><i class="fa-solid fa-stop"></i> <span>Fechar</span></button>`; }
+    
     card.innerHTML = `
         <button class="icon-action-btn card-edit-btn" data-action="edit" title="Editar"><i class="fas fa-pencil"></i></button>
-        <h3>${assetName}</h3>
+        
+        <!-- ALTERAÇÃO: Adicionado link para a página de detalhes -->
+        <h3><a href="asset-details.html?symbol=${assetName}" class="asset-link">${assetName}</a></h3>
+        
         <p style="color: #007bff; font-weight: 500;">Estratégia: ${trade.data.strategyName || 'N/A'}</p>
         <p><strong>Status:</strong> ${trade.data.status}</p>
         <p><strong>Notas:</strong> ${trade.data.notes || ''}</p>
@@ -141,6 +141,7 @@ export function createTradeCard(trade, marketData = {}) {
     return card;
 }
 
+// ... (o resto do ficheiro permanece sem alterações) ...
 function toggleAdvancedChart(tradeId, symbol, button) {
     const chartContainer = document.getElementById(`advanced-chart-${tradeId}`);
     if (!chartContainer) return;
@@ -160,32 +161,24 @@ function toggleAdvancedChart(tradeId, symbol, button) {
         button.innerHTML = `<i class="fa-solid fa-eye-slash"></i> <span>Esconder</span>`;
     }
 }
-
 let tradesForEventListeners = [];
-
 export function displayTrades(trades, marketData) {
     tradesForEventListeners = trades;
     if (!potentialTradesContainer) return;
-    
     potentialTradesContainer.innerHTML = '<p class="empty-state-message">Nenhum ativo na watchlist.</p>';
     armedTradesContainer.innerHTML = '<p class="empty-state-message">Nenhum setup armado.</p>';
     liveTradesContainer.innerHTML = '<p class="empty-state-message">Nenhuma operação ativa.</p>';
-    
     let potentialCount = 0, armedCount = 0, liveCount = 0;
-    
     trades.forEach(trade => {
         const card = createTradeCard(trade, marketData); 
         if (trade.data.status === 'POTENTIAL') { if (potentialCount === 0) potentialTradesContainer.innerHTML = ''; potentialTradesContainer.appendChild(card); potentialCount++; }
         else if (trade.data.status === 'ARMED') { if (armedCount === 0) armedTradesContainer.innerHTML = ''; armedTradesContainer.appendChild(card); armedCount++; }
         else if (trade.data.status === 'LIVE') { if (liveCount === 0) liveTradesContainer.innerHTML = ''; liveTradesContainer.appendChild(card); liveCount++; }
     });
-
     trades.forEach(trade => {
         const assetMarketData = marketData[trade.data.asset];
         if (assetMarketData) renderSparkline(`sparkline-card-${trade.id}`, assetMarketData.sparkline);
     });
-
-    // --- ALTERAÇÃO: APLICA O DESTAQUE ---
     const lastId = getLastCreatedTradeId();
     if (lastId) {
         const newCard = document.querySelector(`.trade-card[data-trade-id="${lastId}"]`);
@@ -193,11 +186,9 @@ export function displayTrades(trades, marketData) {
             newCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
             newCard.classList.add('new-item-flash');
         }
-        setLastCreatedTradeId(null); // Limpa o ID para não repetir a animação
+        setLastCreatedTradeId(null);
     }
 }
-
-// --- LISTENER DE EVENTOS UNIFICADO PARA OS CARDS ---
 document.addEventListener('DOMContentLoaded', () => {
     const dashboard = document.querySelector('.dashboard-columns');
     if (dashboard) {
