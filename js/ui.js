@@ -1,4 +1,4 @@
-// js/ui.js - VERSÃO COM DELEGAÇÃO DE EVENTOS PARA OS CARDS (CORRIGIDA)
+// js/ui.js - VERSÃO COM CORREÇÃO FINAL DO TEMA DO GRÁFICO
 
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openImageModal } from './modals.js';
@@ -23,7 +23,6 @@ function renderSparkline(containerId, dataSeries) {
     const chart = new ApexCharts(container, options);
     chart.render();
 }
-
 
 // --- FUNÇÕES DE GERAÇÃO DE FORMULÁRIO ---
 function getIconForLabel(labelText) {
@@ -112,7 +111,6 @@ export function populateStrategySelect(strategies) {
     }
 }
 
-
 // --- LÓGICA DE CRIAÇÃO E EXIBIÇÃO DE CARDS ---
 export function createTradeCard(trade, marketData = {}) {
     const card = document.createElement('div');
@@ -169,13 +167,18 @@ function toggleAdvancedChart(tradeId, symbol, button) {
     const chartContainer = document.getElementById(`advanced-chart-${tradeId}`);
     if (!chartContainer) return;
     const isVisible = chartContainer.classList.contains('visible');
+
     if (isVisible) {
         chartContainer.innerHTML = '';
         chartContainer.classList.remove('visible');
         button.innerHTML = `<i class="fa-solid fa-chart-simple"></i> <span>Gráfico</span>`;
     } else {
         button.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>A Carregar...</span>`;
-        const currentTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
+        
+        // --- CORREÇÃO APLICADA AQUI ---
+        // Agora verificamos o tema usando o document.documentElement
+        const currentTheme = document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light';
+        
         new TradingView.widget({
             "container_id": chartContainer.id, "autosize": true, "symbol": symbol, "interval": "60",
             "timezone": "Etc/UTC", "theme": currentTheme, "style": "1", "locale": "pt",
