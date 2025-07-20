@@ -14,7 +14,8 @@ import {
     onSnapshot, 
     runTransaction,
     getDocs,
-    where
+    where,
+    setDoc // ADICIONADO para a função de ajuste de saldo
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 import { firebaseConfig } from './config.js';
 
@@ -38,6 +39,7 @@ export function listenToTrades(callback) {
     });
 }
 
+// ... (todas as outras funções de trades, como getTrade, addTrade, updateTrade, deleteTrade, permanecem iguais) ...
 export async function getTrade(tradeId) {
     try {
         const docSnap = await getDoc(doc(db, 'trades', tradeId));
@@ -75,7 +77,69 @@ export async function deleteTrade(tradeId) {
     }
 }
 
-// --- FUNÇÕES PARA A COLEÇÃO "TRANSACTIONS" ---
+
+// --- FUNÇÕES PARA O PORTFÓLIO E TRANSAÇÕES ---
+
+export function listenToPortfolioSummary(callback) {
+    const portfolioRef = doc(db, "portfolio", "summary");
+    return onSnapshot(portfolioRef, (doc) => {
+        const data = doc.exists() ? doc.data() : { balance: 0 };
+        callback(data);
+    }, (error) => {
+        console.error("Erro ao escutar o sumário do portfólio:", error);
+        callback(null, error);
+    });
+}
+
+export function listenToClosedTrades(callback) {
+    const q = query(collection(db, 'trades'), where('status', '==', 'CLOSED'));
+    return onSnapshot(q, (snapshot) => {
+        const closedTrades = [];
+        snapshot.forEach(doc => {
+            closedTrades.push(doc.data());
+        });
+        callback(closedTrades);
+    }, (error) => {
+        console.error("Erro ao escutar trades fechados:", error);
+        callback([], error);
+    });
+}
+
+export async function addTransactionAndUpdateBalance(transactionData) {
+    const portfolioRef = doc(db, "portfolio", "summary");
+    const amountToApply = transactionData.type === 'withdraw' ? -transactionData.amount : transactionData.amount;
+
+    try {
+        await runTransaction(db, async (transaction) => {
+            const portfolioDoc = await transaction.get(portfolioRef);
+            const currentBalance = portfolioDoc.exists() ? portfolioDoc.data().balance : 0;
+            const newBalance = currentBalance + amountToApply;
+
+            if (newBalance < 0) {
+                throw new Error("O saldo do portfólio não pode ficar negativo.");
+            }
+
+            // Adiciona o novo documento de transação
+            transaction.set(doc(collection(db, "transactions")), transactionData);
+            // Atualiza o saldo
+            transaction.set(portfolioRef, { balance: newBalance }, { merge: true });
+        });
+    } catch (error) {
+        console.error("Erro na transação de adicionar:", error);
+        throw error; // Re-throw para o handler da UI poder apanhar
+    }
+}
+
+export async function adjustPortfolioBalance(newBalance) {
+    const portfolioRef = doc(db, "portfolio", "summary");
+    try {
+        await setDoc(portfolioRef, { balance: newBalance });
+    } catch (error) {
+        console.error("Erro no serviço ao ajustar saldo:", error);
+        throw error;
+    }
+}
+
 
 export function listenToTransactions(callback) {
     const q = query(collection(db, 'transactions'), orderBy('date', 'desc'));
@@ -113,8 +177,6 @@ export async function deleteTransaction(transactionId, amount, type) {
     }
 }
 
-// --- FUNÇÃO PARA ATUALIZAR O PORTFÓLIO DIRETAMENTE ---
-
 export async function closeTradeAndUpdateBalance(tradeId, closeDetails) {
     const tradeRef = doc(db, 'trades', tradeId);
     const portfolioRef = doc(db, 'portfolio', 'summary');
@@ -145,7 +207,7 @@ export async function closeTradeAndUpdateBalance(tradeId, closeDetails) {
 
 
 // --- FUNÇÕES PARA A NOVA COLEÇÃO "STRATEGIES" ---
-
+// ... (todas as funções de estratégias permanecem iguais) ...
 export function listenToStrategies(callback) {
     const q = query(collection(db, 'strategies'), orderBy('createdAt', 'desc'));
     onSnapshot(q, (snapshot) => {
