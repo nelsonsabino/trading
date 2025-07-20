@@ -17,47 +17,59 @@ import { setCurrentStrategies, getStrategies } from './state.js';
 async function fetchMarketDataForDashboard(trades) {
     if (trades.length === 0) return {};
 
-    // 1. Cria uma lista de símbolos únicos para evitar chamadas duplicadas
     const symbols = [...new Set(trades.map(trade => trade.data.asset))];
 
     try {
-        // 2. Busca todos os dados em paralelo para máxima eficiência
-        const [tickerResponse, sparklinesResult] = await Promise.all([
+        // --- MELHORIA: Usa Promise.allSettled para maior resiliência ---
+        const results = await Promise.allSettled([
             fetch('https://api.binance.com/api/v3/ticker/24hr'),
             supabase.functions.invoke('get-sparklines-data', { body: { symbols } })
         ]);
 
-        if (!tickerResponse.ok) {
-            console.error("Falha ao buscar dados de ticker da Binance.");
-            return {};
-        }
-
-        const allTickers = await tickerResponse.json();
-        const { data: sparklinesData, error: sparklinesError } = sparklinesResult;
-        if (sparklinesError) {
-            console.error("Falha ao buscar dados de sparkline:", sparklinesError);
-        }
-        
-        // 3. Organiza os dados num único objeto para fácil acesso
         const marketData = {};
-        const tickerMap = new Map(allTickers.map(t => [t.symbol, t]));
+        
+        // Processa o resultado da API da Binance (tickers)
+        const tickerResult = results[0];
+        let tickerMap = new Map();
+        if (tickerResult.status === 'fulfilled' && tickerResult.value.ok) {
+            const allTickers = await tickerResult.value.json();
+            tickerMap = new Map(allTickers.map(t => [t.symbol, t]));
+        } else {
+            console.error("Falha ao buscar dados de ticker da Binance:", tickerResult.reason || 'Resposta não ok');
+        }
 
+        // Processa o resultado da Edge Function (sparklines)
+        const sparklinesResult = results[1];
+        let sparklinesData = {};
+        if (sparklinesResult.status === 'fulfilled') {
+            const { data, error } = sparklinesResult.value;
+            if (error) {
+                console.error("Erro na função de sparkline:", error);
+            } else {
+                sparklinesData = data;
+            }
+        } else {
+            console.error("Falha ao invocar a função de sparkline:", sparklinesResult.reason);
+        }
+
+        // Constrói o objeto final com os dados disponíveis
         symbols.forEach(symbol => {
             const ticker = tickerMap.get(symbol);
             marketData[symbol] = {
                 price: ticker ? parseFloat(ticker.lastPrice) : 0,
                 change: ticker ? parseFloat(ticker.priceChangePercent) : 0,
-                sparkline: (sparklinesData && sparklinesData[symbol]) ? sparklinesData[symbol] : []
+                sparkline: sparklinesData[symbol] || [] // Usa o sparkline se existir, senão um array vazio
             };
         });
 
         return marketData;
 
     } catch (error) {
-        console.error("Erro ao buscar dados de mercado para o dashboard:", error);
+        console.error("Erro geral ao buscar dados de mercado para o dashboard:", error);
         return {}; // Retorna um objeto vazio em caso de falha geral
     }
 }
+
 
 /**
  * Função principal que inicializa a lógica da página do dashboard.
