@@ -2,14 +2,9 @@
 
 import { supabase } from './services.js';
 
-// --- NOVO: Constantes para o Cache ---
 const CACHE_KEY_DATA = 'marketScannerCache';
 const CACHE_KEY_TIMESTAMP = 'marketScannerCacheTime';
-const CACHE_DURATION_MS = 2 * 60 * 1000; // 2 minutos
-
-// =================================================================================
-// LÓGICA E INICIALIZAÇÃO DOS MODAIS (sem alterações)
-// =================================================================================
+const CACHE_DURATION_MS = 2 * 60 * 1000;
 
 const chartModal = document.getElementById('chart-modal');
 const closeChartModalBtn = document.getElementById('close-chart-modal');
@@ -18,9 +13,7 @@ const chartContainer = document.getElementById('chart-modal-container');
 function openChartModal(symbol) {
     if (!chartModal || !chartContainer) return;
     chartContainer.innerHTML = ''; 
-
     const currentTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
-
     new TradingView.widget({
         "container_id": "chart-modal-container", "autosize": true, "symbol": `BINANCE:${symbol}`,
         "interval": "240", "timezone": "Etc/UTC", "theme": currentTheme, "style": "1", "locale": "pt",
@@ -41,21 +34,14 @@ if (chartModal) {
     chartModal.addEventListener('click', (e) => { if (e.target.id === 'chart-modal') closeChartModal(); });
 }
 
-
-// =================================================================================
-// LÓGICA DE RENDERIZAÇÃO (agora separada para reutilização)
-// =================================================================================
-
 function renderSparkline(containerId, dataSeries) {
     if (!dataSeries || dataSeries.length < 2) return;
     const container = document.getElementById(containerId);
-    if (!container) return; // Garante que o container existe
-    container.innerHTML = ''; // Limpa antes de renderizar
-
+    if (!container) return;
+    container.innerHTML = '';
     const firstPrice = dataSeries[0];
     const lastPrice = dataSeries[dataSeries.length - 1];
     const chartColor = lastPrice >= firstPrice ? '#28a745' : '#dc3545';
-
     const options = {
         series: [{ data: dataSeries }], chart: { type: 'line', height: 50, sparkline: { enabled: true }},
         stroke: { curve: 'smooth', width: 2 }, colors: [chartColor],
@@ -68,28 +54,20 @@ function renderSparkline(containerId, dataSeries) {
 function renderPageContent(tickers, sparklinesData) {
     const tbody = document.getElementById('market-scan-tbody');
     if (!tbody) return;
-
     if (tickers.length === 0) {
         tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Não foram encontrados pares com USDC com volume significativo.</td></tr>';
         return;
     }
-
     const tableRowsHtml = tickers.map((ticker, index) => createTableRow(ticker, index)).join('');
     tbody.innerHTML = tableRowsHtml;
-
     tickers.forEach(ticker => {
-        const symbol = ticker.symbol || ticker; // Lida com o formato do ticker
+        const symbol = ticker.symbol || ticker;
         const data = sparklinesData[symbol];
         if (data) {
             renderSparkline(`sparkline-${symbol}`, data);
         }
     });
 }
-
-
-// =================================================================================
-// LÓGICA PRINCIPAL DA PÁGINA (agora com cache)
-// =================================================================================
 
 function formatVolume(volume) {
     if (volume >= 1_000_000_000) return (volume / 1_000_000_000).toFixed(2) + 'B';
@@ -111,7 +89,8 @@ function createTableRow(ticker, index) {
     return `
         <tr>
             <td>${index + 1}</td>
-            <td><div class="asset-name"><span>${baseAsset}</span></div></td>
+            <!-- ALTERAÇÃO: Adicionado link para a página de detalhes -->
+            <td><div class="asset-name"><strong><a href="asset-details.html?symbol=${ticker.symbol}" class="asset-link">${baseAsset}</a></strong></div></td>
             <td>${price.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</td>
             <td class="sparkline-cell"><div class="sparkline-container" id="sparkline-${ticker.symbol}"></div></td>
             <td>${formatVolume(volume)}</td>
@@ -131,8 +110,6 @@ async function fetchAndDisplayMarketData() {
     const tbody = document.getElementById('market-scan-tbody');
     if (!tbody) return;
     tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">A carregar dados...</td></tr>';
-
-    // --- 1. VERIFICAR O CACHE PRIMEIRO ---
     const cachedDataJSON = sessionStorage.getItem(CACHE_KEY_DATA);
     const cacheTimestamp = sessionStorage.getItem(CACHE_KEY_TIMESTAMP);
 
@@ -140,10 +117,9 @@ async function fetchAndDisplayMarketData() {
         console.log("A carregar dados do scanner a partir do cache.");
         const cachedData = JSON.parse(cachedDataJSON);
         renderPageContent(cachedData.tickers, cachedData.sparklines);
-        return; // Termina a função aqui se usar o cache
+        return;
     }
     
-    // --- 2. SE O CACHE FOR INVÁLIDO OU NÃO EXISTIR, BUSCAR NOVOS DADOS ---
     console.log("Cache do scanner inválido. A buscar novos dados da API.");
     try {
         const response = await fetch('https://api.binance.com/api/v3/ticker/24hr');
@@ -164,15 +140,10 @@ async function fetchAndDisplayMarketData() {
         const { data: sparklinesData, error: sparklinesError } = await supabase.functions.invoke('get-sparklines-data', { body: { symbols } });
         if (sparklinesError) throw sparklinesError;
 
-        // --- 3. GUARDAR OS NOVOS DADOS NO CACHE ANTES DE RENDERIZAR ---
-        const dataToCache = {
-            tickers: top50Usdc,
-            sparklines: sparklinesData
-        };
+        const dataToCache = { tickers: top50Usdc, sparklines: sparklinesData };
         sessionStorage.setItem(CACHE_KEY_DATA, JSON.stringify(dataToCache));
         sessionStorage.setItem(CACHE_KEY_TIMESTAMP, Date.now());
 
-        // --- 4. RENDERIZAR O CONTEÚDO DA PÁGINA ---
         renderPageContent(top50Usdc, sparklinesData);
 
     } catch (error) {
@@ -180,11 +151,6 @@ async function fetchAndDisplayMarketData() {
         tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: red;">Não foi possível carregar os dados.</td></tr>';
     }
 }
-
-
-// =================================================================================
-// PONTO DE ENTRADA DA PÁGINA (sem alterações)
-// =================================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
     const tbody = document.getElementById('market-scan-tbody');
