@@ -13,43 +13,33 @@ function renderTradingViewWidgets(symbol) {
     const currentTheme = document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light';
 
     if (mainChartContainer) {
-        // --- ALTERAÇÃO: Novas configurações do gráfico ---
         const chartBackgroundColor = currentTheme === 'light' ? '#ffffff' : '#1e1e1e';
         const chartGridColor = currentTheme === 'light' ? 'rgba(46, 46, 46, 0.06)' : 'rgba(255, 255, 255, 0.1)';
 
         new TradingView.widget({
-            "autosize": true,
-            "symbol": `BINANCE:${symbol}`,
-            "interval": "240",
-            "timezone": "Etc/UTC",
-            "theme": currentTheme,
-            "style": "1",
-            "locale": "pt", // Mantido em Português para consistência
-            "hide_side_toolbar": true, // Esconde a barra de ferramentas lateral
-            "hide_top_toolbar": false, // Mostra a barra de ferramentas superior
-            "allow_symbol_change": false, // Não permite mudar o símbolo no gráfico
-            "save_image": false,
-            "calendar": false,
-            "details": false,
-            "hide_legend": true,
-            "hide_volume": true,
-            "hotlist": false,
-            "withdateranges": false,
-            "backgroundColor": chartBackgroundColor,
-            "gridColor": chartGridColor,
-            "studies": [ // Novos indicadores
-                "STD;RSI",
-                "STD;Supertrend"
-            ],
+            "autosize": true, "symbol": `BINANCE:${symbol}`, "interval": "240", "timezone": "Etc/UTC",
+            "theme": currentTheme, "style": "1", "locale": "pt", "hide_side_toolbar": true, "hide_top_toolbar": false,
+            "allow_symbol_change": false, "save_image": false, "calendar": false, "details": false,
+            "hide_legend": true, "hide_volume": true, "hotlist": false, "withdateranges": false,
+            "backgroundColor": chartBackgroundColor, "gridColor": chartGridColor,
+            "studies": ["STD;RSI", "STD;Supertrend"],
             "container_id": "main-chart-container"
         });
     }
 
     if (techAnalysisContainer) {
-        // O widget de análise técnica permanece o mesmo
+        // --- ALTERAÇÃO: Substituído pelo widget de Análise Técnica completo ---
         new TradingView.widget({
-            "container_id": "tech-analysis-container", "width": "100%", "height": "100%", "symbol": `BINANCE:${symbol}`,
-            "interval": "1D", "timezone": "Etc/UTC", "theme": currentTheme, "style": "1", "locale": "pt"
+            "container_id": "tech-analysis-container",
+            "width": "100%",
+            "height": "100%",
+            "symbol": `BINANCE:${symbol}`,
+            "interval": "1h",
+            "showIntervalTabs": true,
+            "displayMode": "multiple", // Mostra múltiplos timeframes
+            "locale": "pt",
+            "colorTheme": currentTheme,
+            "isTransparent": false
         });
     }
 }
