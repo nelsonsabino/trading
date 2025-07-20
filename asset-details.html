@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Ativo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+        (function() {
+            try {
+                const theme = localStorage.getItem('theme');
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark-mode');
+                } else {
+                    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    if (prefersDark && theme !== 'light') {
+                        document.documentElement.classList.add('dark-mode');
+                    }
+                }
+            } catch (e) {}
+        })();
+    </script>
+</head>
+<body>
+
+    <header>
+        <h1 id="asset-title">A carregar...</h1>
+        <p class="mantra">Toda a informação sobre o ativo, num único local.</p>
+        <nav>
+            <a href="index.html" class="nav-link">Voltar ao Dashboard</a>
+            <a href="market-scan.html" class="nav-link">Scanner de Mercado</a>
+            <a href="alarms.html" class="nav-link">Gerir Alarmes</a>
+            <button id="theme-toggle-btn" class="btn" title="Alternar tema">
+                <i class="fas fa-moon"></i>
+            </button>
+        </nav>
+    </header>
+
+    <main>
+        <section class="asset-charts-grid">
+            <div id="main-chart-container" style="height: 500px; width: 100%;">
+                <!-- Widget do Gráfico Avançado do TradingView será inserido aqui -->
+            </div>
+            <div id="tech-analysis-container" style="height: 500px; width: 100%; margin-top: 2rem;">
+                <!-- Widget de Análise Técnica do TradingView será inserido aqui -->
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <section class="asset-related-data">
+            <h2><i class="fa-solid fa-bell"></i> Alarmes Ativos para este Ativo</h2>
+            <div class="table-wrapper">
+                <table class="alarms-table">
+                    <thead>
+                        <tr>
+                            <th>Condição</th>
+                            <th>Data de Criação</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="asset-alarms-tbody">
+                        <!-- Linhas da tabela de alarmes serão inseridas aqui -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <section class="asset-related-data">
+            <h2><i class="fa-solid fa-history"></i> Histórico de Trades para este Ativo</h2>
+            <div class="table-wrapper">
+                <table id="trades-table">
+                    <thead>
+                        <tr>
+                            <th>Estratégia</th>
+                            <th>Status</th>
+                            <th>Data de Criação</th>
+                            <th>P&L ($)</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="asset-trades-tbody">
+                        <!-- Linhas da tabela de trades serão inseridas aqui -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer></footer>
+
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="js/services.js"></script>
+    <script type="module" src="js/firebase-service.js"></script>
+    <script type="module" src="js/asset-details.js"></script> <!-- O nosso novo script -->
+    <script type="module" src="js/version.js"></script>
+    <script type="module" src="js/dark-mode.js"></script>
+</body>
+</html>
