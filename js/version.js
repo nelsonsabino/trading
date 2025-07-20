@@ -2,15 +2,26 @@
 
 export const changelogData = {
     current: {
-        number: '8.5.0', // <-- VERSÃO ATUALIZADA
+        number: '8.6.0', // <-- VERSÃO ATUALIZADA
         changes: [
-            "**Nova Funcionalidade: Página de Detalhe do Ativo.**",
-            "Adicionada uma nova página (`asset-details.html`) que centraliza todas as informações de um ativo específico.",
-            "A página exibe um gráfico avançado, análise técnica, e tabelas com todos os alarmes e trades relacionados ao ativo.",
-            "Os nomes dos ativos no Dashboard, Scanner de Mercado e página de Alarmes são agora links diretos para esta nova página de análise."
+            "**Melhorias na Página de Detalhes do Ativo:**",
+            "Configuração do gráfico principal melhorada para uma análise mais limpa.",
+            "Adicionado um widget de Análise Técnica avançado com múltiplos timeframes.",
+            "Integrada uma nova secção com as últimas notícias do ativo (via CryptoCompare).",
+            "Adicionados botões de ação rápida no cabeçalho (Adicionar à Watchlist, Criar Alarme, Análise TV).",
+            "Implementado um layout 50/50 para os gráficos em ecrãs maiores para melhor visualização."
         ]
     },
     releases: [
+        {
+            number: '8.5.0',
+            changes: [
+                "**Nova Funcionalidade: Página de Detalhe do Ativo.**",
+                "Adicionada uma nova página (`asset-details.html`) que centraliza todas as informações de um ativo específico.",
+                "A página exibe um gráfico avançado, análise técnica, e tabelas com todos os alarmes e trades relacionados ao ativo.",
+                "Os nomes dos ativos no Dashboard, Scanner de Mercado e página de Alarmes são agora links diretos para esta nova página de análise."
+            ]
+        },
         {
             number: '8.4.0',
             changes: [
