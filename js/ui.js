@@ -1,13 +1,15 @@
-// js/ui.js - VERSÃO COM CORREÇÃO FINAL DO TEMA DO GRÁFICO
+// js/ui.js - VERSÃO COM ANIMAÇÃO DE DESTAQUE
 
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openImageModal } from './modals.js';
 import { loadAndOpenForEditing } from './handlers.js';
+import { getLastCreatedTradeId, setLastCreatedTradeId } from './state.js'; // Importa as funções de estado
 
 // --- FUNÇÃO PARA RENDERIZAR SPARKLINE ---
 function renderSparkline(containerId, dataSeries) {
     const container = document.getElementById(containerId);
     if (!container || !dataSeries || dataSeries.length < 2) return;
+    container.innerHTML = ''; // Limpa antes de renderizar
 
     const firstPrice = dataSeries[0];
     const lastPrice = dataSeries[dataSeries.length - 1];
@@ -80,20 +82,11 @@ export function generateDynamicChecklist(container, phases, data = {}) {
         phase.items.forEach(item => {
             let element;
             switch (item.type) {
-                case 'checkbox':
-                    element = createChecklistItem(item, data);
-                    break;
-                case 'select':
-                case 'text':
-                case 'number':
-                    element = createInputItem(item, data);
-                    break;
-                default:
-                    console.warn(`Tipo de item desconhecido: ${item.type}`);
+                case 'checkbox': element = createChecklistItem(item, data); break;
+                case 'select': case 'text': case 'number': element = createInputItem(item, data); break;
+                default: console.warn(`Tipo de item desconhecido: ${item.type}`);
             }
-            if (element) {
-                phaseDiv.appendChild(element);
-            }
+            if (element) phaseDiv.appendChild(element);
         });
         container.appendChild(phaseDiv);
     });
@@ -116,31 +109,22 @@ export function createTradeCard(trade, marketData = {}) {
     const card = document.createElement('div');
     card.className = 'trade-card';
     card.dataset.tradeId = trade.id;
-
     const assetName = trade.data.asset;
     const tradingViewSymbol = `BINANCE:${assetName}`;
     const assetMarketData = marketData[assetName] || { price: 0, change: 0, sparkline: [] };
     const priceChangeClass = assetMarketData.change >= 0 ? 'positive-pnl' : 'negative-pnl';
-
     if (trade.data.status === 'ARMED') card.classList.add('armed');
     if (trade.data.status === 'LIVE') card.classList.add('live');
-
     let mainActionButtonHtml = '';
-    if (trade.data.status === 'POTENTIAL') {
-        mainActionButtonHtml = `<button class="icon-action-btn action-arm" data-action="arm" title="Validar e Armar Setup"><i class="fa-solid fa-bolt"></i> <span>Armar</span></button>`;
-    } else if (trade.data.status === 'ARMED') {
-        mainActionButtonHtml = `<button class="icon-action-btn action-execute" data-action="execute" title="Executar Trade"><i class="fa-solid fa-play"></i> <span>Executar</span></button>`;
-    } else if (trade.data.status === 'LIVE') {
-        mainActionButtonHtml = `<button class="icon-action-btn action-close" data-action="close" title="Fechar Trade"><i class="fa-solid fa-stop"></i> <span>Fechar</span></button>`;
-    }
-
+    if (trade.data.status === 'POTENTIAL') { mainActionButtonHtml = `<button class="icon-action-btn action-arm" data-action="arm" title="Validar e Armar Setup"><i class="fa-solid fa-bolt"></i> <span>Armar</span></button>`; } 
+    else if (trade.data.status === 'ARMED') { mainActionButtonHtml = `<button class="icon-action-btn action-execute" data-action="execute" title="Executar Trade"><i class="fa-solid fa-play"></i> <span>Executar</span></button>`; } 
+    else if (trade.data.status === 'LIVE') { mainActionButtonHtml = `<button class="icon-action-btn action-close" data-action="close" title="Fechar Trade"><i class="fa-solid fa-stop"></i> <span>Fechar</span></button>`; }
     card.innerHTML = `
         <button class="icon-action-btn card-edit-btn" data-action="edit" title="Editar"><i class="fas fa-pencil"></i></button>
         <h3>${assetName}</h3>
         <p style="color: #007bff; font-weight: 500;">Estratégia: ${trade.data.strategyName || 'N/A'}</p>
         <p><strong>Status:</strong> ${trade.data.status}</p>
         <p><strong>Notas:</strong> ${trade.data.notes || ''}</p>
-        
         <div class="card-market-data">
             <div class="card-sparkline" id="sparkline-card-${trade.id}"></div>
             <div class="card-price-data">
@@ -148,18 +132,12 @@ export function createTradeCard(trade, marketData = {}) {
                 <div class="${priceChangeClass}">${assetMarketData.change.toFixed(2)}%</div>
             </div>
         </div>
-        
         <div class="card-actions">
-            <button class="icon-action-btn action-summary" data-action="toggle-chart" data-symbol="${tradingViewSymbol}" title="Ver gráfico interativo">
-                <i class="fa-solid fa-chart-simple"></i> <span>Gráfico</span>
-            </button>
-            <a href="https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}" target="_blank" rel="noopener noreferrer" class="icon-action-btn action-full-chart" title="Abrir no TradingView para análise completa">
-                <i class="fa-solid fa-arrow-up-right-from-square"></i> <span>Análise</span>
-            </a>
+            <button class="icon-action-btn action-summary" data-action="toggle-chart" data-symbol="${tradingViewSymbol}" title="Ver gráfico interativo"><i class="fa-solid fa-chart-simple"></i> <span>Gráfico</span></button>
+            <a href="https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}" target="_blank" rel="noopener noreferrer" class="icon-action-btn action-full-chart" title="Abrir no TradingView para análise completa"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span>Análise</span></a>
             ${mainActionButtonHtml}
         </div>
-        <div class="mini-chart-container" id="advanced-chart-${trade.id}"></div>
-    `;
+        <div class="mini-chart-container" id="advanced-chart-${trade.id}"></div>`;
     return card;
 }
 
@@ -167,22 +145,15 @@ function toggleAdvancedChart(tradeId, symbol, button) {
     const chartContainer = document.getElementById(`advanced-chart-${tradeId}`);
     if (!chartContainer) return;
     const isVisible = chartContainer.classList.contains('visible');
-
     if (isVisible) {
-        chartContainer.innerHTML = '';
-        chartContainer.classList.remove('visible');
+        chartContainer.innerHTML = ''; chartContainer.classList.remove('visible');
         button.innerHTML = `<i class="fa-solid fa-chart-simple"></i> <span>Gráfico</span>`;
     } else {
         button.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>A Carregar...</span>`;
-        
-        // --- CORREÇÃO APLICADA AQUI ---
-        // Agora verificamos o tema usando o document.documentElement
         const currentTheme = document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light';
-        
         new TradingView.widget({
-            "container_id": chartContainer.id, "autosize": true, "symbol": symbol, "interval": "60",
-            "timezone": "Etc/UTC", "theme": currentTheme, "style": "1", "locale": "pt",
-            "hide_side_toolbar": true, "hide_top_toolbar": true, "hide_legend": true,
+            "container_id": chartContainer.id, "autosize": true, "symbol": symbol, "interval": "60", "timezone": "Etc/UTC", 
+            "theme": currentTheme, "style": "1", "locale": "pt", "hide_side_toolbar": true, "hide_top_toolbar": true, "hide_legend": true,
             "save_image": false, "allow_symbol_change": false
         });
         chartContainer.classList.add('visible');
@@ -211,10 +182,19 @@ export function displayTrades(trades, marketData) {
 
     trades.forEach(trade => {
         const assetMarketData = marketData[trade.data.asset];
-        if (assetMarketData) {
-            renderSparkline(`sparkline-card-${trade.id}`, assetMarketData.sparkline);
-        }
+        if (assetMarketData) renderSparkline(`sparkline-card-${trade.id}`, assetMarketData.sparkline);
     });
+
+    // --- ALTERAÇÃO: APLICA O DESTAQUE ---
+    const lastId = getLastCreatedTradeId();
+    if (lastId) {
+        const newCard = document.querySelector(`.trade-card[data-trade-id="${lastId}"]`);
+        if (newCard) {
+            newCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            newCard.classList.add('new-item-flash');
+        }
+        setLastCreatedTradeId(null); // Limpa o ID para não repetir a animação
+    }
 }
 
 // --- LISTENER DE EVENTOS UNIFICADO PARA OS CARDS ---
@@ -224,32 +204,18 @@ document.addEventListener('DOMContentLoaded', () => {
         dashboard.addEventListener('click', (e) => {
             const button = e.target.closest('[data-action]');
             if (!button) return;
-
             const card = button.closest('.trade-card');
             const tradeId = card ? card.dataset.tradeId : null;
             if (!tradeId) return;
-
             const trade = tradesForEventListeners.find(t => t.id === tradeId);
             if (!trade) return;
-
             const action = button.dataset.action;
-
             switch (action) {
-                case 'toggle-chart':
-                    toggleAdvancedChart(tradeId, button.dataset.symbol, button);
-                    break;
-                case 'edit':
-                    loadAndOpenForEditing(tradeId);
-                    break;
-                case 'arm':
-                    openArmModal(trade);
-                    break;
-                case 'execute':
-                    openExecModal(trade);
-                    break;
-                case 'close':
-                    openCloseTradeModal(trade);
-                    break;
+                case 'toggle-chart': toggleAdvancedChart(tradeId, button.dataset.symbol, button); break;
+                case 'edit': loadAndOpenForEditing(tradeId); break;
+                case 'arm': openArmModal(trade); break;
+                case 'execute': openExecModal(trade); break;
+                case 'close': openCloseTradeModal(trade); break;
             }
         });
     }
