@@ -2,12 +2,19 @@
 
 export const changelogData = {
     current: {
-        number: '8.0.4', // <-- VERSÃO ATUALIZADA E CORRETA
+        number: '8.0.5', // <-- VERSÃO ATUALIZADA
         changes: [
-            "Corrigido o 'flash' do tema claro ao carregar a página no Modo Escuro.",
+            "Unificado o design dos botões de ação em todas as tabelas (Scanner, Alarmes) para um layout de ícones consistente.",
+            "Corrigidos vários bugs de layout e de modo escuro para melhorar a consistência visual em toda a aplicação.",
         ]
     },
     releases: [
+        {
+            number: '8.0.4',
+            changes: [
+                "Corrigido o 'flash' do tema claro ao carregar a página no Modo Escuro.",
+            ]
+        },
         {
             number: '8.0.3',
             changes: [
