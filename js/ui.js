@@ -1,13 +1,4 @@
-// js/ui.js - VERSÃO COM DADOS DE MERCADO E SPARKLINE NOS CARDS
-
-import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
-import { openArmModal, openExecModal, openCloseTradeModal, openImageModal } from './modals.js';
-import { loadAndOpenForEditing } from './handlers.js';
-import { isAndroid, isIOS } from './utils.js';
-
-// --- FUNÇÃO PARA RENDERIZAR SPARKLINE ---
-function renderSparkline(containerId, dataSeries) {
-    const container = document.getElementById(containerId);// js/ui.js - VERSÃO COM DELEGAÇÃO DE EVENTOS PARA OS CARDS
+// js/ui.js - VERSÃO COM DELEGAÇÃO DE EVENTOS PARA OS CARDS (CORRIGIDA)
 
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openImageModal } from './modals.js';
@@ -16,165 +7,6 @@ import { loadAndOpenForEditing } from './handlers.js';
 // --- FUNÇÃO PARA RENDERIZAR SPARKLINE ---
 function renderSparkline(containerId, dataSeries) {
     const container = document.getElementById(containerId);
-    if (!container || !dataSeries || dataSeries.length < 2) return;
-    const firstPrice = dataSeries[0];
-    const lastPrice = dataSeries[dataSeries.length - 1];
-    const chartColor = lastPrice >= firstPrice ? '#28a745' : '#dc3545';
-    const options = {
-        series: [{ data: dataSeries }], chart: { type: 'line', height: 40, width: 100, sparkline: { enabled: true }},
-        stroke: { curve: 'smooth', width: 2 }, colors: [chartColor], tooltip: { enabled: false }
-    };
-    const chart = new ApexCharts(container, options);
-    chart.render();
-}
-
-// --- FUNÇÕES DE GERAÇÃO DE FORMULÁRIO (inalteradas) ---
-function getIconForLabel(labelText) { /*...*/ }
-function createChecklistItem(item, data) { /*...*/ }
-function createInputItem(item, data) { /*...*/ }
-export function generateDynamicChecklist(container, phases, data = {}) { /*...*/ }
-export function populateStrategySelect(strategies) { /*...*/ }
-
-// --- FUNÇÃO DE CRIAÇÃO DE CARD ATUALIZADA (SEM LISTENERS DIRETOS) ---
-export function createTradeCard(trade, marketData = {}) {
-    const card = document.createElement('div');
-    card.className = 'trade-card';
-    card.dataset.tradeId = trade.id; // Importante para a delegação de eventos
-
-    const assetName = trade.data.asset;
-    const tradingViewSymbol = `BINANCE:${assetName}`;
-    const assetMarketData = marketData[assetName] || { price: 0, change: 0, sparkline: [] };
-    const priceChangeClass = assetMarketData.change >= 0 ? 'positive-pnl' : 'negative-pnl';
-
-    // Adiciona classes de estado ao card
-    if (trade.data.status === 'ARMED') card.classList.add('armed');
-    if (trade.data.status === 'LIVE') card.classList.add('live');
-
-    let mainActionButtonHtml = '';
-    if (trade.data.status === 'POTENTIAL') {
-        mainActionButtonHtml = `<button class="icon-action-btn action-arm" data-action="arm" title="Validar e Armar Setup"><i class="fa-solid fa-bolt"></i> <span>Armar</span></button>`;
-    } else if (trade.data.status === 'ARMED') {
-        mainActionButtonHtml = `<button class="icon-action-btn action-execute" data-action="execute" title="Executar Trade"><i class="fa-solid fa-play"></i> <span>Executar</span></button>`;
-    } else if (trade.data.status === 'LIVE') {
-        mainActionButtonHtml = `<button class="icon-action-btn action-close" data-action="close" title="Fechar Trade"><i class="fa-solid fa-stop"></i> <span>Fechar</span></button>`;
-    }
-
-    card.innerHTML = `
-        <button class="icon-action-btn card-edit-btn" data-action="edit" title="Editar"><i class="fas fa-pencil"></i></button>
-        <h3>${assetName}</h3>
-        <p style="color: #007bff; font-weight: 500;">Estratégia: ${trade.data.strategyName || 'N/A'}</p>
-        <p><strong>Status:</strong> ${trade.data.status}</p>
-        <p><strong>Notas:</strong> ${trade.data.notes || ''}</p>
-        
-        <div class="card-market-data">
-            <div class="card-sparkline" id="sparkline-card-${trade.id}"></div>
-            <div class="card-price-data">
-                <div class="card-price">${assetMarketData.price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 8 })}</div>
-                <div class="${priceChangeClass}">${assetMarketData.change.toFixed(2)}%</div>
-            </div>
-        </div>
-        
-        <div class="card-actions">
-            <button class="icon-action-btn action-summary" data-action="toggle-chart" data-symbol="${tradingViewSymbol}" title="Ver gráfico interativo">
-                <i class="fa-solid fa-chart-simple"></i> <span>Gráfico</span>
-            </button>
-            <a href="https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}" target="_blank" rel="noopener noreferrer" class="icon-action-btn action-full-chart" title="Abrir no TradingView para análise completa">
-                <i class="fa-solid fa-arrow-up-right-from-square"></i> <span>Análise</span>
-            </a>
-            ${mainActionButtonHtml}
-        </div>
-        <div class="mini-chart-container" id="advanced-chart-${trade.id}"></div>
-    `;
-    return card;
-}
-
-function toggleAdvancedChart(tradeId, symbol, button) {
-    const chartContainer = document.getElementById(`advanced-chart-${tradeId}`);
-    if (!chartContainer) return;
-    const isVisible = chartContainer.classList.contains('visible');
-    if (isVisible) {
-        chartContainer.innerHTML = '';
-        chartContainer.classList.remove('visible');
-        button.innerHTML = `<i class="fa-solid fa-chart-simple"></i> <span>Gráfico</span>`;
-    } else {
-        button.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>A Carregar...</span>`;
-        const currentTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
-        new TradingView.widget({
-            "container_id": chartContainer.id, "autosize": true, "symbol": symbol, "interval": "60",
-            "timezone": "Etc/UTC", "theme": currentTheme, "style": "1", "locale": "pt",
-            "hide_side_toolbar": true, "hide_top_toolbar": true, "hide_legend": true,
-            "save_image": false, "allow_symbol_change": false
-        });
-        chartContainer.classList.add('visible');
-        button.innerHTML = `<i class="fa-solid fa-eye-slash"></i> <span>Esconder</span>`;
-    }
-}
-
-let tradesForEventListeners = []; // Guarda os trades para usar nos listeners
-
-export function displayTrades(trades, marketData) {
-    tradesForEventListeners = trades; // Atualiza a lista de trades
-    if (!potentialTradesContainer) return;
-    
-    potentialTradesContainer.innerHTML = '<p class="empty-state-message">Nenhum ativo na watchlist.</p>';
-    armedTradesContainer.innerHTML = '<p class="empty-state-message">Nenhum setup armado.</p>';
-    liveTradesContainer.innerHTML = '<p class="empty-state-message">Nenhuma operação ativa.</p>';
-    
-    let potentialCount = 0, armedCount = 0, liveCount = 0;
-    
-    trades.forEach(trade => {
-        const card = createTradeCard(trade, marketData); 
-        if (trade.data.status === 'POTENTIAL') { if (potentialCount === 0) potentialTradesContainer.innerHTML = ''; potentialTradesContainer.appendChild(card); potentialCount++; }
-        else if (trade.data.status === 'ARMED') { if (armedCount === 0) armedTradesContainer.innerHTML = ''; armedTradesContainer.appendChild(card); armedCount++; }
-        else if (trade.data.status === 'LIVE') { if (liveCount === 0) liveTradesContainer.innerHTML = ''; liveTradesContainer.appendChild(card); liveCount++; }
-    });
-
-    trades.forEach(trade => {
-        const assetMarketData = marketData[trade.data.asset];
-        if (assetMarketData) {
-            renderSparkline(`sparkline-card-${trade.id}`, assetMarketData.sparkline);
-        }
-    });
-}
-
-// --- NOVO: LISTENER DE EVENTOS UNIFICADO PARA OS CARDS ---
-document.addEventListener('DOMContentLoaded', () => {
-    const dashboard = document.querySelector('.dashboard-columns');
-    if (dashboard) {
-        dashboard.addEventListener('click', (e) => {
-            const button = e.target.closest('[data-action]');
-            if (!button) return;
-
-            const card = button.closest('.trade-card');
-            const tradeId = card ? card.dataset.tradeId : null;
-            if (!tradeId) return;
-
-            const trade = tradesForEventListeners.find(t => t.id === tradeId);
-            if (!trade) return;
-
-            const action = button.dataset.action;
-
-            switch (action) {
-                case 'toggle-chart':
-                    toggleAdvancedChart(tradeId, button.dataset.symbol, button);
-                    break;
-                case 'edit':
-                    loadAndOpenForEditing(tradeId);
-                    break;
-                case 'arm':
-                    openArmModal(trade);
-                    break;
-                case 'execute':
-                    openExecModal(trade);
-                    break;
-                case 'close':
-                    openCloseTradeModal(trade);
-                    break;
-            }
-        });
-    }
-});
-    // Adiciona uma verificação extra para o container
     if (!container || !dataSeries || dataSeries.length < 2) return;
 
     const firstPrice = dataSeries[0];
@@ -193,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
 }
 
 
-// --- FUNÇÕES DE GERAÇÃO DE FORMULÁRIO E DROPDOWN ---
+// --- FUNÇÕES DE GERAÇÃO DE FORMULÁRIO ---
 function getIconForLabel(labelText) {
     const text = labelText.toLowerCase();
     if (text.includes('tendência')) return 'fa-solid fa-chart-line';
@@ -281,7 +113,7 @@ export function populateStrategySelect(strategies) {
 }
 
 
-// --- FUNÇÃO DE CRIAÇÃO DE CARD ATUALIZADA ---
+// --- LÓGICA DE CRIAÇÃO E EXIBIÇÃO DE CARDS ---
 export function createTradeCard(trade, marketData = {}) {
     const card = document.createElement('div');
     card.className = 'trade-card';
@@ -289,87 +121,47 @@ export function createTradeCard(trade, marketData = {}) {
 
     const assetName = trade.data.asset;
     const tradingViewSymbol = `BINANCE:${assetName}`;
-    
     const assetMarketData = marketData[assetName] || { price: 0, change: 0, sparkline: [] };
     const priceChangeClass = assetMarketData.change >= 0 ? 'positive-pnl' : 'negative-pnl';
 
+    if (trade.data.status === 'ARMED') card.classList.add('armed');
+    if (trade.data.status === 'LIVE') card.classList.add('live');
+
+    let mainActionButtonHtml = '';
+    if (trade.data.status === 'POTENTIAL') {
+        mainActionButtonHtml = `<button class="icon-action-btn action-arm" data-action="arm" title="Validar e Armar Setup"><i class="fa-solid fa-bolt"></i> <span>Armar</span></button>`;
+    } else if (trade.data.status === 'ARMED') {
+        mainActionButtonHtml = `<button class="icon-action-btn action-execute" data-action="execute" title="Executar Trade"><i class="fa-solid fa-play"></i> <span>Executar</span></button>`;
+    } else if (trade.data.status === 'LIVE') {
+        mainActionButtonHtml = `<button class="icon-action-btn action-close" data-action="close" title="Fechar Trade"><i class="fa-solid fa-stop"></i> <span>Fechar</span></button>`;
+    }
+
     card.innerHTML = `
-        <button class="card-edit-btn">Editar</button>
+        <button class="icon-action-btn card-edit-btn" data-action="edit" title="Editar"><i class="fas fa-pencil"></i></button>
         <h3>${assetName}</h3>
         <p style="color: #007bff; font-weight: 500;">Estratégia: ${trade.data.strategyName || 'N/A'}</p>
         <p><strong>Status:</strong> ${trade.data.status}</p>
         <p><strong>Notas:</strong> ${trade.data.notes || ''}</p>
-    `;
-
-    const marketDataContainer = document.createElement('div');
-    marketDataContainer.className = 'card-market-data';
-    marketDataContainer.innerHTML = `
-        <div class="card-sparkline" id="sparkline-card-${trade.id}"></div>
-        <div class="card-price-data">
-            <div class="card-price">${assetMarketData.price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 8 })}</div>
-            <div class="${priceChangeClass}">${assetMarketData.change.toFixed(2)}%</div>
+        
+        <div class="card-market-data">
+            <div class="card-sparkline" id="sparkline-card-${trade.id}"></div>
+            <div class="card-price-data">
+                <div class="card-price">${assetMarketData.price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 8 })}</div>
+                <div class="${priceChangeClass}">${assetMarketData.change.toFixed(2)}%</div>
+            </div>
         </div>
+        
+        <div class="card-actions">
+            <button class="icon-action-btn action-summary" data-action="toggle-chart" data-symbol="${tradingViewSymbol}" title="Ver gráfico interativo">
+                <i class="fa-solid fa-chart-simple"></i> <span>Gráfico</span>
+            </button>
+            <a href="https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}" target="_blank" rel="noopener noreferrer" class="icon-action-btn action-full-chart" title="Abrir no TradingView para análise completa">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> <span>Análise</span>
+            </a>
+            ${mainActionButtonHtml}
+        </div>
+        <div class="mini-chart-container" id="advanced-chart-${trade.id}"></div>
     `;
-    card.appendChild(marketDataContainer);
-
-    const actionsWrapper = document.createElement('div');
-    actionsWrapper.className = 'card-actions';
-
-    const chartBtn = document.createElement('button');
-    chartBtn.className = 'icon-action-btn action-summary';
-    chartBtn.innerHTML = `<i class="fa-solid fa-chart-simple"></i> <span>Gráfico</span>`;
-    chartBtn.title = "Ver gráfico interativo";
-    chartBtn.addEventListener('click', () => {
-        toggleAdvancedChart(trade.id, tradingViewSymbol, chartBtn);
-    });
-    actionsWrapper.appendChild(chartBtn);
-
-    const analysisLink = document.createElement('a');
-    analysisLink.href = `https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}`;
-    analysisLink.className = 'icon-action-btn action-full-chart';
-    analysisLink.innerHTML = `<i class="fa-solid fa-arrow-up-right-from-square"></i> <span>Análise</span>`;
-    analysisLink.title = "Abrir no TradingView para análise completa";
-    analysisLink.target = '_blank';
-    analysisLink.rel = 'noopener noreferrer';
-    actionsWrapper.appendChild(analysisLink);
-
-    let mainActionButton;
-    if (trade.data.status === 'POTENTIAL') {
-        card.classList.remove('armed', 'live');
-        mainActionButton = document.createElement('button');
-        mainActionButton.className = 'icon-action-btn action-arm';
-        mainActionButton.innerHTML = `<i class="fa-solid fa-bolt"></i> <span>Armar</span>`;
-        mainActionButton.title = "Validar e Armar Setup";
-        mainActionButton.addEventListener('click', () => openArmModal(trade));
-    } else if (trade.data.status === 'ARMED') {
-        card.classList.add('armed');
-        mainActionButton = document.createElement('button');
-        mainActionButton.className = 'icon-action-btn action-execute';
-        mainActionButton.innerHTML = `<i class="fa-solid fa-play"></i> <span>Executar</span>`;
-        mainActionButton.title = "Executar Trade";
-        mainActionButton.addEventListener('click', () => openExecModal(trade));
-    } else if (trade.data.status === 'LIVE') {
-        card.classList.add('live');
-        const details = trade.data.executionDetails;
-        if (details) { 
-            const p = document.createElement('p'); 
-            p.innerHTML = `<strong>Entrada:</strong> ${details['entry-price'] || 'N/A'} | <strong>Quantidade:</strong> ${details['quantity'] || 'N/A'}`; 
-            card.appendChild(p); 
-        }
-        mainActionButton = document.createElement('button');
-        mainActionButton.className = 'icon-action-btn action-close';
-        mainActionButton.innerHTML = `<i class="fa-solid fa-stop"></i> <span>Fechar</span>`;
-        mainActionButton.title = "Fechar Trade";
-        mainActionButton.addEventListener('click', () => openCloseTradeModal(trade));
-    }
-    
-    if (mainActionButton) {
-        actionsWrapper.appendChild(mainActionButton);
-    }
-
-    card.appendChild(actionsWrapper);
-    
-    card.querySelector('.card-edit-btn').addEventListener('click', (e) => { e.stopPropagation(); loadAndOpenForEditing(trade.id); });
     return card;
 }
 
@@ -385,9 +177,8 @@ function toggleAdvancedChart(tradeId, symbol, button) {
         button.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>A Carregar...</span>`;
         const currentTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
         new TradingView.widget({
-            "container_id": chartContainer.id, "autosize": true, "symbol": symbol,
-            "interval": "60", "timezone": "Etc/UTC", "theme": currentTheme, "style": "1",
-            "locale": "pt", "toolbar_bg": "#f1f5f9", "enable_publishing": false,
+            "container_id": chartContainer.id, "autosize": true, "symbol": symbol, "interval": "60",
+            "timezone": "Etc/UTC", "theme": currentTheme, "style": "1", "locale": "pt",
             "hide_side_toolbar": true, "hide_top_toolbar": true, "hide_legend": true,
             "save_image": false, "allow_symbol_change": false
         });
@@ -396,7 +187,10 @@ function toggleAdvancedChart(tradeId, symbol, button) {
     }
 }
 
+let tradesForEventListeners = [];
+
 export function displayTrades(trades, marketData) {
+    tradesForEventListeners = trades;
     if (!potentialTradesContainer) return;
     
     potentialTradesContainer.innerHTML = '<p class="empty-state-message">Nenhum ativo na watchlist.</p>';
@@ -419,3 +213,41 @@ export function displayTrades(trades, marketData) {
         }
     });
 }
+
+// --- LISTENER DE EVENTOS UNIFICADO PARA OS CARDS ---
+document.addEventListener('DOMContentLoaded', () => {
+    const dashboard = document.querySelector('.dashboard-columns');
+    if (dashboard) {
+        dashboard.addEventListener('click', (e) => {
+            const button = e.target.closest('[data-action]');
+            if (!button) return;
+
+            const card = button.closest('.trade-card');
+            const tradeId = card ? card.dataset.tradeId : null;
+            if (!tradeId) return;
+
+            const trade = tradesForEventListeners.find(t => t.id === tradeId);
+            if (!trade) return;
+
+            const action = button.dataset.action;
+
+            switch (action) {
+                case 'toggle-chart':
+                    toggleAdvancedChart(tradeId, button.dataset.symbol, button);
+                    break;
+                case 'edit':
+                    loadAndOpenForEditing(tradeId);
+                    break;
+                case 'arm':
+                    openArmModal(trade);
+                    break;
+                case 'execute':
+                    openExecModal(trade);
+                    break;
+                case 'close':
+                    openCloseTradeModal(trade);
+                    break;
+            }
+        });
+    }
+});
