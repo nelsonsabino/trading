@@ -1,9 +1,9 @@
-// js/handlers.js - VERSÃO COM VALIDAÇÃO DE INPUTS
+// js/handlers.js - VERSÃO COM CAPTURA DE ID PARA DESTAQUE
 
 import { addModal } from './dom-elements.js';
 import { GESTAO_PADRAO } from './config.js';
 import { getTrade, addTrade, updateTrade, closeTradeAndUpdateBalance } from './firebase-service.js';
-import { getCurrentTrade, setCurrentTrade, getStrategies } from './state.js';
+import { getCurrentTrade, setCurrentTrade, getStrategies, setLastCreatedTradeId } from './state.js';
 import { closeAddModal, closeArmModal, closeExecModal, closeCloseTradeModal, openAddModal, openArmModal, openExecModal } from './modals.js';
 import { generateDynamicChecklist } from './ui.js';
 
@@ -44,13 +44,21 @@ export async function handleAddSubmit(e) {
         potentialSetup: checklistData
     };
 
-    const currentTrade = getCurrentTrade();
-    if (currentTrade.id) {
-        tradeData.dateAdded = currentTrade.data.dateAdded;
-        await updateTrade(currentTrade.id, tradeData);
-    } else {
-        tradeData.dateAdded = new Date();
-        await addTrade(tradeData);
+    try {
+        const currentTrade = getCurrentTrade();
+        if (currentTrade.id) {
+            tradeData.dateAdded = currentTrade.data.dateAdded;
+            await updateTrade(currentTrade.id, tradeData);
+            setLastCreatedTradeId(null); // Limpa o ID se for uma edição
+        } else {
+            tradeData.dateAdded = new Date();
+            // ALTERAÇÃO: Captura o novo ID e guarda no estado
+            const newTradeId = await addTrade(tradeData);
+            setLastCreatedTradeId(newTradeId);
+        }
+    } catch (error) {
+        alert("Ocorreu um erro ao guardar o trade. Verifique a consola.");
+        return;
     }
     
     closeAddModal();
@@ -64,6 +72,7 @@ export async function handleAddSubmit(e) {
     }
 }
 
+// ... (o resto das funções permanece sem alterações) ...
 export async function handleArmSubmit(e) {
     e.preventDefault();
     const strategies = getStrategies();
@@ -94,19 +103,17 @@ export async function handleExecSubmit(e) {
     const currentTrade = getCurrentTrade();
     const executionData = {};
 
-    // --- VALIDAÇÃO ADICIONADA ---
     for (const input of GESTAO_PADRAO.inputs) {
         const element = document.getElementById(input.id);
         if (element) {
             const value = parseFloat(element.value);
             if (input.required && (isNaN(value) || value <= 0)) {
                 alert(`Por favor, insira um valor válido e positivo para "${input.label}".`);
-                return; // Para a execução da função
+                return;
             }
             executionData[input.id] = element.value;
         }
     }
-    // --- FIM DA VALIDAÇÃO ---
 
     const selectedStrategy = strategies.find(s => s.id === currentTrade.data.strategyId);
     if (!selectedStrategy) return;
@@ -129,7 +136,6 @@ export async function handleExecSubmit(e) {
 export async function handleCloseSubmit(e) {
     e.preventDefault();
     
-    // --- VALIDAÇÃO ADICIONADA ---
     const exitPriceValue = parseFloat(document.getElementById('exit-price').value);
     const pnlValue = parseFloat(document.getElementById('final-pnl').value);
 
@@ -138,11 +144,9 @@ export async function handleCloseSubmit(e) {
         return;
     }
     if (isNaN(pnlValue)) {
-        // Esta validação já existia, mas foi mantida pela sua importância.
         alert("Por favor, insira um valor de P&L válido (pode ser negativo).");
         return;
     }
-    // --- FIM DA VALIDAÇÃO ---
 
     const currentTrade = getCurrentTrade();
     const closeDetails = {
