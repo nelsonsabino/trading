@@ -89,7 +89,6 @@ async function displayNewsForAsset(baseAssetSymbol) {
  * @param {string} symbol - O símbolo do ativo.
  */
 async function displayAlarmsForAsset(symbol) {
-    // (Esta função permanece sem alterações)
     const tbody = document.getElementById('asset-alarms-tbody');
     if (!tbody) return;
     tbody.innerHTML = '<tr><td colspan="3">A carregar alarmes...</td></tr>';
@@ -118,7 +117,6 @@ async function displayAlarmsForAsset(symbol) {
  * @param {string} symbol - O símbolo do ativo.
  */
 async function displayTradesForAsset(symbol) {
-    // (Esta função permanece sem alterações)
     const tbody = document.getElementById('asset-trades-tbody');
     if (!tbody) return;
     tbody.innerHTML = '<tr><td colspan="5">A carregar trades...</td></tr>';
@@ -164,10 +162,17 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('asset-title').textContent = `Análise de ${assetSymbol}`;
     renderTradingViewWidgets(assetSymbol);
     
-    // Extrai o símbolo base para as notícias (ex: "BTC" de "BTCUSDC")
+    // --- LIGAÇÃO CORRETA DOS BOTÕES DE AÇÃO ---
+    const watchlistBtn = document.getElementById('add-to-watchlist-btn');
+    const alarmBtn = document.getElementById('add-alarm-btn');
+    const tvBtn = document.getElementById('open-tv-btn');
+
+    if (watchlistBtn) watchlistBtn.href = `index.html?assetPair=${assetSymbol}`;
+    if (alarmBtn) alarmBtn.href = `alarms.html?assetPair=${assetSymbol}`;
+    if (tvBtn) tvBtn.href = `https://www.tradingview.com/chart/?symbol=BINANCE:${assetSymbol}`;
+
     const baseAsset = assetSymbol.replace(/USDC|USDT|BUSD/, '');
 
-    // Busca todos os dados em paralelo
     displayNewsForAsset(baseAsset);
     displayAlarmsForAsset(assetSymbol);
     displayTradesForAsset(assetSymbol);
