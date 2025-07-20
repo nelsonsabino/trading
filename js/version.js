@@ -2,12 +2,18 @@
 
 export const changelogData = {
     current: {
-        number: '8.3.0', // <-- VERSÃO ATUALIZADA
+        number: '8.4.0', // <-- VERSÃO ATUALIZADA
         changes: [
-            "**Melhoria de UX:** Itens recém-criados (tanto na Watchlist quanto nos Alarmes) são agora destacados com uma animação visual e a página rola até eles, fornecendo um feedback imediato ao utilizador."
+            "**Melhoria de UX e Análise:** Adicionados gráficos de 'Curva de Capital' e 'Desempenho por Estratégia' à página de Estatísticas, permitindo uma análise visual mais rápida e intuitiva da performance."
         ]
     },
     releases: [
+        {
+            number: '8.3.0',
+            changes: [
+                "**Melhoria de UX:** Itens recém-criados (tanto na Watchlist quanto nos Alarmes) são agora destacados com uma animação visual e a página rola até eles, fornecendo um feedback imediato ao utilizador."
+            ]
+        },
         {
             number: '8.2.0',
             changes: [
@@ -55,51 +61,6 @@ export const changelogData = {
                 "Introduzido o Construtor de Estratégias Dinâmico.",
                 "Criada nova página para criar, editar e apagar estratégias de trading.",
                 "As estratégias são agora guardadas e lidas a partir da base de dados (Firebase).",
-            ]
-        },
-        {
-            number: '7.1.3',
-            changes: [
-                "Melhorada a UX do alarme de nível de Estocástico com rótulos mais claros e valores alvo automáticos (30/70).",
-            ]
-        },
-        {
-            number: '7.1.2',
-            changes: [
-                "Gráficos do TradingView agora adaptam o seu tema (claro/escuro) ao tema da aplicação.",
-                "Corrigido bug visual nos cards de alarme no modo escuro em ecrãs de telemóvel.",
-            ]
-        },
-        {
-            number: '7.1.1',
-            changes: [
-                "Correção dos estilos das tabelas no Modo Escuro para garantir a legibilidade.",
-            ]
-        },
-        {
-            number: '7.1.0',
-            changes: [
-                "Implementado Modo Escuro (Dark Mode) em toda a aplicação.",
-                "Adicionado botão para alternar entre temas, com a preferência guardada no browser.",
-            ]
-        },
-        {
-            number: '6.9.0',
-            changes: [
-                "Adicionada a funcionalidade de 'Ver Gráfico' em um modal na página do Market Scanner para análise rápida.",
-            ]
-        },
-        {
-            number: '6.8.1',
-            changes: [
-                "Redesenhados os botões de ação nos cards do dashboard para um design mais compacto com ícones e texto.",
-            ]
-        },
-        {
-            number: '6.8.0',
-            changes: [
-                "Substituído o 'Mini-Gráfico' por um 'Gráfico Avançado' interativo dentro dos cards do dashboard.",
-                "O gráfico agora carrega com uma configuração limpa e minimalista por defeito.",
             ]
         },
         // ... (o seu histórico anterior completo) ...
