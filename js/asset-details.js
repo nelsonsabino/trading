@@ -54,7 +54,7 @@ async function displayNewsForAsset(baseAssetSymbol) {
         return;
     }
 
-    const apiUrl = `https://min-api.cryptocompare.com/data/v2/news/?lang=PT&categories=${baseAssetSymbol}&api_key=${CRYPTOCOMPARE_API_KEY}`;
+    const apiUrl = `https://min-api.cryptocompare.com/data/v2/news/?lang=EN&categories=${baseAssetSymbol}&api_key=${CRYPTOCOMPARE_API_KEY}`;
 
     try {
         const response = await fetch(apiUrl);
