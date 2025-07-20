@@ -50,6 +50,16 @@
 
         <hr class="section-divider">
 
+        <!-- NOVA SECÇÃO PARA NOTÍCIAS -->
+        <section class="asset-related-data">
+            <h2><i class="fa-solid fa-newspaper"></i> Últimas Notícias</h2>
+            <div id="asset-news-container">
+                <p>A carregar notícias...</p>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
         <section class="asset-related-data">
             <h2><i class="fa-solid fa-bell"></i> Alarmes Ativos para este Ativo</h2>
             <div class="table-wrapper">
@@ -61,9 +71,7 @@
                             <th>Ações</th>
                         </tr>
                     </thead>
-                    <tbody id="asset-alarms-tbody">
-                        <!-- Linhas da tabela de alarmes serão inseridas aqui -->
-                    </tbody>
+                    <tbody id="asset-alarms-tbody"></tbody>
                 </table>
             </div>
         </section>
@@ -83,9 +91,7 @@
                             <th>Ações</th>
                         </tr>
                     </thead>
-                    <tbody id="asset-trades-tbody">
-                        <!-- Linhas da tabela de trades serão inseridas aqui -->
-                    </tbody>
+                    <tbody id="asset-trades-tbody"></tbody>
                 </table>
             </div>
         </section>
@@ -97,7 +103,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="js/services.js"></script>
     <script type="module" src="js/firebase-service.js"></script>
-    <script type="module" src="js/asset-details.js"></script> <!-- O nosso novo script -->
+    <script type="module" src="js/asset-details.js"></script>
     <script type="module" src="js/version.js"></script>
     <script type="module" src="js/dark-mode.js"></script>
 </body>
