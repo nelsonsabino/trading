@@ -13,34 +13,56 @@ function renderTradingViewWidgets(symbol) {
     const currentTheme = document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light';
 
     if (mainChartContainer) {
-        const chartBackgroundColor = currentTheme === 'light' ? '#ffffff' : '#1e1e1e';
-        const chartGridColor = currentTheme === 'light' ? 'rgba(46, 46, 46, 0.06)' : 'rgba(255, 255, 255, 0.1)';
-
+        // --- CORREÇÃO 1: Removidos os parâmetros incompatíveis (backgroundColor, gridColor) ---
+        // A propriedade "theme" já controla as cores de forma correta.
         new TradingView.widget({
-            "autosize": true, "symbol": `BINANCE:${symbol}`, "interval": "240", "timezone": "Etc/UTC",
-            "theme": currentTheme, "style": "1", "locale": "pt", "hide_side_toolbar": true, "hide_top_toolbar": false,
-            "allow_symbol_change": false, "save_image": false, "calendar": false, "details": false,
-            "hide_legend": true, "hide_volume": true, "hotlist": false, "withdateranges": false,
-            "backgroundColor": chartBackgroundColor, "gridColor": chartGridColor,
-            "studies": ["STD;RSI", "STD;Supertrend"],
+            "autosize": true,
+            "symbol": `BINANCE:${symbol}`,
+            "interval": "240",
+            "timezone": "Etc/UTC",
+            "theme": currentTheme,
+            "style": "1",
+            "locale": "pt",
+            "hide_side_toolbar": true,
+            "hide_top_toolbar": false,
+            "allow_symbol_change": false,
+            "save_image": false,
+            "calendar": false,
+            "details": false,
+            "hide_legend": true,
+            "hide_volume": true,
+            "hotlist": false,
+            "withdateranges": false,
+            "studies": [
+                "STD;RSI",
+                "STD;Supertrend"
+            ],
             "container_id": "main-chart-container"
         });
     }
 
     if (techAnalysisContainer) {
-        // --- ALTERAÇÃO: Substituído pelo widget de Análise Técnica completo ---
-        new TradingView.widget({
-            "container_id": "tech-analysis-container",
+        // --- CORREÇÃO 2: Implementado o carregamento dinâmico para o widget de Análise Técnica ---
+        techAnalysisContainer.innerHTML = ''; // Limpa o container
+        const script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.async = true;
+        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js';
+        
+        const config = {
             "width": "100%",
             "height": "100%",
             "symbol": `BINANCE:${symbol}`,
             "interval": "1h",
             "showIntervalTabs": true,
-            "displayMode": "multiple", // Mostra múltiplos timeframes
+            "displayMode": "multiple",
             "locale": "pt",
             "colorTheme": currentTheme,
             "isTransparent": false
-        });
+        };
+
+        script.innerHTML = JSON.stringify(config);
+        techAnalysisContainer.appendChild(script);
     }
 }
 
@@ -52,7 +74,6 @@ async function displayAlarmsForAsset(symbol) {
     const tbody = document.getElementById('asset-alarms-tbody');
     if (!tbody) return;
     tbody.innerHTML = '<tr><td colspan="3">A carregar alarmes...</td></tr>';
-
     try {
         const { data: alarms, error } = await supabase.from('alarms').select('*')
             .eq('asset_pair', symbol).eq('status', 'active')
@@ -81,7 +102,6 @@ async function displayTradesForAsset(symbol) {
     const tbody = document.getElementById('asset-trades-tbody');
     if (!tbody) return;
     tbody.innerHTML = '<tr><td colspan="5">A carregar trades...</td></tr>';
-
     try {
         const trades = await getTradesForAsset(symbol);
         if (trades.length === 0) {
