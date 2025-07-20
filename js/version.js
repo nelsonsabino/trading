@@ -2,12 +2,18 @@
 
 export const changelogData = {
     current: {
-        number: '8.2.0', // <-- VERSÃO ATUALIZADA
+        number: '8.3.0', // <-- VERSÃO ATUALIZADA
         changes: [
-            "**Performance:** Implementado um sistema de cache de 2 minutos no Market Scanner. A página agora carrega instantaneamente em visitas repetidas, melhorando a experiência do utilizador e reduzindo chamadas às APIs.",
+            "**Melhoria de UX:** Itens recém-criados (tanto na Watchlist quanto nos Alarmes) são agora destacados com uma animação visual e a página rola até eles, fornecendo um feedback imediato ao utilizador."
         ]
     },
     releases: [
+        {
+            number: '8.2.0',
+            changes: [
+                "**Performance:** Implementado um sistema de cache de 2 minutos no Market Scanner. A página agora carrega instantaneamente em visitas repetidas, melhorando a experiência do utilizador e reduzindo chamadas às APIs.",
+            ]
+        },
         {
             number: '8.1.0',
             changes: [
