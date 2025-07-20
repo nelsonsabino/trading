@@ -1,36 +1,11 @@
-// --- INICIALIZAÇÃO DO FIREBASE (Sintaxe v9 Modular) ---
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-import { 
-    getFirestore, 
-    collection, 
-    doc, 
-    query, 
-    where, 
-    onSnapshot, 
-    runTransaction, 
-    addDoc, 
-    setDoc 
-} from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+// js/stats.js
 
-// A sua configuração da web app do Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyAoKtcIsVOcvI5O6gH_14AXL3bF2I6X8Qc",
-  authDomain: "trading-89c13.firebaseapp.com",
-  projectId: "trading-89c13",
-  storageBucket: "trading-89c13.firebasestorage.app",
-  messagingSenderId: "782074719077",
-  appId: "1:782074719077:web:05c07a2b81b0047ef5cf8c"
-};
-
-// Inicializa o Firebase e o Firestore
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-
-
-
-
-
+import {
+    listenToPortfolioSummary,
+    listenToClosedTrades,
+    addTransactionAndUpdateBalance,
+    adjustPortfolioBalance
+} from './firebase-service.js';
 
 function runStatsPage() {
     // --- SELETORES DO DOM ---
@@ -47,14 +22,15 @@ function runStatsPage() {
     
     let currentTransactionType = 'deposit';
 
-    // --- LÓGICA DO PORTFÓLIO COMPLETA ---
-    onSnapshot(doc(db, "portfolio", "summary"), (doc) => {
-        if (doc.exists()) {
-            const balance = doc.data().balance || 0;
-            balanceEl.textContent = `$${balance.toFixed(2)}`;
-        } else {
-            balanceEl.textContent = '$0.00';
+    // --- LÓGICA DO PORTFÓLIO (AGORA USANDO O SERVIÇO) ---
+    listenToPortfolioSummary((data, error) => {
+        if (error) {
+            console.error("Erro ao obter dados do portfólio:", error);
+            balanceEl.textContent = '$ Erro';
+            return;
         }
+        const balance = data.balance || 0;
+        balanceEl.textContent = `$${balance.toFixed(2)}`;
     });
 
     depositBtn.addEventListener('click', () => {
@@ -96,11 +72,9 @@ function runStatsPage() {
             return;
         }
 
-        const portfolioRef = doc(db, "portfolio", "summary");
-
         if (currentTransactionType === 'adjust') {
             try {
-                await setDoc(portfolioRef, { balance: amount });
+                await adjustPortfolioBalance(amount);
                 console.log("Saldo ajustado com sucesso para:", amount);
                 closeTransactionModal();
             } catch (error) {
@@ -114,16 +88,8 @@ function runStatsPage() {
                 notes: notesInput.value,
                 date: new Date()
             };
-            const amountToApply = currentTransactionType === 'withdraw' ? -amount : amount;
             try {
-                await addDoc(collection(db, "transactions"), transactionData);
-                await runTransaction(db, async (transaction) => {
-                    const portfolioDoc = await transaction.get(portfolioRef);
-                    const currentBalance = portfolioDoc.exists() ? portfolioDoc.data().balance : 0;
-                    const newBalance = currentBalance + amountToApply;
-                    if (newBalance < 0) throw new Error("Saldo não pode ser negativo.");
-                    transaction.set(portfolioRef, { balance: newBalance }, { merge: true });
-                });
+                await addTransactionAndUpdateBalance(transactionData);
                 console.log("Transação registada com sucesso!");
                 closeTransactionModal();
             } catch (error) {
@@ -133,14 +99,19 @@ function runStatsPage() {
         }
     });
 
-    // --- LÓGICA DAS ESTATÍSTICAS DE TRADES COMPLETA ---
+    // --- LÓGICA DAS ESTATÍSTICAS DE TRADES (AGORA USANDO O SERVIÇO) ---
     function calculateAndDisplayStats() {
-        const q = query(collection(db, 'trades'), where('status', '==', 'CLOSED'));
-        onSnapshot(q, (snapshot) => {
-            let totalTrades=0, totalPnl=0, winCount=0, lossCount=0, totalWinAmount=0, totalLossAmount=0;
+        listenToClosedTrades((trades, error) => {
+            if (error) {
+                console.error("Erro ao obter trades fechados:", error);
+                // Opcional: mostrar erro na UI
+                return;
+            }
+
+            let totalTrades = 0, totalPnl = 0, winCount = 0, lossCount = 0, totalWinAmount = 0, totalLossAmount = 0;
             const statsByStrategy = {}, statsByReason = {};
-            snapshot.forEach(doc => {
-                const trade = doc.data();
+            
+            trades.forEach(trade => {
                 if (!trade.closeDetails || isNaN(parseFloat(trade.closeDetails.pnl))) return;
                 totalTrades++;
                 const pnl = parseFloat(trade.closeDetails.pnl);
@@ -148,16 +119,19 @@ function runStatsPage() {
                 if (pnl > 0) { winCount++; totalWinAmount += pnl; } else { lossCount++; totalLossAmount += pnl; }
                 const strategy = trade.strategyName || 'Sem Estratégia';
                 if (!statsByStrategy[strategy]) statsByStrategy[strategy] = { count: 0, pnl: 0 };
-                statsByStrategy[strategy].count++; statsByStrategy[strategy].pnl += pnl;
+                statsByStrategy[strategy].count++; 
+                statsByStrategy[strategy].pnl += pnl;
                 const reason = trade.closeDetails.closeReason || 'Não especificado';
                 if (!statsByReason[reason]) statsByReason[reason] = { count: 0, pnl: 0 };
                 statsByReason[reason].count++;
                 statsByReason[reason].pnl += pnl;
             });
+            
             const winRate = totalTrades > 0 ? (winCount / totalTrades) * 100 : 0;
             const avgWin = winCount > 0 ? totalWinAmount / winCount : 0;
             const avgLoss = lossCount > 0 ? totalLossAmount / lossCount : 0;
             const rrRatio = (avgLoss !== 0) ? Math.abs(avgWin / avgLoss) : 0;
+
             updateElementText('total-trades', totalTrades);
             updateElementText('total-pnl', `$${totalPnl.toFixed(2)}`, true);
             updateElementText('win-rate', `${winRate.toFixed(1)}%`);
@@ -169,7 +143,7 @@ function runStatsPage() {
             generateDetailTable('strategy-stats', 'Estratégia', statsByStrategy);
             generateDetailTable('reason-stats', 'Motivo', statsByReason);
         });
-    }    
+    }
     
     function updateElementText(id, text, isPnl = false) {
         const element = document.getElementById(id);
@@ -187,8 +161,10 @@ function runStatsPage() {
         const container = document.getElementById(containerId);
         if (!container) return;
         let tableHtml = `<table><thead><tr><th>${header}</th><th>Nº Trades</th><th>P&L Total</th></tr></thead><tbody>`;
-        for (const key in data) {
-            const item = data[key];
+        // Ordena os resultados pelo P&L (do maior para o menor)
+        const sortedData = Object.entries(data).sort(([, a], [, b]) => b.pnl - a.pnl);
+
+        for (const [key, item] of sortedData) {
             const pnlClass = item.pnl > 0 ? 'positive-pnl' : (item.pnl < 0 ? 'negative-pnl' : '');
             tableHtml += `<tr><td>${key}</td><td>${item.count}</td><td class="${pnlClass}">$${item.pnl.toFixed(2)}</td></tr>`;
         }
@@ -196,8 +172,9 @@ function runStatsPage() {
         container.innerHTML = tableHtml;
     }
  
-    // Iniciar
+    // Iniciar a página
     calculateAndDisplayStats();
 }
 
-runStatsPage();
+// Garante que o DOM está carregado antes de correr o script
+document.addEventListener('DOMContentLoaded', runStatsPage);
