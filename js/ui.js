@@ -1,11 +1,33 @@
-// js/ui.js - VERSÃO COM generateDynamicChecklist CORRIGIDO
+// js/ui.js - VERSÃO COM DADOS DE MERCADO E SPARKLINE NOS CARDS
 
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openImageModal } from './modals.js';
 import { loadAndOpenForEditing } from './handlers.js';
 import { isAndroid, isIOS } from './utils.js';
 
-// --- FUNÇÕES HELPER PARA CRIAR ELEMENTOS DE FORMULÁRIO ---
+// --- FUNÇÃO PARA RENDERIZAR SPARKLINE ---
+function renderSparkline(containerId, dataSeries) {
+    const container = document.getElementById(containerId);
+    // Adiciona uma verificação extra para o container
+    if (!container || !dataSeries || dataSeries.length < 2) return;
+
+    const firstPrice = dataSeries[0];
+    const lastPrice = dataSeries[dataSeries.length - 1];
+    const chartColor = lastPrice >= firstPrice ? '#28a745' : '#dc3545';
+
+    const options = {
+        series: [{ data: dataSeries }],
+        chart: { type: 'line', height: 40, width: 100, sparkline: { enabled: true }},
+        stroke: { curve: 'smooth', width: 2 },
+        colors: [chartColor],
+        tooltip: { enabled: false }
+    };
+    const chart = new ApexCharts(container, options);
+    chart.render();
+}
+
+
+// --- FUNÇÕES DE GERAÇÃO DE FORMULÁRIO E DROPDOWN ---
 function getIconForLabel(labelText) {
     const text = labelText.toLowerCase();
     if (text.includes('tendência')) return 'fa-solid fa-chart-line';
@@ -24,7 +46,6 @@ function getIconForLabel(labelText) {
     if (text.includes('alvo')) return 'fa-solid fa-crosshairs';
     return 'fa-solid fa-check';
 }
-
 function createChecklistItem(item, data) {
     const isRequired = item.required ? 'required' : '';
     const labelText = item.required ? `${item.label} <span class="required-asterisk">*</span>` : item.label;
@@ -34,7 +55,6 @@ function createChecklistItem(item, data) {
     element.innerHTML = `<i class="${getIconForLabel(item.label)}"></i><input type="checkbox" id="${item.id}" ${isChecked} ${isRequired}><label for="${item.id}">${labelText}</label>`;
     return element;
 }
-
 function createInputItem(item, data) {
     const element = document.createElement('div');
     element.className = 'input-item-styled'; 
@@ -42,7 +62,6 @@ function createInputItem(item, data) {
     const labelText = item.required ? `${item.label} <span class="required-asterisk">*</span>` : item.label;
     const value = data && data[item.id] ? data[item.id] : '';
     let fieldHtml = '';
-
     if (item.type === 'select') {
         const optionsHtml = item.options.map(opt => `<option value="${opt}" ${value === opt ? 'selected' : ''}>${opt}</option>`).join('');
         fieldHtml = `<select id="${item.id}" ${isRequired} class="input-item-field"><option value="">-- Selecione --</option>${optionsHtml}</select>`;
@@ -52,22 +71,15 @@ function createInputItem(item, data) {
     element.innerHTML = `<i class="${getIconForLabel(item.label)}"></i><div style="flex-grow: 1;"><label for="${item.id}">${labelText}</label>${fieldHtml}</div>`;
     return element;
 }
-
-// --- FUNÇÃO PRINCIPAL DE GERAÇÃO DE CHECKLIST (CORRIGIDA) ---
 export function generateDynamicChecklist(container, phases, data = {}) {
     container.innerHTML = '';
     if (!phases || phases.length === 0) return;
-
     phases.forEach(phase => {
-        // Verifica se a fase e os itens existem
         if (!phase || !Array.isArray(phase.items)) return; 
-        
         const phaseDiv = document.createElement('div');
         const titleEl = document.createElement('h4');
         titleEl.textContent = phase.title;
         phaseDiv.appendChild(titleEl);
-
-        // Itera sobre o array 'items' da nossa nova estrutura de dados
         phase.items.forEach(item => {
             let element;
             switch (item.type) {
@@ -86,18 +98,12 @@ export function generateDynamicChecklist(container, phases, data = {}) {
                 phaseDiv.appendChild(element);
             }
         });
-
         container.appendChild(phaseDiv);
     });
 }
-
-// --- OUTRAS FUNÇÕES ---
-
 export function populateStrategySelect(strategies) {
     if (!addModal.strategySelect) return;
-    addModal.strategySelect.innerHTML = '<option value="">-- Selecione uma Estratégia --</option>'; // Texto melhorado
-    
-    // Adiciona uma verificação para garantir que 'strategies' é um array
+    addModal.strategySelect.innerHTML = '<option value="">-- Selecione uma Estratégia --</option>';
     if (strategies && Array.isArray(strategies)) {
         strategies.forEach(strategy => {
             const option = document.createElement('option');
@@ -108,13 +114,18 @@ export function populateStrategySelect(strategies) {
     }
 }
 
-export function createTradeCard(trade) {
+
+// --- FUNÇÃO DE CRIAÇÃO DE CARD ATUALIZADA ---
+export function createTradeCard(trade, marketData = {}) {
     const card = document.createElement('div');
     card.className = 'trade-card';
     card.dataset.tradeId = trade.id;
 
     const assetName = trade.data.asset;
     const tradingViewSymbol = `BINANCE:${assetName}`;
+    
+    const assetMarketData = marketData[assetName] || { price: 0, change: 0, sparkline: [] };
+    const priceChangeClass = assetMarketData.change >= 0 ? 'positive-pnl' : 'negative-pnl';
 
     card.innerHTML = `
         <button class="card-edit-btn">Editar</button>
@@ -124,19 +135,16 @@ export function createTradeCard(trade) {
         <p><strong>Notas:</strong> ${trade.data.notes || ''}</p>
     `;
 
-    const imageUrlToShow = trade.data.imageUrl;
-    if (imageUrlToShow) {
-        const img = document.createElement('img');
-        img.src = imageUrlToShow;
-        img.className = 'card-screenshot';
-        img.alt = `Gráfico de ${assetName}`;
-        card.appendChild(img);
-    }
-    
-    const chartContainer = document.createElement('div');
-    chartContainer.className = 'mini-chart-container';
-    chartContainer.id = `advanced-chart-${trade.id}`;
-    card.appendChild(chartContainer);
+    const marketDataContainer = document.createElement('div');
+    marketDataContainer.className = 'card-market-data';
+    marketDataContainer.innerHTML = `
+        <div class="card-sparkline" id="sparkline-card-${trade.id}"></div>
+        <div class="card-price-data">
+            <div class="card-price">${assetMarketData.price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 8 })}</div>
+            <div class="${priceChangeClass}">${assetMarketData.change.toFixed(2)}%</div>
+        </div>
+    `;
+    card.appendChild(marketDataContainer);
 
     const actionsWrapper = document.createElement('div');
     actionsWrapper.className = 'card-actions';
@@ -202,51 +210,46 @@ export function createTradeCard(trade) {
 function toggleAdvancedChart(tradeId, symbol, button) {
     const chartContainer = document.getElementById(`advanced-chart-${tradeId}`);
     if (!chartContainer) return;
-
     const isVisible = chartContainer.classList.contains('visible');
-
     if (isVisible) {
         chartContainer.innerHTML = '';
         chartContainer.classList.remove('visible');
         button.innerHTML = `<i class="fa-solid fa-chart-simple"></i> <span>Gráfico</span>`;
     } else {
         button.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>A Carregar...</span>`;
-        
         const currentTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
-
         new TradingView.widget({
-            "container_id": chartContainer.id,
-            "autosize": true,
-            "symbol": symbol,
-            "interval": "60",
-            "timezone": "Etc/UTC",
-            "theme": currentTheme,
-            "style": "1",
-            "locale": "pt",
-            "toolbar_bg": "#f1f5f9",
-            "enable_publishing": false,
-            "hide_side_toolbar": true,
-            "hide_top_toolbar": true,
-            "hide_legend": true,
-            "save_image": false,
-            "allow_symbol_change": false
+            "container_id": chartContainer.id, "autosize": true, "symbol": symbol,
+            "interval": "60", "timezone": "Etc/UTC", "theme": currentTheme, "style": "1",
+            "locale": "pt", "toolbar_bg": "#f1f5f9", "enable_publishing": false,
+            "hide_side_toolbar": true, "hide_top_toolbar": true, "hide_legend": true,
+            "save_image": false, "allow_symbol_change": false
         });
-
         chartContainer.classList.add('visible');
         button.innerHTML = `<i class="fa-solid fa-eye-slash"></i> <span>Esconder</span>`;
     }
 }
 
-export function displayTrades(trades) {
+export function displayTrades(trades, marketData) {
     if (!potentialTradesContainer) return;
-    potentialTradesContainer.innerHTML = '<p class="empty-state-message">Nenhuma oportunidade potencial.</p>';
+    
+    potentialTradesContainer.innerHTML = '<p class="empty-state-message">Nenhum ativo na watchlist.</p>';
     armedTradesContainer.innerHTML = '<p class="empty-state-message">Nenhum setup armado.</p>';
     liveTradesContainer.innerHTML = '<p class="empty-state-message">Nenhuma operação ativa.</p>';
+    
     let potentialCount = 0, armedCount = 0, liveCount = 0;
+    
     trades.forEach(trade => {
-        const card = createTradeCard(trade); 
+        const card = createTradeCard(trade, marketData); 
         if (trade.data.status === 'POTENTIAL') { if (potentialCount === 0) potentialTradesContainer.innerHTML = ''; potentialTradesContainer.appendChild(card); potentialCount++; }
         else if (trade.data.status === 'ARMED') { if (armedCount === 0) armedTradesContainer.innerHTML = ''; armedTradesContainer.appendChild(card); armedCount++; }
         else if (trade.data.status === 'LIVE') { if (liveCount === 0) liveTradesContainer.innerHTML = ''; liveTradesContainer.appendChild(card); liveCount++; }
+    });
+
+    trades.forEach(trade => {
+        const assetMarketData = marketData[trade.data.asset];
+        if (assetMarketData) {
+            renderSparkline(`sparkline-card-${trade.id}`, assetMarketData.sparkline);
+        }
     });
 }
