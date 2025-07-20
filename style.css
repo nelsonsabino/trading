@@ -5,6 +5,11 @@ h1, h2, h3 { font-weight: 600; }
 h2 { color: #495057; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem; margin-bottom: 1.5rem; }
 .section-divider { border: none; border-top: 1px solid #dee2e6; margin: 3rem 0; }
 
+/* --- LINKS DE ATIVOS (NOVO) --- */
+.asset-link { color: inherit; text-decoration: none; transition: color 0.2s ease; }
+.asset-link:hover { color: #007bff; text-decoration: underline; }
+.dark-mode .asset-link:hover { color: #4dabf7; }
+
 /* --- CABEÇALHO E NAVEGAÇÃO --- */
 header { text-align: center; padding: 2rem 1rem; background-color: #fff; border-bottom: 1px solid #dee2e6; margin-bottom: 2rem; }
 .mantra { font-style: italic; color: #6c757d; }
@@ -152,12 +157,9 @@ footer { text-align: center; padding: 1rem 0; margin-top: 2rem; color: #6c757d; 
 .dark-mode #theme-toggle-btn { background-color: #2c2c2c; border-color: #444; color: #e0e0e0; }
 .dark-mode #theme-toggle-btn:hover { background-color: #3a3a3a; }
 
-/* --- NOVA ANIMAÇÃO DE DESTAQUE --- */
+/* --- ANIMAÇÃO DE DESTAQUE --- */
 @keyframes flash-yellow {
   from { background-color: rgba(255, 220, 0, 0.5); }
   to { background-color: transparent; }
 }
-
-.new-item-flash {
-  animation: flash-yellow 1.5s ease-out;
-}
+.new-item-flash { animation: flash-yellow 1.5s ease-out; }
