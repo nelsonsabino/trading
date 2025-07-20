@@ -2,12 +2,21 @@
 
 export const changelogData = {
     current: {
-        number: '8.4.0', // <-- VERSÃO ATUALIZADA
+        number: '8.5.0', // <-- VERSÃO ATUALIZADA
         changes: [
-            "**Melhoria de UX e Análise:** Adicionados gráficos de 'Curva de Capital' e 'Desempenho por Estratégia' à página de Estatísticas, permitindo uma análise visual mais rápida e intuitiva da performance."
+            "**Nova Funcionalidade: Página de Detalhe do Ativo.**",
+            "Adicionada uma nova página (`asset-details.html`) que centraliza todas as informações de um ativo específico.",
+            "A página exibe um gráfico avançado, análise técnica, e tabelas com todos os alarmes e trades relacionados ao ativo.",
+            "Os nomes dos ativos no Dashboard, Scanner de Mercado e página de Alarmes são agora links diretos para esta nova página de análise."
         ]
     },
     releases: [
+        {
+            number: '8.4.0',
+            changes: [
+                "**Melhoria de UX e Análise:** Adicionados gráficos de 'Curva de Capital' e 'Desempenho por Estratégia' à página de Estatísticas, permitindo uma análise visual mais rápida e intuitiva da performance."
+            ]
+        },
         {
             number: '8.3.0',
             changes: [
