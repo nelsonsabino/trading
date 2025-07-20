@@ -1,4 +1,4 @@
-// js/handlers.js - VERSÃO COM CORREÇÃO NO REDIRECIONAMENTO PARA ALARMES
+// js/handlers.js - VERSÃO COM VALIDAÇÃO DE INPUTS
 
 import { addModal } from './dom-elements.js';
 import { GESTAO_PADRAO } from './config.js';
@@ -10,14 +10,11 @@ import { generateDynamicChecklist } from './ui.js';
 export async function handleAddSubmit(e) {
     e.preventDefault();
     
-    // --- CORREÇÃO APLICADA AQUI ---
-    // 1. Captura o estado da checkbox e o nome do ativo ANTES de qualquer outra coisa.
     const redirectToAlarmCheckbox = document.getElementById('redirect-to-alarm-checkbox');
     const shouldRedirect = redirectToAlarmCheckbox.checked;
     const assetInput = document.getElementById('asset');
     const assetName = assetInput.value.trim().toUpperCase();
 
-    // 2. Pega as estratégias e processa o formulário
     const strategies = getStrategies();
     const strategyId = addModal.strategySelect.value;
     const selectedStrategy = strategies.find(s => s.id === strategyId);
@@ -47,7 +44,6 @@ export async function handleAddSubmit(e) {
         potentialSetup: checklistData
     };
 
-    // 3. Guarda os dados no Firebase
     const currentTrade = getCurrentTrade();
     if (currentTrade.id) {
         tradeData.dateAdded = currentTrade.data.dateAdded;
@@ -57,10 +53,8 @@ export async function handleAddSubmit(e) {
         await addTrade(tradeData);
     }
     
-    // 4. Fecha o modal (o que vai limpar a checkbox)
     closeAddModal();
 
-    // 5. AGORA, verifica a variável que guardámos no início
     if (shouldRedirect) {
         if (assetName) {
             window.location.href = `alarms.html?assetPair=${assetName}`;
@@ -70,7 +64,6 @@ export async function handleAddSubmit(e) {
     }
 }
 
-// O resto das funções permanece inalterado
 export async function handleArmSubmit(e) {
     e.preventDefault();
     const strategies = getStrategies();
@@ -99,11 +92,25 @@ export async function handleExecSubmit(e) {
     e.preventDefault();
     const strategies = getStrategies();
     const currentTrade = getCurrentTrade();
-    
+    const executionData = {};
+
+    // --- VALIDAÇÃO ADICIONADA ---
+    for (const input of GESTAO_PADRAO.inputs) {
+        const element = document.getElementById(input.id);
+        if (element) {
+            const value = parseFloat(element.value);
+            if (input.required && (isNaN(value) || value <= 0)) {
+                alert(`Por favor, insira um valor válido e positivo para "${input.label}".`);
+                return; // Para a execução da função
+            }
+            executionData[input.id] = element.value;
+        }
+    }
+    // --- FIM DA VALIDAÇÃO ---
+
     const selectedStrategy = strategies.find(s => s.id === currentTrade.data.strategyId);
     if (!selectedStrategy) return;
-
-    const executionData = {};
+    
     const executionPhase = (selectedStrategy.data.phases && selectedStrategy.data.phases.length > 2) ? selectedStrategy.data.phases[2] : null;
     
     if (executionPhase && executionPhase.items) {
@@ -115,27 +122,31 @@ export async function handleExecSubmit(e) {
         });
     }
 
-    GESTAO_PADRAO.inputs.forEach(input => {
-        const element = document.getElementById(input.id);
-        if(element) {
-            executionData[input.id] = element.value;
-        }
-    });
-
     await updateTrade(currentTrade.id, { status: "LIVE", executionDetails: executionData, dateExecuted: new Date() });
     closeExecModal();
 }
 
 export async function handleCloseSubmit(e) {
     e.preventDefault();
-    const currentTrade = getCurrentTrade();
+    
+    // --- VALIDAÇÃO ADICIONADA ---
+    const exitPriceValue = parseFloat(document.getElementById('exit-price').value);
     const pnlValue = parseFloat(document.getElementById('final-pnl').value);
-    if (isNaN(pnlValue)) {
-        alert("Por favor, insira um valor de P&L válido.");
+
+    if (isNaN(exitPriceValue) || exitPriceValue <= 0) {
+        alert("Por favor, insira um Preço de Saída válido e positivo.");
         return;
     }
+    if (isNaN(pnlValue)) {
+        // Esta validação já existia, mas foi mantida pela sua importância.
+        alert("Por favor, insira um valor de P&L válido (pode ser negativo).");
+        return;
+    }
+    // --- FIM DA VALIDAÇÃO ---
+
+    const currentTrade = getCurrentTrade();
     const closeDetails = {
-        exitPrice: document.getElementById('exit-price').value,
+        exitPrice: exitPriceValue,
         pnl: pnlValue,
         closeReason: document.getElementById('close-reason').value,
         finalNotes: document.getElementById('final-notes').value,
