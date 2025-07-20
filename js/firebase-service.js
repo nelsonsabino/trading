@@ -15,7 +15,7 @@ import {
     runTransaction,
     getDocs,
     where,
-    setDoc // ADICIONADO para a função de ajuste de saldo
+    setDoc
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 import { firebaseConfig } from './config.js';
 
@@ -39,7 +39,6 @@ export function listenToTrades(callback) {
     });
 }
 
-// ... (todas as outras funções de trades, como getTrade, addTrade, updateTrade, deleteTrade, permanecem iguais) ...
 export async function getTrade(tradeId) {
     try {
         const docSnap = await getDoc(doc(db, 'trades', tradeId));
@@ -52,9 +51,11 @@ export async function getTrade(tradeId) {
 
 export async function addTrade(tradeData) {
     try {
-        await addDoc(collection(db, 'trades'), tradeData);
+        const docRef = await addDoc(collection(db, 'trades'), tradeData);
+        return docRef.id; // ALTERAÇÃO: Retorna o ID do novo documento
     } catch (error) {
         console.error("Erro ao adicionar trade:", error);
+        throw error; // ALTERAÇÃO: Re-lança o erro para o chamador
     }
 }
 
@@ -64,6 +65,7 @@ export async function updateTrade(tradeId, updatedData) {
         await updateDoc(tradeRef, updatedData);
     } catch (error) {
         console.error("Erro ao atualizar trade:", error);
+        throw error;
     }
 }
 
@@ -79,7 +81,7 @@ export async function deleteTrade(tradeId) {
 
 
 // --- FUNÇÕES PARA O PORTFÓLIO E TRANSAÇÕES ---
-
+// (Sem alterações nesta secção)
 export function listenToPortfolioSummary(callback) {
     const portfolioRef = doc(db, "portfolio", "summary");
     return onSnapshot(portfolioRef, (doc) => {
@@ -108,25 +110,18 @@ export function listenToClosedTrades(callback) {
 export async function addTransactionAndUpdateBalance(transactionData) {
     const portfolioRef = doc(db, "portfolio", "summary");
     const amountToApply = transactionData.type === 'withdraw' ? -transactionData.amount : transactionData.amount;
-
     try {
         await runTransaction(db, async (transaction) => {
             const portfolioDoc = await transaction.get(portfolioRef);
             const currentBalance = portfolioDoc.exists() ? portfolioDoc.data().balance : 0;
             const newBalance = currentBalance + amountToApply;
-
-            if (newBalance < 0) {
-                throw new Error("O saldo do portfólio não pode ficar negativo.");
-            }
-
-            // Adiciona o novo documento de transação
+            if (newBalance < 0) throw new Error("O saldo do portfólio não pode ficar negativo.");
             transaction.set(doc(collection(db, "transactions")), transactionData);
-            // Atualiza o saldo
             transaction.set(portfolioRef, { balance: newBalance }, { merge: true });
         });
     } catch (error) {
         console.error("Erro na transação de adicionar:", error);
-        throw error; // Re-throw para o handler da UI poder apanhar
+        throw error;
     }
 }
 
@@ -139,7 +134,6 @@ export async function adjustPortfolioBalance(newBalance) {
         throw error;
     }
 }
-
 
 export function listenToTransactions(callback) {
     const q = query(collection(db, 'transactions'), orderBy('date', 'desc'));
@@ -159,15 +153,12 @@ export async function deleteTransaction(transactionId, amount, type) {
     const amountToRevert = type === 'deposit' ? -amount : amount;
     const transactionRef = doc(db, 'transactions', transactionId);
     const portfolioRef = doc(db, 'portfolio', 'summary');
-
     try {
         await runTransaction(db, async (transaction) => {
             const portfolioDoc = await transaction.get(portfolioRef);
             if (!portfolioDoc.exists()) throw new Error("Documento do portfólio não encontrado!");
-            
             const currentBalance = portfolioDoc.data().balance || 0;
             const newBalance = currentBalance + amountToRevert;
-
             transaction.update(portfolioRef, { balance: newBalance });
             transaction.delete(transactionRef);
         });
@@ -181,22 +172,13 @@ export async function closeTradeAndUpdateBalance(tradeId, closeDetails) {
     const tradeRef = doc(db, 'trades', tradeId);
     const portfolioRef = doc(db, 'portfolio', 'summary');
     const pnlValue = parseFloat(closeDetails.pnl);
-
-    if (isNaN(pnlValue)) {
-        throw new Error("Valor de P&L inválido fornecido.");
-    }
-
+    if (isNaN(pnlValue)) throw new Error("Valor de P&L inválido fornecido.");
     try {
         await runTransaction(db, async (transaction) => {
             const portfolioDoc = await transaction.get(portfolioRef);
             const currentBalance = portfolioDoc.exists() ? portfolioDoc.data().balance : 0;
             const newBalance = currentBalance + pnlValue;
-
-            transaction.update(tradeRef, { 
-                status: "CLOSED", 
-                closeDetails: closeDetails, 
-                dateClosed: new Date() 
-            });
+            transaction.update(tradeRef, { status: "CLOSED", closeDetails: closeDetails, dateClosed: new Date() });
             transaction.set(portfolioRef, { balance: newBalance }, { merge: true });
         });
     } catch (error) {
@@ -205,9 +187,8 @@ export async function closeTradeAndUpdateBalance(tradeId, closeDetails) {
     }
 }
 
+// --- FUNÇÕES PARA A COLEÇÃO "STRATEGIES" ---
 
-// --- FUNÇÕES PARA A NOVA COLEÇÃO "STRATEGIES" ---
-// ... (todas as funções de estratégias permanecem iguais) ...
 export function listenToStrategies(callback) {
     const q = query(collection(db, 'strategies'), orderBy('createdAt', 'desc'));
     onSnapshot(q, (snapshot) => {
@@ -236,7 +217,6 @@ export async function fetchActiveStrategies() {
     try {
         const q = query(collection(db, 'strategies'), where("isActive", "==", true), orderBy('createdAt', 'desc'));
         const querySnapshot = await getDocs(q);
-        
         const strategies = [];
         querySnapshot.forEach((doc) => {
             strategies.push({ id: doc.id, data: doc.data() });
@@ -255,7 +235,8 @@ export async function addStrategy(strategyData) {
             createdAt: new Date(),
             isActive: true
         };
-        await addDoc(collection(db, 'strategies'), dataToSave);
+        const docRef = await addDoc(collection(db, 'strategies'), dataToSave);
+        return docRef.id; // ALTERAÇÃO: Retorna o ID do novo documento
     } catch (error) {
         console.error("Erro no serviço ao adicionar estratégia:", error);
         throw error;
