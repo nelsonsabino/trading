@@ -2,7 +2,7 @@
 
 import { supabase } from './services.js';
 import { setupAutocomplete } from './utils.js';
-import { setLastCreatedAlarmId, getLastCreatedAlarmId } from './state.js'; // Importa as funções de estado
+import { setLastCreatedAlarmId, getLastCreatedAlarmId } from './state.js';
 
 let editingAlarmId = null;
 window.alarmsData = [];
@@ -38,7 +38,6 @@ if (chartModal) {
 
 
 // --- LÓGICA DA PÁGINA DE ALARMES ---
-
 async function fetchPriceForPair(pair) {
     const priceDisplay = document.getElementById('asset-current-price');
     if (!priceDisplay || !pair) { if (priceDisplay) priceDisplay.textContent = ''; return; }
@@ -72,7 +71,6 @@ async function fetchAndDisplayAlarms() {
         for (const alarm of data) {
             const formattedDate = new Date(alarm.created_at).toLocaleString('pt-PT');
             let alarmDescription = '';
-            // (Lógica de descrição do alarme permanece a mesma)
             if (alarm.alarm_type === 'stochastic') { alarmDescription = `Estocástico(${alarm.indicator_period}) ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} no ${alarm.indicator_timeframe}`; }
             else if (alarm.alarm_type === 'rsi_level') { alarmDescription = `RSI(${alarm.indicator_period}) ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} no ${alarm.indicator_timeframe}`; }
             else if (alarm.alarm_type === 'stochastic_crossover') { alarmDescription = `Estocástico %K(${alarm.indicator_period}) cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} de %D(${alarm.combo_period}) no ${alarm.indicator_timeframe}`; } 
@@ -83,11 +81,14 @@ async function fetchAndDisplayAlarms() {
             
             const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${alarm.asset_pair}`;
             const addOpportunityUrl = `index.html?assetPair=${alarm.asset_pair}`;
+            
+            // ALTERAÇÃO: Adicionado link para a página de detalhes
+            const assetHtml = `<strong><a href="asset-details.html?symbol=${alarm.asset_pair}" class="asset-link">${alarm.asset_pair}</a></strong>`;
 
             if (alarm.status === 'active') {
                 activeAlarmsHtml.push(`
                     <tr data-alarm-id="${alarm.id}">
-                        <td data-label="Ativo"><span class="cell-value"><strong>${alarm.asset_pair}</strong></span></td>
+                        <td data-label="Ativo"><span class="cell-value">${assetHtml}</span></td>
                         <td data-label="Condição"><span class="cell-value description">${alarmDescription}</span></td>
                         <td data-label="Data Criação"><span class="cell-value">${formattedDate}</span></td>
                         <td data-label="Ações">
@@ -104,7 +105,7 @@ async function fetchAndDisplayAlarms() {
                 const triggeredDate = alarm.triggered_at ? new Date(alarm.triggered_at).toLocaleString('pt-PT') : new Date(alarm.created_at).toLocaleString('pt-PT');
                 triggeredAlarmsHtml.push(`
                     <tr data-alarm-id="${alarm.id}">
-                        <td data-label="Ativo"><span class="cell-value"><strong>${alarm.asset_pair}</strong></span></td>
+                        <td data-label="Ativo"><span class="cell-value">${assetHtml}</span></td>
                         <td data-label="Condição"><span class="cell-value description">${alarmDescription}</span></td>
                         <td data-label="Status"><span class="cell-value"><span class="status-badge status-closed">Disparado</span></span></td>
                         <td data-label="Data Disparo"><span class="cell-value">${triggeredDate}</span></td>
@@ -122,7 +123,6 @@ async function fetchAndDisplayAlarms() {
         activeTbody.innerHTML = activeAlarmsHtml.length > 0 ? activeAlarmsHtml.join('') : '<tr><td colspan="4" style="text-align:center;">Nenhum alarme ativo.</td></tr>';
         triggeredTbody.innerHTML = triggeredAlarmsHtml.length > 0 ? triggeredAlarmsHtml.join('') : '<tr><td colspan="5" style="text-align:center;">Nenhum alarme no histórico.</td></tr>';
 
-        // --- ALTERAÇÃO: APLICA O DESTAQUE ---
         const lastId = getLastCreatedAlarmId();
         if (lastId) {
             const newRow = document.querySelector(`tr[data-alarm-id="${lastId}"]`);
@@ -130,25 +130,19 @@ async function fetchAndDisplayAlarms() {
                 newRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 newRow.classList.add('new-item-flash');
             }
-            setLastCreatedAlarmId(null); // Limpa o ID para não repetir a animação
+            setLastCreatedAlarmId(null);
         }
-
     } catch (error) { console.error("Erro ao buscar alarmes:", error); }
 }
 
-async function deleteAlarm(alarmId) {
-    if (!confirm("Tem a certeza que quer apagar este registo?")) return;
-    try { await supabase.from('alarms').delete().eq('id', alarmId); fetchAndDisplayAlarms(); } catch (error) { console.error("Erro ao apagar alarme:", error); }
-}
-
+// ... (o resto do ficheiro permanece sem alterações) ...
+async function deleteAlarm(alarmId) { if (!confirm("Tem a certeza que quer apagar este registo?")) return; try { await supabase.from('alarms').delete().eq('id', alarmId); fetchAndDisplayAlarms(); } catch (error) { console.error("Erro ao apagar alarme:", error); } }
 function enterEditMode(alarm) {
     editingAlarmId = alarm.id;
     document.getElementById('alarm-asset').value = alarm.asset_pair;
     const alarmType = alarm.alarm_type || 'price';
     document.getElementById('alarm-type-select').value = alarmType;
     document.getElementById('alarm-type-select').dispatchEvent(new Event('change'));
-
-    // ... (Lógica de preenchimento do formulário permanece a mesma) ...
     if (alarmType === 'stochastic') { document.getElementById('stoch-condition').value = alarm.condition; document.getElementById('stoch-value').value = alarm.target_price; document.getElementById('stoch-period').value = alarm.indicator_period; document.getElementById('stoch-timeframe').value = alarm.indicator_timeframe; } 
     else if (alarmType === 'rsi_level') { document.getElementById('rsi-level-condition').value = alarm.condition; document.getElementById('rsi-level-value').value = alarm.target_price; document.getElementById('rsi-level-period').value = alarm.indicator_period; document.getElementById('rsi-level-timeframe').value = alarm.indicator_timeframe; } 
     else if (alarmType === 'stochastic_crossover') { document.getElementById('stoch-cross-condition').value = alarm.condition; document.getElementById('stoch-cross-k-period').value = alarm.indicator_period; document.getElementById('stoch-cross-d-period').value = alarm.combo_period; document.getElementById('stoch-cross-timeframe').value = alarm.indicator_timeframe; } 
@@ -156,12 +150,10 @@ function enterEditMode(alarm) {
     else if (alarmType === 'ema_touch') { document.getElementById('ema-condition').value = alarm.condition; document.getElementById('ema-period').value = alarm.ema_period; document.getElementById('ema-timeframe').value = alarm.indicator_timeframe; } 
     else if (alarmType === 'combo') { document.getElementById('combo-primary-trigger').value = alarm.condition; document.getElementById('combo-ema-period').value = alarm.ema_period; document.getElementById('combo-stoch-condition').value = alarm.combo_condition; document.getElementById('combo-stoch-value').value = alarm.combo_target_price; document.getElementById('combo-timeframe').value = alarm.indicator_timeframe; } 
     else { document.getElementById('alarm-condition-standalone').value = alarm.condition; document.getElementById('alarm-price-standalone').value = alarm.target_price; }
-
     document.querySelector('#alarm-form button[type="submit"]').textContent = 'Atualizar Alarme';
     document.getElementById('cancel-edit-btn').style.display = 'inline-block';
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-
 function exitEditMode() {
     editingAlarmId = null;
     document.getElementById('alarm-form').reset();
@@ -170,45 +162,35 @@ function exitEditMode() {
     document.getElementById('cancel-edit-btn').style.display = 'none';
     document.getElementById('asset-current-price').textContent = '';
 }
-
 document.addEventListener('DOMContentLoaded', () => {
     fetchAndDisplayAlarms();
     const alarmForm = document.getElementById('alarm-form');
     const feedbackDiv = document.getElementById('alarm-feedback');
     const assetInput = document.getElementById('alarm-asset');
-    // ... (O resto do setup dos listeners permanece igual) ...
     const resultsDiv = document.getElementById('autocomplete-results');
     const mainContainer = document.querySelector('main');
     const alarmTypeSelect = document.getElementById('alarm-type-select');
-    
     const fields = { price: document.getElementById('price-fields'), rsi_level: document.getElementById('rsi-level-fields'), stochastic: document.getElementById('stochastic-fields'), stochastic_crossover: document.getElementById('stoch-crossover-fields'), rsi_crossover: document.getElementById('rsi-fields'), ema_touch: document.getElementById('ema-fields'), combo: document.getElementById('combo-fields') };
-    
     alarmTypeSelect.addEventListener('change', () => {
         const selectedType = alarmTypeSelect.value;
         for (const type in fields) { if (fields[type]) { fields[type].style.display = type === selectedType ? 'block' : 'none'; } }
         if (selectedType === 'rsi_level') { document.getElementById('rsi-level-condition').dispatchEvent(new Event('change')); }
         if (selectedType === 'stochastic') { document.getElementById('stoch-condition').dispatchEvent(new Event('change')); }
     });
-
     const rsiLevelConditionSelect = document.getElementById('rsi-level-condition');
     if(rsiLevelConditionSelect) { rsiLevelConditionSelect.addEventListener('change', (e) => { const rsiValueInput = document.getElementById('rsi-level-value'); if(e.target.value === 'below') { rsiValueInput.value = 35; } else { rsiValueInput.value = 70; } }); }
-
     const stochConditionSelect = document.getElementById('stoch-condition');
     if (stochConditionSelect) { stochConditionSelect.addEventListener('change', (e) => { const stochValueInput = document.getElementById('stoch-value'); if (e.target.value === 'below') { stochValueInput.value = 30; } else { stochValueInput.value = 70; } }); }
-
     const urlParams = new URLSearchParams(window.location.search);
     const assetPairFromUrl = urlParams.get('assetPair');
     if (assetPairFromUrl && assetInput) { const pair = assetPairFromUrl.toUpperCase(); assetInput.value = pair; fetchPriceForPair(pair); }
-
     mainContainer.addEventListener('click', (e) => {
         const chartBtn = e.target.closest('.view-chart-btn'); if (chartBtn) { const symbol = chartBtn.dataset.symbol; if (symbol) openChartModal(symbol); return; }
         const deleteBtn = e.target.closest('.delete-btn'); if (deleteBtn) { deleteAlarm(deleteBtn.getAttribute('data-id')); return; }
         const editBtn = e.target.closest('.edit-btn'); if (editBtn) { const alarmToEdit = window.alarmsData.find(a => a.id === editBtn.getAttribute('data-id')); if (alarmToEdit) enterEditMode(alarmToEdit); }
     });
-    
     document.getElementById('cancel-edit-btn').addEventListener('click', exitEditMode);
     setupAutocomplete(assetInput, resultsDiv, async (selectedPair) => fetchPriceForPair(selectedPair));
-
     alarmForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const submitButton = alarmForm.querySelector('button[type="submit"]');
@@ -219,7 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!assetPair) throw new Error("Por favor, selecione um par válido.");
             const alarmType = alarmTypeSelect.value;
             let alarmData = { asset_pair: assetPair, alarm_type: alarmType };
-            // ... (Lógica de recolha de dados do formulário permanece a mesma) ...
             if (alarmType === 'price') { alarmData.condition = document.getElementById('alarm-condition-standalone').value; alarmData.target_price = parseFloat(document.getElementById('alarm-price-standalone').value); } 
             else if (alarmType === 'rsi_level') { alarmData.condition = document.getElementById('rsi-level-condition').value; alarmData.target_price = parseFloat(document.getElementById('rsi-level-value').value); alarmData.indicator_period = parseInt(document.getElementById('rsi-level-period').value); alarmData.indicator_timeframe = document.getElementById('rsi-level-timeframe').value; } 
             else if (alarmType === 'stochastic') { alarmData.condition = document.getElementById('stoch-condition').value; alarmData.target_price = parseFloat(document.getElementById('stoch-value').value); alarmData.indicator_period = parseInt(document.getElementById('stoch-period').value); alarmData.indicator_timeframe = document.getElementById('stoch-timeframe').value; } 
@@ -227,19 +208,16 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (alarmType === 'rsi_crossover') { alarmData.condition = document.getElementById('rsi-condition').value; alarmData.indicator_timeframe = document.getElementById('rsi-timeframe').value; alarmData.rsi_period = 14; alarmData.rsi_ma_period = 14; } 
             else if (alarmType === 'ema_touch') { alarmData.condition = document.getElementById('ema-condition').value; alarmData.indicator_timeframe = document.getElementById('ema-timeframe').value; alarmData.ema_period = parseInt(document.getElementById('ema-period').value); } 
             else if (alarmType === 'combo') { alarmData.condition = document.getElementById('combo-primary-trigger').value; alarmData.indicator_timeframe = document.getElementById('combo-timeframe').value; alarmData.ema_period = parseInt(document.getElementById('combo-ema-period').value); alarmData.combo_indicator = 'stochastic'; alarmData.combo_condition = document.getElementById('combo-stoch-condition').value; alarmData.combo_target_price = parseInt(document.getElementById('combo-stoch-value').value); alarmData.combo_period = 14; }
-
             if (editingAlarmId) {
                 const { error } = await supabase.from('alarms').update(alarmData).eq('id', editingAlarmId);
                 if (error) throw error;
-                setLastCreatedAlarmId(null); // Limpa o ID se for uma edição
+                setLastCreatedAlarmId(null);
             } else {
                 alarmData.status = 'active';
-                // ALTERAÇÃO: Captura o ID do novo alarme e guarda no estado
                 const { data, error } = await supabase.from('alarms').insert([alarmData]).select('id').single();
                 if (error) throw error;
                 setLastCreatedAlarmId(data.id);
             }
-
             feedbackDiv.textContent = `✅ Operação concluída com sucesso!`;
             exitEditMode();
             fetchAndDisplayAlarms();
