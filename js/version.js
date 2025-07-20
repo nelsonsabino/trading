@@ -2,15 +2,21 @@
 
 export const changelogData = {
     current: {
-        number: '8.1.0', // <-- VERSÃO ATUALIZADA
+        number: '8.2.0', // <-- VERSÃO ATUALIZADA
         changes: [
-            "**Robustez da Aplicação (Refatoração Interna):**",
-            "Centralizada toda a lógica de acesso ao Firebase no `firebase-service.js`, removendo a inicialização duplicada do `stats.js` para maior consistência.",
-            "Melhorada a resiliência do dashboard: o carregamento de preços e sparklines agora usa `Promise.allSettled`, garantindo que o dashboard carrega mesmo que uma das fontes de dados falhe.",
-            "Adicionada validação de inputs nos formulários de execução e fecho de trade para prevenir a entrada de dados inválidos (ex: preços a zero ou negativos).",
+            "**Performance:** Implementado um sistema de cache de 2 minutos no Market Scanner. A página agora carrega instantaneamente em visitas repetidas, melhorando a experiência do utilizador e reduzindo chamadas às APIs.",
         ]
     },
     releases: [
+        {
+            number: '8.1.0',
+            changes: [
+                "**Robustez da Aplicação (Refatoração Interna):**",
+                "Centralizada toda a lógica de acesso ao Firebase no `firebase-service.js`, removendo a inicialização duplicada do `stats.js` para maior consistência.",
+                "Melhorada a resiliência do dashboard: o carregamento de preços e sparklines agora usa `Promise.allSettled`, garantindo que o dashboard carrega mesmo que uma das fontes de dados falhe.",
+                "Adicionada validação de inputs nos formulários de execução e fecho de trade para prevenir a entrada de dados inválidos (ex: preços a zero ou negativos).",
+            ]
+        },
         {
             number: '8.0.4',
             changes: [
@@ -90,7 +96,7 @@ export const changelogData = {
                 "O gráfico agora carrega com uma configuração limpa e minimalista por defeito.",
             ]
         },
-        // ... (o resto do seu histórico completo) ...
+        // ... (o seu histórico anterior completo) ...
     ]
 };
 
