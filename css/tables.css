@@ -42,7 +42,8 @@
     padding: 1rem; 
     border-bottom: 1px solid #e9ecef; 
     vertical-align: middle; 
-    display: table-cell; 
+    display: table-cell;
+    text-align: left; /* CORREÇÃO ADICIONADA: Força o alinhamento à esquerda */
 }
 
 /* Remove a borda inferior da última linha de TODAS as tabelas */
