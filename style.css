@@ -119,29 +119,73 @@ header nav { margin-top: 1.5rem; display: flex; justify-content: center; align-i
 }
 .rsi-signal:hover::after, .stoch-signal:hover::after { opacity: 1; visibility: visible; }
 
+/* --- CONTROLES DO MERCADO (NOVO) --- */
+.market-controls {
+    display: flex;
+    justify-content: flex-start; /* Alinha à esquerda */
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1rem;
+    background-color: #f1f3f5;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap; /* Permite quebrar linha em ecrãs pequenos */
+}
+.dark-mode .market-controls {
+    background-color: #2c2c2c;
+    border: 1px solid #444;
+}
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.market-controls label {
+    font-weight: 500;
+    color: #495057;
+}
+.dark-mode .market-controls label {
+    color: #e0e0e0;
+}
+.market-controls select {
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    background-color: #fff;
+    color: #343a40;
+    font-size: 0.95em;
+    transition: all 0.2s;
+}
+.dark-mode .market-controls select {
+    background-color: #1e1e1e;
+    border-color: #444;
+    color: #e0e0e0;
+}
+.market-controls select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+.market-controls input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0; /* Override default margin */
+    cursor: pointer;
+}
+.market-controls input[type="checkbox"] + label { /* Estilo para o label da checkbox */
+    cursor: pointer;
+}
+
 
 /* --- PÁGINA DE ESTATÍSTICAS --- */
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem; }
 .stat-card { background-color: #fff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.08); text-align: center; }
 .stat-card h4 { margin-top: 0; margin-bottom: 0.5rem; color: #6c757d; font-size: 1em; }
 .stat-card p { margin: 0; font-size: 2em; font-weight: bold; color: #343a40; }
-.portfolio-section { background-color: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.08); text-align: center; margin-bottom: 2rem; }
+.portfolio-section { background-color: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0/0,0.08); text-align: center; margin-bottom: 2rem; }
 .portfolio-balance { font-size: 1.5rem; color: #495057; }
 .portfolio-balance strong { font-size: 2.5rem; color: #28a745; margin-left: 1rem; }
 .portfolio-actions { margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem; }
-
-/* --- BOTÕES DE ÍCONE --- */
-.icon-action-btn { display: flex; align-items: center; gap: 0.4rem; padding: 6px 10px; border-radius: 6px; text-decoration: none; font-size: 0.9em; font-weight: 500; color: #495057; background-color: #f1f3f5; border: 1px solid #dee2e6; transition: all 0.2s ease; }
-.icon-action-btn:hover { transform: translateY(-2px); box-shadow: 0 3px 6px rgba(0,0,0,0.08); background-color: #e9ecef; }
-.icon-action-btn i { font-size: 1.1em; }
-.card-actions { display: flex; justify-content: flex-end; align-items: center; gap: 1rem; margin-top: 1rem; }
-#market-scan-tbody .action-buttons, #active-alarms-tbody .action-buttons, #triggered-alarms-tbody .action-buttons { display: flex; flex-direction: row; justify-content: flex-end; gap: 0.5rem; }
-#market-scan-tbody .icon-action-btn, #active-alarms-tbody .icon-action-btn, #triggered-alarms-tbody .icon-action-btn { flex-grow: 0; padding: 8px 12px; }
-.icon-action-btn.action-summary { color: #198754; }
-.icon-action-btn.action-full-chart { color: #0d6efd; }
-.icon-action-btn.action-arm { color: #ffc107; }
-.icon-action-btn.action-execute { color: #20c997; }
-.icon-action-btn.action-close { color: #dc3545; }
 
 /* --- GRÁFICOS & WIDGETS --- */
 .mini-chart-container { height: 0; overflow: hidden; transition: height 0.35s ease-in-out; margin-top: 1rem; border-radius: 6px; }
@@ -176,6 +220,16 @@ footer { text-align: center; padding: 1rem 0; margin-top: 2rem; color: #6c757d; 
     .alarms-table td::before, #trades-table td::before { content: attr(data-label); font-weight: 600; color: #495057; padding-right: 1rem; }
     .alarms-table tr td:last-child, #trades-table tr td:last-child { border-bottom: none; }
     .alarms-table td .cell-value, #trades-table td .cell-value { text-align: right; flex-shrink: 0; max-width: 60%; }
+    .market-controls {
+        flex-direction: column; /* Em mobile, empilha os grupos de controlo */
+        align-items: flex-start; /* Alinha à esquerda */
+        gap: 1rem; /* Reduz o espaçamento */
+        padding: 0.75rem;
+    }
+    .market-controls .control-group {
+        width: 100%; /* Ocupa a largura total */
+        justify-content: flex-start;
+    }
 }
 
 /* --- DARK MODE --- */
@@ -195,6 +249,9 @@ footer { text-align: center; padding: 1rem 0; margin-top: 2rem; color: #6c757d; 
 .dark-mode .market-table td, .dark-mode #trades-table td { border-bottom-color: #333; }
 @media (max-width: 768px) {
     .dark-mode .alarms-table tr, .dark-mode #trades-table tr { background-color: #1e1e1e; border-color: #2c2c2c; }
+    .dark-mode .market-controls select {
+        background-color: #2c2c2c; /* Garante que o select escuro fica bem em mobile também */
+    }
 }
 
 /* --- BOTÃO DE TEMA --- */
