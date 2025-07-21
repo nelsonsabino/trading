@@ -92,22 +92,22 @@ header nav { margin-top: 1.5rem; display: flex; justify-content: center; align-i
 /* --- SINAIS E BADGES --- */
 .rsi-signal, .stoch-signal {
     display: inline-block;
-    width: 22px; /* Tamanho fixo para os sinais */
+    width: 22px; 
     height: 22px;
     line-height: 22px;
     font-size: 0.7em;
     font-weight: bold;
     color: white;
-    background-color: #6f42c1; /* Roxo para RSI */
+    background-color: #6f42c1; 
     border-radius: 50%;
     text-align: center;
     cursor: help;
     position: relative;
     flex-shrink: 0;
-    margin-left: 5px; /* Pequena margem para separar múltiplos sinais */
+    margin-left: 5px; 
 }
 .stoch-signal {
-    background-color: #007bff; /* Azul para Estocástico */
+    background-color: #007bff; 
 }
 
 /* Tooltip básico para os sinais */
@@ -185,34 +185,26 @@ header nav { margin-top: 1.5rem; display: flex; justify-content: center; align-i
 }
 .market-controls input[type="checkbox"] + label {
     cursor: pointer;
+    margin-left: 0.25rem; /* Ajuste para o label da checkbox */
 }
 
-/* --- ESTILOS PARA icon-action-btn (BOTÕES DE ÍCONE NAS TABELAS) --- */
+/* --- ESTILOS PARA icon-action-btn (BOTÕES DE ÍCONE GERAL) --- */
 .icon-action-btn {
     display: inline-flex; 
     align-items: center;
     justify-content: center;
-    gap: 0.4rem; 
-    padding: 6px; /* Padding fixo para botões de ícone */
-    width: 32px;  /* Largura fixa */
-    height: 32px; /* Altura fixa */
+    gap: 0.4rem; /* Espaçamento entre ícone e texto */
+    padding: 8px 12px; /* Padding padrão para botões com texto */
     font-size: 0.9em;
     font-weight: 500;
-    text-decoration: none;
+    text-decoration: none; /* Garante que não há sublinhado para links */
     border: 1px solid #dee2e6; 
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
     background-color: #f1f3f5; 
-    color: #495057; 
+    color: #495057; /* Cor padrão do texto/ícone */
     flex-shrink: 0;
-}
-/* Remove o padding de texto que os botões .btn têm */
-.market-table .action-buttons .icon-action-btn, 
-.alarms-table .action-buttons .icon-action-btn, 
-#trades-table .action-buttons .icon-action-btn,
-.asset-related-data .action-buttons .icon-action-btn {
-    padding: 6px; /* Garante o padding fixo para os ícones */
 }
 
 /* Efeito hover geral para botões de ícone */
@@ -228,30 +220,42 @@ header nav { margin-top: 1.5rem; display: flex; justify-content: center; align-i
     line-height: 1; 
 }
 
-/* Estilos ESPECÍFICOS para botões dentro das colunas de Ações das TABELAS */
+/* Estilos ESPECÍFICOS para a DIV que contém os botões de Ações nas TABELAS */
 .market-table .action-buttons,
 .alarms-table .action-buttons,
-#trades-table .action-buttons,
-.asset-related-data .action-buttons {
+#trades-table .action-buttons, /* Aplicável à tabela de gestão e detalhes do ativo */
+.asset-related-data .action-buttons { /* Para ter a certeza que pega a tabela em asset-details.html */
     display: flex;
     flex-direction: row;
-    gap: 0.5rem; /* Espaçamento entre os botões da tabela */
+    gap: 0.5rem; /* Espaçamento entre os botões na tabela */
     align-items: center; 
     justify-content: flex-end; /* Alinha os botões à direita dentro da célula */
 }
 
-/* Força que o texto dentro destes botões NÃO apareça, apenas o ícone */
-.icon-action-btn span { 
-    display: none; 
+/* ESTILO CRÍTICO: Botões de ícone dentro das tabelas */
+/* Isto faz com que sejam todos quadrados e com apenas o ícone visível */
+.market-table .action-buttons .icon-action-btn,
+.alarms-table .action-buttons .icon-action-btn,
+#trades-table .action-buttons .icon-action-btn,
+.asset-related-data .action-buttons .icon-action-btn {
+    padding: 6px; /* Padding uniforme para todos os lados */
+    width: 32px;  /* Largura fixa */
+    height: 32px; /* Altura fixa */
+    border-radius: 6px; /* Bordas arredondadas */
+    /* Garante que qualquer texto dentro do botão é escondido */
+    & span { 
+        display: none; 
+    }
 }
 
-/* Cores específicas para os ícones */
+/* Cores específicas para os ÍCONES dentro dos botões de ação */
+/* As cores são para o <i> elemento dentro do .icon-action-btn */
 .icon-action-btn.view-chart-btn i { color: #198754; } /* Gráfico (verde) */
 .icon-action-btn.action-full-chart i { color: #0d6efd; } /* TradingView (azul) */
 .icon-action-btn.action-bell i { color: #0d6efd; } /* Alarme (azul) */
 .icon-action-btn.action-plus i { color: #0d6efd; } /* Adicionar (azul) */
 
-/* Cores para os botões de ação do dashboard (com texto) - se aplicável */
+/* Cores para os botões de ação do dashboard (com texto) - caso existam estas classes */
 .icon-action-btn.action-arm { color: #ffc107; }
 .icon-action-btn.action-execute { color: #20c997; }
 .icon-action-btn.action-close { color: #dc3545; }
@@ -261,19 +265,19 @@ header nav { margin-top: 1.5rem; display: flex; justify-content: center; align-i
 .dark-mode .icon-action-btn {
     background-color: #2c2c2c;
     border-color: #444;
-    color: #e0e0e0; /* Cor do ícone/texto geral em dark mode */
+    color: #e0e0e0; 
 }
 .dark-mode .icon-action-btn:hover {
     background-color: #3a3a3a;
 }
 /* Dark mode hover para botões com cores específicas */
-.dark-mode .icon-action-btn.view-chart-btn:hover i { background-color: #1a4f2b; } /* Hover verde mais escuro */
-.dark-mode .icon-action-btn.action-full-chart:hover i,
-.dark-mode .icon-action-btn.action-bell:hover i,
-.dark-mode .icon-action-btn.action-plus:hover i { background-color: #0b4991; } /* Hover azul mais escuro */
-.dark-mode .icon-action-btn.action-arm:hover { background-color: #8c7b00; } /* Hover amarelo mais escuro */
-.dark-mode .icon-action-btn.action-execute:hover { background-color: #1f6b57; } /* Hover verde água mais escuro */
-.dark-mode .icon-action-btn.action-close:hover { background-color: #a02a3a; } /* Hover vermelho mais escuro */
+.dark-mode .icon-action-btn.view-chart-btn:hover { background-color: #1a4f2b; } /* Fundo no hover */
+.dark-mode .icon-action-btn.action-full-chart:hover,
+.dark-mode .icon-action-btn.action-bell:hover,
+.dark-mode .icon-action-btn.action-plus:hover { background-color: #0b4991; } 
+.dark-mode .icon-action-btn.action-arm:hover { background-color: #8c7b00; } 
+.dark-mode .icon-action-btn.action-execute:hover { background-color: #1f6b57; } 
+.dark-mode .icon-action-btn.action-close:hover { background-color: #a02a3a; }
 
 
 /* --- PÁGINA DE ESTATÍSTICAS --- */
