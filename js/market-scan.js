@@ -86,23 +86,22 @@ function createTableRow(ticker, index, extraData) {
     const addOpportunityUrl = `index.html?assetPair=${ticker.symbol}`;
 
     let rsiSignalHtml = '';
-    let stochSignalHtml = ''; // NOVO: HTML para o sinal do Estocástico
+    let stochSignalHtml = '';
 
     const assetExtraData = extraData[ticker.symbol];
 
-    // Lógica para o sinal de RSI (5m)
-    if (assetExtraData && assetExtraData.rsi_5m !== null && assetExtraData.rsi_5m < 45) {
-        const rsiValue = assetExtraData.rsi_5m.toFixed(1);
-        rsiSignalHtml = `<span class="rsi-signal" data-tooltip="RSI (5m) está em ${rsiValue}">RSI</span>`;
+    // ALTERAÇÃO: Lógica para o sinal de RSI (1h)
+    if (assetExtraData && assetExtraData.rsi_1h !== null && assetExtraData.rsi_1h < 45) {
+        const rsiValue = assetExtraData.rsi_1h.toFixed(1);
+        rsiSignalHtml = `<span class="rsi-signal" data-tooltip="RSI (1h) está em ${rsiValue}">RSI</span>`;
     }
 
-    // Lógica para o sinal do Estocástico (15m) - Oversold (<20)
-    if (assetExtraData && assetExtraData.stoch_15m !== null) {
-        const stochK = assetExtraData.stoch_15m.k;
-        const stochD = assetExtraData.stoch_15m.d;
-        // Condição para sobrevenda
+    // ALTERAÇÃO: Lógica para o sinal do Estocástico (1h) - Oversold (<20)
+    if (assetExtraData && assetExtraData.stoch_1h !== null) {
+        const stochK = assetExtraData.stoch_1h.k;
+        const stochD = assetExtraData.stoch_1h.d;
         if (stochK < 20 || stochD < 20) { // Se K ou D estiver abaixo de 20
-            stochSignalHtml = `<span class="stoch-signal" data-tooltip="Stoch (15m) K:${stochK.toFixed(1)} D:${stochD.toFixed(1)}">STC</span>`;
+            stochSignalHtml = `<span class="stoch-signal" data-tooltip="Stoch (1h) K:${stochK.toFixed(1)} D:${stochD.toFixed(1)}">STC</span>`;
         }
     }
 
