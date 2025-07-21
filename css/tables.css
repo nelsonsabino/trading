@@ -43,7 +43,7 @@
     border-bottom: 1px solid #e9ecef; 
     vertical-align: middle; 
     display: table-cell;
-    text-align: left; /* CORREÇÃO ADICIONADA: Força o alinhamento à esquerda */
+    text-align: left; /* Garante o alinhamento à esquerda */
 }
 
 /* Remove a borda inferior da última linha de TODAS as tabelas */
