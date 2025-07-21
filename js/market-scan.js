@@ -4,14 +4,7 @@ import { supabase } from './services.js';
 
 const CACHE_KEY_DATA = 'marketScannerCache';
 const CACHE_KEY_TIMESTAMP = 'marketScannerCacheTime';
-const CACHE_DURATION_MS = 2 * 60 * 1000; // 2 minutos
-
-// NOVO: Variáveis para armazenar os dados brutos e o estado de ordenação/filtragem
-let allTickersData = []; // Armazenará os tickers originais da Binance
-let allExtraData = {};  // Armazenará os dados de indicadores da Edge Function
-let currentSortBy = 'volume'; // Valor inicial do dropdown
-let filterRsi = false;       // Estado inicial do filtro RSI
-let filterStoch = false;     // Estado inicial do filtro Estocástico
+const CACHE_DURATION_MS = 2 * 60 * 1000;
 
 const chartModal = document.getElementById('chart-modal');
 const closeChartModalBtn = document.getElementById('close-chart-modal');
@@ -58,18 +51,17 @@ function renderSparkline(containerId, dataSeries) {
     chart.render();
 }
 
-// ALTERADO: A função de renderização agora espera uma lista já ordenada/filtrada
-function renderPageContent(processedTickers) {
+function renderPageContent(tickers, extraData) {
     const tbody = document.getElementById('market-scan-tbody');
     if (!tbody) return;
-    if (processedTickers.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Nenhum ativo corresponde aos filtros.</td></tr>';
+    if (tickers.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Não foram encontrados pares com USDC com volume significativo.</td></tr>';
         return;
     }
-    const tableRowsHtml = processedTickers.map((ticker, index) => createTableRow(ticker, index, allExtraData)).join('');
+    const tableRowsHtml = tickers.map((ticker, index) => createTableRow(ticker, index, extraData)).join('');
     tbody.innerHTML = tableRowsHtml;
-    processedTickers.forEach(ticker => {
-        const symbolData = allExtraData[ticker.symbol];
+    tickers.forEach(ticker => {
+        const symbolData = extraData[ticker.symbol];
         if (symbolData && symbolData.sparkline) {
             renderSparkline(`sparkline-${ticker.symbol}`, symbolData.sparkline);
         }
@@ -121,68 +113,27 @@ function createTableRow(ticker, index, extraData) {
             <td class="${priceChangeClass}">${priceChangePercent.toFixed(2)}%</td>
             <td>
                 <div class="action-buttons">
-                    <button class="icon-action-btn view-chart-btn" data-symbol="${ticker.symbol}" title="Ver Gráfico no Modal"><i class="fa-solid fa-chart-simple"></i></button>
-                    <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn" title="Abrir no TradingView"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                    <a href="${createAlarmUrl}" class="icon-action-btn" title="Criar Alarme"><i class="fa-solid fa-bell"></i></a>
-                    <a href="${addOpportunityUrl}" class="icon-action-btn" title="Adicionar à Watchlist"><i class="fa-solid fa-plus"></i></a>
+                    <!-- ALTERAÇÃO: Adicionadas classes de cor para consistência -->
+                    <button class="icon-action-btn action-summary view-chart-btn" data-symbol="${ticker.symbol}" title="Ver Gráfico no Modal"><i class="fa-solid fa-chart-simple"></i></button>
+                    <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn action-full-chart" title="Abrir no TradingView"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                    <a href="${createAlarmUrl}" class="icon-action-btn action-bell" title="Criar Alarme"><i class="fa-solid fa-bell"></i></a>
+                    <a href="${addOpportunityUrl}" class="icon-action-btn action-plus" title="Adicionar à Watchlist"><i class="fa-solid fa-plus"></i></a>
                 </div>
             </td>
         </tr>`;
 }
 
-/**
- * Aplica os filtros e ordenação atuais e renderiza a tabela.
- */
-function applyFiltersAndSort() {
-    let processedTickers = [...allTickersData]; // Começa com uma cópia dos dados brutos
-
-    // 1. Aplica filtros
-    if (filterRsi) {
-        processedTickers = processedTickers.filter(ticker => {
-            const assetExtraData = allExtraData[ticker.symbol];
-            return assetExtraData && assetExtraData.rsi_1h !== null && assetExtraData.rsi_1h < 45;
-        });
-    }
-    if (filterStoch) {
-        processedTickers = processedTickers.filter(ticker => {
-            const assetExtraData = allExtraData[ticker.symbol];
-            return assetExtraData && assetExtraData.stoch_1h !== null && 
-                   (assetExtraData.stoch_1h.k < 20 || assetExtraData.stoch_1h.d < 20);
-        });
-    }
-
-    // 2. Aplica ordenação
-    processedTickers.sort((a, b) => {
-        if (currentSortBy === 'volume') {
-            return parseFloat(b.quoteVolume) - parseFloat(a.quoteVolume);
-        } else if (currentSortBy === 'price_change_percent_desc') {
-            return parseFloat(b.priceChangePercent) - parseFloat(a.priceChangePercent);
-        } else if (currentSortBy === 'price_change_percent_asc') {
-            return parseFloat(a.priceChangePercent) - parseFloat(b.priceChangePercent);
-        } else if (currentSortBy === 'symbol_asc') {
-            return a.symbol.localeCompare(b.symbol);
-        }
-        return 0; // Se nenhuma opção de ordenação for selecionada
-    });
-
-    renderPageContent(processedTickers); // Renderiza os dados processados
-}
-
-
 async function fetchAndDisplayMarketData() {
     const tbody = document.getElementById('market-scan-tbody');
     if (!tbody) return;
     tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">A carregar dados...</td></tr>';
-    
     const cachedDataJSON = sessionStorage.getItem(CACHE_KEY_DATA);
     const cacheTimestamp = sessionStorage.getItem(CACHE_KEY_TIMESTAMP);
 
     if (cachedDataJSON && cacheTimestamp && (Date.now() - cacheTimestamp < CACHE_DURATION_MS)) {
         console.log("A carregar dados do scanner a partir do cache.");
         const cachedData = JSON.parse(cachedDataJSON);
-        allTickersData = cachedData.tickers; // Guarda os dados brutos do cache
-        allExtraData = cachedData.extraData;
-        applyFiltersAndSort(); // Aplica e renderiza
+        renderPageContent(cachedData.tickers, cachedData.extraData);
         return;
     }
     
@@ -190,64 +141,36 @@ async function fetchAndDisplayMarketData() {
     try {
         const response = await fetch('https://api.binance.com/api/v3/ticker/24hr');
         if (!response.ok) throw new Error('Falha ao comunicar com a API da Binance.');
-        const allFetchedTickers = await response.json(); // Renomeado para evitar conflito
+        const allTickers = await response.json();
 
-        // Filtra para ter apenas pares USDC com volume (os 50 primeiros)
-        const initialFilteredTickers = allFetchedTickers
+        const top50Usdc = allTickers
             .filter(ticker => ticker.symbol.endsWith('USDC') && parseFloat(ticker.quoteVolume) > 0)
             .sort((a, b) => parseFloat(b.quoteVolume) - parseFloat(a.quoteVolume))
             .slice(0, 50);
 
-        const symbols = initialFilteredTickers.map(t => t.symbol);
+        if (top50Usdc.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Não foram encontrados pares com USDC com volume significativo.</td></tr>';
+            return;
+        }
+
+        const symbols = top50Usdc.map(t => t.symbol);
         const { data: extraData, error: extraDataError } = await supabase.functions.invoke('get-sparklines-data', { body: { symbols } });
         if (extraDataError) throw extraDataError;
 
-        // Guarda os dados brutos após a busca bem-sucedida
-        allTickersData = initialFilteredTickers;
-        allExtraData = extraData;
-
-        const dataToCache = { tickers: allTickersData, extraData: allExtraData };
+        const dataToCache = { tickers: top50Usdc, extraData: extraData };
         sessionStorage.setItem(CACHE_KEY_DATA, JSON.stringify(dataToCache));
         sessionStorage.setItem(CACHE_KEY_TIMESTAMP, Date.now());
 
-        applyFiltersAndSort(); // Aplica e renderiza
+        renderPageContent(top50Usdc, extraData);
+
     } catch (error) {
         console.error("Erro ao carregar dados do mercado:", error);
         tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: red;">Não foi possível carregar os dados.</td></tr>';
     }
 }
 
-
-// --- PONTO DE ENTRADA DO SCRIPT ---
 document.addEventListener('DOMContentLoaded', () => {
     const tbody = document.getElementById('market-scan-tbody');
-    const sortBySelect = document.getElementById('sort-by');
-    const filterRsiCheckbox = document.getElementById('filter-rsi');
-    const filterStochCheckbox = document.getElementById('filter-stoch');
-
-    // Inicializa o estado de ordenação e filtro com os valores da UI, se existirem
-    if (sortBySelect) {
-        currentSortBy = sortBySelect.value;
-        sortBySelect.addEventListener('change', (e) => {
-            currentSortBy = e.target.value;
-            applyFiltersAndSort();
-        });
-    }
-    if (filterRsiCheckbox) {
-        filterRsi = filterRsiCheckbox.checked;
-        filterRsiCheckbox.addEventListener('change', (e) => {
-            filterRsi = e.target.checked;
-            applyFiltersAndSort();
-        });
-    }
-    if (filterStochCheckbox) {
-        filterStoch = filterStochCheckbox.checked;
-        filterStochCheckbox.addEventListener('change', (e) => {
-            filterStoch = e.target.checked;
-            applyFiltersAndSort();
-        });
-    }
-
     if (tbody) {
         tbody.addEventListener('click', function(e) {
             const button = e.target.closest('.view-chart-btn');
