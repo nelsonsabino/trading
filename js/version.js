@@ -2,12 +2,19 @@
 
 export const changelogData = {
     current: {
-        number: '8.7.0', // <-- VERSÃO ATUALIZADA
+        number: '8.8.0', // <-- VERSÃO ATUALIZADA
         changes: [
-            "**Redesign Visual:** Substituídos os widgets do TradingView na página de detalhes do ativo por um gráfico limpo e customizado (ApexCharts) para uma melhor estética, performance e consistência visual com o resto da aplicação."
+            "**Análise Adicional no Scanner:** Adicionado um sinal visual 'RSI' no Market Scanner para ativos cujo RSI de 1 hora esteja abaixo de 45, ajudando a identificar rapidamente potenciais oportunidades de sobrevenda.",
+            "O cálculo do RSI é agora efetuado de forma eficiente no backend através de uma Edge Function melhorada."
         ]
     },
     releases: [
+        {
+            number: '8.7.0',
+            changes: [
+                "**Redesign Visual:** Substituídos os widgets do TradingView na página de detalhes do ativo por um gráfico limpo e customizado (ApexCharts) para uma melhor estética, performance e consistência visual com o resto da aplicação."
+            ]
+        },
         {
             number: '8.6.0',
             changes: [
