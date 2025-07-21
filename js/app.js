@@ -1,9 +1,9 @@
-// js/app.js - VERSÃO COM BUSCA DE DADOS DE MERCADO PARA O DASHBOARD
+// js/app.js - VERSÃO AJUSTADA PARA A NOVA EDGE FUNCTION
 
 import { listenToTrades, fetchActiveStrategies } from './firebase-service.js';
-import { supabase } from './services.js'; // Importar o supabase para a Edge Function
-import { addModal, armModal, execModal, closeModalObj, imageModal, closeImageModalBtn } from './dom-elements.js';
-import { openAddModal, closeAddModal, closeArmModal, closeExecModal, closeCloseTradeModal, closeImageModal } from './modals.js';
+import { supabase } from './services.js';
+import { addModal, armModal, execModal, closeModalObj } from './dom-elements.js';
+import { openAddModal, closeAddModal, closeArmModal, closeExecModal, closeCloseTradeModal } from './modals.js';
 import { displayTrades, populateStrategySelect, generateDynamicChecklist } from './ui.js';
 import { handleAddSubmit, handleArmSubmit, handleExecSubmit, handleCloseSubmit, loadAndOpenForEditing } from './handlers.js';
 import { setupAutocomplete } from './utils.js';
@@ -16,21 +16,19 @@ import { setCurrentStrategies, getStrategies } from './state.js';
  */
 async function fetchMarketDataForDashboard(trades) {
     if (trades.length === 0) return {};
-
     const symbols = [...new Set(trades.map(trade => trade.data.asset))];
 
     try {
-        // --- MELHORIA: Usa Promise.allSettled para maior resiliência ---
         const results = await Promise.allSettled([
             fetch('https://api.binance.com/api/v3/ticker/24hr'),
-            supabase.functions.invoke('get-sparklines-data', { body: { symbols } })
+            // ALTERAÇÃO: Chama a nova Edge Function
+            supabase.functions.invoke('get-extra-asset-data', { body: { symbols } })
         ]);
 
         const marketData = {};
-        
-        // Processa o resultado da API da Binance (tickers)
-        const tickerResult = results[0];
         let tickerMap = new Map();
+        
+        const tickerResult = results[0];
         if (tickerResult.status === 'fulfilled' && tickerResult.value.ok) {
             const allTickers = await tickerResult.value.json();
             tickerMap = new Map(allTickers.map(t => [t.symbol, t]));
@@ -38,51 +36,45 @@ async function fetchMarketDataForDashboard(trades) {
             console.error("Falha ao buscar dados de ticker da Binance:", tickerResult.reason || 'Resposta não ok');
         }
 
-        // Processa o resultado da Edge Function (sparklines)
-        const sparklinesResult = results[1];
-        let sparklinesData = {};
-        if (sparklinesResult.status === 'fulfilled') {
-            const { data, error } = sparklinesResult.value;
+        // ALTERAÇÃO: Processa a nova estrutura de dados de extraData
+        let extraData = {};
+        const extraDataResult = results[1];
+        if (extraDataResult.status === 'fulfilled') {
+            const { data, error } = extraDataResult.value;
             if (error) {
-                console.error("Erro na função de sparkline:", error);
+                console.error("Erro na função get-extra-asset-data:", error);
             } else {
-                sparklinesData = data;
+                extraData = data;
             }
         } else {
-            console.error("Falha ao invocar a função de sparkline:", sparklinesResult.reason);
+            console.error("Falha ao invocar a função get-extra-asset-data:", extraDataResult.reason);
         }
 
-        // Constrói o objeto final com os dados disponíveis
         symbols.forEach(symbol => {
             const ticker = tickerMap.get(symbol);
+            const symbolExtraData = extraData[symbol] || {};
             marketData[symbol] = {
                 price: ticker ? parseFloat(ticker.lastPrice) : 0,
                 change: ticker ? parseFloat(ticker.priceChangePercent) : 0,
-                sparkline: sparklinesData[symbol] || [] // Usa o sparkline se existir, senão um array vazio
+                sparkline: symbolExtraData.sparkline || [] // Pega apenas o sparkline
             };
         });
 
         return marketData;
-
     } catch (error) {
         console.error("Erro geral ao buscar dados de mercado para o dashboard:", error);
-        return {}; // Retorna um objeto vazio em caso de falha geral
+        return {};
     }
 }
 
-
-/**
- * Função principal que inicializa a lógica da página do dashboard.
- */
 async function initializeApp() {
     const potentialTradesContainer = document.getElementById('potential-trades-container');
-    if (!potentialTradesContainer) return; // Se não estamos no dashboard, não continua.
+    if (!potentialTradesContainer) return;
 
     const strategies = await fetchActiveStrategies();
     setCurrentStrategies(strategies);
     populateStrategySelect(strategies);
     
-    // Ouve por alterações nos trades. Quando eles mudam, busca os dados de mercado e redesenha tudo.
     listenToTrades(async (trades) => {
         const activeTrades = trades.filter(t => ['POTENTIAL', 'ARMED', 'LIVE'].includes(t.data.status));
         const marketData = await fetchMarketDataForDashboard(activeTrades);
@@ -99,11 +91,8 @@ async function initializeApp() {
 // --- PONTO DE ENTRADA DO SCRIPT ---
 document.addEventListener('DOMContentLoaded', () => {
     
-    // Configura os listeners que não dependem de dados assíncronos
     const addOpportunityBtn = document.getElementById('add-opportunity-btn');
-    if (addOpportunityBtn) {
-        addOpportunityBtn.addEventListener('click', openAddModal);
-    }
+    if (addOpportunityBtn) addOpportunityBtn.addEventListener('click', openAddModal);
     
     if (addModal.container) {
         addModal.closeBtn.addEventListener('click', closeAddModal);
@@ -147,9 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalAssetInput = document.getElementById('asset');
     if (modalAssetInput) {
         const modalResultsDiv = document.getElementById('modal-autocomplete-results');
-        if (modalResultsDiv) {
-            setupAutocomplete(modalAssetInput, modalResultsDiv, (selectedPair) => {});
-        }
+        if (modalResultsDiv) setupAutocomplete(modalAssetInput, modalResultsDiv, () => {});
         const urlParams = new URLSearchParams(window.location.search);
         const assetPairFromUrl = urlParams.get('assetPair');
         if (assetPairFromUrl) {
@@ -158,6 +145,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Inicia a aplicação
     initializeApp();
 });
