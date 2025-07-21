@@ -48,13 +48,8 @@ header nav { margin-top: 1.5rem; display: flex; justify-content: center; align-i
 .dark-mode .card-market-data { border-top-color: #333; }
 .dark-mode .card-price { color: #ffffff; }
 
-/* --- PÁGINA DE DETALHES DO ATIVO (NOVO) --- */
-.asset-charts-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Duas colunas de largura igual */
-    gap: 2rem;
-    align-items: start;
-}
+/* --- PÁGINA DE DETALHES DO ATIVO --- */
+.asset-charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
 
 /* --- MODAIS & FORMULÁRIOS --- */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(33, 37, 41, 0.6); display: none; justify-content: center; align-items: center; z-index: 1000; box-sizing: border-box; overflow-y: auto; padding: 2rem 1rem; }
@@ -81,6 +76,42 @@ header nav { margin-top: 1.5rem; display: flex; justify-content: center; align-i
 .market-table tbody tr:last-child td, .alarms-table tbody tr:last-child td, #trades-table tbody tr:last-child td { border-bottom: none; }
 .positive-pnl { color: #28a745; font-weight: bold; }
 .negative-pnl { color: #dc3545; font-weight: bold; }
+.asset-name { display: flex; align-items: center; gap: 8px; }
+
+/* --- SINAIS E BADGES (NOVO) --- */
+.rsi-signal {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    line-height: 22px;
+    font-size: 0.7em;
+    font-weight: bold;
+    color: white;
+    background-color: #6f42c1; /* Roxo */
+    border-radius: 50%;
+    text-align: center;
+    cursor: help;
+    position: relative;
+    flex-shrink: 0; /* Impede que o dístico encolha */
+}
+.rsi-signal::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #343a40;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 13px; /* Tamanho fixo para legibilidade */
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s;
+    z-index: 10;
+}
+.rsi-signal:hover::after { opacity: 1; visibility: visible; }
 
 /* --- PÁGINA DE ESTATÍSTICAS --- */
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem; }
@@ -92,7 +123,7 @@ header nav { margin-top: 1.5rem; display: flex; justify-content: center; align-i
 .portfolio-balance strong { font-size: 2.5rem; color: #28a745; margin-left: 1rem; }
 .portfolio-actions { margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem; }
 
-/* --- BOTÕES DE ÍCONE (Cards & Tabelas) --- */
+/* --- BOTÕES DE ÍCONE --- */
 .icon-action-btn { display: flex; align-items: center; gap: 0.4rem; padding: 6px 10px; border-radius: 6px; text-decoration: none; font-size: 0.9em; font-weight: 500; color: #495057; background-color: #f1f3f5; border: 1px solid #dee2e6; transition: all 0.2s ease; }
 .icon-action-btn:hover { transform: translateY(-2px); box-shadow: 0 3px 6px rgba(0,0,0,0.08); background-color: #e9ecef; }
 .icon-action-btn i { font-size: 1.1em; }
@@ -122,7 +153,7 @@ footer { text-align: center; padding: 1rem 0; margin-top: 2rem; color: #6c757d; 
 /* --- RESPONSIVIDADE --- */
 @media (max-width: 992px) { 
     .dashboard-columns { grid-template-columns: 1fr 1fr; } 
-    .asset-charts-grid { grid-template-columns: 1fr; } /* Altera para uma coluna em ecrãs menores */
+    .asset-charts-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 768px) {
     html { font-size: 14px; }
