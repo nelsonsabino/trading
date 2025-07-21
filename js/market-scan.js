@@ -51,20 +51,21 @@ function renderSparkline(containerId, dataSeries) {
     chart.render();
 }
 
-function renderPageContent(tickers, sparklinesData) {
+// ALTERAÇÃO: Recebe agora os dados extra (com RSI)
+function renderPageContent(tickers, extraData) {
     const tbody = document.getElementById('market-scan-tbody');
     if (!tbody) return;
     if (tickers.length === 0) {
         tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Não foram encontrados pares com USDC com volume significativo.</td></tr>';
         return;
     }
-    const tableRowsHtml = tickers.map((ticker, index) => createTableRow(ticker, index)).join('');
+    // Passa os dados extra para a função que cria as linhas
+    const tableRowsHtml = tickers.map((ticker, index) => createTableRow(ticker, index, extraData)).join('');
     tbody.innerHTML = tableRowsHtml;
     tickers.forEach(ticker => {
-        const symbol = ticker.symbol || ticker;
-        const data = sparklinesData[symbol];
-        if (data) {
-            renderSparkline(`sparkline-${symbol}`, data);
+        const symbolData = extraData[ticker.symbol];
+        if (symbolData && symbolData.sparkline) {
+            renderSparkline(`sparkline-${ticker.symbol}`, symbolData.sparkline);
         }
     });
 }
@@ -76,7 +77,8 @@ function formatVolume(volume) {
     return volume.toFixed(2);
 }
 
-function createTableRow(ticker, index) {
+// ALTERAÇÃO: Recebe e utiliza os dados extra para criar o sinal de RSI
+function createTableRow(ticker, index, extraData) {
     const baseAsset = ticker.symbol.replace('USDC', '');
     const price = parseFloat(ticker.lastPrice);
     const volume = parseFloat(ticker.quoteVolume);
@@ -86,11 +88,17 @@ function createTableRow(ticker, index) {
     const createAlarmUrl = `alarms.html?assetPair=${ticker.symbol}`;
     const addOpportunityUrl = `index.html?assetPair=${ticker.symbol}`;
 
+    let rsiSignalHtml = '';
+    const assetExtraData = extraData[ticker.symbol];
+    if (assetExtraData && assetExtraData.rsi_1h !== null && assetExtraData.rsi_1h < 45) {
+        const rsiValue = assetExtraData.rsi_1h.toFixed(1);
+        rsiSignalHtml = `<span class="rsi-signal" data-tooltip="RSI (1h) está em ${rsiValue}">RSI</span>`;
+    }
+
     return `
         <tr>
             <td>${index + 1}</td>
-            <!-- ALTERAÇÃO: Adicionado link para a página de detalhes -->
-            <td><div class="asset-name"><strong><a href="asset-details.html?symbol=${ticker.symbol}" class="asset-link">${baseAsset}</a></strong></div></td>
+            <td><div class="asset-name"><strong><a href="asset-details.html?symbol=${ticker.symbol}" class="asset-link">${baseAsset}</a></strong> ${rsiSignalHtml}</div></td>
             <td>${price.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</td>
             <td class="sparkline-cell"><div class="sparkline-container" id="sparkline-${ticker.symbol}"></div></td>
             <td>${formatVolume(volume)}</td>
@@ -116,7 +124,7 @@ async function fetchAndDisplayMarketData() {
     if (cachedDataJSON && cacheTimestamp && (Date.now() - cacheTimestamp < CACHE_DURATION_MS)) {
         console.log("A carregar dados do scanner a partir do cache.");
         const cachedData = JSON.parse(cachedDataJSON);
-        renderPageContent(cachedData.tickers, cachedData.sparklines);
+        renderPageContent(cachedData.tickers, cachedData.extraData);
         return;
     }
     
@@ -137,14 +145,16 @@ async function fetchAndDisplayMarketData() {
         }
 
         const symbols = top50Usdc.map(t => t.symbol);
-        const { data: sparklinesData, error: sparklinesError } = await supabase.functions.invoke('get-sparklines-data', { body: { symbols } });
-        if (sparklinesError) throw sparklinesError;
+        // ALTERAÇÃO: Chama a nova Edge Function
+        const { data: extraData, error: extraDataError } = await supabase.functions.invoke('get-extra-asset-data', { body: { symbols } });
+        if (extraDataError) throw extraDataError;
 
-        const dataToCache = { tickers: top50Usdc, sparklines: sparklinesData };
+        // ALTERAÇÃO: Guarda a nova estrutura de dados no cache
+        const dataToCache = { tickers: top50Usdc, extraData: extraData };
         sessionStorage.setItem(CACHE_KEY_DATA, JSON.stringify(dataToCache));
         sessionStorage.setItem(CACHE_KEY_TIMESTAMP, Date.now());
 
-        renderPageContent(top50Usdc, sparklinesData);
+        renderPageContent(top50Usdc, extraData);
 
     } catch (error) {
         console.error("Erro ao carregar dados do mercado:", error);
