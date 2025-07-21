@@ -13,15 +13,12 @@
                 if (theme === 'dark') {
                     document.documentElement.classList.add('dark-mode');
                 } else {
-                    // Opcional: verifica a preferência do sistema se não houver nada guardado
                     const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
                     if (prefersDark && theme !== 'light') {
                         document.documentElement.classList.add('dark-mode');
                     }
                 }
-            } catch (e) {
-                // Ignora erros (ex: localStorage desativado)
-            }
+            } catch (e) {}
         })();
     </script>
         <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
@@ -44,51 +41,63 @@
     <main>
         <section class="market-scan-section">
             <h2><i class="fa-solid fa-fire" style="color: #ffc107;"></i> Top 50 Pares com Maior Volume (USDC)</h2>
+
+            <!-- NOVOS CONTROLOS DE FILTRO E ORDENAÇÃO -->
+            <div class="market-controls">
+                <div class="control-group">
+                    <label for="sort-by">Ordenar por:</label>
+                    <select id="sort-by">
+                        <option value="volume">Volume (Descendente)</option>
+                        <option value="price_change_percent_desc">Variação % (Descendente)</option>
+                        <option value="price_change_percent_asc">Variação % (Ascendente)</option>
+                        <option value="symbol_asc">Ativo (A-Z)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Filtros:</label>
+                    <input type="checkbox" id="filter-rsi">
+                    <label for="filter-rsi">RSI < 45 (1h)</label>
+                    <input type="checkbox" id="filter-stoch">
+                    <label for="filter-stoch">STOCH < 20 (1h)</label>
+                </div>
+            </div>
+
             <div class="table-wrapper">
                 <table class="market-table">
-
-<thead>
-    <tr>
-        <th>#</th>
-        <th>Ativo</th>
-        <th>Último Preço</th>
-        <th>Sparkline (24h)</th> <!-- COLUNA ADICIONADA -->
-        <th>Volume (24h)</th>
-        <th>Variação (24h)</th>
-        <th>Ações</th>
-    </tr>
-</thead>
-                    <tbody id="market-scan-tbody">
-                        <!-- As linhas serão inseridas aqui pelo market-scan.js -->
+                    <thead>
                         <tr>
-                            <td colspan="6" style="text-align: center; padding: 2rem;">A carregar dados do mercado...</td>
+                            <th>#</th>
+                            <th>Ativo</th>
+                            <th>Último Preço</th>
+                            <th>Sparkline (24h)</th>
+                            <th>Volume (24h)</th>
+                            <th>Variação (24h)</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="market-scan-tbody">
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 2rem;">A carregar dados do mercado...</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </section>
 
-
-    <!-- NOVO: Modal para o Gráfico Avançado -->
-    <div id="chart-modal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 90%; height: 90%; padding: 1rem;">
-            <span id="close-chart-modal" style="position: absolute; top: 15px; right: 25px; font-size: 2.5rem; color: #adb5bd; font-weight: 300; cursor: pointer; z-index: 10;">×</span>
-            <div id="chart-modal-container" style="height: 100%; width: 100%;">
-                <!-- O widget do TradingView será inserido aqui -->
+        <!-- Modais de Gráfico e Análise Técnica (permanecem inalterados) -->
+        <div id="chart-modal" class="modal-overlay">
+            <div class="modal-content" style="max-width: 90%; height: 90%; padding: 1rem;">
+                <span id="close-chart-modal" style="position: absolute; top: 15px; right: 25px; font-size: 2.5rem; color: #adb5bd; font-weight: 300; cursor: pointer; z-index: 10;">×</span>
+                <div id="chart-modal-container" style="height: 100%; width: 100%;"></div>
             </div>
         </div>
-    </div>
-
 
         <div id="tech-analysis-modal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 450px; height: 600px; padding: 1rem;">
-            <span id="close-tech-analysis-modal" style="position: absolute; top: 15px; right: 25px; font-size: 2.5rem; color: #adb5bd; font-weight: 300; cursor: pointer; z-index: 10;">×</span>
-            <div id="tech-analysis-container" style="height: 100%; width: 100%;">
-                <!-- O widget de Análise Técnica será inserido aqui -->
+            <div class="modal-content" style="max-width: 450px; height: 600px; padding: 1rem;">
+                <span id="close-tech-analysis-modal" style="position: absolute; top: 15px; right: 25px; font-size: 2.5rem; color: #adb5bd; font-weight: 300; cursor: pointer; z-index: 10;">×</span>
+                <div id="tech-analysis-container" style="height: 100%; width: 100%;"></div>
             </div>
         </div>
-    </div>
-
         
     </main>
 
@@ -96,7 +105,7 @@
     
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script type="module" src="js/market-scan.js"></script>
-    <script type="module" src="js/version.js?v=6.5.3"></script>
-<script type="module" src="js/dark-mode.js"></script>
+    <script type="module" src="js/version.js"></script>
+    <script type="module" src="js/dark-mode.js"></script>
 </body>
 </html>
