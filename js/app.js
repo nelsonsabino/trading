@@ -54,8 +54,7 @@ async function fetchMarketDataForDashboard(trades) {
             marketData[symbol] = {
                 price: ticker ? parseFloat(ticker.lastPrice) : 0,
                 change: ticker ? parseFloat(ticker.priceChangePercent) : 0,
-                // ALTERAÇÃO: Aceder à propriedade sparkline aninhada
-                sparkline: symbolExtraData.sparkline || []
+                sparkline: symbolExtraData.sparkline || [] // Já extrai corretamente a propriedade sparkline aninhada
             };
         });
 
