@@ -42,8 +42,7 @@
     padding: 1rem; 
     border-bottom: 1px solid #e9ecef; 
     vertical-align: middle; 
-    display: table-cell;
-    text-align: left; /* Garante o alinhamento à esquerda */
+    display: table-cell; /* ADICIONADO: Garante o comportamento correto da célula em desktop */
 }
 
 /* Remove a borda inferior da última linha de TODAS as tabelas */
@@ -69,7 +68,7 @@
 .asset-name { 
     display: flex; 
     align-items: center; 
-    gap: 8px; 
+    gap: 8px; /* Espaçamento entre o nome e os sinais */
 }
 
 /* --- SINAIS E BADGES (RSI, STOCH) --- */
@@ -81,35 +80,35 @@
     font-size: 0.7em;
     font-weight: bold;
     color: white;
-    background-color: #6f42c1; 
-    border-radius: 50%; 
+    background-color: #6f42c1; /* Roxo para RSI */
+    border-radius: 50%; /* Torna-os circulares */
     text-align: center;
-    cursor: help; 
-    position: relative; 
-    flex-shrink: 0; 
-    margin-left: 5px; 
+    cursor: help; /* Indica que há um tooltip */
+    position: relative; /* Para posicionar o tooltip */
+    flex-shrink: 0; /* Impede que o dístico encolha */
+    margin-left: 5px; /* Pequena margem para separar múltiplos sinais */
 }
 .stoch-signal {
-    background-color: #007bff; 
+    background-color: #007bff; /* Azul para Estocástico */
 }
 
 /* Tooltip básico para os sinais */
 .rsi-signal::after, .stoch-signal::after {
-    content: attr(data-tooltip); 
+    content: attr(data-tooltip); /* Pega o texto do atributo data-tooltip */
     position: absolute;
-    bottom: 125%; 
+    bottom: 125%; /* Posiciona acima do dístico */
     left: 50%;
-    transform: translateX(-50%); 
-    background-color: #343a40; 
-    color: #fff; 
+    transform: translateX(-50%); /* Centra horizontalmente */
+    background-color: #343a40; /* Fundo escuro */
+    color: #fff; /* Texto branco */
     padding: 5px 10px;
     border-radius: 4px;
-    font-size: 13px; 
-    white-space: nowrap; 
-    opacity: 0; 
+    font-size: 13px; /* Tamanho fixo para legibilidade */
+    white-space: nowrap; /* Impede que o texto quebre linha */
+    opacity: 0; /* Escondido por padrão */
     visibility: hidden;
-    transition: opacity 0.2s, visibility 0.2s; 
-    z-index: 10; 
+    transition: opacity 0.2s, visibility 0.2s; /* Transição suave */
+    z-index: 10; /* Garante que aparece por cima de outros elementos */
 }
 /* Mostra o tooltip no hover */
 .rsi-signal:hover::after, .stoch-signal:hover::after { 
