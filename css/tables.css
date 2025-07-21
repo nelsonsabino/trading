@@ -7,7 +7,9 @@
     -webkit-overflow-scrolling: touch; 
 }
 
-.market-table, .alarms-table, #trades-table { 
+/* Aplicar o estilo base a TODAS as tabelas, incluindo as de estatísticas */
+.market-table, .alarms-table, #trades-table, 
+#strategy-stats table, #reason-stats table { 
     width: 100%; 
     border-collapse: collapse; 
     margin-top: 1.5rem; 
@@ -18,29 +20,37 @@
     font-size: 0.95em; 
 }
 
-.market-table thead tr, .alarms-table thead tr, #trades-table thead tr { 
+/* Aplicar o estilo de cabeçalho a TODAS as tabelas */
+.market-table thead tr, .alarms-table thead tr, #trades-table thead tr,
+#strategy-stats thead tr, #reason-stats thead tr { 
     background-color: #f8f9fa; 
     border-bottom: 2px solid #dee2e6; 
 }
 
-.market-table th, .alarms-table th, #trades-table th { 
+/* Aplicar o estilo de célula de cabeçalho a TODAS as tabelas */
+.market-table th, .alarms-table th, #trades-table th,
+#strategy-stats th, #reason-stats th { 
     padding: 1rem; 
     text-align: left; 
     font-weight: 600; 
     color: #495057; 
 }
 
-.market-table td, .alarms-table td, #trades-table td { 
+/* Aplicar o estilo de célula de dados a TODAS as tabelas */
+.market-table td, .alarms-table td, #trades-table td,
+#strategy-stats td, #reason-stats td { 
     padding: 1rem; 
     border-bottom: 1px solid #e9ecef; 
     vertical-align: middle; 
-    display: table-cell; /* ADICIONADO: Garante o comportamento correto da célula em desktop */
+    display: table-cell; 
 }
 
-/* Remove a borda inferior da última linha da tabela */
+/* Remove a borda inferior da última linha de TODAS as tabelas */
 .market-table tbody tr:last-child td, 
 .alarms-table tbody tr:last-child td, 
-#trades-table tbody tr:last-child td { 
+#trades-table tbody tr:last-child td,
+#strategy-stats tbody tr:last-child td,
+#reason-stats tbody tr:last-child td { 
     border-bottom: none; 
 }
 
@@ -58,7 +68,7 @@
 .asset-name { 
     display: flex; 
     align-items: center; 
-    gap: 8px; /* Espaçamento entre o nome e os sinais */
+    gap: 8px; 
 }
 
 /* --- SINAIS E BADGES (RSI, STOCH) --- */
