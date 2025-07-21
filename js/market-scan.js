@@ -109,12 +109,10 @@ function createTableRow(ticker, index, extraData) {
         }
     }
 
-    // --- ALTERAÇÃO: Formatação de preço mais precisa para valores baixos ---
     let formattedPrice;
     if (price >= 1.0) {
         formattedPrice = price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 });
     } else {
-        // Para preços menores que 1, mostra mais casas decimais
         formattedPrice = '$' + price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
     }
 
@@ -127,8 +125,9 @@ function createTableRow(ticker, index, extraData) {
             <td>${formatVolume(volume)}</td>
             <td class="${priceChangeClass}">${priceChangePercent.toFixed(2)}%</td>
             <td>
+                <!-- CORREÇÃO: O botão é agora um link <a> para consistência -->
                 <div class="action-buttons">
-                    <button class="icon-action-btn view-chart-btn" data-symbol="${ticker.symbol}" title="Ver Gráfico no Modal"><i class="fa-solid fa-chart-simple"></i></button>
+                    <a href="#" class="icon-action-btn view-chart-btn" data-symbol="${ticker.symbol}" title="Ver Gráfico no Modal"><i class="fa-solid fa-chart-simple"></i></a>
                     <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn" title="Abrir no TradingView"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
                     <a href="${createAlarmUrl}" class="icon-action-btn" title="Criar Alarme"><i class="fa-solid fa-bell"></i></a>
                     <a href="${addOpportunityUrl}" class="icon-action-btn" title="Adicionar à Watchlist"><i class="fa-solid fa-plus"></i></a>
@@ -166,7 +165,6 @@ function applyFiltersAndSort() {
     });
     renderPageContent(processedTickers);
 }
-
 
 async function fetchAndDisplayMarketData() {
     const tbody = document.getElementById('market-scan-tbody');
@@ -214,8 +212,6 @@ async function fetchAndDisplayMarketData() {
     }
 }
 
-
-// --- PONTO DE ENTRADA DO SCRIPT ---
 document.addEventListener('DOMContentLoaded', () => {
     const tbody = document.getElementById('market-scan-tbody');
     const sortBySelect = document.getElementById('sort-by');
@@ -248,6 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tbody.addEventListener('click', function(e) {
             const button = e.target.closest('.view-chart-btn');
             if (button) {
+                e.preventDefault(); // Impede o link de navegar
                 const symbol = button.dataset.symbol;
                 openChartModal(symbol);
             }
