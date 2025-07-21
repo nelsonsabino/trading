@@ -1,5 +1,5 @@
 /* --- GERAL & TIPOGRAFIA --- */
-body { font-family: -apple-system, BlinkMacMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; background-color: #f8f9fa; color: #343a40; margin: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; background-color: #f8f9fa; color: #343a40; margin: 0; }
 main { max-width: 1400px; margin: auto; padding: 0 2rem 2rem 2rem; }
 h1, h2, h3 { font-weight: 600; }
 h2 { color: #495057; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem; margin-bottom: 1.5rem; }
@@ -187,25 +187,32 @@ header nav { margin-top: 1.5rem; display: flex; justify-content: center; align-i
     cursor: pointer;
 }
 
-/* --- ESTILOS PARA icon-action-btn (BOTÕES DE ÍCONE) --- */
+/* --- NOVO: ESTILOS PARA icon-action-btn (BOTÕES DE ÍCONE) --- */
 
 /* Base para todos os icon-action-btn (botões em cards e tabelas) */
 .icon-action-btn {
-    display: inline-flex; /* Permite ícone e texto lado a lado */
+    /* Usar flex para alinhar ícone e texto */
+    display: inline-flex; 
     align-items: center;
-    justify-content: center; /* Centra o conteúdo */
+    justify-content: center; /* Centra o conteúdo (ícone ou ícone+texto) */
     gap: 0.4rem; /* Espaçamento entre ícone e texto */
-    padding: 8px 12px; /* Padding padrão para botões com texto */
+    padding: 8px 12px; /* Padding padrão para botões com texto (nos cards) */
     font-size: 0.9em;
     font-weight: 500;
     text-decoration: none;
-    border: 1px solid #dee2e6; /* Borda padrão */
+    border: 1px solid #dee2e6; 
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
     background-color: #f1f3f5; /* Fundo cinzento claro padrão */
     color: #495057; /* Cor padrão do texto/ícone */
     flex-shrink: 0; /* Impede que o botão encolha */
+}
+
+/* Garante o tamanho correto do ícone */
+.icon-action-btn i {
+    font-size: 1.1em;
+    line-height: 1; /* Ajuda a alinhar verticalmente */
 }
 
 /* Efeito hover global */
@@ -215,22 +222,17 @@ header nav { margin-top: 1.5rem; display: flex; justify-content: center; align-i
     background-color: #e9ecef; /* Fundo cinzento ligeiramente mais escuro no hover */
 }
 
-/* Garante o tamanho correto do ícone */
-.icon-action-btn i {
-    font-size: 1.1em;
-    line-height: 1; /* Ajuda a alinhar verticalmente */
-}
-
 /* Estilos ESPECÍFICOS para botões dentro das colunas de Ações das TABELAS */
 /* Aplica-se às tabelas do scanner, alarmes, gestão e detalhes do ativo */
 .market-table .action-buttons,
 .alarms-table .action-buttons,
-#trades-table .action-buttons, /* Na página de gestão e detalhes do ativo */
+#trades-table .action-buttons,
 .asset-related-data .action-buttons {
-    display: flex; /* Garante que os botões ficam lado a lado */
+    display: flex;
     flex-direction: row;
-    gap: 0.2rem; /* Espaçamento muito pequeno para botões compactos */
-    /* Removido justify-content: flex-end; se não for estritamente necessário pelo layout do td */
+    gap: 0.5rem; /* Espaçamento entre os botões da tabela */
+    align-items: center; /* Garante alinhamento vertical */
+    justify-content: flex-end; /* Alinha os botões à direita dentro da célula */
 }
 
 .market-table .action-buttons .icon-action-btn,
@@ -240,40 +242,40 @@ header nav { margin-top: 1.5rem; display: flex; justify-content: center; align-i
     padding: 6px; /* Padding igual em todos os lados para fazer o botão quadrado */
     width: 32px; /* Largura fixa para botões de ícone */
     height: 32px; /* Altura fixa para botões de ícone */
-    
-    /* Garante que o texto dentro destes botões NÃO aparece */
-    /* target children span if any */
+    border-radius: 6px; /* Bordas arredondadas */
+
+    /* Força que o texto dentro destes botões NÃO apareça, apenas o ícone */
     & span { 
         display: none; 
     }
 }
 
+/* Cores específicas para os ícones */
+.icon-action-btn.view-chart-btn i { color: #198754; } /* Gráfico (verde) */
+.icon-action-btn.action-full-chart i { color: #0d6efd; } /* TradingView (azul) */
+.icon-action-btn.action-bell i { color: #0d6efd; } /* Alarme (azul) */
+.icon-action-btn.action-plus i { color: #0d6efd; } /* Adicionar (azul) */
 
-/* Cores específicas para os botões de ação (tanto em cards como em tabelas) */
-/* As cores dos ícones */
-.icon-action-btn.action-summary { color: #198754; } /* Gráfico (verde) */
-.icon-action-btn.action-full-chart { color: #0d6efd; } /* TradingView (azul) */
-.icon-action-btn.action-bell { color: #0d6efd; } /* Alarme (azul) */
-.icon-action-btn.action-plus { color: #0d6efd; } /* Adicionar (azul) */
-.icon-action-btn.action-arm { color: #ffc107; } /* Armar (amarelo) */
-.icon-action-btn.action-execute { color: #20c997; } /* Executar (verde água) */
-.icon-action-btn.action-close { color: #dc3545; } /* Fechar (vermelho) */
+/* Cores para os botões de ação do dashboard (com texto) - caso existam estas classes */
+.icon-action-btn.action-arm { color: #ffc107; }
+.icon-action-btn.action-execute { color: #20c997; }
+.icon-action-btn.action-close { color: #dc3545; }
 
 
 /* Ajustes para o Dark Mode */
 .dark-mode .icon-action-btn {
     background-color: #2c2c2c;
     border-color: #444;
-    color: #e0e0e0; /* Cor do ícone/texto em dark mode */
+    color: #e0e0e0; /* Cor do texto/ícone geral em dark mode */
 }
 .dark-mode .icon-action-btn:hover {
     background-color: #3a3a3a;
 }
 /* Dark mode hover para botões com cores específicas */
-.dark-mode .icon-action-btn.action-summary:hover { background-color: #1a4f2b; }
-.dark-mode .icon-action-btn.action-full-chart:hover,
-.dark-mode .icon-action-btn.action-bell:hover,
-.dark-mode .icon-action-btn.action-plus:hover { background-color: #0b4991; }
+.dark-mode .icon-action-btn.view-chart-btn:hover i { background-color: #1a4f2b; }
+.dark-mode .icon-action-btn.action-full-chart:hover i,
+.dark-mode .icon-action-btn.action-bell:hover i,
+.dark-mode .icon-action-btn.action-plus:hover i { background-color: #0b4991; }
 .dark-mode .icon-action-btn.action-arm:hover { background-color: #8c7b00; }
 .dark-mode .icon-action-btn.action-execute:hover { background-color: #1f6b57; }
 .dark-mode .icon-action-btn.action-close:hover { background-color: #a02a3a; }
