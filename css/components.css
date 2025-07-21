@@ -26,13 +26,13 @@
     background-color: #fff; 
     padding: 1.5rem; 
     border-radius: 8px; 
-    border-top: 4px solid #6c757d; /* Cor base para "Potencial" */
+    border-top: 4px solid #6c757d; 
 }
 .armed-trades { 
-    border-top-color: #ffc107; /* Cor para "Armado" */
+    border-top-color: #ffc107; 
 }
 .live-trades { 
-    border-top-color: #28a745; /* Cor para "Ativo" */
+    border-top-color: #28a745; 
 }
 .trade-card { 
     position: relative; 
@@ -80,24 +80,36 @@
     opacity: 1; 
 }
 
-/* --- NOVO: AÇÕES DOS CARDS (COM TEXTO) --- */
-/* O container dos botões nos cards do dashboard */
+/* --- CORREÇÃO: Layout para dados de mercado nos cards --- */
+.card-market-data { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    margin-top: 1rem; 
+    padding-top: 1rem; 
+    border-top: 1px solid #e9ecef; 
+}
+.card-price-data { 
+    text-align: right; 
+}
+.card-sparkline { 
+    width: 100px; 
+    height: 40px; 
+}
+
+/* Ações dos cards (com texto) */
 .card-actions { 
     display: flex; 
     justify-content: flex-end; 
     align-items: center; 
-    gap: 0.75rem; /* Ajustado para um espaçamento mais apertado, se for o caso */
+    gap: 0.75rem; 
     margin-top: 1rem; 
 }
-
-/* Garante que os botões dentro de .card-actions têm o padding e tamanho corretos para mostrar o texto */
 .card-actions .icon-action-btn {
-    padding: 8px 12px; /* Padding para botões com texto */
-    width: auto; /* Deixa a largura ser definida pelo conteúdo */
-    height: auto; /* Deixa a altura ser definida pelo conteúdo */
+    padding: 8px 12px; 
+    width: auto; 
+    height: auto; 
 }
-
-/* Garante que o span (texto) dentro destes botões nos cards seja visível */
 .card-actions .icon-action-btn span {
     display: inline; 
 }
