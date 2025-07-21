@@ -2,15 +2,21 @@
 
 export const changelogData = {
     current: {
-        number: '8.10.2', // <-- VERSÃO ATUALIZADA
+        number: '9.0.0', // <-- VERSÃO ATUALIZADA (Major release)
         changes: [
-            "**Correções Críticas de UI:**",
-            "Resolvido o problema de inconsistência de tamanho e estilo dos botões de ação com ícone em todas as tabelas (Scanner, Alarmes, Gestão e Detalhes do Ativo), garantindo uma aparência compacta e uniforme.",
-            "Corrigida a formatação de preços em moedas de baixo valor no Market Scanner, exibindo a precisão correta (mais casas decimais).",
-            "O botão 'Ver Gráfico no Modal' nas tabelas agora é um link (`<a>`) para garantir consistência de estilo com os outros botões de ação.",
+            "**Reestruturação do CSS:** O gigantesco ficheiro `style.css` foi dividido em múltiplos ficheiros CSS mais pequenos e modulares (ex: `base.css`, `layout.css`, `components.css`, `buttons.css`, etc.) para melhorar a manutenibilidade, organização e escalabilidade do projeto. Todos os ficheiros HTML foram atualizados para importar a nova estrutura de CSS."
         ]
     },
     releases: [
+        {
+            number: '8.10.2',
+            changes: [
+                "**Correções Críticas de UI:**",
+                "Resolvido o problema de inconsistência de tamanho e estilo dos botões de ação com ícone em todas as tabelas (Scanner, Alarmes, Gestão e Detalhes do Ativo), garantindo uma aparência compacta e uniforme.",
+                "Corrigida a formatação de preços em moedas de baixo valor no Market Scanner, exibindo a precisão correta (mais casas decimais).",
+                "O botão 'Ver Gráfico no Modal' nas tabelas agora é um link (`<a>`) para garantir consistência de estilo com os outros botões de ação.",
+            ]
+        },
         {
             number: '8.10.1',
             changes: [
