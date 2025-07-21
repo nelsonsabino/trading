@@ -1,0 +1,127 @@
+/* css/components.css */
+
+/* --- COMPONENTES GERAIS --- */
+.stat-card { 
+    background-color: #fff; 
+    padding: 1.5rem; 
+    border-radius: 8px; 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08); 
+    text-align: center; 
+}
+.stat-card h4 { 
+    margin-top: 0; 
+    margin-bottom: 0.5rem; 
+    color: #6c757d; 
+    font-size: 1em; 
+}
+.stat-card p { 
+    margin: 0; 
+    font-size: 2em; 
+    font-weight: bold; 
+    color: #343a40; 
+}
+
+/* --- CARDS DO DASHBOARD (POTENCIAL, ARMADO, ATIVO) --- */
+.potential-trades, .armed-trades, .live-trades { 
+    background-color: #fff; 
+    padding: 1.5rem; 
+    border-radius: 8px; 
+    border-top: 4px solid #6c757d; /* Cor base para "Potencial" */
+}
+.armed-trades { 
+    border-top-color: #ffc107; /* Cor para "Armado" */
+}
+.live-trades { 
+    border-top-color: #28a745; /* Cor para "Ativo" */
+}
+.trade-card { 
+    position: relative; 
+    background: #fdfdfd; 
+    border: 1px solid #e9ecef; 
+    padding: 1rem 1.5rem; 
+    border-radius: 6px; 
+    margin-bottom: 1rem; 
+    transition: box-shadow 0.2s ease-in-out; 
+    border-left: 5px solid #6c757d; 
+}
+.trade-card:hover { 
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08); 
+}
+.trade-card.armed { 
+    border-left-color: #ffc107; 
+}
+.trade-card.live { 
+    border-left-color: #28a745; 
+}
+.trade-card h3 { 
+    margin-top: 0; 
+    margin-bottom: 0.5rem; 
+}
+.trade-card p { 
+    margin: 0.25rem 0; 
+    font-size: 0.95em; 
+    color: #495057; 
+}
+.card-edit-btn { 
+    background-color: #ffc107; 
+    color: #212529; 
+    padding: 4px 8px; 
+    font-size: 0.8em; 
+    border-radius: 4px; 
+    border: none; 
+    cursor: pointer; 
+    position: absolute; 
+    top: 1rem; 
+    right: 1.5rem; 
+    opacity: 0; 
+    transition: opacity 0.2s; 
+}
+.trade-card:hover .card-edit-btn { 
+    opacity: 1; 
+}
+
+/* --- SECÇÃO DE PORTFÓLIO (Página de Estatísticas) --- */
+.portfolio-section { 
+    background-color: #fff; 
+    padding: 2rem; 
+    border-radius: 8px; 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08); 
+    text-align: center; 
+    margin-bottom: 2rem; 
+}
+.portfolio-balance { 
+    font-size: 1.5rem; 
+    color: #495057; 
+}
+.portfolio-balance strong { 
+    font-size: 2.5rem; 
+    color: #28a745; 
+    margin-left: 1rem; 
+}
+.portfolio-actions { 
+    margin-top: 1.5rem; 
+    display: flex; 
+    justify-content: center; 
+    gap: 1rem; 
+}
+
+/* --- ARTIGO DE NOTÍCIAS (Página de Detalhes do Ativo) --- */
+.news-article {
+    background-color: #fdfdfd; /* Mais claro que o .stat-card padrão */
+    border: 1px solid #e9ecef;
+    padding: 1rem 1.5rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    text-align: left; /* Override .stat-card center text */
+}
+.news-article h4 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: #212529; /* Cor do título da notícia */
+}
+.news-article h4 .asset-link {
+    color: inherit; /* Garante que o link dentro do h4 herda a cor */
+}
+.news-article p {
+    margin: 0; /* Remove margem extra */
+}
