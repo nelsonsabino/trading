@@ -2,17 +2,23 @@
 
 export const changelogData = {
     current: {
-        number: '8.6.0', // <-- VERSÃO ATUALIZADA
+        number: '8.7.0', // <-- VERSÃO ATUALIZADA
         changes: [
-            "**Melhorias na Página de Detalhes do Ativo:**",
-            "Configuração do gráfico principal melhorada para uma análise mais limpa.",
-            "Adicionado um widget de Análise Técnica avançado com múltiplos timeframes.",
-            "Integrada uma nova secção com as últimas notícias do ativo (via CryptoCompare).",
-            "Adicionados botões de ação rápida no cabeçalho (Adicionar à Watchlist, Criar Alarme, Análise TV).",
-            "Implementado um layout 50/50 para os gráficos em ecrãs maiores para melhor visualização."
+            "**Redesign Visual:** Substituídos os widgets do TradingView na página de detalhes do ativo por um gráfico limpo e customizado (ApexCharts) para uma melhor estética, performance e consistência visual com o resto da aplicação."
         ]
     },
     releases: [
+        {
+            number: '8.6.0',
+            changes: [
+                "**Melhorias na Página de Detalhes do Ativo:**",
+                "Configuração do gráfico principal melhorada para uma análise mais limpa.",
+                "Adicionado um widget de Análise Técnica avançado com múltiplos timeframes.",
+                "Integrada uma nova secção com as últimas notícias do ativo (via CryptoCompare).",
+                "Adicionados botões de ação rápida no cabeçalho (Adicionar à Watchlist, Criar Alarme, Análise TV).",
+                "Implementado um layout 50/50 para os gráficos em ecrãs maiores para melhor visualização."
+            ]
+        },
         {
             number: '8.5.0',
             changes: [
