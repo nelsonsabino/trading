@@ -87,9 +87,10 @@ function createTableRow(ticker, index, extraData) {
 
     let rsiSignalHtml = '';
     const assetExtraData = extraData[ticker.symbol];
-    if (assetExtraData && assetExtraData.rsi_1h !== null && assetExtraData.rsi_1h < 45) {
-        const rsiValue = assetExtraData.rsi_1h.toFixed(1);
-        rsiSignalHtml = `<span class="rsi-signal" data-tooltip="RSI (1h) está em ${rsiValue}">RSI</span>`;
+    // ALTERAÇÃO: Verifica rsi_5m em vez de rsi_1h e atualiza o tooltip
+    if (assetExtraData && assetExtraData.rsi_5m !== null && assetExtraData.rsi_5m < 45) {
+        const rsiValue = assetExtraData.rsi_5m.toFixed(1);
+        rsiSignalHtml = `<span class="rsi-signal" data-tooltip="RSI (5m) está em ${rsiValue}">RSI</span>`;
     }
 
     return `
@@ -142,7 +143,6 @@ async function fetchAndDisplayMarketData() {
         }
 
         const symbols = top50Usdc.map(t => t.symbol);
-        // ALTERAÇÃO: Revertido para o nome original da Edge Function
         const { data: extraData, error: extraDataError } = await supabase.functions.invoke('get-sparklines-data', { body: { symbols } });
         if (extraDataError) throw extraDataError;
 
