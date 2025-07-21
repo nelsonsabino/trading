@@ -2,14 +2,23 @@
 
 export const changelogData = {
     current: {
-        number: '8.10.1', // <-- VERSÃO ATUALIZADA
+        number: '8.10.2', // <-- VERSÃO ATUALIZADA
         changes: [
-            "**Correções Visuais e de Preço no Scanner e em toda a aplicação:**",
-            "Resolvido o problema de estilo e espaçamento dos botões de ação com ícone em todas as tabelas e cards da aplicação, garantindo uma aparência compacta e consistente.",
-            "Ajustada a formatação dos preços no Market Scanner para moedas com valores muito baixos (ex: PEPE), exibindo mais casas decimais para maior precisão."
+            "**Correções Críticas de UI:**",
+            "Resolvido o problema de inconsistência de tamanho e estilo dos botões de ação com ícone em todas as tabelas (Scanner, Alarmes, Gestão e Detalhes do Ativo), garantindo uma aparência compacta e uniforme.",
+            "Corrigida a formatação de preços em moedas de baixo valor no Market Scanner, exibindo a precisão correta (mais casas decimais).",
+            "O botão 'Ver Gráfico no Modal' nas tabelas agora é um link (`<a>`) para garantir consistência de estilo com os outros botões de ação.",
         ]
     },
     releases: [
+        {
+            number: '8.10.1',
+            changes: [
+                "**Sinais de Mercado Otimizados:**",
+                "Os sinais visuais de RSI e Estocástico no Market Scanner agora são calculados para o timeframe de **1 hora** (revertendo a alteração anterior de 5 minutos para RSI e adicionando Estocástico em 1h), oferecendo uma perspetiva diária mais estável.",
+                "Os gráficos Sparkline continuam a mostrar consistentemente os dados das últimas **24 horas** (timeframe de 1 hora), independentemente dos timeframes dos indicadores. A Edge Function `get-sparklines-data` foi ajustada para buscar dados de múltiplos timeframes em paralelo, garantindo a informação completa."
+            ]
+        },
         {
             number: '8.10.0',
             changes: [
