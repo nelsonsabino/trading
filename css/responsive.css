@@ -1,0 +1,106 @@
+/* css/responsive.css */
+
+/* --- RESPONSIVIDADE --- */
+
+/* Tablet em diante (maior que 992px) */
+@media (max-width: 992px) { 
+    .dashboard-columns { 
+        grid-template-columns: 1fr 1fr; /* 2 colunas para o dashboard */
+    } 
+    .asset-charts-grid { 
+        grid-template-columns: 1fr; /* Gráficos da página de detalhes empilhados */
+    }
+}
+
+/* Telemóvel em diante (maior que 768px) */
+@media (max-width: 768px) {
+    html { 
+        font-size: 14px; /* Reduz o tamanho da fonte base */
+    }
+    header { 
+        padding: 1.5rem 1rem; 
+        margin-bottom: 1rem; 
+    }
+    main { 
+        padding: 0 1rem 1rem 1rem; /* Reduz o padding lateral */
+    }
+    .dashboard-columns { 
+        grid-template-columns: 1fr; /* Dashboard com 1 coluna */
+    }
+    h1 { 
+        font-size: 1.8rem; 
+    }
+    h2 { 
+        font-size: 1.4rem; 
+        margin-bottom: 1rem; 
+    }
+    /* Botões e links de navegação em mobile */
+    .btn, .nav-link { 
+        padding: 8px 16px; 
+        font-size: 0.95rem; 
+    }
+
+    /* Tabelas em mobile (transforma linhas em blocos) */
+    .alarms-table thead, 
+    #trades-table thead,
+    .market-table thead { /* Adicionado para a tabela do scanner */
+        display: none; /* Esconde o cabeçalho da tabela */
+    }
+    .alarms-table tr, 
+    #trades-table tr,
+    .market-table tr { /* Adicionado para a tabela do scanner */
+        display: block; /* Cada linha se torna um bloco */
+        margin-bottom: 1.5rem; 
+        border: 1px solid #dee2e6; 
+        border-radius: 8px; 
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+        background-color: #fff; 
+    }
+    .alarms-table td, 
+    #trades-table td,
+    .market-table td { /* Adicionado para a tabela do scanner */
+        display: flex; /* Conteúdo da célula em flex */
+        justify-content: space-between; /* Alinha label e valor */
+        align-items: center; 
+        padding: 0.8rem 1rem; 
+        border-bottom: 1px solid #f1f1f1; 
+    }
+    /* Adiciona o label do cabeçalho como pseudo-elemento */
+    .alarms-table td::before, 
+    #trades-table td::before,
+    .market-table td::before { /* Adicionado para a tabela do scanner */
+        content: attr(data-label); 
+        font-weight: 600; 
+        color: #495057; 
+        padding-right: 1rem; 
+    }
+    /* Remove borda inferior da última célula */
+    .alarms-table tr td:last-child, 
+    #trades-table tr td:last-child,
+    .market-table tr td:last-child { /* Adicionado para a tabela do scanner */
+        border-bottom: none; 
+    }
+    /* Garante que o valor da célula não quebra o layout */
+    .alarms-table td .cell-value, 
+    #trades-table td .cell-value,
+    .market-table td .cell-value { /* Adicionado para a tabela do scanner */
+        text-align: right; 
+        flex-shrink: 0; 
+        max-width: 60%; 
+    }
+    /* Controlos do mercado em mobile */
+    .market-controls {
+        flex-direction: column; /* Empilha os grupos de controlo */
+        align-items: flex-start; /* Alinha à esquerda */
+        gap: 1rem; /* Reduz o espaçamento */
+        padding: 0.75rem;
+    }
+    .market-controls .control-group {
+        width: 100%; /* Ocupa a largura total */
+        justify-content: flex-start;
+    }
+    /* Ajuste de select em dark mode para mobile */
+    .dark-mode .market-controls select {
+        background-color: #2c2c2c;
+    }
+}
