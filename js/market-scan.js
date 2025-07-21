@@ -86,17 +86,30 @@ function createTableRow(ticker, index, extraData) {
     const addOpportunityUrl = `index.html?assetPair=${ticker.symbol}`;
 
     let rsiSignalHtml = '';
+    let stochSignalHtml = ''; // NOVO: HTML para o sinal do Estocástico
+
     const assetExtraData = extraData[ticker.symbol];
-    // ALTERAÇÃO: Verifica rsi_5m em vez de rsi_1h e atualiza o tooltip
+
+    // Lógica para o sinal de RSI (5m)
     if (assetExtraData && assetExtraData.rsi_5m !== null && assetExtraData.rsi_5m < 45) {
         const rsiValue = assetExtraData.rsi_5m.toFixed(1);
         rsiSignalHtml = `<span class="rsi-signal" data-tooltip="RSI (5m) está em ${rsiValue}">RSI</span>`;
     }
 
+    // Lógica para o sinal do Estocástico (15m) - Oversold (<20)
+    if (assetExtraData && assetExtraData.stoch_15m !== null) {
+        const stochK = assetExtraData.stoch_15m.k;
+        const stochD = assetExtraData.stoch_15m.d;
+        // Condição para sobrevenda
+        if (stochK < 20 || stochD < 20) { // Se K ou D estiver abaixo de 20
+            stochSignalHtml = `<span class="stoch-signal" data-tooltip="Stoch (15m) K:${stochK.toFixed(1)} D:${stochD.toFixed(1)}">STC</span>`;
+        }
+    }
+
     return `
         <tr>
             <td>${index + 1}</td>
-            <td><div class="asset-name"><strong><a href="asset-details.html?symbol=${ticker.symbol}" class="asset-link">${baseAsset}</a></strong> ${rsiSignalHtml}</div></td>
+            <td><div class="asset-name"><strong><a href="asset-details.html?symbol=${ticker.symbol}" class="asset-link">${baseAsset}</a></strong> ${rsiSignalHtml} ${stochSignalHtml}</div></td>
             <td>${price.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</td>
             <td class="sparkline-cell"><div class="sparkline-container" id="sparkline-${ticker.symbol}"></div></td>
             <td>${formatVolume(volume)}</td>
