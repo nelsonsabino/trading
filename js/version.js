@@ -2,13 +2,19 @@
 
 export const changelogData = {
     current: {
-        number: '8.8.0', // <-- VERSÃO ATUALIZADA
+        number: '8.8.1', // <-- VERSÃO ATUALIZADA
         changes: [
-            "**Análise Adicional no Scanner:** Adicionado um sinal visual 'RSI' no Market Scanner para ativos cujo RSI de 1 hora esteja abaixo de 45, ajudando a identificar rapidamente potenciais oportunidades de sobrevenda.",
-            "O cálculo do RSI é agora efetuado de forma eficiente no backend através de uma Edge Function melhorada."
+            "**Sinal de RSI Ajustado:** O sinal de RSI no Market Scanner agora é calculado para o timeframe de **5 minutos** (em vez de 1 hora), permitindo uma análise mais rápida das condições de sobrevenda no curto prazo. A Edge Function `get-sparklines-data` foi ajustada para refletir esta alteração."
         ]
     },
     releases: [
+        {
+            number: '8.8.0',
+            changes: [
+                "**Análise Adicional no Scanner:** Adicionado um sinal visual 'RSI' no Market Scanner para ativos cujo RSI de 1 hora esteja abaixo de 45, ajudando a identificar rapidamente potenciais oportunidades de sobrevenda.",
+                "O cálculo do RSI é agora efetuado de forma eficiente no backend através de uma Edge Function melhorada."
+            ]
+        },
         {
             number: '8.7.0',
             changes: [
