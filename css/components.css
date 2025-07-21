@@ -80,14 +80,15 @@
     opacity: 1; 
 }
 
-/* --- CORREÇÃO: Layout para dados de mercado nos cards --- */
-.card-market-data { 
-    display: flex; 
-    align-items: center; 
-    justify-content: space-between; 
-    margin-top: 1rem; 
-    padding-top: 1rem; 
-    border-top: 1px solid #e9ecef; 
+/* --- DADOS DE MERCADO DENTRO DOS CARDS --- */
+/* CORREÇÃO: Restaurada a regra de layout flex para alinhar o gráfico e os preços */
+.card-market-data {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e9ecef;
 }
 .card-price-data { 
     text-align: right; 
