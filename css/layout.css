@@ -1,0 +1,55 @@
+/* css/layout.css */
+
+/* --- CABEÇALHO E NAVEGAÇÃO --- */
+header { 
+    text-align: center; 
+    padding: 2rem 1rem; 
+    background-color: #fff; 
+    border-bottom: 1px solid #dee2e6; 
+    margin-bottom: 2rem; 
+}
+.mantra { 
+    font-style: italic; 
+    color: #6c757d; 
+}
+header nav { 
+    margin-top: 1.5rem; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    gap: 1rem; 
+    flex-wrap: wrap; 
+}
+
+/* --- DASHBOARD (Layout das colunas) --- */
+.dashboard-columns { 
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 2rem; 
+}
+
+/* --- PÁGINA DE DETALHES DO ATIVO (Layout dos gráficos) --- */
+.asset-charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Duas colunas de largura igual */
+    gap: 2rem;
+    align-items: start;
+}
+
+/* --- CONTROLES DO MERCADO (Layout dos filtros e ordenação) --- */
+.market-controls {
+    display: flex;
+    justify-content: flex-start; 
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1rem;
+    background-color: #f1f3f5;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap; 
+}
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
