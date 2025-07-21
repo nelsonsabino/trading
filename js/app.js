@@ -1,4 +1,4 @@
-// js/app.js - VERSÃO AJUSTADA PARA A NOVA EDGE FUNCTION
+// js/app.js - VERSÃO AJUSTADA PARA O NOME REVERTIDO DA EDGE FUNCTION
 
 import { listenToTrades, fetchActiveStrategies } from './firebase-service.js';
 import { supabase } from './services.js';
@@ -21,8 +21,8 @@ async function fetchMarketDataForDashboard(trades) {
     try {
         const results = await Promise.allSettled([
             fetch('https://api.binance.com/api/v3/ticker/24hr'),
-            // ALTERAÇÃO: Chama a nova Edge Function
-            supabase.functions.invoke('get-extra-asset-data', { body: { symbols } })
+            // ALTERAÇÃO: Revertido para o nome original da Edge Function
+            supabase.functions.invoke('get-sparklines-data', { body: { symbols } })
         ]);
 
         const marketData = {};
@@ -36,18 +36,17 @@ async function fetchMarketDataForDashboard(trades) {
             console.error("Falha ao buscar dados de ticker da Binance:", tickerResult.reason || 'Resposta não ok');
         }
 
-        // ALTERAÇÃO: Processa a nova estrutura de dados de extraData
         let extraData = {};
         const extraDataResult = results[1];
         if (extraDataResult.status === 'fulfilled') {
             const { data, error } = extraDataResult.value;
             if (error) {
-                console.error("Erro na função get-extra-asset-data:", error);
+                console.error("Erro na função get-sparklines-data:", error);
             } else {
                 extraData = data;
             }
         } else {
-            console.error("Falha ao invocar a função get-extra-asset-data:", extraDataResult.reason);
+            console.error("Falha ao invocar a função get-sparklines-data:", extraDataResult.reason);
         }
 
         symbols.forEach(symbol => {
@@ -56,7 +55,7 @@ async function fetchMarketDataForDashboard(trades) {
             marketData[symbol] = {
                 price: ticker ? parseFloat(ticker.lastPrice) : 0,
                 change: ticker ? parseFloat(ticker.priceChangePercent) : 0,
-                sparkline: symbolExtraData.sparkline || [] // Pega apenas o sparkline
+                sparkline: symbolExtraData.sparkline || []
             };
         });
 
