@@ -51,7 +51,6 @@ function renderSparkline(containerId, dataSeries) {
     chart.render();
 }
 
-// ALTERAÇÃO: Recebe agora os dados extra (com RSI)
 function renderPageContent(tickers, extraData) {
     const tbody = document.getElementById('market-scan-tbody');
     if (!tbody) return;
@@ -59,7 +58,6 @@ function renderPageContent(tickers, extraData) {
         tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Não foram encontrados pares com USDC com volume significativo.</td></tr>';
         return;
     }
-    // Passa os dados extra para a função que cria as linhas
     const tableRowsHtml = tickers.map((ticker, index) => createTableRow(ticker, index, extraData)).join('');
     tbody.innerHTML = tableRowsHtml;
     tickers.forEach(ticker => {
@@ -77,7 +75,6 @@ function formatVolume(volume) {
     return volume.toFixed(2);
 }
 
-// ALTERAÇÃO: Recebe e utiliza os dados extra para criar o sinal de RSI
 function createTableRow(ticker, index, extraData) {
     const baseAsset = ticker.symbol.replace('USDC', '');
     const price = parseFloat(ticker.lastPrice);
@@ -145,11 +142,10 @@ async function fetchAndDisplayMarketData() {
         }
 
         const symbols = top50Usdc.map(t => t.symbol);
-        // ALTERAÇÃO: Chama a nova Edge Function
-        const { data: extraData, error: extraDataError } = await supabase.functions.invoke('get-extra-asset-data', { body: { symbols } });
+        // ALTERAÇÃO: Revertido para o nome original da Edge Function
+        const { data: extraData, error: extraDataError } = await supabase.functions.invoke('get-sparklines-data', { body: { symbols } });
         if (extraDataError) throw extraDataError;
 
-        // ALTERAÇÃO: Guarda a nova estrutura de dados no cache
         const dataToCache = { tickers: top50Usdc, extraData: extraData };
         sessionStorage.setItem(CACHE_KEY_DATA, JSON.stringify(dataToCache));
         sessionStorage.setItem(CACHE_KEY_TIMESTAMP, Date.now());
