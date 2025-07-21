@@ -77,6 +77,19 @@
     align-items: center; 
 }
 
+/* NOVO: Estilo para linhas de formulário com múltiplos itens lado a lado */
+.form-row {
+    display: flex;
+    gap: 1rem; /* Espaçamento entre os itens na linha */
+    flex-wrap: wrap; /* Permite quebrar linha em ecrãs pequenos */
+}
+.form-row .input-item,
+.form-row .input-item-styled {
+    flex: 1; /* Faz com que os itens ocupem o espaço disponível igualmente */
+    min-width: 150px; /* Garante que não encolhem demasiado */
+}
+
+
 /* Estilos para grupos de input (label + input/select/textarea) */
 .input-item { 
     margin-bottom: 1.25rem; 
@@ -138,36 +151,35 @@
     color: #6c757d;
 }
 .checklist-item input[type="checkbox"] {
-    width: auto; /* Deixa o checkbox ter o tamanho natural */
+    width: auto; 
     margin: 0;
 }
 .checklist-item label {
-    margin-bottom: 0; /* Remove a margem padrão do label */
+    margin-bottom: 0; 
     cursor: pointer;
-    font-weight: normal; /* Override default font-weight for labels */
+    font-weight: normal; 
 }
 .checklist-item .required-asterisk {
-    color: #dc3545; /* Cor para asterisco de campos obrigatórios */
+    color: #dc3545; 
 }
 
 /* Estilos para campos de input dinâmicos (estratégias) */
 .input-item-styled {
     display: flex;
-    align-items: flex-start; /* Alinha o ícone e o label no topo */
+    align-items: flex-start; 
     gap: 10px;
-    margin-bottom: 1.25rem; /* Margem entre os itens */
+    margin-bottom: 1.25rem; 
 }
 .input-item-styled i {
     font-size: 1.2em;
     color: #6c757d;
-    padding-top: 10px; /* Alinha o ícone com o topo do input */
+    padding-top: 10px; 
 }
 .input-item-styled label {
-    margin-bottom: 5px; /* Margem entre label e campo */
+    margin-bottom: 5px; 
 }
 .input-item-styled .input-item-field {
     width: 100%;
-    /* Estilos já definidos em .input-item input, select, textarea */
 }
 
 /* Rodapé dos formulários */
