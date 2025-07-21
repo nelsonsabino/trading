@@ -27,27 +27,26 @@
 
 /* --- BOTÕES DE ÍCONE (icon-action-btn) --- */
 
-/* Base para todos os icon-action-btn (botões em cards e tabelas) */
+/* Base para TODOS os icon-action-btn (cards e tabelas) */
 .icon-action-btn {
-    /* Usar inline-flex para permitir ícone e texto ou apenas ícone */
     display: inline-flex; 
     align-items: center;
-    justify-content: center; /* Centra o conteúdo (ícone ou ícone+texto) */
+    justify-content: center; /* Centra o conteúdo */
     gap: 0.4rem; /* Espaçamento entre ícone e texto */
     padding: 8px 12px; /* Padding padrão para botões com texto (nos cards) */
     font-size: 0.9em;
     font-weight: 500;
-    text-decoration: none; /* Garante que não há sublinhado para links */
+    text-decoration: none; 
     border: 1px solid #dee2e6; 
-    border-radius: 6px;
-    cursor: pointer;
+    border-radius: 6px; 
+    cursor: pointer; 
     transition: all 0.2s ease-in-out;
     background-color: #f1f3f5; 
-    color: #495057; /* Cor padrão do texto/ícone */
+    color: #495057; /* Cor padrão do texto/ícone (cinzento) */
     flex-shrink: 0; /* Impede que o botão encolha */
 }
 
-/* Efeito hover geral para botões de ícone */
+/* Efeito hover geral para todos os icon-action-btn */
 .icon-action-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 3px 6px rgba(0,0,0,0.08);
@@ -61,50 +60,46 @@
 }
 
 
-/* Estilos ESPECÍFICOS para a DIV que contém os botões de Ações nas TABELAS */
-/* Isto vai para o container flex, NÃO para os botões individuais */
+/* --- Estilos para containers de botões de Ações (Ex: dentro de cards ou tabelas) --- */
+.card-actions, /* Container de ações nos cards do dashboard */
 .market-table .action-buttons,
 .alarms-table .action-buttons,
-#trades-table .action-buttons, /* Aplicável à tabela de gestão e detalhes do ativo */
-.asset-related-data .action-buttons { /* Para ter a certeza que pega a tabela em asset-details.html */
+#trades-table .action-buttons, /* Na página de gestão e detalhes do ativo */
+.asset-related-data .action-buttons { /* Para pegar a tabela em asset-details.html */
     display: flex;
     flex-direction: row;
-    gap: 0.5rem; /* Espaçamento entre os botões na tabela */
+    gap: 0.5rem; /* Espaçamento padrão entre os botões */
     align-items: center; 
-    justify-content: flex-end; /* Alinha os botões à direita dentro da célula */
+    justify-content: flex-end; /* Alinha os botões à direita dentro da célula/card */
 }
 
-/* ESTILO CRÍTICO: Botões de ícone compactos dentro das tabelas */
-/* Isto faz com que sejam todos quadrados e com apenas o ícone visível */
+
+/* --- ESTILOS ESPECÍFICOS: Botões de ícone compactos dentro das TABELAS --- */
+/* Aplica-se aos botões .icon-action-btn que ESTÃO dentro de um .action-buttons numa TABLE */
 .market-table .action-buttons .icon-action-btn,
 .alarms-table .action-buttons .icon-action-btn,
 #trades-table .action-buttons .icon-action-btn,
 .asset-related-data .action-buttons .icon-action-btn {
-    padding: 6px; /* Padding uniforme para todos os lados */
+    padding: 6px; /* Padding uniforme para todos os lados, torna-o quadrado */
     width: 32px;  /* Largura fixa */
     height: 32px; /* Altura fixa */
     border-radius: 6px; /* Bordas arredondadas */
-}
-
-/* Garante que o texto dentro destes botões da tabela NÃO aparece */
-.market-table .action-buttons .icon-action-btn span,
-.alarms-table .action-buttons .icon-action-btn span,
-#trades-table .action-buttons .icon-action-btn span,
-.asset-related-data .action-buttons .icon-action-btn span { 
-    display: none; 
+    /* IMPORTANTE: Garante que o texto DENTRO destes botões (apenas tabelas) NÃO aparece */
+    & span { 
+        display: none; 
+    }
 }
 
 
-/* Cores específicas para os ÍCONES (aplicadas ao <i> elemento) */
-.icon-action-btn.view-chart-btn i { color: #198754; } /* Gráfico (verde) */
+/* --- CORES ESPECÍFICAS DOS ÍCONES (Aplicadas ao <i> elemento) --- */
+/* Estas classes são usadas em todos os icon-action-btn, tanto em cards como em tabelas */
+.icon-action-btn.action-summary i, .icon-action-btn.view-chart-btn i { color: #198754; } /* Gráfico (verde) */
 .icon-action-btn.action-full-chart i { color: #0d6efd; } /* TradingView (azul) */
 .icon-action-btn.action-bell i { color: #0d6efd; } /* Alarme (azul) */
 .icon-action-btn.action-plus i { color: #0d6efd; } /* Adicionar (azul) */
-
-/* Cores para os botões de ação do dashboard (com texto), se aplicável */
-.icon-action-btn.action-arm { color: #ffc107; }
-.icon-action-btn.action-execute { color: #20c997; }
-.icon-action-btn.action-close { color: #dc3545; }
+.icon-action-btn.action-arm i { color: #ffc107; } /* Armar (amarelo) */
+.icon-action-btn.action-execute i { color: #20c997; } /* Executar (verde água) */
+.icon-action-btn.action-close i { color: #dc3545; } /* Fechar (vermelho) */
 
 
 /* --- BOTÃO DE TEMA (Estilo específico, não um icon-action-btn genérico) --- */
