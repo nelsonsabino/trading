@@ -6,7 +6,6 @@
     <title>Dashboard de Estatísticas</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- NOVOS FICHEIROS CSS IMPORTADOS -->
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/components.css">
@@ -92,12 +91,13 @@
         
         <hr class="section-divider">
 
+        <!-- CORREÇÃO: As tabelas estão agora fora de qualquer .stat-card -->
         <section class="detailed-stats">
             <h2>Análise por Estratégia</h2>
-            <div id="strategy-stats"></div>
+            <div id="strategy-stats" class="table-wrapper"></div> <!-- Adicionada a classe table-wrapper -->
             
-            <h2>Análise por Motivo de Fecho</h2>
-            <div id="reason-stats"></div>
+            <h2 style="margin-top: 2rem;">Análise por Motivo de Fecho</h2>
+            <div id="reason-stats" class="table-wrapper"></div> <!-- Adicionada a classe table-wrapper -->
         </section>
     </main>
 
