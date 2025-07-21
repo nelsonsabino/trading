@@ -1,0 +1,37 @@
+/* css/charts.css */
+
+/* --- GRÁFICOS & WIDGETS GERAIS --- */
+.mini-chart-container { 
+    height: 0; /* Escondido por padrão */
+    overflow: hidden; 
+    transition: height 0.35s ease-in-out; 
+    margin-top: 1rem; 
+    border-radius: 6px; 
+}
+.mini-chart-container.visible { 
+    height: 400px; /* Altura quando visível */
+}
+
+/* Células da tabela que contêm sparklines */
+.sparkline-cell { 
+    padding: 0 !important; /* Remove padding da célula da tabela */
+    vertical-align: middle !important; /* Alinha verticalmente */
+}
+
+/* Contentor do sparkline dentro da célula */
+.sparkline-container { 
+    width: 150px; 
+    height: 50px; 
+    margin: auto; /* Centra o sparkline */
+}
+
+/* Estilos para a nova secção de gráficos na página de detalhes do ativo */
+.main-chart-section .stat-card {
+    padding: 1rem; /* Reduz o padding para o gráfico */
+}
+
+/* Ajustes para o widget de Análise Técnica do TradingView (se ainda estiver em uso em algum modal) */
+/* Embora tenhamos substituído na asset-details, pode ainda ser usado no market-scan modal */
+#tech-analysis-container .tradingview-widget-copyright {
+    display: none; /* Esconde o copyright para um look mais limpo */
+}
