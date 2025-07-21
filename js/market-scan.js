@@ -109,16 +109,24 @@ function createTableRow(ticker, index, extraData) {
         }
     }
 
+    // --- ALTERAÇÃO: Formatação de preço mais precisa para valores baixos ---
+    let formattedPrice;
+    if (price >= 1.0) {
+        formattedPrice = price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    } else {
+        // Para preços menores que 1, mostra mais casas decimais
+        formattedPrice = '$' + price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
+    }
+
     return `
         <tr>
             <td>${index + 1}</td>
             <td><div class="asset-name"><strong><a href="asset-details.html?symbol=${ticker.symbol}" class="asset-link">${baseAsset}</a></strong> ${rsiSignalHtml} ${stochSignalHtml}</div></td>
-            <td>${price.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</td>
+            <td>${formattedPrice}</td>
             <td class="sparkline-cell"><div class="sparkline-container" id="sparkline-${ticker.symbol}"></div></td>
             <td>${formatVolume(volume)}</td>
             <td class="${priceChangeClass}">${priceChangePercent.toFixed(2)}%</td>
             <td>
-                <!-- CORREÇÃO: Removido o texto dos botões, mantendo apenas os ícones -->
                 <div class="action-buttons">
                     <button class="icon-action-btn view-chart-btn" data-symbol="${ticker.symbol}" title="Ver Gráfico no Modal"><i class="fa-solid fa-chart-simple"></i></button>
                     <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn" title="Abrir no TradingView"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
@@ -158,6 +166,7 @@ function applyFiltersAndSort() {
     });
     renderPageContent(processedTickers);
 }
+
 
 async function fetchAndDisplayMarketData() {
     const tbody = document.getElementById('market-scan-tbody');
@@ -205,6 +214,8 @@ async function fetchAndDisplayMarketData() {
     }
 }
 
+
+// --- PONTO DE ENTRADA DO SCRIPT ---
 document.addEventListener('DOMContentLoaded', () => {
     const tbody = document.getElementById('market-scan-tbody');
     const sortBySelect = document.getElementById('sort-by');
