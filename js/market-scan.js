@@ -6,6 +6,12 @@ const CACHE_KEY_DATA = 'marketScannerCache';
 const CACHE_KEY_TIMESTAMP = 'marketScannerCacheTime';
 const CACHE_DURATION_MS = 2 * 60 * 1000;
 
+let allTickersData = [];
+let allExtraData = {};
+let currentSortBy = 'volume';
+let filterRsi = false;
+let filterStoch = false;
+
 const chartModal = document.getElementById('chart-modal');
 const closeChartModalBtn = document.getElementById('close-chart-modal');
 const chartContainer = document.getElementById('chart-modal-container');
@@ -51,17 +57,17 @@ function renderSparkline(containerId, dataSeries) {
     chart.render();
 }
 
-function renderPageContent(tickers, extraData) {
+function renderPageContent(processedTickers) {
     const tbody = document.getElementById('market-scan-tbody');
     if (!tbody) return;
-    if (tickers.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Não foram encontrados pares com USDC com volume significativo.</td></tr>';
+    if (processedTickers.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Nenhum ativo corresponde aos filtros.</td></tr>';
         return;
     }
-    const tableRowsHtml = tickers.map((ticker, index) => createTableRow(ticker, index, extraData)).join('');
+    const tableRowsHtml = processedTickers.map((ticker, index) => createTableRow(ticker, index, allExtraData)).join('');
     tbody.innerHTML = tableRowsHtml;
-    tickers.forEach(ticker => {
-        const symbolData = extraData[ticker.symbol];
+    processedTickers.forEach(ticker => {
+        const symbolData = allExtraData[ticker.symbol];
         if (symbolData && symbolData.sparkline) {
             renderSparkline(`sparkline-${ticker.symbol}`, symbolData.sparkline);
         }
@@ -112,28 +118,61 @@ function createTableRow(ticker, index, extraData) {
             <td>${formatVolume(volume)}</td>
             <td class="${priceChangeClass}">${priceChangePercent.toFixed(2)}%</td>
             <td>
+                <!-- CORREÇÃO: Removido o texto dos botões, mantendo apenas os ícones -->
                 <div class="action-buttons">
-                    <!-- ALTERAÇÃO: Adicionadas classes de cor para consistência -->
-                    <button class="icon-action-btn action-summary view-chart-btn" data-symbol="${ticker.symbol}" title="Ver Gráfico no Modal"><i class="fa-solid fa-chart-simple"></i></button>
-                    <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn action-full-chart" title="Abrir no TradingView"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                    <a href="${createAlarmUrl}" class="icon-action-btn action-bell" title="Criar Alarme"><i class="fa-solid fa-bell"></i></a>
-                    <a href="${addOpportunityUrl}" class="icon-action-btn action-plus" title="Adicionar à Watchlist"><i class="fa-solid fa-plus"></i></a>
+                    <button class="icon-action-btn view-chart-btn" data-symbol="${ticker.symbol}" title="Ver Gráfico no Modal"><i class="fa-solid fa-chart-simple"></i></button>
+                    <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn" title="Abrir no TradingView"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                    <a href="${createAlarmUrl}" class="icon-action-btn" title="Criar Alarme"><i class="fa-solid fa-bell"></i></a>
+                    <a href="${addOpportunityUrl}" class="icon-action-btn" title="Adicionar à Watchlist"><i class="fa-solid fa-plus"></i></a>
                 </div>
             </td>
         </tr>`;
+}
+
+function applyFiltersAndSort() {
+    let processedTickers = [...allTickersData];
+    if (filterRsi) {
+        processedTickers = processedTickers.filter(ticker => {
+            const assetExtraData = allExtraData[ticker.symbol];
+            return assetExtraData && assetExtraData.rsi_1h !== null && assetExtraData.rsi_1h < 45;
+        });
+    }
+    if (filterStoch) {
+        processedTickers = processedTickers.filter(ticker => {
+            const assetExtraData = allExtraData[ticker.symbol];
+            return assetExtraData && assetExtraData.stoch_1h !== null && 
+                   (assetExtraData.stoch_1h.k < 20 || assetExtraData.stoch_1h.d < 20);
+        });
+    }
+    processedTickers.sort((a, b) => {
+        if (currentSortBy === 'volume') {
+            return parseFloat(b.quoteVolume) - parseFloat(a.quoteVolume);
+        } else if (currentSortBy === 'price_change_percent_desc') {
+            return parseFloat(b.priceChangePercent) - parseFloat(a.priceChangePercent);
+        } else if (currentSortBy === 'price_change_percent_asc') {
+            return parseFloat(a.priceChangePercent) - parseFloat(b.priceChangePercent);
+        } else if (currentSortBy === 'symbol_asc') {
+            return a.symbol.localeCompare(b.symbol);
+        }
+        return 0;
+    });
+    renderPageContent(processedTickers);
 }
 
 async function fetchAndDisplayMarketData() {
     const tbody = document.getElementById('market-scan-tbody');
     if (!tbody) return;
     tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">A carregar dados...</td></tr>';
+    
     const cachedDataJSON = sessionStorage.getItem(CACHE_KEY_DATA);
     const cacheTimestamp = sessionStorage.getItem(CACHE_KEY_TIMESTAMP);
 
     if (cachedDataJSON && cacheTimestamp && (Date.now() - cacheTimestamp < CACHE_DURATION_MS)) {
         console.log("A carregar dados do scanner a partir do cache.");
         const cachedData = JSON.parse(cachedDataJSON);
-        renderPageContent(cachedData.tickers, cachedData.extraData);
+        allTickersData = cachedData.tickers;
+        allExtraData = cachedData.extraData;
+        applyFiltersAndSort();
         return;
     }
     
@@ -141,28 +180,25 @@ async function fetchAndDisplayMarketData() {
     try {
         const response = await fetch('https://api.binance.com/api/v3/ticker/24hr');
         if (!response.ok) throw new Error('Falha ao comunicar com a API da Binance.');
-        const allTickers = await response.json();
+        const allFetchedTickers = await response.json();
 
-        const top50Usdc = allTickers
+        const initialFilteredTickers = allFetchedTickers
             .filter(ticker => ticker.symbol.endsWith('USDC') && parseFloat(ticker.quoteVolume) > 0)
             .sort((a, b) => parseFloat(b.quoteVolume) - parseFloat(a.quoteVolume))
             .slice(0, 50);
 
-        if (top50Usdc.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Não foram encontrados pares com USDC com volume significativo.</td></tr>';
-            return;
-        }
-
-        const symbols = top50Usdc.map(t => t.symbol);
+        const symbols = initialFilteredTickers.map(t => t.symbol);
         const { data: extraData, error: extraDataError } = await supabase.functions.invoke('get-sparklines-data', { body: { symbols } });
         if (extraDataError) throw extraDataError;
 
-        const dataToCache = { tickers: top50Usdc, extraData: extraData };
+        allTickersData = initialFilteredTickers;
+        allExtraData = extraData;
+
+        const dataToCache = { tickers: allTickersData, extraData: allExtraData };
         sessionStorage.setItem(CACHE_KEY_DATA, JSON.stringify(dataToCache));
         sessionStorage.setItem(CACHE_KEY_TIMESTAMP, Date.now());
 
-        renderPageContent(top50Usdc, extraData);
-
+        applyFiltersAndSort();
     } catch (error) {
         console.error("Erro ao carregar dados do mercado:", error);
         tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: red;">Não foi possível carregar os dados.</td></tr>';
@@ -171,6 +207,32 @@ async function fetchAndDisplayMarketData() {
 
 document.addEventListener('DOMContentLoaded', () => {
     const tbody = document.getElementById('market-scan-tbody');
+    const sortBySelect = document.getElementById('sort-by');
+    const filterRsiCheckbox = document.getElementById('filter-rsi');
+    const filterStochCheckbox = document.getElementById('filter-stoch');
+
+    if (sortBySelect) {
+        currentSortBy = sortBySelect.value;
+        sortBySelect.addEventListener('change', (e) => {
+            currentSortBy = e.target.value;
+            applyFiltersAndSort();
+        });
+    }
+    if (filterRsiCheckbox) {
+        filterRsi = filterRsiCheckbox.checked;
+        filterRsiCheckbox.addEventListener('change', (e) => {
+            filterRsi = e.target.checked;
+            applyFiltersAndSort();
+        });
+    }
+    if (filterStochCheckbox) {
+        filterStoch = filterStochCheckbox.checked;
+        filterStochCheckbox.addEventListener('change', (e) => {
+            filterStoch = e.target.checked;
+            applyFiltersAndSort();
+        });
+    }
+
     if (tbody) {
         tbody.addEventListener('click', function(e) {
             const button = e.target.closest('.view-chart-btn');
