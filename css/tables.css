@@ -1,0 +1,107 @@
+/* css/tables.css */
+
+/* --- TABELAS GERAIS --- */
+.table-wrapper { 
+    overflow-x: auto; 
+    width: 100%; 
+    -webkit-overflow-scrolling: touch; 
+}
+
+.market-table, .alarms-table, #trades-table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    margin-top: 1.5rem; 
+    background: #fff; 
+    border-radius: 8px; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+    overflow: hidden; 
+    font-size: 0.95em; 
+}
+
+.market-table thead tr, .alarms-table thead tr, #trades-table thead tr { 
+    background-color: #f8f9fa; 
+    border-bottom: 2px solid #dee2e6; 
+}
+
+.market-table th, .alarms-table th, #trades-table th { 
+    padding: 1rem; 
+    text-align: left; 
+    font-weight: 600; 
+    color: #495057; 
+}
+
+.market-table td, .alarms-table td, #trades-table td { 
+    padding: 1rem; 
+    border-bottom: 1px solid #e9ecef; 
+    vertical-align: middle; 
+    display: table-cell; /* ADICIONADO: Garante o comportamento correto da célula em desktop */
+}
+
+/* Remove a borda inferior da última linha da tabela */
+.market-table tbody tr:last-child td, 
+.alarms-table tbody tr:last-child td, 
+#trades-table tbody tr:last-child td { 
+    border-bottom: none; 
+}
+
+/* Cores para o P&L (Lucro e Prejuízo) */
+.positive-pnl { 
+    color: #28a745; 
+    font-weight: bold; 
+}
+.negative-pnl { 
+    color: #dc3545; 
+    font-weight: bold; 
+}
+
+/* Alinhamento dos elementos na coluna de ativo (para sinais) */
+.asset-name { 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; /* Espaçamento entre o nome e os sinais */
+}
+
+/* --- SINAIS E BADGES (RSI, STOCH) --- */
+.rsi-signal, .stoch-signal {
+    display: inline-block;
+    width: 22px; 
+    height: 22px;
+    line-height: 22px; 
+    font-size: 0.7em;
+    font-weight: bold;
+    color: white;
+    background-color: #6f42c1; 
+    border-radius: 50%; 
+    text-align: center;
+    cursor: help; 
+    position: relative; 
+    flex-shrink: 0; 
+    margin-left: 5px; 
+}
+.stoch-signal {
+    background-color: #007bff; 
+}
+
+/* Tooltip básico para os sinais */
+.rsi-signal::after, .stoch-signal::after {
+    content: attr(data-tooltip); 
+    position: absolute;
+    bottom: 125%; 
+    left: 50%;
+    transform: translateX(-50%); 
+    background-color: #343a40; 
+    color: #fff; 
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 13px; 
+    white-space: nowrap; 
+    opacity: 0; 
+    visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s; 
+    z-index: 10; 
+}
+/* Mostra o tooltip no hover */
+.rsi-signal:hover::after, .stoch-signal:hover::after { 
+    opacity: 1; 
+    visibility: visible; 
+}
