@@ -21,22 +21,29 @@ header nav {
     flex-wrap: wrap; 
 }
 
-/* --- DASHBOARD (Layout das colunas) --- */
+/* --- GRIDS DE LAYOUT PRINCIPAL --- */
 .dashboard-columns { 
     display: grid; 
     grid-template-columns: repeat(3, 1fr); 
     gap: 2rem; 
 }
 
-/* --- PÁGINA DE DETALHES DO ATIVO (Layout dos gráficos) --- */
 .asset-charts-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Duas colunas de largura igual */
+    grid-template-columns: 1fr 1fr;
     gap: 2rem;
     align-items: start;
 }
 
-/* --- CONTROLES DO MERCADO (Layout dos filtros e ordenação) --- */
+/* CORREÇÃO: A regra para a grelha de estatísticas foi restaurada aqui */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+
+/* --- CONTROLES DO MERCADO --- */
 .market-controls {
     display: flex;
     justify-content: flex-start; 
