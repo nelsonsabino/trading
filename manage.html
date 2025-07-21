@@ -5,7 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestão de Trades</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    
+    <!-- NOVOS FICHEIROS CSS IMPORTADOS -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/buttons.css">
+    <link rel="stylesheet" href="css/tables.css">
+    <link rel="stylesheet" href="css/forms-modals.css">
+    <link rel="stylesheet" href="css/charts.css">
+    <link rel="stylesheet" href="css/strategy-builder.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
+    <link rel="stylesheet" href="css/responsive.css">
+
     <script>
         (function() {
             try {
@@ -13,15 +26,12 @@
                 if (theme === 'dark') {
                     document.documentElement.classList.add('dark-mode');
                 } else {
-                    // Opcional: verifica a preferência do sistema se não houver nada guardado
                     const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
                     if (prefersDark && theme !== 'light') {
                         document.documentElement.classList.add('dark-mode');
                     }
                 }
-            } catch (e) {
-                // Ignora erros (ex: localStorage desativado)
-            }
+            } catch (e) {}
         })();
     </script>
 </head>
@@ -29,11 +39,11 @@
 
     <header>
         <h1>Gestão de Todas as Operações</h1>
-        <p class="mantra">Revê, aprende, melhora. Apagua apenas o que for necessário.</p>
+        <p class="mantra">Revê, aprende, melhora. Apaga apenas o que for necessário.</p>
 <nav>
     <a href="index.html" class="nav-link">Voltar ao Dashboard Principal</a>
     <a href="stats.html" class="nav-link">Ver Estatísticas</a>
-    <a href="market-scan.html" class="nav-link" style="background-color: #198754;">Scanner de Mercado</a> <!-- LINK NOVO -->
+    <a href="market-scan.html" class="nav-link" style="background-color: #198754;">Scanner de Mercado</a>
 <button id="theme-toggle-btn" class="btn" title="Alternar tema">
         <i class="fas fa-moon"></i>
     </button>
@@ -61,7 +71,6 @@
 
  <hr class="section-divider">
 
-        <!-- NOVA SECÇÃO PARA O HISTÓRICO DE TRANSAÇÕES -->
         <section class="transaction-history">
             <h2>Histórico de Transações do Portfólio</h2>
             <table id="transactions-table">
@@ -85,7 +94,7 @@
     <footer></footer>
 
     <script type="module" src="js/manage.js"></script>
-<script type="module" src="js/version.js?v=6.5.3"></script>
-<script type="module" src="js/dark-mode.js"></script>
+    <script type="module" src="js/version.js"></script>
+    <script type="module" src="js/dark-mode.js"></script>
 </body>
 </html>
