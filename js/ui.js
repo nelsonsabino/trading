@@ -1,11 +1,10 @@
-// js/ui.js - VERSÃO COM LINK PARA A PÁGINA DE DETALHES
+// js/ui.js - VERSÃO AJUSTADA PARA A NOVA EDGE FUNCTION
 
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openImageModal } from './modals.js';
 import { loadAndOpenForEditing } from './handlers.js';
 import { getLastCreatedTradeId, setLastCreatedTradeId } from './state.js';
 
-// --- FUNÇÃO PARA RENDERIZAR SPARKLINE ---
 function renderSparkline(containerId, dataSeries) {
     const container = document.getElementById(containerId);
     if (!container || !dataSeries || dataSeries.length < 2) return;
@@ -21,8 +20,7 @@ function renderSparkline(containerId, dataSeries) {
     chart.render();
 }
 
-// --- FUNÇÕES DE GERAÇÃO DE FORMULÁRIO ---
-// ... (sem alterações nesta secção) ...
+// --- Funções de Geração de Formulário (sem alterações) ---
 function getIconForLabel(labelText) {
     const text = labelText.toLowerCase();
     if (text.includes('tendência')) return 'fa-solid fa-chart-line';
@@ -100,7 +98,7 @@ export function populateStrategySelect(strategies) {
     }
 }
 
-// --- LÓGICA DE CRIAÇÃO E EXIBIÇÃO DE CARDS ---
+// --- Lógica de Criação e Exibição de Cards (sem alterações) ---
 export function createTradeCard(trade, marketData = {}) {
     const card = document.createElement('div');
     card.className = 'trade-card';
@@ -115,13 +113,9 @@ export function createTradeCard(trade, marketData = {}) {
     if (trade.data.status === 'POTENTIAL') { mainActionButtonHtml = `<button class="icon-action-btn action-arm" data-action="arm" title="Validar e Armar Setup"><i class="fa-solid fa-bolt"></i> <span>Armar</span></button>`; } 
     else if (trade.data.status === 'ARMED') { mainActionButtonHtml = `<button class="icon-action-btn action-execute" data-action="execute" title="Executar Trade"><i class="fa-solid fa-play"></i> <span>Executar</span></button>`; } 
     else if (trade.data.status === 'LIVE') { mainActionButtonHtml = `<button class="icon-action-btn action-close" data-action="close" title="Fechar Trade"><i class="fa-solid fa-stop"></i> <span>Fechar</span></button>`; }
-    
     card.innerHTML = `
         <button class="icon-action-btn card-edit-btn" data-action="edit" title="Editar"><i class="fas fa-pencil"></i></button>
-        
-        <!-- ALTERAÇÃO: Adicionado link para a página de detalhes -->
         <h3><a href="asset-details.html?symbol=${assetName}" class="asset-link">${assetName}</a></h3>
-        
         <p style="color: #007bff; font-weight: 500;">Estratégia: ${trade.data.strategyName || 'N/A'}</p>
         <p><strong>Status:</strong> ${trade.data.status}</p>
         <p><strong>Notas:</strong> ${trade.data.notes || ''}</p>
@@ -141,7 +135,6 @@ export function createTradeCard(trade, marketData = {}) {
     return card;
 }
 
-// ... (o resto do ficheiro permanece sem alterações) ...
 function toggleAdvancedChart(tradeId, symbol, button) {
     const chartContainer = document.getElementById(`advanced-chart-${tradeId}`);
     if (!chartContainer) return;
@@ -161,7 +154,9 @@ function toggleAdvancedChart(tradeId, symbol, button) {
         button.innerHTML = `<i class="fa-solid fa-eye-slash"></i> <span>Esconder</span>`;
     }
 }
+
 let tradesForEventListeners = [];
+
 export function displayTrades(trades, marketData) {
     tradesForEventListeners = trades;
     if (!potentialTradesContainer) return;
@@ -175,10 +170,15 @@ export function displayTrades(trades, marketData) {
         else if (trade.data.status === 'ARMED') { if (armedCount === 0) armedTradesContainer.innerHTML = ''; armedTradesContainer.appendChild(card); armedCount++; }
         else if (trade.data.status === 'LIVE') { if (liveCount === 0) liveTradesContainer.innerHTML = ''; liveTradesContainer.appendChild(card); liveCount++; }
     });
+
     trades.forEach(trade => {
+        // ALTERAÇÃO: Garante que extrai o sparkline da estrutura correta
         const assetMarketData = marketData[trade.data.asset];
-        if (assetMarketData) renderSparkline(`sparkline-card-${trade.id}`, assetMarketData.sparkline);
+        if (assetMarketData && assetMarketData.sparkline) {
+            renderSparkline(`sparkline-card-${trade.id}`, assetMarketData.sparkline);
+        }
     });
+
     const lastId = getLastCreatedTradeId();
     if (lastId) {
         const newCard = document.querySelector(`.trade-card[data-trade-id="${lastId}"]`);
@@ -189,6 +189,7 @@ export function displayTrades(trades, marketData) {
         setLastCreatedTradeId(null);
     }
 }
+
 document.addEventListener('DOMContentLoaded', () => {
     const dashboard = document.querySelector('.dashboard-columns');
     if (dashboard) {
