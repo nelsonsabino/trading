@@ -2,15 +2,24 @@
 
 export const changelogData = {
     current: {
-        number: '9.1.3', // <-- VERSÃO ATUALIZADA (Correções finais de layout)
+        number: '9.1.4', // <-- VERSÃO ATUALIZADA (Reversão do widget de análise técnica)
         changes: [
-            "**Correções e Otimizações Finais de UI:**",
-            "Resolvidos todos os problemas de layout e alinhamento nos cards do Dashboard, garantindo a compactação, o posicionamento correto do lápis de edição (visível no hover), e o alinhamento em linha do sparkline, preço e percentagem.",
-            "Restaurado o comportamento de tabela clássico em ecrãs móveis para o Market Scanner (e todas as tabelas), permitindo scroll horizontal em vez de quebrar em blocos, melhorando a visualização de dados tabulares.",
-            "Ajustes finos em espaçamentos e alinhamentos CSS para garantir a consistência e o aspeto profissional em toda a aplicação.",
+            "**Otimização da Página de Detalhes do Ativo (Final):**",
+            "O gráfico principal do ativo agora permite a seleção de diferentes timeframes (1m, 5m, 15m, 30m, 1h, 4h, 1d, 1w, 1M) via dropdown, permitindo uma análise flexível da ação de preço.",
+            "O widget de 'Análise Técnica' do TradingView foi reintroduzido na página de detalhes do ativo, substituindo a tentativa de replicação com ApexCharts, para fornecer as recomendações agregadas de 'Strong Buy/Sell' em múltiplos timeframes.",
+            "As chamadas à API da Binance para dados de gráfico e indicadores são agora centralizadas na Edge Function `get-sparklines-data` para otimização e processamento no backend, garantindo performance e fiabilidade.",
         ]
     },
     releases: [
+        {
+            number: '9.1.3',
+            changes: [
+                "**Correções e Otimizações Finais de UI:**",
+                "Resolvidos todos os problemas de layout e alinhamento nos cards do Dashboard, garantindo a compactação, o posicionamento correto do lápis de edição (visível no hover), e o alinhamento em linha do sparkline, preço e percentagem.",
+                "Restaurado o comportamento de tabela clássico em ecrãs móveis para o Market Scanner (e todas as tabelas), permitindo scroll horizontal em vez de quebrar em blocos, melhorando a visualização de dados tabulares.",
+                "Ajustes finos em espaçamentos e alinhamentos CSS para garantir a consistência e o aspeto profissional em toda a aplicação.",
+            ]
+        },
         {
             number: '9.1.2',
             changes: [
