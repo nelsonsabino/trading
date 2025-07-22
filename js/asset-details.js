@@ -73,6 +73,7 @@ async function renderMainAssetChart(symbol, interval = '1h') {
 
 /**
  * Renderiza o widget de Análise Técnica da TradingView.
+ * CORRIGIDO: Usa o método de carregamento via script para o widget.
  * @param {string} symbol - O símbolo do ativo.
  */
 function renderTradingViewTechnicalAnalysisWidget(symbol) {
@@ -82,18 +83,27 @@ function renderTradingViewTechnicalAnalysisWidget(symbol) {
     
     const currentTheme = document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light';
 
-    new TradingView.widget({
-        "container_id": "tradingview-tech-analysis-container",
+    // Cria o script do widget e define as suas propriedades
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.async = true;
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js';
+    
+    // Configuração do widget
+    const config = {
         "width": "100%",
         "height": "100%",
         "symbol": `BINANCE:${symbol}`,
-        "interval": "1h", // Pode ajustar este intervalo se quiser um padrão diferente
+        "interval": "1h", 
         "showIntervalTabs": true,
         "displayMode": "multiple",
-        "locale": "pt", // Mantido em português
+        "locale": "pt", 
         "colorTheme": currentTheme,
         "isTransparent": false
-    });
+    };
+
+    script.innerHTML = JSON.stringify(config); // Define as opções JSON dentro do script
+    container.appendChild(script); // Adiciona o script ao container
 }
 
 
@@ -167,7 +177,7 @@ async function displayTradesForAsset(symbol) {
         tbody.innerHTML = tradesHtml;
     } catch (err) {
         console.error("Erro ao buscar trades para o ativo:", err);
-        tbody.innerHTML = '<tr><td colspan="5" style="color:red;text-align:center;">Erro ao carregar trades.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="color:red;text-align:center;">Erro ao carregar trades.</td></td>';
     }
 }
 function editTrade(tradeId) {
@@ -212,19 +222,6 @@ document.addEventListener('DOMContentLoaded', () => {
     displayAlarmsForAsset(assetSymbol);
     displayTradesForAsset(assetSymbol);
 
-    const tradesTable = document.getElementById('trades-table');
-    if (tradesTable) {
-        tradesTable.addEventListener('click', (e) => {
-            const button = e.target.closest('.edit-btn');
-            if (button) {
-                const tradeId = button.closest('tr').dataset.tradeId;
-                if (tradeId) {
-                    editTrade(tradeId);
-                }
-            }
-        });
-    }
-
-    // NOVO: Renderiza o widget de análise técnica da TradingView
+    // AGORA CORRETO: Chama a função para renderizar o widget de análise técnica
     renderTradingViewTechnicalAnalysisWidget(assetSymbol);
 });
