@@ -2,9 +2,15 @@
 
 export const changelogData = {
     current: {
-        number: '9.1.2', // <-- VERSÃO ATUALIZADA (Correção de ícone)
+        number: '9.1.2', // <-- VERSÃO ATUALIZADA (Otimização dos Cards do Dashboard)
         changes: [
-            "**Correção de Ícone:** O ícone para 'Criar Alarme' na navegação principal foi corrigido de `fa-bell-plus` para `fa-plus-circle`, garantindo que é exibido corretamente em todas as páginas."
+            "**Otimização de UI - Cards do Dashboard:**",
+            "Reduzido o tamanho dos cards no Dashboard principal para torná-los mais compactos e permitir uma visualização mais densa de ativos.",
+            "Removido o texto dos botões 'Gráfico' e 'Análise' nos cards, exibindo apenas os ícones para um visual mais limpo.",
+            "O mini-gráfico, preço e variação percentual são agora exibidos na mesma linha para maior eficiência de espaço.",
+            "As 'Notas' do trade só aparecem se houver conteúdo, evitando linhas vazias desnecessárias.",
+            "O status do trade foi removido do corpo do card, uma vez que a coluna Kanban já indica essa informação.",
+            "O botão de ação principal (Armar/Executar/Fechar) foi reposicionado na parte superior do card para maior proeminência e acessibilidade."
         ]
     },
     releases: [
@@ -15,7 +21,8 @@ export const changelogData = {
                 "Resolvidos múltiplos problemas de layout e alinhamento em todas as tabelas (Dashboard, Scanner, Alarmes, Gestão e Detalhes do Ativo), tanto em desktop como em mobile, restaurando a aparência original e consistente.",
                 "Corrigido o layout dos cards do Dashboard, garantindo que o gráfico Sparkline e os dados de preço são exibidos corretamente lado a lado.",
                 "As tabelas de análise na página de Estatísticas agora estão alinhadas corretamente à esquerda e formatadas de forma consistente.",
-                "Garantida a compatibilidade total com o novo sistema de navegação e as correções de CSS anteriores."
+                "Garantida a compatibilidade total com o novo sistema de navegação e as correções de CSS anteriores.",
+                "Correção do ícone para 'Criar Alarme' na navegação principal, alterado para `fa-plus-circle` para exibição correta."
             ]
         },
         {
