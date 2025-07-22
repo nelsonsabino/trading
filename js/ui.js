@@ -1,4 +1,4 @@
-// js/ui.js - VERSÃO AJUSTADA PARA A NOVA EDGE FUNCTION
+// js/ui.js - VERSÃO COM CARDS DO DASHBOARD OTIMIZADOS
 
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openImageModal } from './modals.js';
@@ -14,7 +14,8 @@ function renderSparkline(containerId, dataSeries) {
     const chartColor = lastPrice >= firstPrice ? '#28a745' : '#dc3545';
     const options = {
         series: [{ data: dataSeries }], chart: { type: 'line', height: 40, width: 100, sparkline: { enabled: true }},
-        stroke: { curve: 'smooth', width: 2 }, colors: [chartColor], tooltip: { enabled: false }
+        stroke: { curve: 'smooth', width: 2 }, colors: [chartColor],
+        tooltip: { fixed: { enabled: false }, x: { show: false }, y: { title: { formatter: () => '' }, formatter: (val) => val.toFixed(5) }, marker: { show: false }}
     };
     const chart = new ApexCharts(container, options);
     chart.render();
@@ -98,7 +99,7 @@ export function populateStrategySelect(strategies) {
     }
 }
 
-// --- Lógica de Criação e Exibição de Cards (sem alterações) ---
+// --- LÓGICA DE CRIAÇÃO E EXIBIÇÃO DE CARDS (OTIMIZADA) ---
 export function createTradeCard(trade, marketData = {}) {
     const card = document.createElement('div');
     card.className = 'trade-card';
@@ -107,31 +108,72 @@ export function createTradeCard(trade, marketData = {}) {
     const tradingViewSymbol = `BINANCE:${assetName}`;
     const assetMarketData = marketData[assetName] || { price: 0, change: 0, sparkline: [] };
     const priceChangeClass = assetMarketData.change >= 0 ? 'positive-pnl' : 'negative-pnl';
+
+    // Aplica classes de status ao card
     if (trade.data.status === 'ARMED') card.classList.add('armed');
     if (trade.data.status === 'LIVE') card.classList.add('live');
+
+    // Botão de ação principal (Armar / Executar / Fechar)
     let mainActionButtonHtml = '';
-    if (trade.data.status === 'POTENTIAL') { mainActionButtonHtml = `<button class="icon-action-btn action-arm" data-action="arm" title="Validar e Armar Setup"><i class="fa-solid fa-bolt"></i> <span>Armar</span></button>`; } 
-    else if (trade.data.status === 'ARMED') { mainActionButtonHtml = `<button class="icon-action-btn action-execute" data-action="execute" title="Executar Trade"><i class="fa-solid fa-play"></i> <span>Executar</span></button>`; } 
-    else if (trade.data.status === 'LIVE') { mainActionButtonHtml = `<button class="icon-action-btn action-close" data-action="close" title="Fechar Trade"><i class="fa-solid fa-stop"></i> <span>Fechar</span></button>`; }
+    let mainActionButtonClass = '';
+    let mainActionButtonIcon = '';
+    let mainActionButtonTitle = '';
+
+    if (trade.data.status === 'POTENTIAL') {
+        mainActionButtonClass = 'action-arm';
+        mainActionButtonIcon = 'fa-solid fa-bolt';
+        mainActionButtonTitle = 'Validar e Armar Setup';
+        mainActionButtonHtml = `<button class="icon-action-btn ${mainActionButtonClass}" data-action="arm" title="${mainActionButtonTitle}"><i class="${mainActionButtonIcon}"></i></button>`;
+    } else if (trade.data.status === 'ARMED') {
+        mainActionButtonClass = 'action-execute';
+        mainActionButtonIcon = 'fa-solid fa-play';
+        mainActionButtonTitle = 'Executar Trade';
+        mainActionButtonHtml = `<button class="icon-action-btn ${mainActionButtonClass}" data-action="execute" title="${mainActionButtonTitle}"><i class="${mainActionButtonIcon}"></i></button>`;
+    } else if (trade.data.status === 'LIVE') {
+        mainActionButtonClass = 'action-close';
+        mainActionButtonIcon = 'fa-solid fa-stop';
+        mainActionButtonTitle = 'Fechar Trade';
+        mainActionButtonHtml = `<button class="icon-action-btn ${mainActionButtonClass}" data-action="close" title="${mainActionButtonTitle}"><i class="${mainActionButtonIcon}"></i></button>`;
+    }
+    
+    // Formatação de preço (reutilizado do Market Scanner)
+    let formattedPrice;
+    if (assetMarketData.price >= 1.0) {
+        formattedPrice = assetMarketData.price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    } else {
+        formattedPrice = '$' + assetMarketData.price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
+    }
+
+    // Geração condicional das notas
+    const notesHtml = trade.data.notes 
+        ? `<p class="trade-notes">${trade.data.notes}</p>` 
+        : '';
+
     card.innerHTML = `
-        <button class="icon-action-btn card-edit-btn" data-action="edit" title="Editar"><i class="fas fa-pencil"></i></button>
-        <h3><a href="asset-details.html?symbol=${assetName}" class="asset-link">${assetName}</a></h3>
-        <p style="color: #007bff; font-weight: 500;">Estratégia: ${trade.data.strategyName || 'N/A'}</p>
-        <p><strong>Status:</strong> ${trade.data.status}</p>
-        <p><strong>Notas:</strong> ${trade.data.notes || ''}</p>
+        <div class="card-top-row">
+            <h3 class="asset-title-card"><a href="asset-details.html?symbol=${assetName}" class="asset-link">${assetName}</a></h3>
+            <div class="card-top-buttons">
+                ${mainActionButtonHtml}
+                <button class="icon-action-btn card-edit-btn" data-action="edit" title="Editar"><i class="fas fa-pencil"></i></button>
+            </div>
+        </div>
+        <p class="strategy-name">Estratégia: ${trade.data.strategyName || 'N/A'}</p>
+        
+        ${notesHtml}
+
         <div class="card-market-data">
             <div class="card-sparkline" id="sparkline-card-${trade.id}"></div>
             <div class="card-price-data">
-                <div class="card-price">${assetMarketData.price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 8 })}</div>
-                <div class="${priceChangeClass}">${assetMarketData.change.toFixed(2)}%</div>
+                <div class="card-price">${formattedPrice}</div>
+                <div class="${priceChangeClass} price-change-percent">${assetMarketData.change.toFixed(2)}%</div>
             </div>
         </div>
-        <div class="card-actions">
-            <button class="icon-action-btn action-summary" data-action="toggle-chart" data-symbol="${tradingViewSymbol}" title="Ver gráfico interativo"><i class="fa-solid fa-chart-simple"></i> <span>Gráfico</span></button>
-            <a href="https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}" target="_blank" rel="noopener noreferrer" class="icon-action-btn action-full-chart" title="Abrir no TradingView para análise completa"><i class="fa-solid fa-arrow-up-right-from-square"></i> <span>Análise</span></a>
-            ${mainActionButtonHtml}
+        
+        <div class="card-bottom-actions">
+            <button class="icon-action-btn action-summary" data-action="toggle-chart" data-symbol="${tradingViewSymbol}" title="Ver gráfico interativo"><i class="fa-solid fa-chart-simple"></i></button>
+            <a href="https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}" target="_blank" rel="noopener noreferrer" class="icon-action-btn action-full-chart" title="Abrir no TradingView para análise completa"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
         </div>
-        <div class="mini-chart-container" id="advanced-chart-${trade.id}"></div>`;
+    `;
     return card;
 }
 
@@ -172,7 +214,6 @@ export function displayTrades(trades, marketData) {
     });
 
     trades.forEach(trade => {
-        // ALTERAÇÃO: Garante que extrai o sparkline da estrutura correta
         const assetMarketData = marketData[trade.data.asset];
         if (assetMarketData && assetMarketData.sparkline) {
             renderSparkline(`sparkline-card-${trade.id}`, assetMarketData.sparkline);
