@@ -1,11 +1,8 @@
-
 // js/config.js
 
-// Não há inicialização do Firebase aqui.
-
-// A sua configuração da web app do Firebase. A palavra 'export' permite que outros ficheiros a importem.
+// Estes são placeholders que serão substituídos pelo GitHub Actions.
 export const firebaseConfig = {
-  apiKey: "AIzaSyAoKtcIsVOcvI5O6gH_14AXL3bF2I6X8Qc",
+  apiKey: "__FIREBASE_API_KEY__",
   authDomain: "trading-89c13.firebaseapp.com",
   projectId: "trading-89c13",
   storageBucket: "trading-89c13.firebasestorage.app",
@@ -13,10 +10,6 @@ export const firebaseConfig = {
   appId: "1:782074719077:web:05c07a2b81b0047ef5cf8c"
 };
 
-
-
-
-// O plano de gestão padrão.
 export const GESTAO_PADRAO = {
     title: "Plano de Gestão", 
     inputs: [
@@ -27,12 +20,6 @@ export const GESTAO_PADRAO = {
     ]
 };
 
-
-
-// --- NOVAS CONFIGURAÇÕES PARA SERVIÇOS DE ALARMES ---
-
-// Cole as suas credenciais da Supabase aqui
-export const supabaseUrl = 'https://styiycllsahfcioasqpm.supabase.co'; 
-export const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN0eWl5Y2xsc2FoZmNpb2FzcXBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE1MzgyMDQsImV4cCI6MjA2NzExNDIwNH0.DLOcuDrnfVDd72BplLF0qSuP05nvgT34f4zKgutHBr4';
-
-
+// Placeholders para as credenciais da Supabase.
+export const supabaseUrl = "__SUPABASE_URL__"; 
+export const supabaseAnonKey = "__SUPABASE_ANON_KEY__";
