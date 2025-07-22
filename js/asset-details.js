@@ -25,7 +25,7 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
     currentChartType = chartType; 
 
     try {
-        // Invoca a NOVA Edge Function para obter dados de klines e indicadores
+        // Invoca a Edge Function para obter dados de klines e indicadores para o timeframe do gráfico
         const { data: edgeFunctionResponse, error: edgeFunctionError } = await supabase.functions.invoke('get-asset-details-data', {
             body: { symbol: symbol, interval: interval },
         });
@@ -61,11 +61,10 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
         }
         
         // Adiciona as EMAs como séries de linha secundárias
-        // A Edge Function já preenche com null, então podemos mapear diretamente
         if (indicatorsData.ema50_data && indicatorsData.ema50_data.length > 0) {
             const ema50SeriesData = indicatorsData.ema50_data.map((emaVal, index) => ({
-                x: klinesData[index][0], // Usa o timestamp da vela correspondente
-                y: emaVal // emaVal pode ser null
+                x: klinesData[index][0], 
+                y: emaVal 
             }));
             series.push({ name: 'EMA 50', type: 'line', data: ema50SeriesData });
         }
@@ -77,29 +76,39 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
             series.push({ name: 'EMA 200', type: 'line', data: ema200SeriesData });
         }
         
-        // Define as cores do gráfico principal e das EMAs
         const currentPriceVal = klinesData[klinesData.length - 1][4];
         const firstPriceVal = klinesData[0][4];
         const priceChartColor = currentPriceVal >= firstPriceVal ? '#28a745' : '#dc3545';
-        const ema50Color = '#ffc107'; // Amarelo
-        const ema200Color = '#0d6efd'; // Azul
-        // As cores serão aplicadas na ordem das séries
+        const ema50Color = '#ffc107'; 
+        const ema200Color = '#0d6efd'; 
         const colors = [];
-        if (chartType === 'candlestick' || chartType === 'bar') { /* Cores para velas/barras são definidas em plotOptions */ }
-        else { colors.push(priceChartColor); } // A cor da série de preço (area/line)
+        if (chartType === 'candlestick' || chartType === 'bar') { /* Cores para velas/barras definidas em plotOptions */ }
+        else { colors.push(priceChartColor); } 
         colors.push(ema50Color);
         colors.push(ema200Color);
-
 
         let options = {
             series: series,
             chart: {
-                type: chartType, // Usa o tipo de plotagem selecionado (candlestick, bar, area, line)
-                height: 400, toolbar: { show: true, tools: { download: false, pan: true } },
+                type: chartType, 
+                height: 400, 
+                toolbar: { 
+                    show: true, 
+                    tools: { 
+                        download: false, 
+                        // ADICIONADO: Ferramentas de pan e reset
+                        pan: true, 
+                        zoom: true,
+                        zoomin: true,
+                        zoomout: true,
+                        selection: true,
+                        reset: true // Botão de reset
+                    } 
+                },
                 zoom: { enabled: true }
             },
             dataLabels: { enabled: false },
-            colors: colors, // Aplica as cores às séries
+            colors: colors, 
             xaxis: { type: 'datetime', labels: { datetimeUTC: false, format: 'dd MMM \'yy' } },
             yaxis: { 
                 labels: { 
@@ -111,13 +120,11 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
                 x: { format: 'dd MMM yyyy HH:mm' },
                 y: { 
                     formatter: (val, { seriesIndex, dataPointIndex, w }) => {
-                        // Para a série de preço principal (vela/barra)
                         if ((chartType === 'candlestick' || chartType === 'bar') && seriesIndex === 0) {
-                            if (Array.isArray(val)) { // Para velas/barras, o val é um array [O, H, L, C]
+                            if (Array.isArray(val)) { 
                                 return `O: $${val[0].toLocaleString()} H: $${val[1].toLocaleString()} L: $${val[2].toLocaleString()} C: $${val[3].toLocaleString()}`;
                             }
                         }
-                        // Para as EMAs ou gráficos de área/linha, é um valor único
                         const seriesName = w.globals.seriesNames[seriesIndex];
                         return `${seriesName}: $${val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 8})}`; 
                     }
@@ -153,10 +160,9 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
             };
         } else { // Para 'candlestick' e 'bar'
             options.stroke = {
-                width: 1, // Uma borda fina para velas/barras
-                colors: ['#333'] // Cor da borda
+                width: 1, 
+                colors: ['#333'] 
             };
-            // O fill para candlestick/bar é definido em plotOptions.candlestick.colors / plotOptions.bar.colors.ranges
         }
 
         chartContainer.innerHTML = '';
