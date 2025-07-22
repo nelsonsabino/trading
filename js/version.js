@@ -4,7 +4,9 @@ export const changelogData = {
     current: {
         number: '9.0.0', // <-- VERSÃO ATUALIZADA (Major release)
         changes: [
-            "**Reestruturação do CSS:** O gigantesco ficheiro `style.css` foi dividido em múltiplos ficheiros CSS mais pequenos e modulares (ex: `base.css`, `layout.css`, `components.css`, `buttons.css`, etc.) para melhorar a manutenibilidade, organização e escalabilidade do projeto. Todos os ficheiros HTML foram atualizados para importar a nova estrutura de CSS."
+            "**Reestruturação do CSS (Versão 9):** O ficheiro `style.css` foi dividido em múltiplos ficheiros CSS modulares (ex: `base.css`, `layout.css`, `components.css`, etc.) para melhorar a manutenibilidade e organização do projeto.",
+            "**Melhoria do Layout Responsivo:** O layout das tabelas em ecrãs de telemóvel foi alterado. Em vez de se transformarem em blocos, as tabelas agora mantêm o seu formato de colunas com scroll horizontal, melhorando a análise de dados em dispositivos móveis.",
+            "Correções gerais de layout em toda a aplicação para garantir a consistência visual após a reestruturação do CSS."
         ]
     },
     releases: [
@@ -12,7 +14,7 @@ export const changelogData = {
             number: '8.10.2',
             changes: [
                 "**Correções Críticas de UI:**",
-                "Resolvido o problema de inconsistência de tamanho e estilo dos botões de ação com ícone em todas as tabelas (Scanner, Alarmes, Gestão e Detalhes do Ativo), garantindo uma aparência compacta e uniforme.",
+                "Resolvido o problema de estilo e espaçamento dos botões de ação com ícone em todas as tabelas (Scanner, Alarmes, Gestão e Detalhes do Ativo), garantindo uma aparência compacta e uniforme.",
                 "Corrigida a formatação de preços em moedas de baixo valor no Market Scanner, exibindo a precisão correta (mais casas decimais).",
                 "O botão 'Ver Gráfico no Modal' nas tabelas agora é um link (`<a>`) para garantir consistência de estilo com os outros botões de ação.",
             ]
