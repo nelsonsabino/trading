@@ -34,15 +34,19 @@
 .live-trades { 
     border-top-color: #28a745; 
 }
+
+/* CORREÇÃO: Trade Card agora é mais compacto */
 .trade-card { 
     position: relative; 
     background: #fdfdfd; 
     border: 1px solid #e9ecef; 
-    padding: 1rem 1.5rem; 
+    padding: 0.8rem 1rem; /* Reduzido o padding */
     border-radius: 6px; 
     margin-bottom: 1rem; 
     transition: box-shadow 0.2s ease-in-out; 
     border-left: 5px solid #6c757d; 
+    display: flex; /* Usar flexbox para o layout interno do card */
+    flex-direction: column;
 }
 .trade-card:hover { 
     box-shadow: 0 5px 15px rgba(0,0,0,0.08); 
@@ -53,15 +57,34 @@
 .trade-card.live { 
     border-left-color: #28a745; 
 }
+
+/* Título e estratégia ficam compactos no topo */
 .trade-card h3 { 
     margin-top: 0; 
-    margin-bottom: 0.5rem; 
+    margin-bottom: 0.25rem; /* Margem reduzida */
+    font-size: 1.1em; /* Tamanho ligeiramente reduzido */
 }
 .trade-card p { 
-    margin: 0.25rem 0; 
-    font-size: 0.95em; 
+    margin: 0; /* Remover margens padrão */
+    font-size: 0.85em; /* Tamanho reduzido */
     color: #495057; 
 }
+.trade-card p.strategy-name { /* Adicionei uma classe no HTML para esta linha */
+    color: #007bff; 
+    font-weight: 500;
+}
+.trade-card p.trade-notes { /* Adicionei uma classe no HTML para esta linha */
+    font-size: 0.8em;
+    color: #6c757d;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed #e9ecef; /* Linha divisória para notas */
+    white-space: nowrap; /* Não quebra linha */
+    overflow: hidden; /* Esconde o que excede */
+    text-overflow: ellipsis; /* Adiciona "..." */
+}
+
+/* Botão de edição fica no canto superior direito */
 .card-edit-btn { 
     background-color: #ffc107; 
     color: #212529; 
@@ -71,49 +94,64 @@
     border: none; 
     cursor: pointer; 
     position: absolute; 
-    top: 1rem; 
-    right: 1.5rem; 
+    top: 0.8rem; /* Ajuste a posição */
+    right: 1rem; /* Ajuste a posição */
     opacity: 0; 
     transition: opacity 0.2s; 
+    z-index: 2; /* Garante que está por cima */
 }
 .trade-card:hover .card-edit-btn { 
     opacity: 1; 
 }
 
-/* --- DADOS DE MERCADO DENTRO DOS CARDS --- */
-/* CORREÇÃO: Restaurada a regra de layout flex para alinhar o gráfico e os preços */
-.card-market-data {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid #e9ecef;
+/* --- CORREÇÃO: Layout do gráfico, preço e percentagem na mesma linha --- */
+.card-market-data { 
+    display: flex; 
+    align-items: center; /* Alinha verticalmente */
+    justify-content: space-between; /* Espaço entre os grupos */
+    margin-top: 0.5rem; /* Margem superior reduzida */
+    padding-top: 0.5rem; 
+    border-top: 1px solid #e9ecef; 
+    flex-grow: 1; /* Permite que o bloco ocupe espaço restante */
 }
 .card-price-data { 
+    display: flex; /* Organiza preço e percentagem */
+    flex-direction: column; /* Empilha preço e percentagem */
     text-align: right; 
+    flex-shrink: 0; /* Não permite que este bloco encolha */
+}
+.card-price { 
+    font-weight: 600; 
+    font-size: 1.0em; /* Reduzido */
+    color: #212529; 
+}
+.card-price-data .price-change-percent { /* Nova classe para a percentagem */
+    font-size: 0.85em; /* Tamanho menor */
+    margin-top: 0.2rem;
 }
 .card-sparkline { 
-    width: 100px; 
-    height: 40px; 
+    width: 80px; /* Largura reduzida para o sparkline */
+    height: 30px; /* Altura reduzida */
+    flex-shrink: 0;
 }
 
-/* Ações dos cards (com texto) */
+/* --- Ações dos cards (botões de ícone SEM TEXTO) --- */
 .card-actions { 
     display: flex; 
     justify-content: flex-end; 
     align-items: center; 
-    gap: 0.75rem; 
-    margin-top: 1rem; 
+    gap: 0.3rem; /* Espaçamento muito pequeno para botões compactos */
+    margin-top: 0.5rem; /* Margem superior reduzida */
 }
 .card-actions .icon-action-btn {
-    padding: 8px 12px; 
-    width: auto; 
-    height: auto; 
+    padding: 6px; /* Padding pequeno para ser apenas um ícone */
+    width: 32px;  /* Tamanho fixo para ícone */
+    height: 32px; 
 }
 .card-actions .icon-action-btn span {
-    display: inline; 
+    display: none; /* ESCONDE O TEXTO */
 }
+
 
 /* --- SECÇÃO DE PORTFÓLIO (Página de Estatísticas) --- */
 .portfolio-section { 
