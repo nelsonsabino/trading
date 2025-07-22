@@ -1,7 +1,7 @@
 /* css/tables.css */
 
 /* --- TABELAS GERAIS --- */
-/* CORREÇÃO CRÍTICA: Esta div envolve a tabela e permite o scroll horizontal */
+/* Esta div envolve a tabela e permite o scroll horizontal quando necessário */
 .table-wrapper { 
     overflow-x: auto; /* Permite deslizar horizontalmente em ecrãs pequenos */
     width: 100%; 
@@ -17,7 +17,7 @@
     background: #fff; 
     border-radius: 8px; 
     box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
-    overflow: hidden; 
+    overflow: hidden; /* Garante que o conteúdo dentro não sai das bordas */
     font-size: 0.95em; 
 }
 
@@ -43,8 +43,8 @@
     padding: 1rem; 
     border-bottom: 1px solid #e9ecef; 
     vertical-align: middle; 
-    display: table-cell;
-    text-align: left; 
+    display: table-cell; /* Garante o comportamento correto da célula em desktop e mobile */
+    text-align: left; /* Garante o alinhamento à esquerda */
 }
 
 /* Remove a borda inferior da última linha de TODAS as tabelas */
