@@ -5,10 +5,10 @@
 /* Tablet (menor que 992px) */
 @media (max-width: 992px) { 
     .dashboard-columns { 
-        grid-template-columns: 1fr 1fr; 
+        grid-template-columns: 1fr 1fr; /* 2 colunas para o dashboard */
     } 
     .asset-charts-grid { 
-        grid-template-columns: 1fr; 
+        grid-template-columns: 1fr; /* Gráficos da página de detalhes empilhados */
     }
 }
 
@@ -39,51 +39,9 @@
         font-size: 0.95rem; 
     }
 
-    /* Tabelas em mobile (transforma linhas em blocos) */
-    .alarms-table thead, 
-    #trades-table thead,
-    .market-table thead { 
-        display: none; 
-    }
-    .alarms-table tr, 
-    #trades-table tr,
-    .market-table tr { 
-        display: block; 
-        margin-bottom: 1.5rem; 
-        border: 1px solid #dee2e6; 
-        border-radius: 8px; 
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
-        background-color: #fff; 
-    }
-    .alarms-table td, 
-    #trades-table td,
-    .market-table td { 
-        display: flex; 
-        justify-content: space-between; 
-        align-items: center; 
-        padding: 0.8rem 1rem; 
-        border-bottom: 1px solid #f1f1f1; 
-    }
-    .alarms-table td::before, 
-    #trades-table td::before,
-    .market-table td::before { 
-        content: attr(data-label); 
-        font-weight: 600; 
-        color: #495057; 
-        padding-right: 1rem; 
-    }
-    .alarms-table tr td:last-child, 
-    #trades-table tr td:last-child,
-    .market-table tr td:last-child { 
-        border-bottom: none; 
-    }
-    .alarms-table td .cell-value, 
-    #trades-table td .cell-value,
-    .market-table td .cell-value { 
-        text-align: right; 
-        flex-shrink: 0; 
-        max-width: 60%; 
-    }
+    /* --- CORREÇÃO CRÍTICA: TODAS as regras que transformavam a tabela em blocos foram REMOVIDAS daqui --- */
+    /* Isto garante que as tabelas mantêm o seu layout de colunas e linhas em mobile */
+    /* O scroll horizontal será garantido por .table-wrapper em tables.css */
 
     /* Controlos do mercado em mobile */
     .market-controls {
