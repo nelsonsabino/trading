@@ -4,19 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalhes do Ativo</title>
-
-<!-- FAVICONS GERADOS -->
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-<meta name="msapplication-TileColor" content="#ffffff">
-<meta name="theme-color" content="#ffffff">
-<link rel="icon" href="/favicon.ico" type="image/x-icon">
-<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-<!-- FIM DOS FAVICONS GERADOS -->
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <link rel="stylesheet" href="css/base.css">
@@ -81,19 +68,32 @@
     <main>
         <section class="main-chart-section">
             <div class="stat-card" style="padding: 1rem;">
-                <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
-                    <label for="chart-timeframe-select" style="margin-right: 0.5rem;">Timeframe:</label>
-                    <select id="chart-timeframe-select" style="padding: 5px; border-radius: 4px; font-size: 0.9em;">
-                        <option value="1m">1 Minuto</option>
-                        <option value="5m">5 Minutos</option>
-                        <option value="15m">15 Minutos</option>
-                        <option value="30m">30 Minutos</option>
-                        <option value="1h" selected>1 Hora</option>
-                        <option value="4h">4 Horas</option>
-                        <option value="1d">1 Dia</option>
-                        <option value="1w">1 Semana</option>
-                        <option value="1M">1 Mês</option>
-                    </select>
+                <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 1rem; gap: 1rem;">
+                    <!-- NOVO: Seletor de Tipo de Gráfico -->
+                    <div>
+                        <label for="chart-type-select" style="margin-right: 0.5rem;">Tipo:</label>
+                        <select id="chart-type-select" style="padding: 5px; border-radius: 4px; font-size: 0.9em;">
+                            <option value="area">Área</option>
+                            <option value="candlestick">Velas</option>
+                            <option value="bar">Barras</option>
+                            <option value="line">Linha</option>
+                        </select>
+                    </div>
+                    <!-- Seletor de Timeframe -->
+                    <div>
+                        <label for="chart-timeframe-select" style="margin-right: 0.5rem;">Timeframe:</label>
+                        <select id="chart-timeframe-select" style="padding: 5px; border-radius: 4px; font-size: 0.9em;">
+                            <option value="1m">1 Minuto</option>
+                            <option value="5m">5 Minutos</option>
+                            <option value="15m">15 Minutos</option>
+                            <option value="30m">30 Minutos</option>
+                            <option value="1h" selected>1 Hora</option>
+                            <option value="4h">4 Horas</option>
+                            <option value="1d">1 Dia</option>
+                            <option value="1w">1 Semana</option>
+                            <option value="1M">1 Mês</option>
+                        </select>
+                    </div>
                 </div>
                 <div id="main-asset-chart" style="min-height: 400px;"></div>
             </div>
@@ -104,7 +104,6 @@
         <section class="asset-related-data" style="margin-bottom: 2rem;">
             <h2><i class="fa-solid fa-chart-line"></i> Análise Técnica Detalhada</h2>
             <div class="stat-card" style="padding: 1rem;">
-                <!-- ALTERAÇÃO: Adicionada classe para estilização -->
                 <div id="tradingview-tech-analysis-container" class="tradingview-widget-wrapper"></div> 
             </div>
         </section>
