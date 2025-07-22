@@ -116,13 +116,12 @@
     margin-top: 0.5rem;
     padding-top: 0.5rem;
     border-top: 1px solid #e9ecef;
-    gap: 0.8rem;
-    flex-wrap: wrap; /* PERMITE A QUEBRA DE LINHA EM MOBILE */
+    gap: 0.5rem; 
 }
 .card-chart-price-group {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: 0.5rem;
     flex-grow: 1;
     min-width: 0;
 }
@@ -137,6 +136,9 @@
     align-items: baseline; 
     gap: 0.4rem; 
     flex-shrink: 0;
+    /* CORREÇÃO FINAL: Garante que o bloco de preço tem uma largura mínima para não ser esmagado */
+    min-width: 100px; 
+    justify-content: flex-end; /* Alinha o conteúdo à direita dentro do seu espaço */
 }
 .card-price {
     font-weight: 600;
@@ -153,8 +155,8 @@
     flex-shrink: 0;
 }
 .card-secondary-actions .icon-action-btn {
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
     padding: 4px;
     box-sizing: border-box;
 }
