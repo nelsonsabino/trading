@@ -2,14 +2,23 @@
 
 export const changelogData = {
     current: {
-        number: '9.1.6', // <-- VERSÃO ATUALIZADA (Correção de tema nos gráficos)
+        number: '9.2.0', // <-- VERSÃO ATUALIZADA (Funcionalidade PWA)
         changes: [
-            "**Correção de Tema em Gráficos (Página de Detalhes):**",
-            "Resolvido o problema onde os gráficos (ApexCharts e widget de Análise Técnica TradingView) na página de detalhes do ativo não mudavam de tema (claro/escuro) dinamicamente.",
-            "Implementado um sistema de notificação de mudança de tema (`CustomEvent`) para que os gráficos se redesenhem automaticamente com o tema correto ao alternar.",
+            "**Funcionalidade PWA (Progressive Web App):**",
+            "A aplicação agora é totalmente funcional como uma PWA, permitindo a instalação no ecrã inicial de dispositivos móveis e desktop.",
+            "Implementado um Service Worker (`service-worker.js`) para caching dos assets estáticos da aplicação, permitindo que a app funcione offline e carregue instantaneamente após a primeira visita.",
+            "O ficheiro `site.webmanifest` foi atualizado com metadados completos para uma melhor experiência de instalação e integração com o sistema operativo.",
         ]
     },
     releases: [
+        {
+            number: '9.1.6',
+            changes: [
+                "**Correção de Tema em Gráficos (Página de Detalhes):**",
+                "Resolvido o problema onde os gráficos (ApexCharts e widget de Análise Técnica TradingView) na página de detalhes do ativo não mudavam de tema (claro/escuro) dinamicamente.",
+                "Implementado um sistema de notificação de mudança de tema (`CustomEvent`) para que os gráficos se redesenhem automaticamente com o tema correto ao alternar.",
+            ]
+        },
         {
             number: '9.1.5',
             changes: [
