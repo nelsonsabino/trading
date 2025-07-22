@@ -35,7 +35,7 @@
     border-top-color: #28a745; 
 }
 
-/* CORREÇÃO: Trade Card agora é mais compacto */
+/* CORREÇÃO: Trade Card agora é mais compacto e com layout flex */
 .trade-card { 
     position: relative; 
     background: #fdfdfd; 
@@ -58,22 +58,38 @@
     border-left-color: #28a745; 
 }
 
-/* Título e estratégia ficam compactos no topo */
-.trade-card h3 { 
-    margin-top: 0; 
-    margin-bottom: 0.25rem; /* Margem reduzida */
+/* Nova linha superior para título e botões de ação principais */
+.trade-card .card-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+}
+.trade-card .asset-title-card { /* Título do ativo no card */
+    margin: 0; /* Remove margens padrão do h3 */
     font-size: 1.1em; /* Tamanho ligeiramente reduzido */
+    flex-grow: 1; /* Permite que o título ocupe o espaço */
+    text-align: left; /* Garante que o título não esteja centrado */
 }
-.trade-card p { 
-    margin: 0; /* Remover margens padrão */
-    font-size: 0.85em; /* Tamanho reduzido */
-    color: #495057; 
+
+/* Contêiner para os botões superiores (Armar/Executar/Fechar + Editar) */
+.trade-card .card-top-buttons {
+    display: flex;
+    gap: 0.3rem; /* Espaçamento entre os botões superiores */
+    flex-shrink: 0; /* Impede que os botões encolham */
 }
-.trade-card p.strategy-name { /* Adicionei uma classe no HTML para esta linha */
+
+/* Estilo para o nome da estratégia */
+.trade-card p.strategy-name { 
+    margin: 0; 
+    font-size: 0.85em; 
     color: #007bff; 
     font-weight: 500;
+    text-align: left; /* Garante que a estratégia não está centrada */
 }
-.trade-card p.trade-notes { /* Adicionei uma classe no HTML para esta linha */
+
+/* Estilo para as notas (condicional) */
+.trade-card p.trade-notes { 
     font-size: 0.8em;
     color: #6c757d;
     margin-top: 0.5rem;
@@ -82,56 +98,52 @@
     white-space: nowrap; /* Não quebra linha */
     overflow: hidden; /* Esconde o que excede */
     text-overflow: ellipsis; /* Adiciona "..." */
+    text-align: left; /* Garante que as notas não estão centradas */
 }
 
 /* Botão de edição fica no canto superior direito */
 .card-edit-btn { 
-    background-color: #ffc107; 
-    color: #212529; 
-    padding: 4px 8px; 
-    font-size: 0.8em; 
-    border-radius: 4px; 
-    border: none; 
-    cursor: pointer; 
-    position: absolute; 
-    top: 0.8rem; /* Ajuste a posição */
-    right: 1rem; /* Ajuste a posição */
-    opacity: 0; 
-    transition: opacity 0.2s; 
-    z-index: 2; /* Garante que está por cima */
+    position: static; /* Não mais absoluto, está no fluxo flex */
+    order: 2; /* Para aparecer depois do botão principal */
+    /* Remova as propriedades top, right, opacity: 0, z-index: 2 pois já não são necessárias */
+    opacity: 1; /* Sempre visível agora */
+    /* Remova a transição e sombra específicas do hover, pois agora herda de .icon-action-btn */
 }
+/* No hover do card, não precisamos de mudar a opacidade do card-edit-btn */
 .trade-card:hover .card-edit-btn { 
-    opacity: 1; 
+    /* Remove esta regra se não for necessária, pois já está sempre visível */
 }
+
 
 /* --- CORREÇÃO: Layout do gráfico, preço e percentagem na mesma linha --- */
 .card-market-data { 
     display: flex; 
-    align-items: center; /* Alinha verticalmente */
-    justify-content: space-between; /* Espaço entre os grupos */
-    margin-top: 0.5rem; /* Margem superior reduzida */
+    align-items: center; 
+    justify-content: space-between; 
+    margin-top: 0.5rem; 
     padding-top: 0.5rem; 
     border-top: 1px solid #e9ecef; 
-    flex-grow: 1; /* Permite que o bloco ocupe espaço restante */
+    flex-grow: 1; 
 }
 .card-price-data { 
-    display: flex; /* Organiza preço e percentagem */
-    flex-direction: column; /* Empilha preço e percentagem */
+    display: flex; 
+    flex-direction: column; 
     text-align: right; 
-    flex-shrink: 0; /* Não permite que este bloco encolha */
+    flex-shrink: 0; 
+    min-width: 60px; /* Garante que há espaço suficiente para os valores */
 }
 .card-price { 
     font-weight: 600; 
-    font-size: 1.0em; /* Reduzido */
+    font-size: 1.0em; 
     color: #212529; 
 }
-.card-price-data .price-change-percent { /* Nova classe para a percentagem */
-    font-size: 0.85em; /* Tamanho menor */
+.card-price-data .price-change-percent { 
+    font-size: 0.85em; 
     margin-top: 0.2rem;
 }
 .card-sparkline { 
-    width: 80px; /* Largura reduzida para o sparkline */
-    height: 30px; /* Altura reduzida */
+    width: 80px; 
+    height: 30px; 
     flex-shrink: 0;
 }
 
@@ -140,16 +152,16 @@
     display: flex; 
     justify-content: flex-end; 
     align-items: center; 
-    gap: 0.3rem; /* Espaçamento muito pequeno para botões compactos */
-    margin-top: 0.5rem; /* Margem superior reduzida */
+    gap: 0.3rem; 
+    margin-top: 0.5rem; 
 }
 .card-actions .icon-action-btn {
-    padding: 6px; /* Padding pequeno para ser apenas um ícone */
-    width: 32px;  /* Tamanho fixo para ícone */
+    padding: 6px; 
+    width: 32px;  
     height: 32px; 
 }
 .card-actions .icon-action-btn span {
-    display: none; /* ESCONDE O TEXTO */
+    display: none; 
 }
 
 
