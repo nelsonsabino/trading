@@ -57,7 +57,8 @@ async function renderMainAssetChart(symbol, interval = '1h') {
                 y: { formatter: (val) => `$${val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 8})}` }
             },
             theme: {
-                mode: document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light'
+                // CORRIGIDO: Sempre obtem o tema atual na inicialização/redesenho
+                mode: document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light' 
             }
         };
 
@@ -73,37 +74,30 @@ async function renderMainAssetChart(symbol, interval = '1h') {
 
 /**
  * Renderiza o widget de Análise Técnica da TradingView.
- * CORRIGIDO: Usa o método de carregamento via script para o widget.
  * @param {string} symbol - O símbolo do ativo.
  */
 function renderTradingViewTechnicalAnalysisWidget(symbol) {
     const container = document.getElementById('tradingview-tech-analysis-container');
     if (!container) return;
-    container.innerHTML = ''; // Limpa o container para garantir que o widget é carregado corretamente
+    container.innerHTML = ''; 
     
+    // CORRIGIDO: Sempre obtem o tema atual na inicialização/redesenho
     const currentTheme = document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light';
 
-    // Cria o script do widget e define as suas propriedades
     const script = document.createElement('script');
     script.type = 'text/javascript';
     script.async = true;
     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js';
     
-    // Configuração do widget
     const config = {
-        "width": "100%",
-        "height": "100%",
-        "symbol": `BINANCE:${symbol}`,
-        "interval": "1h", 
-        "showIntervalTabs": true,
-        "displayMode": "multiple",
-        "locale": "pt", 
-        "colorTheme": currentTheme,
+        "width": "100%", "height": "100%", "symbol": `BINANCE:${symbol}`, "interval": "1h", 
+        "showIntervalTabs": true, "displayMode": "multiple", "locale": "pt", 
+        "colorTheme": currentTheme, // Garante que o tema é atualizado
         "isTransparent": false
     };
 
-    script.innerHTML = JSON.stringify(config); // Define as opções JSON dentro do script
-    container.appendChild(script); // Adiciona o script ao container
+    script.innerHTML = JSON.stringify(config); 
+    container.appendChild(script); 
 }
 
 
@@ -222,6 +216,28 @@ document.addEventListener('DOMContentLoaded', () => {
     displayAlarmsForAsset(assetSymbol);
     displayTradesForAsset(assetSymbol);
 
-    // AGORA CORRETO: Chama a função para renderizar o widget de análise técnica
+    const tradesTable = document.getElementById('trades-table');
+    if (tradesTable) {
+        tradesTable.addEventListener('click', (e) => {
+            const button = e.target.closest('.edit-btn');
+            if (button) {
+                const tradeId = button.closest('tr').dataset.tradeId;
+                if (tradeId) {
+                    editTrade(tradeId);
+                }
+            }
+        });
+    }
+
+    // Listener para o evento de mudança de tema
+    document.addEventListener('themeChange', (e) => {
+        // Redesenha o gráfico principal com o timeframe atual para aplicar o novo tema
+        const currentInterval = timeframeSelect ? timeframeSelect.value : '1h';
+        renderMainAssetChart(assetSymbol, currentInterval);
+        // Redesenha o widget de análise técnica para aplicar o novo tema
+        renderTradingViewTechnicalAnalysisWidget(assetSymbol);
+    });
+
+    // Renderiza o widget de análise técnica (inicial)
     renderTradingViewTechnicalAnalysisWidget(assetSymbol);
 });
