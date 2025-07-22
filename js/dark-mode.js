@@ -24,6 +24,10 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('theme', newTheme);
         
         updateIcon(); // Atualiza o ícone
+        
+        // NOVO: Dispara um evento personalizado para notificar outros scripts
+        const event = new CustomEvent('themeChange', { detail: { theme: newTheme } });
+        document.dispatchEvent(event);
     };
 
     // Adiciona o evento de clique ao botão
@@ -31,8 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
         themeToggleButton.addEventListener('click', toggleTheme);
     }
 
-    // --- LÓGICA DE INICIALIZAÇÃO SIMPLIFICADA ---
-    // Apenas precisamos de garantir que o ícone está correto quando a página carrega.
-    // O tema já foi aplicado pelo script "anti-flash" no <head>.
+    // Lógica de inicialização: garante que o ícone está correto quando a página carrega.
     updateIcon();
 });
