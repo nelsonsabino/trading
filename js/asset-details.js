@@ -8,22 +8,33 @@ const CRYPTOCOMPARE_API_KEY = "92d8c73125edcc9a95da0a5f30a6ca4720e5fdba544dba9ba
 /**
  * Busca dados históricos e renderiza o gráfico principal do ativo com ApexCharts.
  * @param {string} symbol - O símbolo do ativo (ex: "BTCUSDC").
+ * @param {string} interval - O intervalo de tempo (ex: "1h", "1d").
  */
-async function renderMainAssetChart(symbol) {
+async function renderMainAssetChart(symbol, interval = '1h') {
     const chartContainer = document.getElementById('main-asset-chart');
     if (!chartContainer) return;
     chartContainer.innerHTML = '<p>A carregar gráfico...</p>';
 
     try {
-        // Busca os últimos 180 dias de dados diários da Binance
-        const response = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1d&limit=180`);
-        if (!response.ok) throw new Error('Não foi possível obter os dados do gráfico da Binance.');
+        // Ajusta o limite de dados com base no intervalo para ter uma boa visualização
+        let limit = 200; // Padrão
+        if (interval === '1m') limit = 180; // 3 horas de dados
+        else if (interval === '5m') limit = 180; // 15 horas de dados
+        else if (interval === '15m') limit = 180; // 45 horas de dados
+        else if (interval === '30m') limit = 180; // 90 horas de dados
+        else if (interval === '1h') limit = 200; // ~8 dias
+        else if (interval === '4h') limit = 180; // 30 dias
+        else if (interval === '1d') limit = 180; // 180 dias (~6 meses)
+        else if (interval === '1w') limit = 100; // ~2 anos
+        else if (interval === '1M') limit = 60; // 5 anos
+
+        const response = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`);
+        if (!response.ok) throw new Error(`Não foi possível obter os dados do gráfico para ${interval} da Binance.`);
         const klines = await response.json();
 
-        // Formata os dados para o formato que o ApexCharts espera
         const seriesData = klines.map(kline => ({
-            x: kline[0], // Timestamp de abertura
-            y: parseFloat(kline[4]) // Preço de fecho
+            x: kline[0], 
+            y: parseFloat(kline[4]) 
         }));
 
         const currentPrice = seriesData[seriesData.length - 1].y;
@@ -43,24 +54,142 @@ async function renderMainAssetChart(symbol) {
             xaxis: { type: 'datetime', labels: { datetimeUTC: false, format: 'dd MMM \'yy' } },
             yaxis: { labels: { formatter: (val) => `$${val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` } },
             tooltip: {
-                x: { format: 'dd MMM yyyy' },
-                y: { formatter: (val) => `$${val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` }
+                x: { format: 'dd MMM yyyy HH:mm' }, // Inclui hora para timeframes menores
+                y: { formatter: (val) => `$${val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 8})}` } // Mais precisão para preços baixos
             },
             theme: {
                 mode: document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light'
             }
         };
 
-        chartContainer.innerHTML = ''; // Limpa a mensagem "A carregar..."
+        chartContainer.innerHTML = '';
         const chart = new ApexCharts(chartContainer, options);
         chart.render();
 
     } catch (err) {
         console.error("Erro ao renderizar o gráfico principal:", err);
-        chartContainer.innerHTML = '<p style="color:red;">Não foi possível carregar o gráfico.</p>';
+        chartContainer.innerHTML = '<p style="color:red;">Não foi possível carregar o gráfico. ' + err.message + '</p>';
     }
 }
 
+/**
+ * Renderiza uma visualização de indicadores técnicos (RSI e Estocástico) em vários timeframes.
+ * @param {string} symbol - O símbolo do ativo.
+ */
+async function renderIndicatorOverview(symbol) {
+    const container = document.getElementById('indicator-overview-chart-container'); // Este ID ainda não existe, será criado no próximo passo
+    if (!container) return;
+    container.innerHTML = '<p>A carregar indicadores...</p>';
+
+    try {
+        // Define os timeframes para os quais queremos dados de indicadores
+        const timeframes = ['1h', '4h', '1d', '1w'];
+        const indicatorData = {}; // Para armazenar RSI e Stoch para cada TF
+
+        await Promise.all(timeframes.map(async (tf) => {
+            const limit = 60; // Suficiente para calcular RSI(14) e Stoch(14,3)
+            const response = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${tf}&limit=${limit}`);
+            if (!response.ok) {
+                console.warn(`Falha ao buscar klines para ${symbol} (${tf}): ${response.statusText}`);
+                indicatorData[tf] = { rsi: null, stochK: null, stochD: null };
+                return;
+            }
+            const klines = await response.json();
+            const highPrices = klines.map(k => parseFloat(k[2]));
+            const lowPrices = klines.map(k => parseFloat(k[3]));
+            const closePrices = klines.map(k => parseFloat(k[4]));
+
+            let rsiValue = null;
+            if (closePrices.length >= 15) {
+                const rsiResults = RSI.calculate({ period: 14, values: closePrices });
+                if (rsiResults.length > 0) rsiValue = rsiResults[rsiResults.length - 1];
+            }
+
+            let stochK = null, stochD = null;
+            if (closePrices.length >= 15) {
+                const stochResults = Stochastic.calculate({ high: highPrices, low: lowPrices, close: closePrices, period: 14, signalPeriod: 3 });
+                if (stochResults.length > 0) {
+                    stochK = stochResults[stochResults.length - 1].k;
+                    stochD = stochResults[stochResults.length - 1].d;
+                }
+            }
+            indicatorData[tf] = { rsi: rsiValue, stochK: stochK, stochD: stochD };
+        }));
+
+        // Agora, renderizar com ApexCharts (exemplo de gráfico de barras simples ou tabela formatada)
+        // Por exemplo, podemos criar uma tabela aqui com os valores, ou um gráfico de barras agregadas
+        // Para uma visualização de "medidor", um gráfico de barras simples para RSI e Stoch pode ser interessante.
+
+        const rsiSeries = timeframes.map(tf => indicatorData[tf].rsi !== null ? parseFloat(indicatorData[tf].rsi.toFixed(1)) : 0);
+        const stochKSeries = timeframes.map(tf => indicatorData[tf].stochK !== null ? parseFloat(indicatorData[tf].stochK.toFixed(1)) : 0);
+        const stochDSeries = timeframes.map(tf => indicatorData[tf].stochD !== null ? parseFloat(indicatorData[tf].stochD.toFixed(1)) : 0);
+        
+        const options = {
+            series: [
+                { name: 'RSI', data: rsiSeries },
+                { name: 'Stoch %K', data: stochKSeries },
+                { name: 'Stoch %D', data: stochDSeries }
+            ],
+            chart: {
+                type: 'bar',
+                height: 300,
+                stacked: false,
+                toolbar: { show: false }
+            },
+            plotOptions: {
+                bar: {
+                    horizontal: false,
+                    columnWidth: '50%',
+                    endingShape: 'rounded'
+                },
+            },
+            dataLabels: {
+                enabled: true,
+                formatter: function(val) { return val.toFixed(1); }
+            },
+            stroke: {
+                show: true,
+                width: 2,
+                colors: ['transparent']
+            },
+            xaxis: {
+                categories: timeframes,
+                title: { text: 'Timeframe' }
+            },
+            yaxis: {
+                title: { text: 'Valor do Indicador' },
+                min: 0,
+                max: 100
+            },
+            fill: {
+                opacity: 1
+            },
+            tooltip: {
+                y: {
+                    formatter: function (val) {
+                        return val.toFixed(1);
+                    }
+                }
+            },
+            colors: ['#6f42c1', '#007bff', '#20c997'], // Cores para RSI, Stoch K, Stoch D
+            theme: {
+                mode: document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light'
+            }
+        };
+
+        chartContainer.innerHTML = '';
+        const chart = new ApexCharts(container, options);
+        chart.render();
+
+
+    } catch (err) {
+        console.error("Erro ao renderizar overview de indicadores:", err);
+        container.innerHTML = '<p style="color:red;">Não foi possível carregar indicadores. ' + err.message + '</p>';
+    }
+}
+
+
+// --- Funções de Notícias, Alarmes e Trades (sem alterações) ---
 async function displayNewsForAsset(baseAssetSymbol) {
     const newsContainer = document.getElementById('asset-news-container');
     if (!newsContainer) return;
@@ -87,7 +216,6 @@ async function displayNewsForAsset(baseAssetSymbol) {
         newsContainer.innerHTML = '<p style="color:red;">Não foi possível carregar as notícias.</p>';
     }
 }
-
 async function displayAlarmsForAsset(symbol) {
     const tbody = document.getElementById('asset-alarms-tbody');
     if (!tbody) return;
@@ -111,7 +239,6 @@ async function displayAlarmsForAsset(symbol) {
         tbody.innerHTML = '<tr><td colspan="3" style="color:red;text-align:center;">Erro ao carregar alarmes.</td></tr>';
     }
 }
-
 async function displayTradesForAsset(symbol) {
     const tbody = document.getElementById('asset-trades-tbody');
     if (!tbody) return;
@@ -135,12 +262,12 @@ async function displayTradesForAsset(symbol) {
         tbody.innerHTML = '<tr><td colspan="5" style="color:red;text-align:center;">Erro ao carregar trades.</td></tr>';
     }
 }
-
 function editTrade(tradeId) {
     localStorage.setItem('tradeToEdit', tradeId);
     window.location.href = 'index.html';
 }
 
+// --- PONTO DE ENTRADA DO SCRIPT ---
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const assetSymbol = urlParams.get('symbol');
@@ -154,17 +281,29 @@ document.addEventListener('DOMContentLoaded', () => {
     document.title = `Detalhes de ${assetSymbol}`;
     document.getElementById('asset-title').textContent = `Análise de ${assetSymbol}`;
     
+    // Configura o seletor de timeframe e o listener
+    const timeframeSelect = document.getElementById('chart-timeframe-select');
+    if (timeframeSelect) {
+        timeframeSelect.addEventListener('change', (e) => {
+            renderMainAssetChart(assetSymbol, e.target.value);
+        });
+        // Renderiza o gráfico inicial com o valor padrão (1h)
+        renderMainAssetChart(assetSymbol, timeframeSelect.value);
+    } else {
+        // Fallback se o seletor não existir (não deve acontecer com o HTML correto)
+        renderMainAssetChart(assetSymbol, '1h');
+    }
+
+    // Configura os botões de ação do cabeçalho
     const watchlistBtn = document.getElementById('add-to-watchlist-btn');
     const alarmBtn = document.getElementById('add-alarm-btn');
     const tvBtn = document.getElementById('open-tv-btn');
     if (watchlistBtn) watchlistBtn.href = `index.html?assetPair=${assetSymbol}`;
-    if (alarmBtn) alarmBtn.href = `alarms.html?assetPair=${assetSymbol}`;
+    if (alarmBtn) alarmBtn.href = `alarms-create.html?assetPair=${assetSymbol}`; // CORRIGIDO PARA alarms-create.html
     if (tvBtn) tvBtn.href = `https://www.tradingview.com/chart/?symbol=BINANCE:${assetSymbol}`;
 
     const baseAsset = assetSymbol.replace(/USDC|USDT|BUSD/, '');
 
-    // Inicia todas as buscas de dados
-    renderMainAssetChart(assetSymbol);
     displayNewsForAsset(baseAsset);
     displayAlarmsForAsset(assetSymbol);
     displayTradesForAsset(assetSymbol);
@@ -181,4 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // NOVO: Renderiza a visualização de indicadores
+    renderIndicatorOverview(assetSymbol);
 });
