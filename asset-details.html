@@ -88,11 +88,11 @@
 
         <hr class="section-divider">
 
-        <!-- NOVO: Container para o gráfico de visão geral de indicadores -->
+        <!-- NOVO: Container para o widget de análise técnica do TradingView -->
         <section class="asset-related-data" style="margin-bottom: 2rem;">
-            <h2><i class="fa-solid fa-chart-line"></i> Indicadores Chave</h2>
+            <h2><i class="fa-solid fa-chart-line"></i> Análise Técnica Detalhada</h2>
             <div class="stat-card" style="padding: 1rem;">
-                <div id="indicator-overview-chart-container" style="min-height: 300px;"></div>
+                <div id="tradingview-tech-analysis-container" style="min-height: 300px;"></div> <!-- ID CORRIGIDO -->
             </div>
         </section>
 
@@ -146,6 +146,7 @@
 
     <footer></footer>
 
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="js/services.js"></script>
     <script type="module" src="js/firebase-service.js"></script>
