@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/dark-mode.css">
     <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/navigation-menu.css"> <!-- NOVO: Estilos para o menu de navegação -->
 
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script>
@@ -40,21 +41,27 @@
     <header>
         <h1 id="asset-title">A carregar...</h1>
         <p class="mantra">Toda a informação sobre o ativo, num único local.</p>
-        <nav>
-            <a id="add-to-watchlist-btn" href="#" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Adicionar à Watchlist</a>
-            <a id="add-alarm-btn" href="#" class="btn btn-secondary"><i class="fa-solid fa-bell"></i> Criar Alarme</a>
-            <a id="open-tv-btn" href="#" class="btn" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i> Análise TV</a>
-            <button id="theme-toggle-btn" class="btn" title="Alternar tema">
+        <nav class="main-nav">
+            <a href="index.html" class="nav-icon-link" title="Dashboard"><i class="fas fa-home"></i></a>
+            <a href="market-scan.html" class="nav-icon-link" title="Scanner de Mercado"><i class="fas fa-search-dollar"></i></a>
+            <a href="alarms-create.html" class="nav-icon-link" title="Criar Alarme"><i class="fas fa-bell-plus"></i></a>
+            <a href="alarms-manage.html" class="nav-icon-link" title="Meus Alarmes"><i class="fas fa-bell"></i></a>
+            
+            <div class="nav-dropdown">
+                <button id="management-toggle" class="nav-icon-link" title="Gerir e Estatísticas"><i class="fas fa-cog"></i></button>
+                <div class="nav-dropdown-content">
+                    <a href="strategies-manager.html" class="nav-link">Gerir Estratégias</a>
+                    <a href="manage.html" class="nav-link">Todas as Operações</a>
+                    <a href="stats.html" class="nav-link">Ver Estatísticas</a>
+                </div>
+            </div>
+
+            <button id="add-to-watchlist-btn" href="#" class="btn nav-icon-link" title="Adicionar à Watchlist"><i class="fa-solid fa-plus"></i></button>
+            <button id="add-alarm-btn" href="#" class="btn nav-icon-link" title="Criar Alarme"><i class="fa-solid fa-bell"></i></button>
+            <a id="open-tv-btn" href="#" class="btn nav-icon-link" target="_blank" rel="noopener noreferrer" title="Análise TradingView"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+            <button id="theme-toggle-btn" class="btn nav-icon-link" title="Alternar tema">
                 <i class="fas fa-moon"></i>
             </button>
-        </nav>
-        <nav style="margin-top: 1rem; border-top: 1px solid #e9ecef; padding-top: 1rem;">
-            <a href="index.html" class="nav-link">Dashboard</a>
-            <a href="market-scan.html" class="nav-link">Scanner</a>
-            <a href="alarms-manage.html" class="nav-link">Meus Alarmes</a>
-            <a href="strategies-manager.html" class="nav-link">Gerir Estratégias</a>
-            <a href="manage.html" class="nav-link">Todas as Operações</a>
-            <a href="stats.html" class="nav-link">Ver Estatísticas</a>
         </nav>
     </header>
 
@@ -119,6 +126,7 @@
     <script type="module" src="js/services.js"></script>
     <script type="module" src="js/firebase-service.js"></script>
     <script type="module" src="js/asset-details.js"></script>
+    <script type="module" src="js/navigation.js"></script> <!-- NOVO SCRIPT -->
     <script type="module" src="js/version.js"></script>
     <script type="module" src="js/dark-mode.js"></script>
 </body>
