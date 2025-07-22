@@ -7,7 +7,6 @@ on:
     branches:
       - main
 
-# ADICIONADO: Permissões para que a Ação possa criar a branch e publicar
 permissions:
   contents: write
 
@@ -24,9 +23,11 @@ jobs:
           sed -i "s|__SUPABASE_URL__|${{ secrets.SUPABASE_URL }}|g" js/config.js
           sed -i "s|__SUPABASE_ANON_KEY__|${{ secrets.SUPABASE_ANON_KEY }}|g" js/config.js
           sed -i "s|__CRYPTOCOMPARE_API_KEY__|${{ secrets.CRYPTOCOMPARE_API_KEY }}|g" js/asset-details.js
-
-      - name: Deploy 🚀
+      
+      - name: Build and Deploy with Jekyll 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          branch: gh-pages
-          folder: .
+          branch: gh-pages # A branch onde a versão publicada será guardada
+          folder: . # O diretório raiz do seu projeto
+          # ADICIONADO: Configuração para usar o Jekyll
+          jekyll: true
