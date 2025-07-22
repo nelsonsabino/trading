@@ -7,7 +7,7 @@ const CRYPTOCOMPARE_API_KEY = "92d8c73125edcc9a95da0a5f30a6ca4720e5fdba544dba9ba
 
 let currentAssetSymbol = null; 
 let currentChartTimeframe = '1h'; 
-let currentChartType = 'line'; // CORREÇÃO: Default é 'line'
+let currentChartType = 'line'; // Default para 'line'
 
 /**
  * Busca dados de klines e indicadores da Edge Function e renderiza o gráfico principal do ativo.
@@ -46,19 +46,18 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
         
         if (chartType === 'candlestick') {
             const ohlcSeriesData = klinesData.map(kline => ({
-                x: kline[0],
-                y: [kline[1], kline[2], kline[3], kline[4]]
+                x: kline[0], 
+                y: [kline[1], kline[2], kline[3], kline[4]] 
             }));
             series.push({ name: 'Preço', type: 'candlestick', data: ohlcSeriesData });
         } else { // 'line'
             const closePriceSeriesData = klinesData.map(kline => ({
                 x: kline[0],
-                y: kline[4]
+                y: kline[4] 
             }));
             series.push({ name: 'Preço (USD)', type: 'line', data: closePriceSeriesData });
         }
         
-        // CORREÇÃO: Mapeia as EMAs, mantendo os nulls iniciais para renderização completa
         if (indicatorsData.ema50_data && indicatorsData.ema50_data.length === klinesData.length) {
             const ema50SeriesData = indicatorsData.ema50_data.map((emaVal, index) => ({
                 x: klinesData[index][0], 
@@ -88,15 +87,7 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
                 height: 400, 
                 toolbar: { 
                     show: true, 
-                    tools: { 
-                        download: false, 
-                        selection: true, 
-                        zoom: true, 
-                        zoomin: true, 
-                        zoomout: true, 
-                        pan: true, // Ferramenta de arrastar ATIVA
-                        reset: true // Botão de reset ATIVO
-                    } 
+                    autoSelected: 'pan' // A "mão" (pan) começa ativa por defeito
                 },
                 zoom: { enabled: true }
             },
