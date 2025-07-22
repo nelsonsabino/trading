@@ -2,17 +2,23 @@
 
 export const changelogData = {
     current: {
-        number: '9.3.0', // <-- VERSÃO ATUALIZADA (Melhorias no Gráfico Principal)
+        number: '9.3.1', // <-- VERSÃO ATUALIZADA (Remoção da secção de notícias)
         changes: [
-            "**Gráfico Principal Otimizado (Página de Detalhes do Ativo):**",
-            "Adicionadas as linhas de EMA 50 e EMA 200 ao gráfico principal do ApexCharts.",
-            "Implementada a funcionalidade de alterar o tipo de gráfico (Linha ou Velas) e o timeframe dinamicamente.",
-            "Aumentada a quantidade de dados históricos solicitados para garantir que a EMA 200 é desenhada na sua totalidade.",
-            "Corrigidos todos os bugs de renderização, incluindo o problema das EMAs incompletas no gráfico de linha e a falha na exibição dos gráficos de velas.",
-            "Restauradas as ferramentas de navegação do gráfico (zoom, arrastar/pan e reset) no toolbar do ApexCharts."
+            "**Simplificação da Página de Detalhes:** Removida a secção de notícias da página de detalhes do ativo para uma interface mais limpa e focada na análise técnica e nos dados da aplicação."
         ]
     },
     releases: [
+        {
+            number: '9.3.0',
+            changes: [
+                "**Gráfico Principal Otimizado (Página de Detalhes do Ativo):**",
+                "Adicionadas as linhas de EMA 50 e EMA 200 ao gráfico principal do ApexCharts.",
+                "Implementada a funcionalidade de alterar o tipo de gráfico (Linha ou Velas) e o timeframe dinamicamente.",
+                "Aumentada a quantidade de dados históricos solicitados para garantir que a EMA 200 é desenhada na sua totalidade.",
+                "Corrigidos todos os bugs de renderização, incluindo o problema das EMAs incompletas no gráfico de linha e a falha na exibição dos gráficos de velas.",
+                "Restauradas todas as ferramentas de navegação do gráfico (zoom, arrastar/pan e reset) no toolbar do ApexCharts."
+            ]
+        },
         {
             number: '9.2.0',
             changes: [
@@ -20,6 +26,15 @@ export const changelogData = {
                 "A aplicação agora é totalmente funcional como uma PWA, permitindo a instalação no ecrã inicial de dispositivos móveis e desktop.",
                 "Implementado um Service Worker (`service-worker.js`) para caching dos assets estáticos da aplicação, permitindo que a app funcione offline e carregue instantaneamente após a primeira visita.",
                 "O ficheiro `site.webmanifest` foi atualizado com metadados completos para uma melhor experiência de instalação e integração com o sistema operativo.",
+            ]
+        },
+        {
+            number: '9.1.7',
+            changes: [
+                "**Correções e Otimizações Finais de UI:**",
+                "Resolvidos todos os problemas de layout e alinhamento nos cards do Dashboard, garantindo a compactação, o posicionamento correto do lápis de edição (visível no hover), e o alinhamento em linha do sparkline, preço e percentagem.",
+                "Restaurado o comportamento de tabela clássico em ecrãs móveis para o Market Scanner (e todas as tabelas), permitindo scroll horizontal em vez de quebrar em blocos, melhorando a visualização de dados tabulares.",
+                "Ajustes finos em espaçamentos e alinhamentos CSS para garantir a consistência e o aspeto profissional em toda a aplicação.",
             ]
         },
         {
