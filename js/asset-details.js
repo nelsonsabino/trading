@@ -25,7 +25,7 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
     currentChartType = chartType; 
 
     try {
-        // Invoca a Edge Function para obter dados de klines e indicadores para o timeframe do gráfico
+        // Invoca a NOVA Edge Function para obter dados de klines e indicadores
         const { data: edgeFunctionResponse, error: edgeFunctionError } = await supabase.functions.invoke('get-asset-details-data', {
             body: { symbol: symbol, interval: interval },
         });
@@ -38,7 +38,6 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
         const klinesData = edgeFunctionResponse.ohlc; // [timestamp, open, high, low, close]
         const indicatorsData = edgeFunctionResponse.indicators; // Contém ema50_data, ema200_data, etc.
 
-        // Se não houver dados de klines, não renderiza o gráfico
         if (klinesData.length === 0) {
             chartContainer.innerHTML = '<p style="color:red;">Não há dados de preço para este timeframe.</p>';
             return;
@@ -61,24 +60,21 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
             series.push({ name: 'Preço (USD)', type: chartType, data: closePriceSeriesData });
         }
         
-        // Adiciona as EMAs como séries de linha secundárias, se existirem e houver dados suficientes
+        // Adiciona as EMAs como séries de linha secundárias
+        // A Edge Function já preenche com null, então podemos mapear diretamente
         if (indicatorsData.ema50_data && indicatorsData.ema50_data.length > 0) {
             const ema50SeriesData = indicatorsData.ema50_data.map((emaVal, index) => ({
-                x: klinesData[index] ? klinesData[index][0] : null, // Usa o timestamp da vela correspondente
-                y: emaVal
-            })).filter(d => d.x !== null); // Filtra nulos que podem vir do padding no início
-            if (ema50SeriesData.length > 0) {
-                 series.push({ name: 'EMA 50', type: 'line', data: ema50SeriesData });
-            }
+                x: klinesData[index][0], // Usa o timestamp da vela correspondente
+                y: emaVal // emaVal pode ser null
+            }));
+            series.push({ name: 'EMA 50', type: 'line', data: ema50SeriesData });
         }
         if (indicatorsData.ema200_data && indicatorsData.ema200_data.length > 0) {
             const ema200SeriesData = indicatorsData.ema200_data.map((emaVal, index) => ({
-                x: klinesData[index] ? klinesData[index][0] : null,
+                x: klinesData[index][0],
                 y: emaVal
-            })).filter(d => d.y !== null);
-            if (ema200SeriesData.length > 0) {
-                series.push({ name: 'EMA 200', type: 'line', data: ema200SeriesData });
-            }
+            }));
+            series.push({ name: 'EMA 200', type: 'line', data: ema200SeriesData });
         }
         
         // Define as cores do gráfico principal e das EMAs
@@ -87,9 +83,15 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
         const priceChartColor = currentPriceVal >= firstPriceVal ? '#28a745' : '#dc3545';
         const ema50Color = '#ffc107'; // Amarelo
         const ema200Color = '#0d6efd'; // Azul
-        const colors = [priceChartColor, ema50Color, ema200Color];
+        // As cores serão aplicadas na ordem das séries
+        const colors = [];
+        if (chartType === 'candlestick' || chartType === 'bar') { /* Cores para velas/barras são definidas em plotOptions */ }
+        else { colors.push(priceChartColor); } // A cor da série de preço (area/line)
+        colors.push(ema50Color);
+        colors.push(ema200Color);
 
-        const options = {
+
+        let options = {
             series: series,
             chart: {
                 type: chartType, // Usa o tipo de plotagem selecionado (candlestick, bar, area, line)
@@ -97,15 +99,7 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
                 zoom: { enabled: true }
             },
             dataLabels: { enabled: false },
-            stroke: { 
-                curve: (chartType === 'area' || chartType === 'line') ? 'smooth' : 'straight', 
-                width: (chartType === 'area' || chartType === 'line') ? 2 : undefined 
-            },
-            colors: colors,
-            fill: { 
-                type: (chartType === 'area') ? 'gradient' : 'solid', 
-                gradient: (chartType === 'area') ? { opacityFrom: 0.6, opacityTo: 0.1 } : undefined 
-            },
+            colors: colors, // Aplica as cores às séries
             xaxis: { type: 'datetime', labels: { datetimeUTC: false, format: 'dd MMM \'yy' } },
             yaxis: { 
                 labels: { 
@@ -117,19 +111,15 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
                 x: { format: 'dd MMM yyyy HH:mm' },
                 y: { 
                     formatter: (val, { seriesIndex, dataPointIndex, w }) => {
-                        // Verifica se a série é de preço primário (a primeira série)
-                        if (seriesIndex === 0) {
-                            if (chartType === 'candlestick' || chartType === 'bar') {
-                                // Para velas/barras, o val é um array [O, H, L, C]
-                                if (Array.isArray(val)) {
-                                    return `O: $${val[0].toLocaleString()} H: $${val[1].toLocaleString()} L: $${val[2].toLocaleString()} C: $${val[3].toLocaleString()}`;
-                                }
+                        // Para a série de preço principal (vela/barra)
+                        if ((chartType === 'candlestick' || chartType === 'bar') && seriesIndex === 0) {
+                            if (Array.isArray(val)) { // Para velas/barras, o val é um array [O, H, L, C]
+                                return `O: $${val[0].toLocaleString()} H: $${val[1].toLocaleString()} L: $${val[2].toLocaleString()} C: $${val[3].toLocaleString()}`;
                             }
-                            return `$${val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 8})}`; 
-                        } else {
-                            // Para as EMAs, apenas o valor formatado
-                            return `${w.globals.seriesNames[seriesIndex]}: $${val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
                         }
+                        // Para as EMAs ou gráficos de área/linha, é um valor único
+                        const seriesName = w.globals.seriesNames[seriesIndex];
+                        return `${seriesName}: $${val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 8})}`; 
                     }
                 }
             },
@@ -150,6 +140,24 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
                 mode: document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light' 
             }
         };
+
+        // Condicionalmente adiciona stroke e fill com base no chartType (para evitar conflitos)
+        if (chartType === 'area' || chartType === 'line') {
+            options.stroke = {
+                curve: 'smooth',
+                width: 2
+            };
+            options.fill = {
+                type: 'gradient',
+                gradient: { opacityFrom: 0.6, opacityTo: 0.1 }
+            };
+        } else { // Para 'candlestick' e 'bar'
+            options.stroke = {
+                width: 1, // Uma borda fina para velas/barras
+                colors: ['#333'] // Cor da borda
+            };
+            // O fill para candlestick/bar é definido em plotOptions.candlestick.colors / plotOptions.bar.colors.ranges
+        }
 
         chartContainer.innerHTML = '';
         const chart = new ApexCharts(chartContainer, options);
