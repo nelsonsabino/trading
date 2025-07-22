@@ -1,0 +1,399 @@
+/* --- GERAL & TIPOGRAFIA --- */
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; background-color: #f8f9fa; color: #343a40; margin: 0; }
+main { max-width: 1400px; margin: auto; padding: 0 2rem 2rem 2rem; }
+h1, h2, h3 { font-weight: 600; }
+h2 { color: #495057; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem; margin-bottom: 1.5rem; }
+
+/* --- CABEÇALHO E NAVEGAÇÃO --- */
+header { text-align: center; padding: 2rem 1rem; background-color: #fff; border-bottom: 1px solid #dee2e6; margin-bottom: 2rem; }
+.mantra { font-style: italic; color: #6c757d; }
+header nav { margin-top: 1.5rem; display: flex; justify-content: center; align-items: center; gap: 1rem; flex-wrap: wrap; }
+
+/* --- ESTILO DE BOTÕES CONSISTENTE --- */
+.btn, .nav-link { display: inline-block; padding: 10px 20px; font-size: 1rem; font-weight: 600; text-align: center; text-decoration: none; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s ease-in-out; }
+.btn-primary, #add-opportunity-btn { background-color: #007bff; color: white; }
+.btn-primary:hover, #add-opportunity-btn:hover { background-color: #0056b3; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+.nav-link { background-color: #6c757d; color: white; }
+.nav-link:hover { background-color: #5a6268; transform: translateY(-2px); }
+
+/* --- DASHBOARD E COLUNAS --- */
+.dashboard-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+.potential-trades, .armed-trades, .live-trades { background-color: #fff; padding: 1.5rem; border-radius: 8px; border-top: 4px solid #6c757d; }
+.armed-trades { border-top-color: #ffc107; }
+.live-trades { border-top-color: #28a745; }
+
+/* --- CARDS DE TRADE --- */
+.trade-card { position: relative; background: #fdfdfd; border: 1px solid #e9ecef; padding: 1rem 1.5rem; border-radius: 6px; margin-bottom: 1rem; transition: box-shadow 0.2s ease-in-out; border-left: 5px solid #6c757d; }
+.trade-card:hover { box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
+.trade-card.armed { border-left-color: #ffc107; }
+.trade-card.live { border-left-color: #28a745; }
+.trade-card h3 { margin-top: 0; margin-bottom: 0.5rem; }
+.trade-card p { margin: 0.25rem 0; font-size: 0.95em; color: #495057; }
+.trade-card .card-screenshot { width: 100%; height: auto; margin-top: 1rem; border-radius: 4px; cursor: pointer; border: 1px solid #e9ecef; }
+.trigger-btn { width: 100%; margin-top: 1rem; padding: 8px; font-weight: 600; color: #fff; border-radius: 4px; border: none; cursor: pointer; transition: opacity 0.2s; box-sizing: border-box; }
+.trigger-btn:hover { opacity: 0.85; }
+.btn-potential { background-color: #ffc107; color: #212529; }
+.btn-armed { background-color: #28a745; }
+.btn-live, .trigger-btn.close-trade-btn { background-color: #dc3545; }
+.card-edit-btn { background-color: #ffc107; color: #212529; padding: 4px 8px; font-size: 0.8em; border-radius: 4px; border: none; cursor: pointer; position: absolute; top: 1rem; right: 1.5rem; opacity: 0; transition: opacity 0.2s; }
+.trade-card:hover .card-edit-btn { opacity: 1; }
+.empty-state-message { color: #6c757d; text-align: center; padding: 2rem 0; }
+
+/* --- MODAIS E FORMULÁRIOS --- */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(33, 37, 41, 0.6); display: none; justify-content: center; align-items: center; z-index: 1000; box-sizing: border-box; overflow-y: auto; padding: 2rem 1rem; }
+.modal-content { background: #fff; padding: 2rem 2.5rem; border-radius: 12px; width: 100%; max-width: 550px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.1); animation: fadeIn 0.3s ease-out; margin: auto; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+.modal-overlay.visible { display: flex !important; }
+.modal-content > span[id^="close-"] { position: absolute; top: 15px; right: 25px; font-size: 2.5rem; color: #adb5bd; font-weight: 300; cursor: pointer; line-height: 1; transition: color 0.2s; }
+.modal-content > span[id^="close-"]:hover { color: #495057; }
+.modal-content h3 { margin-top: 0; margin-bottom: 0.5rem; color: #212529; }
+.modal-content p { margin-top: 0; margin-bottom: 2rem; color: #6c757d; border-bottom: 1px solid #e9ecef; padding-bottom: 1rem; }
+.modal-content h4 { margin-top: 1.5rem; margin-bottom: 1rem; font-size: 1.1rem; color: #007bff; }
+.input-item { margin-bottom: 1.25rem; }
+.input-item label, .radio-group > label { display: block; margin-bottom: 8px; font-weight: 500; color: #495057; }
+.input-item input, .input-item select, .input-item textarea { width: 100%; padding: 12px; font-size: 1rem; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box; transition: border-color 0.2s, box-shadow 0.2s; }
+.input-item input:focus, .input-item select:focus, .input-item textarea:focus { outline: none; border-color: #80bdff; box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); }
+.checklist-item { display: flex; align-items: center; margin-bottom: 1rem; padding: 10px; background-color: #f8f9fa; border-radius: 6px; }
+.checklist-item input { margin-right: 12px; transform: scale(1.2); flex-shrink: 0; }
+.checklist-item label { line-height: 1.4; }
+.radio-group { margin-top: 1.5rem; padding: 1rem; border: 1px solid #e9ecef; border-radius: 6px; }
+.form-footnote { font-size: 0.8em; color: #6c757d; text-align: right; margin-top: -0.5rem; margin-bottom: 1.5rem; }
+.required-asterisk { color: #dc3545; font-weight: bold; margin-left: 4px; }
+.modal-content form button[type="submit"] { width: 100%; padding: 14px; margin-top: 1.5rem; font-size: 1.1rem; font-weight: 600; background-color: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; transition: background-color 0.2s; }
+.modal-content form button[type="submit"]:hover { background-color: #218838; }
+
+/* --- ESTILOS PARA EXEMPLOS NOS MODAIS --- */
+.example-image-container { margin-bottom: 1.5rem; border: 1px solid #dee2e6; border-radius: 8px; padding: 0.5rem; }
+.example-image-container img { width: 100%; height: auto; display: block; border-radius: 4px; cursor: pointer; }
+.example-image-container p { font-size: 0.85em; text-align: center; margin: 0.5rem 0 0 0; color: #6c757d; padding-bottom: 0; border-bottom: none; }
+
+/* --- PÁGINA DE GESTÃO (manage.html) --- */
+#trades-table { width: 100%; border-collapse: collapse; margin-top: 2rem; background: #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: hidden; font-size: 0.95em; }
+#trades-table thead tr { background-color: #f8f9fa; border-bottom: 2px solid #dee2e6; }
+#trades-table th { padding: 1rem; text-align: left; font-weight: 600; color: #495057; text-transform: uppercase; letter-spacing: 0.5px; }
+#trades-table td { padding: 1rem; border-bottom: 1px solid #e9ecef; vertical-align: middle; }
+#trades-table tbody tr:last-child td { border-bottom: none; }
+.action-buttons { display: flex; gap: 0.5rem; }
+.action-buttons .btn { padding: 6px 12px; font-size: 0.9em; font-weight: 500; border-radius: 5px; }
+.action-buttons .edit-btn { background-color: #ffc107; color: #212529; }
+.action-buttons .edit-btn:hover { background-color: #e0a800; }
+.action-buttons .delete-btn { background-color: #dc3545; color: white; }
+.action-buttons .delete-btn:hover { background-color: #c82333; }
+.status-badge { padding: 4px 10px; border-radius: 16px; color: white; font-size: 0.85em; font-weight: 600; text-transform: uppercase; display: inline-block; }
+.status-badge.status-potential { background-color: #6c757d; }
+.status-badge.status-armed { background-color: #ffc107; color: #212529; }
+.status-badge.status-live { background-color: #28a745; }
+.status-badge.status-closed { background-color: #343a40; }
+.positive-pnl { color: #28a745; font-weight: bold; }
+.negative-pnl { color: #dc3545; font-weight: bold; }
+
+/* --- PÁGINA DE ESTATÍSTICAS (stats.html) --- */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem; }
+.stat-card { background-color: #fff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.08); text-align: center; }
+.stat-card h4 { margin-top: 0; margin-bottom: 0.5rem; color: #6c757d; font-size: 1em; }
+.stat-card p { margin: 0; font-size: 2em; font-weight: bold; color: #343a40; }
+.pnl-value.positive-pnl { color: #28a745; }
+.pnl-value.negative-pnl { color: #dc3545; }
+.detailed-stats { margin-top: 3rem; }
+.detailed-stats h2 { font-size: 1.5em; }
+.detailed-stats table { width: 100%; margin-top: 1rem; }
+.detailed-stats .positive-pnl { color: #28a745; font-weight: bold; }
+.detailed-stats .negative-pnl { color: #dc3545; font-weight: bold; }
+
+/* --- RESPONSIVIDADE --- */
+@media (max-width: 992px) { .dashboard-columns { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 768px) { .dashboard-columns { grid-template-columns: 1fr; } main { padding: 0 1rem 1rem 1rem; } }
+
+/* --- NOVOS ESTILOS PARA A PÁGINA DE ESTATÍSTICAS --- */
+.portfolio-section { background-color: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.08); text-align: center; margin-bottom: 2rem; }
+.portfolio-balance { font-size: 1.5rem; color: #495057; }
+.portfolio-balance strong { font-size: 2.5rem; color: #28a745; margin-left: 1rem; }
+.portfolio-actions { margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem; }
+.btn-secondary { background-color: #6c757d; color: white; }
+.btn-secondary:hover { background-color: #5a6268; }
+.btn-tertiary { background-color: #ffc107; color: #212529; }
+.btn-tertiary:hover { background-color: #e0a800; }
+
+.section-divider { border: none; border-top: 1px solid #dee2e6; margin: 3rem 0; }
+
+/* --- FOOTER DE VERSÃO --- */
+footer { text-align: center; padding: 1rem 0; margin-top: 2rem; color: #6c757d; font-size: 0.9em; border-top: 1px solid #e9ecef; }
+
+/* --- NOVOS ESTILOS PARA FORMULÁRIOS E CHECKLISTS --- */
+.modal-content h4 { margin-top: 1.5rem; margin-bottom: 1rem; padding-bottom: 0.5rem; font-size: 1.1rem; color: #007bff; border-bottom: 2px solid #e9ecef; display: flex; align-items: center; }
+.checklist-item, .input-item-styled { display: flex; align-items: center; margin-bottom: 1rem; padding: 1rem; background-color: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef; transition: all 0.2s ease-in-out; }
+.checklist-item:hover, .input-item-styled:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.07); border-left: 3px solid #007bff; }
+.checklist-item i, .input-item-styled i { font-size: 1.5rem; color: #495057; margin-right: 1.25rem; width: 25px; text-align: center; }
+.checklist-item input[type="checkbox"] { transform: scale(1.4); margin-right: 1.25rem; flex-shrink: 0; }
+.checklist-item label { margin: 0; padding: 0; line-height: 1.4; font-weight: 500; }
+.required-asterisk { color: #dc3545; font-weight: bold; margin-left: 5px; font-size: 1.1em; }
+
+/* --- ESTILOS PARA O CRIADOR DE ALARMES INDEPENDENTE --- */
+.alarm-creator-section { background-color: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin: 2rem auto; max-width: 1400px; }
+.alarm-creator-section h2 { border-bottom: none; margin-bottom: 1.5rem; text-align: center; }
+.alarm-form-standalone .form-row { display: flex; gap: 1.5rem; align-items: flex-end; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.alarm-form-standalone .input-item {
+    flex: 1;
+    min-width: 200px;
+    position: relative; /* ADIÇÃO: Esta é a linha chave para o autocomplete */
+}
+.alarm-form-standalone label { display: block; margin-bottom: 8px; font-weight: 500; }
+.alarm-form-standalone input, .alarm-form-standalone select { width: 100%; padding: 12px; font-size: 1rem; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box; }
+.alarm-feedback { margin-top: 1rem; font-weight: 500; text-align: center; min-height: 20px; }
+
+/* --- ESTILOS PARA O AUTOCOMPLETE DE ALARMES --- */
+.autocomplete-results { display: none; position: absolute; border: 1px solid #ddd; border-top: none; z-index: 99; top: 100%; left: 0; right: 0; max-height: 200px; overflow-y: auto; background-color: #fff; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-radius: 0 0 6px 6px; }
+.autocomplete-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #eee; display: flex; align-items: center; }
+.autocomplete-item:last-child { border-bottom: none; }
+.autocomplete-item:hover { background-color: #f1f1f1; }
+.autocomplete-item strong { color: #007bff; }
+
+/* --- ESTILOS PARA AS TABELAS DE ALARMES --- */
+.alarms-table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; background: #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: hidden; font-size: 0.95em; }
+.alarms-table thead tr { background-color: #f8f9fa; border-bottom: 2px solid #dee2e6; }
+.alarms-table th { padding: 1rem; text-align: left; font-weight: 600; color: #495057; }
+.alarms-table td { padding: 1rem; border-bottom: 1px solid #e9ecef; vertical-align: middle; }
+.alarms-table tbody tr:last-child td { border-bottom: none; }
+.alarms-table .condition-above { color: #198754; font-weight: bold; }
+.alarms-table .condition-below { color: #dc3545; font-weight: bold; }
+
+/* --- ESTILOS ADICIONAIS PARA BOTÕES DE AÇÃO --- */
+.form-actions { display: flex; justify-content: center; gap: 1rem; }
+.alarms-table .edit-btn { background-color: #ffc107; color: #212529; }
+.alarms-table .edit-btn:hover { background-color: #e0a800; }
+
+/* NOVO: Wrapper para tabelas responsivas */
+.table-wrapper {
+    overflow-x: auto;
+    width: 100%;
+    -webkit-overflow-scrolling: touch; /* Melhora a experiência de scroll em iOS */
+}
+
+.combo-separator {
+    font-weight: bold;
+    color: #007bff;
+    text-align: center;
+    margin: 2rem 0 1rem 0;
+    font-size: 1.1em;
+}
+
+/* --- AJUSTES FINAIS PARA TELAS PEQUENAS (MOBILE-FIRST) --- */
+@media (max-width: 768px) {
+
+  /* 1. Reduzir o tamanho da fonte base para todo o site */
+  /* O padrão é 16px. Ao mudar para 14px, todos os textos em 'rem' e 'em'
+     ficarão proporcionalmente menores, condensando a interface. */
+  html {
+    font-size: 14px;
+  }
+
+  /* 2. Reduzir espaçamentos gerais para um look mais "condensado" */
+  header {
+    padding: 1.5rem 1rem;
+    margin-bottom: 1rem;
+  }
+
+  main {
+     /* Já tínhamos esta regra, mas garantimos que está aqui */
+    padding: 0 1rem 1rem 1rem;
+  }
+
+  .alarm-creator-section {
+      margin-top: 1.5rem;
+      margin-bottom: 1.5rem;
+      padding: 1.5rem;
+  }
+  
+  .section-divider {
+      margin: 1.5rem 0;
+  }
+
+  /* 3. Condensar as tabelas */
+  .alarms-table th,
+  .alarms-table td,
+  #trades-table th,
+  #trades-table td {
+    padding: 0.8rem 0.6rem; /* Menos padding vertical e horizontal nas células */
+    font-size: 0.9em; /* Letra da tabela um pouco mais pequena */
+  }
+
+  /* 4. Ajustar títulos e botões */
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+  }
+
+  .btn, .nav-link {
+    padding: 8px 16px; /* Botões um pouco menores */
+    font-size: 0.95rem;
+  }
+  
+  /* 5. Ajustar o formulário de alarmes */
+  .alarm-form-standalone .form-row {
+      gap: 1rem; /* Menos espaço entre os campos quando eles quebram a linha */
+  }
+}
+
+
+/* --- ESTILO PARA O MOSTRADOR DE PREÇO ATUAL --- */
+.asset-price-display {
+    min-height: 24px; /* Garante que não "salta" o layout */
+    padding-top: 8px;
+    font-size: 0.9em;
+    color: #007bff;
+    font-weight: bold;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* --- ESTILOS PARA A PÁGINA DE SCANNER DE MERCADO --- */
+.market-scan-section h2 {
+    text-align: center;
+    border-bottom: none;
+    margin-bottom: 1.5rem;
+}
+.market-table {
+    /* Reutiliza muitos estilos das outras tabelas */
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    overflow: hidden;
+    font-size: 0.95em;
+}
+.market-table thead tr {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+.market-table th, .market-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e9ecef;
+    vertical-align: middle;
+}
+.market-table th:first-child, .market-table td:first-child {
+    text-align: center;
+    width: 50px;
+}
+.market-table tbody tr:last-child td {
+    border-bottom: none;
+}
+.market-table .asset-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+}
+
+/* --- ESTILOS PARA OS BOTÕES DENTRO DOS CARDS --- */
+.card-actions {
+    display: flex;
+    gap: 10px; /* Espaço entre os botões */
+    margin-top: 1rem;
+}
+
+.card-actions .btn,
+.card-actions .trigger-btn {
+    flex-grow: 1; /* Faz com que os botões ocupem o espaço disponível */
+    margin-top: 0; /* Remove a margem que o trigger-btn tinha */
+}
+
+/* Garante que o link do gráfico não é mais largo que o necessário se houver 2 botões */
+.card-actions a.btn {
+    flex-grow: 0; 
+}
+
+
+
+/* --- Tabela de Alarmes Responsiva (Card View com FLEXBOX) --- */
+@media (max-width: 768px) {
+    .alarms-table thead {
+        display: none;
+    }
+
+    .alarms-table tr {
+        display: block;
+        margin-bottom: 1.5rem;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        background-color: #fff;
+    }
+
+    .alarms-table td {
+        display: flex; /* <-- A magia começa aqui */
+        justify-content: space-between; /* <-- Empurra o rótulo para a esquerda e o valor para a direita */
+        align-items: center; /* <-- Alinha tudo verticalmente */
+        padding: 0.8rem 1rem;
+        border-bottom: 1px solid #f1f1f1;
+        /* Removemos o posicionamento relativo e o alinhamento de texto */
+    }
+
+    .alarms-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #495057;
+        padding-right: 1rem; /* Adiciona um espaço para respirar */
+    }
+
+    /* O valor da célula (o conteúdo à direita) */
+    .alarms-table td .cell-value {
+        text-align: right;
+        flex-shrink: 0; /* Impede que os botões encolham e quebrem a linha */
+        max-width: 60%; /* Evita que a descrição da condição seja demasiado longa e empurre tudo */
+    }
+
+    /* Caso especial para a descrição, para que possa quebrar a linha */
+    .alarms-table td .cell-value.description {
+        white-space: normal;
+        text-align: right;
+    }
+    
+    .alarms-table tr td:last-child {
+        border-bottom: none;
+    }
+
+    .alarms-table td .action-buttons {
+        text-align: right;
+    }
+}
+
+
+/* style.css */
+
+/* --- NOVOS ESTILOS: MINI-GRÁFICO NOS CARDS --- */
+
+/* Contentor que irá receber o mini-gráfico. Começa escondido. */
+.mini-chart-container {
+    height: 0;
+    overflow: hidden;
+    transition: height 0.35s ease-in-out; /* Animação suave de expansão */
+    margin-top: 1rem;
+    border-radius: 6px;
+}
+
+/* Classe adicionada via JS para mostrar o gráfico */
+.mini-chart-container.visible {
+    height: 400px; /* Aumentado de 250px para 400px para o gráfico avançado */
+}
+
+/* O div dentro do contentor que o TradingView usa */
+.mini-chart-container > div {
+    height: 100%;
+    width: 100%;
+}
+
+/* Ajustes no botão de resumo para o diferenciar */
+.card-actions .btn-summary {
+    background-color: #198754; /* Um verde para se destacar */
+    color: white;
+}
+
+.card-actions .btn-summary:hover {
+    background-color: #157347;
+}
