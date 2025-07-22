@@ -189,5 +189,41 @@
     <script type="module" src="js/navigation.js"></script>
     <script type="module" src="js/version.js"></script>
     <script type="module" src="js/dark-mode.js"></script>
+
+    
+<script>
+  let deferredPrompt;
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    // Impede o Chrome de mostrar automaticamente o banner
+    e.preventDefault();
+    deferredPrompt = e;
+
+    // Mostra o botão ou notificação personalizada
+    const installBanner = document.getElementById('installBanner');
+    installBanner.classList.remove('hidden');
+
+    // Clica no botão de "Instalar"
+    document.getElementById('installBtn').addEventListener('click', () => {
+      installBanner.classList.add('hidden');
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('O utilizador aceitou instalar');
+        } else {
+          console.log('O utilizador recusou instalar');
+        }
+        deferredPrompt = null;
+      });
+    });
+  });
+</script>
+
+    <div id="installBanner" class="hidden fixed bottom-4 left-4 right-4 md:right-auto md:left-4 z-50 bg-white border border-gray-300 shadow-xl p-4 rounded-xl flex items-center justify-between max-w-sm mx-auto">
+  <span class="text-gray-800 font-medium">Instalar esta app?</span>
+  <button id="installBtn" class="ml-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Instalar</button>
+</div>
+
+    
 </body>
 </html>
