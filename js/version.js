@@ -2,18 +2,27 @@
 
 export const changelogData = {
     current: {
-        number: '9.1.2', // <-- VERSÃO ATUALIZADA (Otimização dos Cards do Dashboard)
+        number: '9.1.3', // <-- VERSÃO ATUALIZADA (Correções finais de layout)
         changes: [
-            "**Otimização de UI - Cards do Dashboard:**",
-            "Reduzido o tamanho dos cards no Dashboard principal para torná-los mais compactos e permitir uma visualização mais densa de ativos.",
-            "Removido o texto dos botões 'Gráfico' e 'Análise' nos cards, exibindo apenas os ícones para um visual mais limpo.",
-            "O mini-gráfico, preço e variação percentual são agora exibidos na mesma linha para maior eficiência de espaço.",
-            "As 'Notas' do trade só aparecem se houver conteúdo, evitando linhas vazias desnecessárias.",
-            "O status do trade foi removido do corpo do card, uma vez que a coluna Kanban já indica essa informação.",
-            "O botão de ação principal (Armar/Executar/Fechar) foi reposicionado na parte superior do card para maior proeminência e acessibilidade."
+            "**Correções e Otimizações Finais de UI:**",
+            "Resolvidos todos os problemas de layout e alinhamento nos cards do Dashboard, garantindo a compactação, o posicionamento correto do lápis de edição (visível no hover), e o alinhamento em linha do sparkline, preço e percentagem.",
+            "Restaurado o comportamento de tabela clássico em ecrãs móveis para o Market Scanner (e todas as tabelas), permitindo scroll horizontal em vez de quebrar em blocos, melhorando a visualização de dados tabulares.",
+            "Ajustes finos em espaçamentos e alinhamentos CSS para garantir a consistência e o aspeto profissional em toda a aplicação.",
         ]
     },
     releases: [
+        {
+            number: '9.1.2',
+            changes: [
+                "**Otimização de UI - Cards do Dashboard:**",
+                "Reduzido o tamanho dos cards no Dashboard principal para torná-los mais compactos e permitir uma visualização mais densa de ativos.",
+                "Removido o texto dos botões 'Gráfico' e 'Análise' nos cards, exibindo apenas os ícones para um visual mais limpo.",
+                "O mini-gráfico, preço e variação percentual são agora exibidos na mesma linha para maior eficiência de espaço.",
+                "As 'Notas' do trade só aparecem se houver conteúdo, evitando linhas vazias desnecessárias.",
+                "O status do trade foi removido do corpo do card, uma vez que a coluna Kanban já indica essa informação.",
+                "O botão de ação principal (Armar/Executar/Fechar) foi reposicionado na parte superior do card para maior proeminência e acessibilidade."
+            ]
+        },
         {
             number: '9.1.1',
             changes: [
