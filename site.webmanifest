@@ -1,6 +1,14 @@
 {
-  "name": "MyWebSite",
-  "short_name": "MySite",
+  "name": "Trading Web-App",
+  "short_name": "TradingApp",
+  "description": "Ferramenta de apoio ao trading e gestão de operações.",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#1f2937", 
+  "lang": "pt-PT",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
@@ -13,9 +21,12 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
-  ],
-  "theme_color": "#ffffff",
-  "background_color": "#ffffff",
-  "display": "standalone"
+  ]
 }
