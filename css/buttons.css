@@ -1,0 +1,130 @@
+/* css/buttons.css */
+
+/* --- BOTÕES GERAIS (.btn) --- */
+.btn { 
+    display: inline-block; 
+    padding: 10px 20px; 
+    font-size: 1rem; 
+    font-weight: 600; 
+    text-align: center; 
+    text-decoration: none; 
+    border: none; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    transition: all 0.2s ease-in-out; 
+}
+
+/* Cores e efeitos para os botões gerais */
+.btn-primary, #add-opportunity-btn { background-color: #007bff; color: white; }
+.btn-primary:hover, #add-opportunity-btn:hover { background-color: #0056b3; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+
+.btn-secondary { background-color: #6c757d; color: white; }
+.btn-secondary:hover { background-color: #5a6268; }
+.btn-tertiary { background-color: #ffc107; color: #212529; }
+.btn-tertiary:hover { background-color: #e0a800; }
+
+
+/* --- icon-action-btn (BOTÕES COM ÍCONE EM CONTEÚDO) --- */
+
+/* Base para todos os icon-action-btn (cards e tabelas) */
+.icon-action-btn {
+    display: inline-flex; 
+    align-items: center;
+    justify-content: center; 
+    gap: 0.4rem; /* Espaçamento entre ícone e texto */
+    padding: 8px 12px; /* Padding padrão para botões com texto (nos cards) */
+    font-size: 0.9em;
+    font-weight: 500;
+    text-decoration: none; 
+    border: 1px solid #dee2e6; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    transition: all 0.2s ease-in-out;
+    background-color: #f1f3f5; 
+    color: #495057; 
+    flex-shrink: 0; 
+}
+
+/* Efeito hover geral para todos os icon-action-btn */
+.icon-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+    background-color: #e9ecef; 
+}
+
+/* Garante o tamanho correto do ícone */
+.icon-action-btn i {
+    font-size: 1.1em;
+    line-height: 1; 
+}
+
+/* --- Estilos para containers de botões de Ações (Ex: dentro de cards ou tabelas) --- */
+.card-actions, 
+.market-table .action-buttons,
+.alarms-table .action-buttons,
+#trades-table .action-buttons, 
+.asset-related-data .action-buttons { 
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem; 
+    align-items: center; 
+    justify-content: flex-end; 
+}
+
+/* ESTILOS ESPECÍFICOS: Botões de ícone compactos dentro das TABELAS */
+.market-table .action-buttons .icon-action-btn,
+.alarms-table .action-buttons .icon-action-btn,
+#trades-table .action-buttons .icon-action-btn,
+.asset-related-data .action-buttons .icon-action-btn {
+    padding: 6px; 
+    width: 32px;  
+    height: 32px; 
+    border-radius: 6px; 
+    & span { 
+        display: none; 
+    }
+}
+
+/* Cores específicas para os ÍCONES (Aplicadas ao <i> elemento) */
+.icon-action-btn.action-summary i, .icon-action-btn.view-chart-btn i { color: #198754; } 
+.icon-action-btn.action-full-chart i { color: #0d6efd; }
+.icon-action-btn.action-bell i { color: #0d6efd; }
+.icon-action-btn.action-plus i { color: #0d6efd; }
+.icon-action-btn.action-arm i { color: #ffc107; }
+.icon-action-btn.action-execute i { color: #20c997; }
+.icon-action-btn.action-close i { color: #dc3545; }
+
+
+/* --- BOTÃO DE TEMA --- */
+/* NOTA: O botão de tema agora usa a classe .nav-icon-link em HTML */
+/* Se houver conflito, esta regra pode ser removida se .nav-icon-link for suficiente */
+/* #theme-toggle-btn { 
+    background-color: #f8f9fa; 
+    color: #495057; 
+    border: 1px solid #dee2e6; 
+    width: 45px; 
+    height: 45px; 
+    padding: 0; 
+    line-height: 45px; 
+    border-radius: 50%; 
+    font-size: 1.2rem; 
+}
+#theme-toggle-btn:hover { 
+    background-color: #e9ecef; 
+} */
+
+
+/* --- LINKS DE NAVEGAÇÃO SECUNDÁRIOS (dentro do dropdown) --- */
+/* São os únicos que ainda usam a classe .nav-link agora */
+a.nav-link { 
+    background-color: #6c757d; /* Cor base mais escura */
+    color: white; 
+    border: none;
+    text-decoration: none; /* Garante que links não são sublinhados */
+    border-radius: 6px; /* Para os botões normais */
+}
+a.nav-link:hover { 
+    background-color: #5a6268; 
+    transform: translateY(-2px); 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+}

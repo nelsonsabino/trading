@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Ativo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/buttons.css">
+    <link rel="stylesheet" href="css/tables.css">
+    <link rel="stylesheet" href="css/forms-modals.css">
+    <link rel="stylesheet" href="css/charts.css">
+    <link rel="stylesheet" href="css/strategy-builder.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/navigation-menu.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+        (function() {
+            try {
+                const theme = localStorage.getItem('theme');
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark-mode');
+                } else {
+                    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    if (prefersDark && theme !== 'light') {
+                        document.documentElement.classList.add('dark-mode');
+                    }
+                }
+            } catch (e) {}
+        })();
+    </script>
+</head>
+<body>
+
+    <header>
+        <h1 id="asset-title">A carregar...</h1>
+        <p class="mantra">Toda a informação sobre o ativo, num único local.</p>
+        <nav class="main-nav">
+            <a href="index.html" class="nav-icon-link" title="Dashboard"><i class="fas fa-home"></i></a>
+            <a href="market-scan.html" class="nav-icon-link" title="Scanner de Mercado"><i class="fas fa-search-dollar"></i></a>
+            <a href="alarms-create.html" class="nav-icon-link" title="Criar Alarme"><i class="fas fa-plus-circle"></i></a>
+            <a href="alarms-manage.html" class="nav-icon-link" title="Meus Alarmes"><i class="fas fa-bell"></i></a>
+            
+            <div class="nav-dropdown">
+                <button id="management-toggle" class="nav-icon-link" title="Gerir e Estatísticas"><i class="fas fa-cog"></i></button>
+                <div class="nav-dropdown-content">
+                    <a href="strategies-manager.html" class="nav-link">Gerir Estratégias</a>
+                    <a href="manage.html" class="nav-link">Todas as Operações</a>
+                    <a href="stats.html" class="nav-link">Ver Estatísticas</a>
+                </div>
+            </div>
+
+            <button id="add-to-watchlist-btn" href="#" class="btn nav-icon-link" title="Adicionar à Watchlist"><i class="fa-solid fa-plus"></i></button>
+            <button id="add-alarm-btn" href="#" class="btn nav-icon-link" title="Criar Alarme"><i class="fa-solid fa-bell"></i></button>
+            <a id="open-tv-btn" href="#" class="btn nav-icon-link" target="_blank" rel="noopener noreferrer" title="Análise TradingView"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+            <button id="theme-toggle-btn" class="btn nav-icon-link" title="Alternar tema">
+                <i class="fas fa-moon"></i>
+            </button>
+        </nav>
+    </header>
+
+    <main>
+        <section class="main-chart-section">
+            <div class="stat-card" style="padding: 1rem;">
+                <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 1rem; gap: 1rem;">
+                    <div>
+                        <label for="chart-type-select" style="margin-right: 0.5rem;">Tipo:</label>
+                        <select id="chart-type-select" style="padding: 5px; border-radius: 4px; font-size: 0.9em;">
+                            <option value="line" selected>Linha</option>
+                            <option value="candlestick">Velas</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="chart-timeframe-select" style="margin-right: 0.5rem;">Timeframe:</label>
+                        <select id="chart-timeframe-select" style="padding: 5px; border-radius: 4px; font-size: 0.9em;">
+                            <option value="1m">1 Minuto</option>
+                            <option value="5m">5 Minutos</option>
+                            <option value="15m">15 Minutos</option>
+                            <option value="30m">30 Minutos</option>
+                            <option value="1h" selected>1 Hora</option>
+                            <option value="4h">4 Horas</option>
+                            <option value="1d">1 Dia</option>
+                            <option value="1w">1 Semana</option>
+                            <option value="1M">1 Mês</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="main-asset-chart" style="min-height: 400px;"></div>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <section class="asset-related-data" style="margin-bottom: 2rem;">
+            <h2><i class="fa-solid fa-chart-line"></i> Análise Técnica Detalhada</h2>
+            <div class="stat-card" style="padding: 1rem;">
+                <div id="tradingview-tech-analysis-container" class="tradingview-widget-wrapper"></div> 
+            </div>
+        </section>
+
+        <!-- SECÇÃO DAS NOTÍCIAS REMOVIDA -->
+
+        <hr class="section-divider">
+
+        <section class="asset-related-data">
+            <h2><i class="fa-solid fa-bell"></i> Alarmes Ativos para este Ativo</h2>
+            <div class="table-wrapper">
+                <table class="alarms-table">
+                    <thead>
+                        <tr>
+                            <th>Condição</th>
+                            <th>Data de Criação</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="asset-alarms-tbody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <section class="asset-related-data">
+            <h2><i class="fa-solid fa-history"></i> Histórico de Trades para este Ativo</h2>
+            <div class="table-wrapper">
+                <table id="trades-table">
+                    <thead>
+                        <tr>
+                            <th>Estratégia</th>
+                            <th>Status</th>
+                            <th>Data de Criação</th>
+                            <th>P&L ($)</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="asset-trades-tbody"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer></footer>
+
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="js/services.js"></script>
+    <script type="module" src="js/firebase-service.js"></script>
+    <script type="module" src="js/asset-details.js"></script>
+    <script type="module" src="js/navigation.js"></script>
+    <script type="module" src="js/version.js"></script>
+    <script type="module" src="js/dark-mode.js"></script>
+</body>
+</html>

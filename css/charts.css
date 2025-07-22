@@ -1,0 +1,43 @@
+/* css/charts.css */
+
+/* --- GRÁFICOS & WIDGETS GERAIS --- */
+.mini-chart-container { 
+    height: 0; 
+    overflow: hidden; 
+    transition: height 0.35s ease-in-out; 
+    margin-top: 1rem; 
+    border-radius: 6px; 
+}
+.mini-chart-container.visible { 
+    height: 400px; 
+}
+
+/* Células da tabela que contêm sparklines */
+.sparkline-cell { 
+    padding: 0 !important; 
+    vertical-align: middle !important; 
+}
+
+/* Contentor do sparkline dentro da célula */
+.sparkline-container { 
+    width: 150px; 
+    height: 50px; 
+    margin: auto; 
+}
+
+/* Estilos para a nova secção de gráficos na página de detalhes do ativo */
+.main-chart-section .stat-card {
+    padding: 1rem; 
+}
+
+/* NOVO: Estilo para o wrapper do widget de análise técnica da TradingView */
+.tradingview-widget-wrapper {
+    height: 500px; /* Definido explicitamente para dar espaço ao widget */
+    width: 100%;
+}
+/* O widget já tem os seus próprios estilos de fundo, etc. */
+
+/* Ajustes para o widget de Análise Técnica do TradingView (se ainda estiver em uso em algum modal) */
+#tech-analysis-container .tradingview-widget-copyright {
+    display: none; /* Esconde o copyright para um look mais limpo */
+}

@@ -1,0 +1,62 @@
+/* css/layout.css */
+
+/* --- CABEÇALHO E NAVEGAÇÃO --- */
+header { 
+    text-align: center; 
+    padding: 2rem 1rem; 
+    background-color: #fff; 
+    border-bottom: 1px solid #dee2e6; 
+    margin-bottom: 2rem; 
+}
+.mantra { 
+    font-style: italic; 
+    color: #6c757d; 
+}
+header nav { 
+    margin-top: 1.5rem; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    gap: 1rem; 
+    flex-wrap: wrap; 
+}
+
+/* --- GRIDS DE LAYOUT PRINCIPAL --- */
+.dashboard-columns { 
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 2rem; 
+}
+
+.asset-charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+/* CORREÇÃO: A regra para a grelha de estatísticas foi restaurada aqui */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+
+/* --- CONTROLES DO MERCADO --- */
+.market-controls {
+    display: flex;
+    justify-content: flex-start; 
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1rem;
+    background-color: #f1f3f5;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap; 
+}
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}

@@ -1,0 +1,171 @@
+/* css/components.css */
+
+/* --- COMPONENTES GERAIS --- */
+.stat-card { 
+    background-color: #fff; 
+    padding: 1.5rem; 
+    border-radius: 8px; 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08); 
+    text-align: center; 
+}
+.stat-card h4 { 
+    margin-top: 0; 
+    margin-bottom: 0.5rem; 
+    color: #6c757d; 
+    font-size: 1em; 
+}
+.stat-card p { 
+    margin: 0; 
+    font-size: 2em; 
+    font-weight: bold; 
+    color: #343a40; 
+}
+
+/* --- CARDS DO DASHBOARD (POTENCIAL, ARMADO, ATIVO) --- */
+.potential-trades, .armed-trades, .live-trades { 
+    background-color: #fff; 
+    padding: 1.5rem; 
+    border-radius: 8px; 
+    border-top: 4px solid #6c757d; 
+}
+.armed-trades { 
+    border-top-color: #ffc107; 
+}
+.live-trades { 
+    border-top-color: #28a745; 
+}
+
+/* Base do trade-card */
+.trade-card { 
+    background: #fdfdfd; 
+    border: 1px solid #e9ecef; 
+    padding: 0.8rem 1rem;
+    border-radius: 6px; 
+    margin-bottom: 1rem; 
+    transition: box-shadow 0.2s ease-in-out; 
+    border-left: 5px solid #6c757d; 
+    display: flex; 
+    flex-direction: column;
+}
+.trade-card:hover { 
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08); 
+}
+.trade-card.armed { 
+    border-left-color: #ffc107; 
+}
+.trade-card.live { 
+    border-left-color: #28a745; 
+}
+
+/* --- LINHA SUPERIOR DO CARD --- */
+.card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+}
+.asset-title-card {
+    margin: 0;
+    font-size: 1.2em;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.card-edit-btn {
+    background: none;
+    border: none;
+    color: #6c757d;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+    padding: 0;
+    width: auto;
+    height: auto;
+    font-size: 0.9em;
+}
+.trade-card:hover .card-edit-btn {
+    opacity: 1;
+}
+
+/* --- SEÇÃO DO MEIO (ESTRATÉGIA E NOTAS) --- */
+.strategy-name {
+    margin: 0;
+    font-size: 0.85em;
+    color: #007bff;
+    font-weight: 500;
+    text-align: left;
+}
+.trade-notes {
+    font-size: 0.8em;
+    color: #6c757d;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed #e9ecef;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+}
+
+/* --- LINHA INFERIOR DO CARD --- */
+.card-bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #e9ecef;
+    gap: 0.5rem; 
+}
+.card-chart-price-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-grow: 1;
+    min-width: 0;
+}
+.card-sparkline {
+    width: 60px;
+    height: 25px;
+    flex-shrink: 0;
+}
+.card-price-data {
+    display: flex;
+    flex-direction: row; 
+    align-items: baseline; 
+    gap: 0.4rem; 
+    flex-shrink: 0;
+    /* CORREÇÃO FINAL: Garante que o bloco de preço tem uma largura mínima para não ser esmagado */
+    min-width: 100px; 
+    justify-content: flex-end; /* Alinha o conteúdo à direita dentro do seu espaço */
+}
+.card-price {
+    font-weight: 600;
+    font-size: 0.9em; 
+}
+.price-change-percent {
+    font-size: 0.8em; 
+}
+
+/* Ações secundárias */
+.card-secondary-actions {
+    display: flex;
+    gap: 0.3rem;
+    flex-shrink: 0;
+}
+.card-secondary-actions .icon-action-btn {
+    width: 28px;
+    height: 28px;
+    padding: 4px;
+    box-sizing: border-box;
+}
+.card-secondary-actions .icon-action-btn i {
+    font-size: 0.9em;
+}
+
+
+/* --- SECÇÃO DE PORTFÓLIO E NOTÍCIAS (sem alterações) --- */
+.portfolio-section, .news-article {
+    /* Estilos existentes */
+}

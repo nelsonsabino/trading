@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Estratégias</title>
+
+<!-- FAVICONS GERADOS -->
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+<!-- FIM DOS FAVICONS GERADOS -->
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/buttons.css">
+    <link rel="stylesheet" href="css/tables.css">
+    <link rel="stylesheet" href="css/forms-modals.css">
+    <link rel="stylesheet" href="css/charts.css">
+    <link rel="stylesheet" href="css/strategy-builder.css">
+    <link rel="stylesheet" href="css/footer.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/navigation-menu.css"> <!-- NOVO: Estilos para o menu de navegação -->
+
+    <script>
+        (function() {
+            try {
+                const theme = localStorage.getItem('theme');
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark-mode');
+                } else {
+                    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    if (prefersDark && theme !== 'light') {
+                        document.documentElement.classList.add('dark-mode');
+                    }
+                }
+            } catch (e) {}
+        })();
+    </script>
+</head>
+<body>
+
+    <header>
+        <h1>Gestão de Estratégias</h1>
+        <p class="mantra">Crie e refine os seus sistemas de trading.</p>
+        <nav class="main-nav">
+            <a href="index.html" class="nav-icon-link" title="Dashboard"><i class="fas fa-home"></i></a>
+            <a href="market-scan.html" class="nav-icon-link" title="Scanner de Mercado"><i class="fas fa-search-dollar"></i></a>
+            <a href="alarms-create.html" class="nav-icon-link" title="Criar Alarme"><i class="fas fa-plus-circle"></i></a> <!-- ÍCONE CORRIGIDO -->
+            <a href="alarms-manage.html" class="nav-icon-link" title="Meus Alarmes"><i class="fas fa-bell"></i></a>
+            
+            <div class="nav-dropdown">
+                <button id="management-toggle" class="nav-icon-link" title="Gerir e Estatísticas"><i class="fas fa-cog"></i></button>
+                <div class="nav-dropdown-content">
+                    <a href="strategies-manager.html" class="nav-link">Gerir Estratégias</a>
+                    <a href="manage.html" class="nav-link">Todas as Operações</a>
+                    <a href="stats.html" class="nav-link">Ver Estatísticas</a>
+                </div>
+            </div>
+
+            <button id="create-strategy-btn" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Criar Nova Estratégia
+            </button>
+            <button id="theme-toggle-btn" class="btn nav-icon-link" title="Alternar tema">
+                <i class="fas fa-moon"></i>
+            </button>
+        </nav>
+    </header>
+
+    <main>
+        <section class="strategies-list-section">
+            <h2>Estratégias Guardadas</h2>
+            <div id="strategies-container">
+                <p class="empty-state-message">A carregar estratégias...</p>
+                <!-- As estratégias serão listadas aqui pelo JavaScript -->
+            </div>
+        </section>
+
+    <div id="strategy-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 800px;">
+            <span id="close-strategy-modal">×</span>
+            <form id="strategy-form">
+                <h3 id="strategy-modal-title">Criar Nova Estratégia</h3>
+                
+                <div class="input-item">
+                    <label for="strategy-name">Nome da Estratégia:</label>
+                    <input type="text" id="strategy-name" required placeholder="Ex: EMA50 Breakout">
+                </div>
+
+                <hr style="margin: 2rem 0;">
+
+                <h4>Fases da Estratégia</h4>
+                <div id="phases-container">
+                    <!-- As fases serão adicionadas dinamicamente aqui -->
+                </div>
+
+                <button type="button" id="add-phase-btn" class="btn btn-secondary" style="margin-top: 1rem;">
+                    <i class="fas fa-plus"></i> Adicionar Fase
+                </button>
+
+                <hr style="margin: 2rem 0;">
+                
+                <button type="submit" id="save-strategy-btn">Guardar Estratégia</button>
+            </form>
+
+            <div id="add-item-type-modal" class="modal-overlay" style="display: none; background-color: rgba(0,0,0,0.4);">
+                <div class="modal-content" style="max-width: 350px;">
+                    <h4>Escolha o Tipo de Item</h4>
+                    <div id="item-type-buttons" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <button type="button" class="btn btn-secondary" data-type="checkbox">Checkbox</button>
+                        <button type="button" class="btn btn-secondary" data-type="select">Dropdown (Select)</button>
+                        <button type="button" class="btn btn-secondary" data-type="text">Campo de Texto</button>
+                        <button type="button" class="btn btn-secondary" data-type="number">Campo de Número</button>
+                    </div>
+                    <button type="button" id="cancel-add-item" class="btn" style="margin-top: 1rem; background-color: #6c757d; color: white;">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </main>
+
+    <footer></footer>
+
+    <script type="module" src="js/strategies-manager.js"></script>
+    <script type="module" src="js/navigation.js"></script> <!-- NOVO SCRIPT -->
+    <script type="module" src="js/version.js"></script>
+    <script type="module" src="js/dark-mode.js"></script>
+
+</body>
+</html>
