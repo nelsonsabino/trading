@@ -25,7 +25,6 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
     currentChartType = chartType; 
 
     try {
-        // Invoca a NOVA Edge Function para obter dados de klines e indicadores para o timeframe do gráfico
         const { data: edgeFunctionResponse, error: edgeFunctionError } = await supabase.functions.invoke('get-asset-details-data', {
             body: { symbol: symbol, interval: interval },
         });
@@ -45,30 +44,29 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
 
         let series = [];
         
-        // Formatação dos dados primários (preço)
         if (chartType === 'candlestick') {
             const ohlcSeriesData = klinesData.map(kline => ({
-                x: kline[0], // Timestamp
-                y: [kline[1], kline[2], kline[3], kline[4]] // Open, High, Low, Close
+                x: kline[0], 
+                y: [kline[1], kline[2], kline[3], kline[4]] 
             }));
             series.push({ name: 'Preço', type: 'candlestick', data: ohlcSeriesData });
-        } else { // 'area' ou 'line'
+        } else { 
             const closePriceSeriesData = klinesData.map(kline => ({
                 x: kline[0],
-                y: kline[4] // Close price
+                y: kline[4] 
             }));
             series.push({ name: 'Preço (USD)', type: chartType, data: closePriceSeriesData });
         }
         
-        // Adiciona as EMAs como séries de linha secundárias
-        if (indicatorsData.ema50_data && indicatorsData.ema50_data.length > 0) {
+        // CORREÇÃO: Mapeia as EMAs, mantendo os nulls iniciais
+        if (indicatorsData.ema50_data && indicatorsData.ema50_data.length === klinesData.length) {
             const ema50SeriesData = indicatorsData.ema50_data.map((emaVal, index) => ({
                 x: klinesData[index][0], 
-                y: emaVal 
+                y: emaVal // emaVal pode ser null
             }));
             series.push({ name: 'EMA 50', type: 'line', data: ema50SeriesData });
         }
-        if (indicatorsData.ema200_data && indicatorsData.ema200_data.length > 0) {
+        if (indicatorsData.ema200_data && indicatorsData.ema200_data.length === klinesData.length) {
             const ema200SeriesData = indicatorsData.ema200_data.map((emaVal, index) => ({
                 x: klinesData[index][0],
                 y: emaVal
@@ -90,7 +88,7 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
         let options = {
             series: series,
             chart: {
-                type: 'line', // Tipo base é linha, mas as séries definem o seu próprio tipo
+                type: 'line', 
                 height: 400, 
                 toolbar: { 
                     show: true, 
@@ -100,8 +98,8 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
                         zoom: true, 
                         zoomin: true, 
                         zoomout: true, 
-                        pan: true, // Ferramenta de arrastar
-                        reset: true // Botão de reset
+                        pan: true, 
+                        reset: true 
                     } 
                 },
                 zoom: { enabled: true }
@@ -141,7 +139,6 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
             }
         };
 
-        // Condicionalmente adiciona stroke e fill com base no chartType (para evitar conflitos)
         if (chartType === 'area' || chartType === 'line') {
             options.stroke = {
                 curve: 'smooth',
@@ -156,7 +153,7 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
         } else { 
             options.stroke = {
                 width: 1, 
-                colors: undefined // Para que cada série use a sua cor
+                colors: undefined 
             };
         }
 
