@@ -3,8 +3,9 @@
 // Declaração ÚNICA das variáveis de estado no topo.
 let currentTrade = {};
 let strategies = [];
-let lastCreatedTradeId = null; // NOVO: Guarda o ID do último trade criado
-let lastCreatedAlarmId = null; // NOVO: Guarda o ID do último alarme criado
+let lastCreatedTradeId = null;
+let lastCreatedAlarmId = null; 
+let alarmsData = []; // NOVO: Armazena os dados de alarmes
 
 // Funções para gerir o trade atual
 export function getCurrentTrade() {
@@ -24,8 +25,7 @@ export function setCurrentStrategies(loadedStrategies) {
     strategies = loadedStrategies;
 }
 
-// --- NOVAS FUNÇÕES PARA GERIR O ESTADO DO DESTAQUE ---
-
+// Funções para gerir o estado do destaque
 export function getLastCreatedTradeId() {
     return lastCreatedTradeId;
 }
@@ -40,4 +40,13 @@ export function getLastCreatedAlarmId() {
 
 export function setLastCreatedAlarmId(id) {
     lastCreatedAlarmId = id;
+}
+
+// NOVAS Funções para gerir os dados de alarmes
+export function getAlarmsData() {
+    return alarmsData;
+}
+
+export function setAlarmsData(data) {
+    alarmsData = data;
 }
