@@ -2,16 +2,22 @@
 
 export const changelogData = {
     current: {
-        number: '9.1.1', // <-- VERSÃO CORRIGIDA
+        number: '9.1.2', // <-- VERSÃO ATUALIZADA (Correção de ícone)
         changes: [
-            "**Correções de UI Pós-Reestruturação da Navegação:**",
-            "Resolvidos múltiplos problemas de layout e alinhamento em todas as tabelas (Dashboard, Scanner, Alarmes, Gestão e Detalhes do Ativo), tanto em desktop como em mobile, restaurando a aparência original e consistente.",
-            "Corrigido o layout dos cards do Dashboard, garantindo que o gráfico Sparkline e os dados de preço são exibidos corretamente lado a lado.",
-            "As tabelas de análise na página de Estatísticas agora estão alinhadas corretamente à esquerda e formatadas de forma consistente.",
-            "Garantida a compatibilidade total com o novo sistema de navegação e as correções de CSS anteriores."
+            "**Correção de Ícone:** O ícone para 'Criar Alarme' na navegação principal foi corrigido de `fa-bell-plus` para `fa-plus-circle`, garantindo que é exibido corretamente em todas as páginas."
         ]
     },
     releases: [
+        {
+            number: '9.1.1',
+            changes: [
+                "**Correções de UI Pós-Reestruturação da Navegação:**",
+                "Resolvidos múltiplos problemas de layout e alinhamento em todas as tabelas (Dashboard, Scanner, Alarmes, Gestão e Detalhes do Ativo), tanto em desktop como em mobile, restaurando a aparência original e consistente.",
+                "Corrigido o layout dos cards do Dashboard, garantindo que o gráfico Sparkline e os dados de preço são exibidos corretamente lado a lado.",
+                "As tabelas de análise na página de Estatísticas agora estão alinhadas corretamente à esquerda e formatadas de forma consistente.",
+                "Garantida a compatibilidade total com o novo sistema de navegação e as correções de CSS anteriores."
+            ]
+        },
         {
             number: '9.1.0',
             changes: [
