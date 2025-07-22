@@ -116,29 +116,45 @@
     margin-top: 0.5rem;
     padding-top: 0.5rem;
     border-top: 1px solid #e9ecef;
+    gap: 0.5rem; /* Espaçamento geral na linha inferior */
 }
 .card-chart-price-group {
     display: flex;
     align-items: center;
-    gap: 0.8rem;
+    gap: 0.5rem; /* Espaçamento entre sparkline e dados de preço */
 }
 .card-sparkline {
-    width: 80px;
-    height: 30px;
+    width: 60px; /* Reduz a largura do sparkline */
+    height: 25px; /* Reduz a altura do sparkline */
 }
 .card-price-data {
     display: flex;
-    /* CORREÇÃO: Altera para row para alinhar preço e percentagem */
     flex-direction: row; 
-    align-items: baseline; /* Alinha pela base do texto */
-    gap: 0.5rem; /* Espaço entre o preço e a percentagem */
+    align-items: baseline; 
+    gap: 0.4rem; /* Espaçamento entre preço e percentagem */
 }
 .card-price {
     font-weight: 600;
-    font-size: 1.0em;
+    font-size: 0.9em; /* Ligeiramente menor */
 }
 .price-change-percent {
-    font-size: 0.85em;
+    font-size: 0.8em; /* Ligeiramente menor */
+}
+
+/* Ações secundárias */
+.card-secondary-actions {
+    display: flex;
+    gap: 0.3rem; /* Espaçamento compacto entre os botões */
+    flex-shrink: 0;
+}
+/* CORREÇÃO: Tamanho dos botões inferiores */
+.card-secondary-actions .icon-action-btn {
+    width: 28px;  /* Tamanho menor */
+    height: 28px; /* Tamanho menor */
+    padding: 4px; /* Padding menor */
+}
+.card-secondary-actions .icon-action-btn i {
+    font-size: 0.9em; /* Ícone menor */
 }
 
 /* --- SECÇÃO DE PORTFÓLIO E NOTÍCIAS (sem alterações) --- */
