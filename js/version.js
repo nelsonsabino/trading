@@ -2,15 +2,26 @@
 
 export const changelogData = {
     current: {
-        number: '9.2.0', // <-- VERSÃO ATUALIZADA (Funcionalidade PWA)
+        number: '9.3.0', // <-- VERSÃO ATUALIZADA (Melhorias no Gráfico Principal)
         changes: [
-            "**Funcionalidade PWA (Progressive Web App):**",
-            "A aplicação agora é totalmente funcional como uma PWA, permitindo a instalação no ecrã inicial de dispositivos móveis e desktop.",
-            "Implementado um Service Worker (`service-worker.js`) para caching dos assets estáticos da aplicação, permitindo que a app funcione offline e carregue instantaneamente após a primeira visita.",
-            "O ficheiro `site.webmanifest` foi atualizado com metadados completos para uma melhor experiência de instalação e integração com o sistema operativo.",
+            "**Gráfico Principal Otimizado (Página de Detalhes do Ativo):**",
+            "Adicionadas as linhas de EMA 50 e EMA 200 ao gráfico principal do ApexCharts.",
+            "Implementada a funcionalidade de alterar o tipo de gráfico (Linha ou Velas) e o timeframe dinamicamente.",
+            "Aumentada a quantidade de dados históricos solicitados para garantir que a EMA 200 é desenhada na sua totalidade.",
+            "Corrigidos todos os bugs de renderização, incluindo o problema das EMAs incompletas no gráfico de linha e a falha na exibição dos gráficos de velas.",
+            "Restauradas as ferramentas de navegação do gráfico (zoom, arrastar/pan e reset) no toolbar do ApexCharts."
         ]
     },
     releases: [
+        {
+            number: '9.2.0',
+            changes: [
+                "**Funcionalidade PWA (Progressive Web App):**",
+                "A aplicação agora é totalmente funcional como uma PWA, permitindo a instalação no ecrã inicial de dispositivos móveis e desktop.",
+                "Implementado um Service Worker (`service-worker.js`) para caching dos assets estáticos da aplicação, permitindo que a app funcione offline e carregue instantaneamente após a primeira visita.",
+                "O ficheiro `site.webmanifest` foi atualizado com metadados completos para uma melhor experiência de instalação e integração com o sistema operativo.",
+            ]
+        },
         {
             number: '9.1.6',
             changes: [
