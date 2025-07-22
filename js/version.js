@@ -1,318 +1,291 @@
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planeamento: Viagem a Paris 2025</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" rel="stylesheet">
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
-    <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core/locales/pt-br.global.min.js'></script>
+// js/version.js - Ponto central de controlo de versão e changelog
+
+export const changelogData = {
+    current: {
+        number: '9.1.6', // <-- VERSÃO ATUALIZADA (Correção de tema nos gráficos)
+        changes: [
+            "**Correção de Tema em Gráficos (Página de Detalhes):**",
+            "Resolvido o problema onde os gráficos (ApexCharts e widget de Análise Técnica TradingView) na página de detalhes do ativo não mudavam de tema (claro/escuro) dinamicamente.",
+            "Implementado um sistema de notificação de mudança de tema (`CustomEvent`) para que os gráficos se redesenhem automaticamente com o tema correto ao alternar.",
+        ]
+    },
+    releases: [
+        {
+            number: '9.1.5',
+            changes: [
+                "**Correção de Visualização:** Corrigido o problema de carregamento incompleto do widget de 'Análise Técnica Detalhada' do TradingView na página de detalhes do ativo, garantindo que o gráfico é exibido na sua totalidade.",
+                "Ajustada a altura do contentor do widget para garantir que a biblioteca TradingView tem espaço suficiente para renderizar."
+            ]
+        },
+        {
+            number: '9.1.4',
+            changes: [
+                "**Otimização da Página de Detalhes do Ativo (Final):**",
+                "O gráfico principal do ativo agora permite a seleção de diferentes timeframes (1m, 5m, 15m, 30m, 1h, 4h, 1d, 1w, 1M) via dropdown, permitindo uma análise flexível da ação de preço.",
+                "O widget de 'Análise Técnica' do TradingView foi reintroduzido na página de detalhes do ativo, substituindo a tentativa de replicação com ApexCharts, para fornecer as recomendações agregadas de 'Strong Buy/Sell' em múltiplos timeframes.",
+                "As chamadas à API da Binance para dados de gráfico e indicadores são agora centralizadas na Edge Function `get-sparklines-data` para otimização e processamento no backend, garantindo performance e fiabilidade.",
+            ]
+        },
+        {
+            number: '9.1.3',
+            changes: [
+                "**Correções e Otimizações Finais de UI:**",
+                "Resolvidos todos os problemas de layout e alinhamento nos cards do Dashboard, garantindo a compactação, o posicionamento correto do lápis de edição (visível no hover), e o alinhamento em linha do sparkline, preço e percentagem.",
+                "Restaurado o comportamento de tabela clássico em ecrãs móveis para o Market Scanner (e todas as tabelas), permitindo scroll horizontal em vez de quebrar em blocos, melhorando a visualização de dados tabulares.",
+                "Ajustes finos em espaçamentos e alinhamentos CSS para garantir a consistência e o aspeto profissional em toda a aplicação.",
+            ]
+        },
+        {
+            number: '9.1.2',
+            changes: [
+                "**Otimização de UI - Cards do Dashboard:**",
+                "Reduzido o tamanho dos cards no Dashboard principal para torná-los mais compactos e permitir uma visualização mais densa de ativos.",
+                "Removido o texto dos botões 'Gráfico' e 'Análise' nos cards, exibindo apenas os ícones para um visual mais limpo.",
+                "O mini-gráfico, preço e variação percentual são agora exibidos na mesma linha para maior eficiência de espaço.",
+                "As 'Notas' do trade só aparecem se houver conteúdo, evitando linhas vazias desnecessárias.",
+                "O status do trade foi removido do corpo do card, uma vez que a coluna Kanban já indica essa informação.",
+                "O botão de ação principal (Armar/Executar/Fechar) foi reposicionado na parte superior do card para maior proeminência e acessibilidade."
+            ]
+        },
+        {
+            number: '9.1.1',
+            changes: [
+                "**Correções de UI Pós-Reestruturação da Navegação:**",
+                "Resolvidos múltiplos problemas de layout e alinhamento em todas as tabelas (Dashboard, Scanner, Alarmes, Gestão e Detalhes do Ativo), tanto em desktop como em mobile, restaurando a aparência original e consistente.",
+                "Corrigido o layout dos cards do Dashboard, garantindo que o gráfico Sparkline e os dados de preço são exibidos corretamente lado a lado.",
+                "As tabelas de análise na página de Estatísticas agora estão alinhadas corretamente à esquerda e formatadas de forma consistente.",
+                "Garantida a compatibilidade total com o novo sistema de navegação e as correções de CSS anteriores.",
+                "Correção do ícone para 'Criar Alarme' na navegação principal, alterado para `fa-plus-circle` para exibição correta."
+            ]
+        },
+        {
+            number: '9.1.0',
+            changes: [
+                "**Reestruturação da Navegação (UI/UX):**",
+                "Menu de navegação principal simplificado, utilizando ícones sugestivos para as páginas mais usadas (Dashboard, Scanner, Criar Alarme, Meus Alarmes).",
+                "Páginas de gestão e análise (Gerir Estratégias, Todas as Operações, Ver Estatísticas) agrupadas num menu suspenso acessível através de um ícone de roda dentada, reduzindo a sobrecarga visual.",
+                "Um novo script (`js/navigation.js`) foi adicionado para gerir a lógica de abrir/fechar este menu, proporcionando uma experiência de utilizador mais limpa e organizada em todas as páginas.",
+            ]
+        },
+        {
+            number: '9.0.0',
+            changes: [
+                "**Reestruturação do CSS (Versão 9):** O ficheiro `style.css` foi dividido em múltiplos ficheiros CSS modulares (ex: `base.css`, `layout.css`, `components.css`, `buttons.css`, etc.) para melhorar a manutenibilidade e organização do projeto.",
+                "**Melhoria do Layout Responsivo:** O layout das tabelas em ecrãs de telemóvel foi alterado. Em vez de se transformarem em blocos, as tabelas agora mantêm o seu formato de colunas com scroll horizontal, melhorando a análise de dados em dispositivos móveis.",
+                "Correções gerais de layout em toda a aplicação para garantir a consistência visual após a reestruturação do CSS."
+            ]
+        },
+        {
+            number: '8.10.2',
+            changes: [
+                "**Correções Críticas de UI:**",
+                "Resolvido o problema de inconsistência de tamanho e estilo dos botões de ação com ícone em todas as tabelas (Scanner, Alarmes, Gestão e Detalhes do Ativo), garantindo uma aparência compacta e uniforme.",
+                "Corrigida a formatação de preços em moedas de baixo valor no Market Scanner, exibindo a precisão correta (mais casas decimais).",
+                "O botão 'Ver Gráfico no Modal' nas tabelas agora é um link (`<a>`) para garantir consistência de estilo com os outros botões de ação.",
+            ]
+        },
+        {
+            number: '8.10.1',
+            changes: [
+                "**Sinais de Mercado Otimizados:**",
+                "Os sinais visuais de RSI e Estocástico no Market Scanner agora são calculados para o timeframe de **1 hora** (revertendo a alteração anterior de 5 minutos para RSI e adicionando Estocástico em 1h), oferecendo uma perspetiva diária mais estável.",
+                "Os gráficos Sparkline continuam a mostrar consistentemente os dados das últimas **24 horas** (timeframe de 1 hora), independentemente dos timeframes dos indicadores. A Edge Function `get-sparklines-data` foi ajustada para buscar dados de múltiplos timeframes em paralelo, garantindo a informação completa."
+            ]
+        },
+        {
+            number: '8.10.0',
+            changes: [
+                "**Scanner de Mercado Otimizado (Ordenação e Filtros):**",
+                "Adicionadas opções para ordenar os ativos por Volume, Variação Percentual (Ascendente/Descendente) e Símbolo (A-Z).",
+                "Implementados filtros para exibir apenas ativos com RSI < 45 (1h) e/ou Estocástico < 20 (1h), permitindo uma análise mais direcionada.",
+                "A ordenação e filtragem são aplicadas no frontend sobre os dados em cache, resultando numa experiência de utilizador fluida e instantânea.",
+            ]
+        },
+        {
+            number: '8.9.1',
+            changes: [
+                "**Sinais de Mercado Otimizados:**",
+                "Os sinais visuais de RSI e Estocástico no Market Scanner agora são calculados para o timeframe de **1 hora** (revertendo a alteração anterior de 5 minutos para RSI e adicionando Estocástico em 1h), oferecendo uma perspetiva diária mais estável.",
+                "Os gráficos Sparkline continuam a mostrar consistentemente os dados das últimas **24 horas** (timeframe de 1 hora), independentemente dos timeframes dos indicadores. A Edge Function `get-sparklines-data` foi ajustada para buscar dados de múltiplos timeframes em paralelo, garantindo a informação completa."
+            ]
+        },
+        {
+            number: '8.9.0',
+            changes: [
+                "**Sinais de Mercado Expandidos:**",
+                "Adicionado um novo sinal visual 'STC' (Estocástico) no Market Scanner para ativos cujo Estocástico de 15 minutos (%K ou %D) esteja abaixo de 20 (Sobrevenda).",
+                "Os gráficos Sparkline no Market Scanner agora mostram consistentemente os dados das últimas **24 horas** (timeframe de 1 hora), independentemente do timeframe usado para calcular os sinais de RSI ou Estocástico. A Edge Function `get-sparklines-data` foi significativamente melhorada para buscar dados de múltiplos timeframes em paralelo."
+            ]
+        },
+        {
+            number: '8.8.1',
+            changes: [
+                "**Sinal de RSI Ajustado:** O sinal de RSI no Market Scanner agora é calculado para o timeframe de **5 minutos** (em vez de 1 hora), permitindo uma análise mais rápida das condições de sobrevenda no curto prazo. A Edge Function `get-sparklines-data` foi ajustada para refletir esta alteração."
+            ]
+        },
+        {
+            number: '8.8.0',
+            changes: [
+                "**Análise Adicional no Scanner:** Adicionado um sinal visual 'RSI' no Market Scanner para ativos cujo RSI de 1 hora esteja abaixo de 45, ajudando a identificar rapidamente potenciais oportunidades de sobrevenda.",
+                "O cálculo do RSI é agora efetuado de forma eficiente no backend através de uma Edge Function melhorada."
+            ]
+        },
+        {
+            number: '8.7.0',
+            changes: [
+                "**Redesign Visual:** Substituídos os widgets do TradingView na página de detalhes do ativo por um gráfico limpo e customizado (ApexCharts) para uma melhor estética, performance e consistência visual com o resto da aplicação."
+            ]
+        },
+        {
+            number: '8.6.0',
+            changes: [
+                "**Melhorias na Página de Detalhes do Ativo:**",
+                "Configuração do gráfico principal melhorada para uma análise mais limpa.",
+                "Adicionado um widget de Análise Técnica avançado com múltiplos timeframes.",
+                "Integrada uma nova secção com as últimas notícias do ativo (via CryptoCompare).",
+                "Adicionados botões de ação rápida no cabeçalho (Adicionar à Watchlist, Criar Alarme, Análise TV).",
+                "Implementado um layout 50/50 para os gráficos em ecrãs maiores para melhor visualização."
+            ]
+        },
+        {
+            number: '8.5.0',
+            changes: [
+                "**Nova Funcionalidade: Página de Detalhe do Ativo.**",
+                "Adicionada uma nova página (`asset-details.html`) que centraliza todas as informações de um ativo específico.",
+                "A página exibe um gráfico avançado, análise técnica, e tabelas com todos os alarmes e trades relacionados ao ativo.",
+                "Os nomes dos ativos no Dashboard, Scanner de Mercado e página de Alarmes são agora links diretos para esta nova página de análise."
+            ]
+        },
+        {
+            number: '8.4.0',
+            changes: [
+                "**Melhoria de UX e Análise:** Adicionados gráficos de 'Curva de Capital' e 'Desempenho por Estratégia' à página de Estatísticas, permitindo uma análise visual mais rápida e intuitiva da performance."
+            ]
+        },
+        {
+            number: '8.3.0',
+            changes: [
+                "**Melhoria de UX:** Itens recém-criados (tanto na Watchlist quanto nos Alarmes) são agora destacados com uma animação visual e a página rola até eles, fornecendo um feedback imediato ao utilizador."
+            ]
+        },
+        {
+            number: '8.2.0',
+            changes: [
+                "**Performance:** Implementado um sistema de cache de 2 minutos no Market Scanner. A página agora carrega instantaneamente em visitas repetidas, melhorando a experiência do utilizador e reduzindo chamadas às APIs.",
+            ]
+        },
+        {
+            number: '8.1.0',
+            changes: [
+                "**Robustez da Aplicação (Refatoração Interna):**",
+                "Centralizada toda a lógica de acesso ao Firebase no `firebase-service.js`, removendo a inicialização duplicada do `stats.js` para maior consistência.",
+                "Melhorada a resiliência do dashboard: o carregamento de preços e sparklines agora usa `Promise.allSettled`, garantindo que o dashboard carrega mesmo que uma das fontes de dados falhe.",
+                "Adicionada validação de inputs nos formulários de execução e fecho de trade para prevenir a entrada de dados inválidos (ex: preços a zero ou negativos).",
+            ]
+        },
+        {
+            number: '8.0.4',
+            changes: [
+                "Corrigido o 'flash' do tema claro ao carregar a página no Modo Escuro.",
+            ]
+        },
+        {
+            number: '8.0.3', 
+            changes: [
+                "Corrigido bug que impedia o redirecionamento para a página de alarmes após guardar uma nova oportunidade.",
+            ]
+        },
+        {
+            number: '8.0.2',
+            changes: [
+                "Otimizado o construtor de estratégias: as fases (Potential, Armed, Execution) são agora adicionadas automaticamente, simplificando a criação.",
+                "Corrigido bug que impedia o construtor de guardar estratégias com itens de checklist.",
+            ]
+        },
+        {
+            number: '8.0.1',
+            changes: [
+                "Finalizada a integração do sistema de estratégias dinâmicas na aplicação principal.",
+                "Dropdown de estratégias e checklists dos modais agora usam os dados do Firebase.",
+            ]
+        },
+        {
+            number: '8.0.0',
+            changes: [
+                "Introduzido o Construtor de Estratégias Dinâmico.",
+                "Criada nova página para criar, editar e apagar estratégias de trading.",
+                "As estratégias são agora guardadas e lidas a partir da base de dados (Firebase).",
+            ]
+        },
+        {
+            number: '7.1.3',
+            changes: [
+                "Melhorada a UX do alarme de nível de Estocástico com rótulos mais claros e valores alvo automáticos (30/70).",
+            ]
+        },
+        {
+            number: '7.1.2',
+            changes: [
+                "Gráficos do TradingView agora adaptam o seu tema (claro/escuro) ao tema da aplicação.",
+                "Corrigido bug visual nos cards de alarme no modo escuro em ecrãs de telemóvel.",
+            ]
+        },
+        {
+            number: '7.1.1',
+            changes: [
+                "Correção dos estilos das tabelas no Modo Escuro para garantir a legibilidade.",
+            ]
+        },
+        {
+            number: '7.1.0',
+            changes: [
+                "Implementado Modo Escuro (Dark Mode) em toda a aplicação.",
+                "Adicionado botão para alternar entre temas, com a preferência guardada no browser.",
+            ]
+        },
+        {
+            number: '6.9.0',
+            changes: [
+                "Adicionada a funcionalidade de 'Ver Gráfico' em um modal na página do Market Scanner para análise rápida.",
+            ]
+        },
+        {
+            number: '6.8.1',
+            changes: [
+                "Redesenhados os botões de ação nos cards do dashboard para um design mais compacto com ícones e texto.",
+            ]
+        },
+        {
+            number: '6.8.0',
+            changes: [
+                "Substituído o 'Mini-Gráfico' por um 'Gráfico Avançado' interativo dentro dos cards do dashboard.",
+                "O gráfico agora carrega com uma configuração limpa e minimalista por defeito.",
+            ]
+        },
+    ]
+};
+
+
+// --- LÓGICA AUTOMÁTICA DE RODAPÉ ---
+function injectFooter() {
+    let footer = document.querySelector('footer');
+
+    if (!footer) {
+        footer = document.createElement('footer');
+        document.body.appendChild(footer);
+    }
     
-<!-- Favicon (Versão Corrigida) -->
-<link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="manifest" href="/site.webmanifest">
-<!-- Fim Favicon -->
+    footer.innerHTML = `
+        <p>
+            Versão: ${changelogData.current.number} | <a href="changelog.html" style="color: #0d6efd;">Histórico de Alterações</a>
+        </p>
+    `;
+    footer.style.textAlign = 'center';
+    footer.style.padding = '1rem 0';
+    footer.style.marginTop = '2rem';
+    footer.style.color = '#6c757d';
+    footer.style.fontSize = '0.9em';
+    footer.style.borderTop = '1px solid #e9ecef';
+}
 
-    <style>
-        /* CSS para a Galeria de Destaques */
-        .highlight-card {
-            aspect-ratio: 1 / 1; /* Proporção quadrada por defeito */
-        }
-        .highlight-card.col-span-2 {
-            aspect-ratio: 2 / 1; /* Proporção retangular para os cartões duplos */
-        }
-    
-        /* Estilos base (para telemóveis) */
-        body { font-family: 'Poppins', sans-serif; background-color: #f0f4f8; font-size: 14px; }
-        .main-title { font-size: 2rem; line-height: 2.5rem; }
-        .section-title { font-size: 1.5rem; line-height: 2rem; }
-        .countdown-number { font-size: 2.25rem; }
-
-        /* Regras para ecrãs maiores (md: 768px em diante) */
-        @media (min-width: 768px) {
-            body { font-size: 16px; }
-            .main-title { font-size: 3rem; line-height: 1; }
-            .section-title { font-size: 1.875rem; line-height: 2.25rem; }
-            .countdown-number { font-size: 2.25rem; }
-        }
-        .checklist-item input:checked + label { text-decoration: line-through; color: #9ca3af; }
-        .checklist-item input:checked + label .icon-box { background-color: #16a34a; color: white; }
-    </style>
-</head>
-<body class="text-gray-800">
-    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
-        <header class="text-center py-12 rounded-2xl shadow-lg mb-12 bg-cover bg-center" style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cGFyaXN8ZW58MHx8MHx8fDA%3D');">
-            <h1 class="main-title font-bold text-white mb-4">Rumo a Paris!</h1>
-            <p class="text-lg text-gray-200 mb-6">A nossa aventura aproxima-se...</p>
-            <div id="countdown" class="flex justify-center space-x-4 md:space-x-8 text-white">
-                <div><span id="days" class="countdown-number font-bold">00</span><span class="block text-sm">Dias</span></div>
-                <div><span id="hours" class="countdown-number font-bold">00</span><span class="block text-sm">Horas</span></div>
-                <div><span id="minutes" class="countdown-number font-bold">00</span><span class="block text-sm">Minutos</span></div>
-                <div><span id="seconds" class="countdown-number font-bold">00</span><span class="block text-sm">Segundos</span></div>
-            </div>
-        </header>
-        <section class="mb-12">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <a href="guia.html" class="block bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-transform duration-300">
-                    <div class="flex items-center text-green-800 mb-3"><i class="fa-solid fa-map-location-dot text-2xl mr-3"></i><h3 class="text-xl font-bold">Guia Visual</h3></div>
-                    <p class="text-gray-600">O nosso plano com imagens, curiosidades e destaques.</p>
-                </a>
-                <a href="roteiro.html" class="block bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-transform duration-300">
-                     <div class="flex items-center text-blue-800 mb-3"><i class="fa-solid fa-list-ol text-2xl mr-3"></i><h3 class="text-xl font-bold">Roteiro Detalhado</h3></div>
-                    <p class="text-gray-600">A versão com horários, transportes e todas as informações.</p>
-                </a>
-                <a href="orcamento.html" class="block bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-transform duration-300">
-                     <div class="flex items-center text-red-800 mb-3"><i class="fa-solid fa-euro-sign text-2xl mr-3"></i><h3 class="text-xl font-bold">Orçamento Detalhado</h3></div>
-                    <p class="text-gray-600">Consulta os custos estimados por grupo e bilhetes.</p>
-                </a>
-             </div>
-        </section>
-        <section class="mb-12">
-            <h2 class="section-title font-bold text-gray-800 mb-6 text-center">Próximos Passos</h2>
-            <div id="timeline-container" class="space-y-8"></div>
-        </section>
-        
-        <section class="mb-12">
-            <h2 class="section-title font-bold text-gray-800 mb-6 text-center">Destaques da Nossa Viagem</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-                <a href="guia.html#day1" class="highlight-card group block relative rounded-2xl overflow-hidden shadow-lg col-span-2 aspect-w-2 aspect-h-1">
-                    <img src="https://res.cloudinary.com/dtljonz0f/image/upload/f_auto/q_auto/v1/gc-v1/paris/3%20giorni%20a%20Parigi%20Tour%20Eiffel?_a=BAVAZGE70" alt="Torre Eiffel" class="absolute w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                    <h3 class="absolute bottom-4 left-4 text-white text-xl font-bold">Torre Eiffel</h3>
-                </a>
-                <a href="guia.html#day4" class="highlight-card group block relative rounded-2xl overflow-hidden shadow-lg aspect-w-1 aspect-h-1">
-                    <img src="https://www.relaisdulouvre.com/wp-content/uploads/2024/03/Louvre1-1024x682.jpg" alt="Museu do Louvre" class="absolute w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                    <h3 class="absolute bottom-4 left-4 text-white text-lg font-bold">Museu do Louvre</h3>
-                </a>
-                <a href="guia.html#day3" class="highlight-card group block relative rounded-2xl overflow-hidden shadow-lg aspect-w-1 aspect-h-1">
-                    <img src="https://paisageiro.com/wp-content/uploads/2023/03/organizacao-jardins-de-versalhes1-1024x683.jpg" alt="Palácio de Versalhes" class="absolute w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                    <h3 class="absolute bottom-4 left-4 text-white text-lg font-bold">Palácio de Versalhes</h3>
-                </a>
-                <a href="guia.html#day2" class="highlight-card group block relative rounded-2xl overflow-hidden shadow-lg col-span-2 aspect-w-2 aspect-h-1">
-                    <img src="https://images.adsttc.com/media/images/671f/6aa2/3dfd/b479/8aac/78a7/large_jpg/notre-dame-de-paris-announces-reopening-date-and-proposes-constroversial-entrance-fee_2.jpg?1730112234" alt="Catedral de Notre-Dame" class="absolute w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                    <h3 class="absolute bottom-4 left-4 text-white text-xl font-bold">Catedral de Notre-Dame</h3>
-                </a>
-                <a href="guia.html#day5" class="highlight-card group block relative rounded-2xl overflow-hidden shadow-lg aspect-w-1 aspect-h-1">
-                    <img src="https://www.timographie360.fr/photos/realisations/sliders/hd/visite-virtuelle-sainte-chapelle-02_518.jpg" alt="Sainte-Chapelle" class="absolute w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                    <h3 class="absolute bottom-4 left-4 text-white text-lg font-bold">Sainte-Chapelle</h3>
-                </a>
-                <a href="guia.html#day3" class="highlight-card group block relative rounded-2xl overflow-hidden shadow-lg aspect-w-1 aspect-h-1">
-                    <img src="https://www.civitatis.com/f/francia/paris/free-tour-montmartre-589x392.jpg" alt="Montmartre" class="absolute w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                    <h3 class="absolute bottom-4 left-4 text-white text-lg font-bold">Montmartre</h3>
-                </a>
-                <a href="guia.html#day2" class="highlight-card group block relative rounded-2xl overflow-hidden shadow-lg aspect-w-1 aspect-h-1">
-                    <img src="https://officiel-galeries-musees.fr/wp-content/uploads/2020/08/orsay-musee.jpg" alt="Musée d'Orsay" class="absolute w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                    <h3 class="absolute bottom-4 left-4 text-white text-lg font-bold">Musée d'Orsay</h3>
-                </a>
-                <a href="guia.html#day2" class="highlight-card group block relative rounded-2xl overflow-hidden shadow-lg aspect-w-1 aspect-h-1">
-                    <img src="https://www.tudosobreparis.com/f/francia/paris/guia/campos-eliseos-m.jpg" alt="Champs-Élysées" class="absolute w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                    <h3 class="absolute bottom-4 left-4 text-white text-lg font-bold">Champs-Élysées</h3>
-                </a>
-                <a href="guia.html#day4" class="highlight-card group block relative rounded-2xl overflow-hidden shadow-lg aspect-w-1 aspect-h-1">
-                    <img src="https://www.franceguide.info/wp-content/uploads/sites/18/paris-galeries-lafayette.jpg" alt="Galeries Lafayette" class="absolute w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                    <h3 class="absolute bottom-4 left-4 text-white text-lg font-bold">Galeries Lafayette</h3>
-                </a>
-                <a href="guia.html#day5" class="highlight-card group block relative rounded-2xl overflow-hidden shadow-lg aspect-w-1 aspect-h-1">
-                    <img src="https://midias-turismo.eurodicas.com.br/wp-content/uploads/2025/02/quartier-latin-1-1200x800.jpg.webp" alt="Quartier Latin" class="absolute w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                    <h3 class="absolute bottom-4 left-4 text-white text-lg font-bold">Quartier Latin</h3>
-                </a>
-            </div>
-        </section>        
-        
-        <section class="mb-12">
-            <h2 class="section-title font-bold text-gray-800 mb-6 text-center">Calendário</h2>
-            <div class="bg-white p-4 md:p-6 rounded-2xl shadow-lg">
-                <div id='calendar'></div>
-            </div>
-        </section>
-        <section class="mb-12">
-            <h2 class="section-title font-bold text-gray-800 mb-6 text-center">Checklist de Preparação</h2>
-            <div class="bg-white p-6 rounded-2xl shadow-lg space-y-4">
-                <div class="checklist-item flex items-center"><input type="checkbox" id="check-aviao" class="hidden"><label for="check-aviao" class="flex items-center cursor-pointer w-full"><span class="icon-box w-8 h-8 mr-4 flex items-center justify-center border-2 border-gray-300 rounded-md transition-colors"><i class="fa-solid fa-check"></i></span><span class="text-lg">Reservar voos</span></label></div>
-                <div class="checklist-item flex items-center"><input type="checkbox" id="check-alojamento" class="hidden"><label for="check-alojamento" class="flex items-center cursor-pointer w-full"><span class="icon-box w-8 h-8 mr-4 flex items-center justify-center border-2 border-gray-300 rounded-md transition-colors"><i class="fa-solid fa-check"></i></span><span class="text-lg">Reservar alojamento</span></label></div>
-                <div class="checklist-item flex items-center"><input type="checkbox" id="check-mochilas" class="hidden"><label for="check-mochilas" class="flex items-center cursor-pointer w-full"><span class="icon-box w-8 h-8 mr-4 flex items-center justify-center border-2 border-gray-300 rounded-md transition-colors"><i class="fa-solid fa-check"></i></span><span class="text-lg">Compra de mochilas</span></label></div>
-                <div class="checklist-item flex items-center"><input type="checkbox" id="check-seguro" class="hidden"><label for="check-seguro" class="flex items-center cursor-pointer w-full"><span class="icon-box w-8 h-8 mr-4 flex items-center justify-center border-2 border-gray-300 rounded-md transition-colors"><i class="fa-solid fa-check"></i></span><span class="text-lg">Todos têm cartões de saúde europeus?</span></label></div>
-                <div class="checklist-item flex items-center"><input type="checkbox" id="check-transportes" class="hidden"><label for="check-transportes" class="flex items-center cursor-pointer w-full"><span class="icon-box w-8 h-8 mr-4 flex items-center justify-center border-2 border-gray-300 rounded-md transition-colors"><i class="fa-solid fa-check"></i></span><span class="text-lg">Bilhetes transportes públicos</span></label></div>
-            </div>
-        </section>
-        
-        <section class="mb-12">
-            <h2 class="section-title font-bold text-gray-800 mb-6 text-center">Resumo de Bilhetes a comprar</h2>
-            <div id="ticket-timeline-container" class="space-y-6"></div>
-        </section>
-    </div>
-    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-database-compat.js"></script>
-    <script>
-        const countdownDate = new Date(2025, 8, 19, 6, 0, 0).getTime();
-        const x = setInterval(function() {
-            const now = new Date().getTime();
-            const distance = countdownDate - now;
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-            if (document.getElementById("days")) {
-                document.getElementById("days").innerText = days.toString().padStart(2, '0');
-                document.getElementById("hours").innerText = hours.toString().padStart(2, '0');
-                document.getElementById("minutes").innerText = minutes.toString().padStart(2, '0');
-                document.getElementById("seconds").innerText = seconds.toString().padStart(2, '0');
-            }
-            if (distance < 0) {
-                clearInterval(x);
-                if (document.getElementById("countdown")) {
-                    document.getElementById("countdown").innerHTML = "<div class='text-center w-full'><p class='text-2xl font-bold'>A VIAGEM COMEÇOU! BON VOYAGE!</p></div>";
-                }
-            }
-        }, 1000);
-        
-        const firebaseConfig = {
-          apiKey: "AIzaSyAt7jAk5r2tqSdyTf2m7MUebd_t7bbDTJk",
-          authDomain: "planeamento-viagem-paris.firebaseapp.com",
-          databaseURL: "https://planeamento-viagem-paris-default-rtdb.europe-west1.firebasedatabase.app",
-          projectId: "planeamento-viagem-paris",
-          storageBucket: "planeamento-viagem-paris.appspot.com",
-          messagingSenderId: "121000897121",
-          appId: "1:121000897121:web:75662c01dc56926bf61820"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        
-        const planningEvents = [
-            { title: 'Comprar bilhetes para o Museu do Louvre', date: '2025-06-18', description: 'Comprar para o dia 22 de Setembro (Segunda-feira).', status: 'complete', color: '#16a34a' },
-            { title: 'Comprar bilhetes para a Museu D Orsay', date: '2025-06-21', description: 'Em principio em julho já é possivel comprar os bilhetes. Verificar disponibilidade.', status: 'complete', color: '#16a34a' },
-            { title: 'Comprar bilhetes para Versailles', date: '2025-06-23', description: 'A partir desta data já é possivel comprar para o dia 21 de setembro.', status: 'complete', color: '#16a34a' },
-            { title: 'Comprar bilhetes para a Sainte-Chapelle', date: '2025-07-01', description: 'Em principio em julho já é possivel comprar os bilhetes. Verificar disponibilidade.', status: 'complete', color: '#16a34a' },
-            { title: 'Comprar bilhetes para a Torre Eiffel', date: '2025-07-20', description: 'Comprar ás 23h!! (0.00h em Paris) Os bilhetes ficam disponíveis 60 dias antes. Comprar para o dia 19 de Setembro (Sexta-feira).', status: 'complete', color: '#16a34a' },
-            { title: 'Comprar bilhetes para a Ópera Garnier', date: '2025-07-23', description: 'Fazer a compra ás 23h!! Comprar para o dia 22 de Setembro (Segunda-feira).', status: 'pending', color: '#dc2626' },
-            { title: 'Fazer pagamento da casa de Paris', date: '2025-08-25', description: 'Fazer o pagamento final da reserva.', status: 'pending', color: '#ea580c' },
-            { title: 'Reserva para entrada sem filas na Notre-Dame', date: '2025-09-19', description: 'A reserva só pode ser feita umas horas antes. Irá ser dificil apanhar um slot disponível.', status: 'pending', color: '#ea580c' },
-            { title: 'VIAGEM!', date: '2025-09-19', endDate: '2025-09-24', description: 'De 19 a 23 de Setembro.', status: 'complete', color: '#16a34a' }
-        ];
-        
-        const tripItinerary = [
-            { day: 'Dia 1', date: '19/09', theme: 'Chegada e Torre Eiffel', ticketedVenues: [
-                { name: 'Torre Eiffel', icon: 'fa-tower-observation', status: 'complete', openingHours: '09:00 - 23:45', openDays: 'Todos os dias' }] },
-            { day: 'Dia 2', date: '20/09', theme: 'Coração Histórico', ticketedVenues: [
-                { name: 'Musée dOrsay', icon: 'fa-gem', status: 'complete', openingHours: '09:00 - 17:00', openDays: 'Todos os dias (verificar feriados)' }] },
-            { day: 'Dia 3', date: '21/09', theme: 'Realeza e Arte Boémia', ticketedVenues: [
-                { name: 'Palácio de Versalhes', icon: 'fa-crown', status: 'complete', openingHours: '09:00 - 18:30 (Palácio)', openDays: 'Fecha às Segundas' }] },
-            { day: 'Dia 4', date: '22/09', theme: 'Imersão em Arte', ticketedVenues: [
-                { name: 'Museu do Louvre', icon: 'fa-landmark-dome', status: 'complete', openingHours: '09:00 - 18:00', openDays: 'Fecha às Terças' }, 
-                { name: 'Ópera Garnier', icon: 'fa-masks-theater', status: 'pending', openingHours: '10:00 - 17:00', openDays: 'Todos os dias (pode fechar para eventos)' }] },
-            { day: 'Dia 5', date: '23/09', theme: 'Despedida e Regresso', ticketedVenues: [
-                 { name: 'Sainte-Chapelle', icon: 'fa-gem', status: 'complete', openingHours: '09:00 - 17:00', openDays: 'Todos os dias (verificar feriados)' } ] }
-        ];
-
-        function setupChecklist() {
-            const checklistItems = document.querySelectorAll('.checklist-item input[type="checkbox"]');
-            const checklistRef = database.ref('checklist');
-            checklistRef.on('value', (snapshot) => {
-                const data = snapshot.val();
-                if (data) { checklistItems.forEach(item => { if (data[item.id] !== undefined) { item.checked = data[item.id]; } }); }
-            });
-            checklistItems.forEach(item => { item.addEventListener('change', (e) => { checklistRef.child(e.target.id).set(e.target.checked); }); });
-        }
-        
-        function renderTimeline() {
-            const timelineContainer = document.getElementById('timeline-container');
-            if (!timelineContainer) return;
-            timelineContainer.innerHTML = '';
-            planningEvents.forEach(event => {
-                if (event.title === 'VIAGEM!') return;
-                const eventDate = new Date(event.date + 'T00:00:00');
-                const month = eventDate.toLocaleString('pt-PT', { month: 'short' }).toUpperCase().replace('.', '');
-                const day = eventDate.getDate();
-                const isComplete = event.status === 'complete';
-                const itemHTML = `<div class="flex items-start space-x-4 ${isComplete ? 'opacity-60' : ''}"><div class="flex flex-col items-center"><span class="text-lg font-semibold ${isComplete ? 'text-gray-500' : 'text-green-700'}">${month}</span><span class="text-2xl font-bold ${isComplete ? 'text-gray-500' : 'text-green-700'}">${day}</span></div><div class="bg-white p-4 rounded-lg shadow-md flex-1"><h3 class="font-semibold text-lg ${isComplete ? 'line-through' : ''}">${event.title}</h3><p class="text-sm text-gray-600">${event.description}</p><div class="mt-2 text-sm font-medium ${isComplete ? 'text-green-600' : 'text-yellow-600'}"><i class="fa-solid ${isComplete ? 'fa-check-circle' : 'fa-hourglass-half'} mr-2"></i>${isComplete ? 'Concluído' : 'Pendente'}</div></div></div>`;
-                timelineContainer.innerHTML += itemHTML;
-            });
-        }
-
-        function renderCalendar() {
-            const calendarEl = document.getElementById('calendar');
-            if (!calendarEl) return;
-            const modal = document.getElementById('event-modal');
-            const modalTitle = document.getElementById('modal-title');
-            const modalDescription = document.getElementById('modal-description');
-            const modalCloseBtn = document.getElementById('modal-close-btn');
-            const calendarEvents = planningEvents.map(event => ({ title: event.title, start: event.date, end: event.endDate, backgroundColor: event.color, borderColor: event.color, allDay: true, extendedProps: { description: event.description || 'Não há detalhes adicionais.' } }));
-            const calendar = new FullCalendar.Calendar(calendarEl, { initialView: 'dayGridMonth', locale: 'pt-br', headerToolbar: { left: 'prev,next today', center: 'title', right: '' }, events: calendarEvents, eventClick: function(info) { info.jsEvent.preventDefault(); if(modal) { modalTitle.textContent = info.event.title; modalDescription.textContent = info.event.extendedProps.description; modal.classList.remove('hidden');} } });
-            function closeModal() { if(modal) modal.classList.add('hidden'); }
-            if(modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
-            if(modal) modal.addEventListener('click', function(e) { if (e.target === modal) { closeModal(); } });
-            calendar.render();
-        }
-
-        function renderTicketTimeline() {
-            const container = document.getElementById('ticket-timeline-container');
-            if (!container) return;
-            container.innerHTML = '';
-            tripItinerary.forEach(day => {
-                let venuesHTML = '';
-                if (day.ticketedVenues.length > 0) {
-                    venuesHTML = `<ul class="mt-3 space-y-4">` + day.ticketedVenues.map(venue => {
-                        const isComplete = venue.status === 'complete';
-                        return `
-                        <li class="p-4 bg-gray-50 rounded-lg">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <i class="fa-solid ${isComplete ? 'fa-check-circle text-green-500' : 'fa-hourglass-half text-yellow-500'} w-6 text-center mr-3"></i>
-                                    <span class="font-semibold ${isComplete ? 'line-through text-gray-400' : 'text-gray-800'}">${venue.name}</span>
-                                </div>
-                                <i class="fa-solid ${venue.icon} text-xl text-gray-400"></i>
-                            </div>
-                            <div class="mt-2 pl-9 text-sm text-gray-600 space-y-1">
-                                <div class="flex items-start"><i class="fa-regular fa-calendar-days w-6 text-center mr-1 pt-1"></i><span>${venue.openDays || 'Não especificado'}</span></div>
-                                <div class="flex items-start"><i class="fa-regular fa-clock w-6 text-center mr-1 pt-1"></i><span>${venue.openingHours || 'Não especificado'}</span></div>
-                            </div>
-                        </li>`;
-                    }).join('') + `</ul>`;
-                } else {
-                    venuesHTML = `<p class="mt-2 text-gray-500 italic">Nenhum bilhete a comprar para este dia.</p>`;
-                }
-                const dayHTML = `
-                    <div class="bg-white p-6 rounded-2xl shadow-lg">
-                        <div class="flex items-center border-b pb-3">
-                            <div class="text-center w-16"><p class="text-xl font-bold text-gray-800">${day.day}</p><p class="text-sm text-gray-500">${day.date}</p></div>
-                            <div class="pl-4 border-l ml-4"><h4 class="font-semibold text-lg text-gray-900">${day.theme}</h4></div>
-                        </div>
-                        ${venuesHTML}
-                    </div>`;
-                container.innerHTML += dayHTML;
-            });
-        }
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            setupChecklist();
-            renderTimeline();
-            renderCalendar();
-            renderTicketTimeline();
-        });
-    </script>
-    <div id="event-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 w-full max-w-md relative">
-            <button id="modal-close-btn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 transition">
-                <i class="fa-solid fa-xmark fa-2x"></i>
-            </button>
-            <h3 id="modal-title" class="text-2xl font-bold text-gray-800 mb-4">Título do Evento</h3>
-            <p id="modal-description" class="text-gray-600">Descrição detalhada do evento irá aparecer aqui.</p>
-        </div>
-    </div>
-</body>
-</html>
+document.addEventListener('DOMContentLoaded', injectFooter);
