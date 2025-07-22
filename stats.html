@@ -41,12 +41,17 @@
         <h1>Dashboard de Estatísticas</h1>
         <p class="mantra">Os dados não mentem. Analise os seus resultados para encontrar a sua vantagem.</p>
         <nav>
-            <a href="index.html" class="nav-link">Voltar ao Dashboard Principal</a>
-            <a href="manage.html" class="nav-link">Gerir Operações</a>
-            <a href="market-scan.html" class="nav-link" style="background-color: #198754;">Scanner de Mercado</a>
+            <a href="index.html" class="nav-link">Dashboard</a>
+            <a href="market-scan.html" class="nav-link">Scanner</a>
+            <a href="alarms-create.html" class="nav-link">Criar Alarme</a>
+            <a href="alarms-manage.html" class="nav-link">Meus Alarmes</a>
             <button id="theme-toggle-btn" class="btn" title="Alternar tema">
                 <i class="fas fa-moon"></i>
             </button>
+        </nav>
+        <nav style="margin-top: 1rem; border-top: 1px solid #e9ecef; padding-top: 1rem;">
+            <a href="strategies-manager.html" class="nav-link">Gerir Estratégias</a>
+            <a href="manage.html" class="nav-link">Todas as Operações</a>
         </nav>
     </header>
 
@@ -91,13 +96,12 @@
         
         <hr class="section-divider">
 
-        <!-- CORREÇÃO: As tabelas estão agora fora de qualquer .stat-card -->
         <section class="detailed-stats">
             <h2>Análise por Estratégia</h2>
-            <div id="strategy-stats" class="table-wrapper"></div> <!-- Adicionada a classe table-wrapper -->
+            <div id="strategy-stats" class="table-wrapper"></div>
             
             <h2 style="margin-top: 2rem;">Análise por Motivo de Fecho</h2>
-            <div id="reason-stats" class="table-wrapper"></div> <!-- Adicionada a classe table-wrapper -->
+            <div id="reason-stats" class="table-wrapper"></div>
         </section>
     </main>
 
