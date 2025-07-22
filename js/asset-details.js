@@ -58,11 +58,10 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
             series.push({ name: 'Preço (USD)', type: chartType, data: closePriceSeriesData });
         }
         
-        // CORREÇÃO: Mapeia as EMAs, mantendo os nulls iniciais
         if (indicatorsData.ema50_data && indicatorsData.ema50_data.length === klinesData.length) {
             const ema50SeriesData = indicatorsData.ema50_data.map((emaVal, index) => ({
                 x: klinesData[index][0], 
-                y: emaVal // emaVal pode ser null
+                y: emaVal 
             }));
             series.push({ name: 'EMA 50', type: 'line', data: ema50SeriesData });
         }
@@ -156,6 +155,28 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
                 colors: undefined 
             };
         }
+
+        // CORREÇÃO: Força as EMAs a serem desenhadas num segundo eixo Y invisível para o modo "area"
+        if (chartType === 'area') {
+            options.yaxis = [
+                { // Eixo Y principal para a série de preço (área)
+                    seriesName: 'Preço (USD)',
+                    labels: {
+                        formatter: (val) => `$${val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
+                    },
+                    tooltip: { enabled: true }
+                },
+                { // Eixo Y secundário para as EMAs (invisível)
+                    seriesName: 'EMA 50',
+                    show: false, // Esconde o eixo, mas força a série a ser uma linha
+                },
+                { // Eixo Y terciário para a EMA 200 (invisível)
+                    seriesName: 'EMA 200',
+                    show: false,
+                }
+            ];
+        }
+
 
         chartContainer.innerHTML = '';
         const chart = new ApexCharts(chartContainer, options);
