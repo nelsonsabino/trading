@@ -7,15 +7,15 @@ const CRYPTOCOMPARE_API_KEY = "92d8c73125edcc9a95da0a5f30a6ca4720e5fdba544dba9ba
 
 let currentAssetSymbol = null; 
 let currentChartTimeframe = '1h'; 
-let currentChartType = 'area'; 
+let currentChartType = 'line'; // CORREÇÃO: Default é 'line'
 
 /**
  * Busca dados de klines e indicadores da Edge Function e renderiza o gráfico principal do ativo.
  * @param {string} symbol - O símbolo do ativo (ex: "BTCUSDC").
  * @param {string} interval - O intervalo de tempo (ex: "1h", "1d").
- * @param {string} chartType - O tipo de gráfico (ex: "area", "candlestick", "line").
+ * @param {string} chartType - O tipo de gráfico (ex: "line", "candlestick").
  */
-async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area') {
+async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line') {
     const chartContainer = document.getElementById('main-asset-chart');
     if (!chartContainer) return;
     chartContainer.innerHTML = '<p>A carregar gráfico...</p>';
@@ -46,18 +46,19 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
         
         if (chartType === 'candlestick') {
             const ohlcSeriesData = klinesData.map(kline => ({
-                x: kline[0], 
-                y: [kline[1], kline[2], kline[3], kline[4]] 
+                x: kline[0],
+                y: [kline[1], kline[2], kline[3], kline[4]]
             }));
             series.push({ name: 'Preço', type: 'candlestick', data: ohlcSeriesData });
-        } else { 
+        } else { // 'line'
             const closePriceSeriesData = klinesData.map(kline => ({
                 x: kline[0],
-                y: kline[4] 
+                y: kline[4]
             }));
-            series.push({ name: 'Preço (USD)', type: chartType, data: closePriceSeriesData });
+            series.push({ name: 'Preço (USD)', type: 'line', data: closePriceSeriesData });
         }
         
+        // CORREÇÃO: Mapeia as EMAs, mantendo os nulls iniciais para renderização completa
         if (indicatorsData.ema50_data && indicatorsData.ema50_data.length === klinesData.length) {
             const ema50SeriesData = indicatorsData.ema50_data.map((emaVal, index) => ({
                 x: klinesData[index][0], 
@@ -78,11 +79,7 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
         const priceChartColor = currentPriceVal >= firstPriceVal ? '#28a745' : '#dc3545';
         const ema50Color = '#ffc107'; 
         const ema200Color = '#0d6efd'; 
-        const colors = [];
-        if (chartType === 'candlestick') { /* As cores para candlestick são definidas em plotOptions */ }
-        else { colors.push(priceChartColor); }
-        colors.push(ema50Color);
-        colors.push(ema200Color);
+        const colors = [priceChartColor, ema50Color, ema200Color];
 
         let options = {
             series: series,
@@ -97,14 +94,18 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
                         zoom: true, 
                         zoomin: true, 
                         zoomout: true, 
-                        pan: true, 
-                        reset: true 
+                        pan: true, // Ferramenta de arrastar ATIVA
+                        reset: true // Botão de reset ATIVO
                     } 
                 },
                 zoom: { enabled: true }
             },
             dataLabels: { enabled: false },
             colors: colors, 
+            stroke: { 
+                curve: 'smooth',
+                width: 2
+            },
             xaxis: { type: 'datetime', labels: { datetimeUTC: false, format: 'dd MMM \'yy' } },
             yaxis: { 
                 labels: { 
@@ -137,46 +138,6 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
                 mode: document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light' 
             }
         };
-
-        if (chartType === 'area' || chartType === 'line') {
-            options.stroke = {
-                curve: 'smooth',
-                width: 2
-            };
-            if (chartType === 'area') {
-                options.fill = {
-                    type: 'gradient',
-                    gradient: { opacityFrom: 0.6, opacityTo: 0.1 }
-                };
-            }
-        } else { 
-            options.stroke = {
-                width: 1, 
-                colors: undefined 
-            };
-        }
-
-        // CORREÇÃO: Força as EMAs a serem desenhadas num segundo eixo Y invisível para o modo "area"
-        if (chartType === 'area') {
-            options.yaxis = [
-                { // Eixo Y principal para a série de preço (área)
-                    seriesName: 'Preço (USD)',
-                    labels: {
-                        formatter: (val) => `$${val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
-                    },
-                    tooltip: { enabled: true }
-                },
-                { // Eixo Y secundário para as EMAs (invisível)
-                    seriesName: 'EMA 50',
-                    show: false, // Esconde o eixo, mas força a série a ser uma linha
-                },
-                { // Eixo Y terciário para a EMA 200 (invisível)
-                    seriesName: 'EMA 200',
-                    show: false,
-                }
-            ];
-        }
-
 
         chartContainer.innerHTML = '';
         const chart = new ApexCharts(chartContainer, options);
@@ -313,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const loadChart = () => {
         const selectedTimeframe = timeframeSelect ? timeframeSelect.value : '1h';
-        const selectedChartType = chartTypeSelect ? chartTypeSelect.value : 'area';
+        const selectedChartType = chartTypeSelect ? chartTypeSelect.value : 'line'; // Default para 'line'
         renderMainAssetChart(assetSymbol, selectedTimeframe, selectedChartType);
     };
 
