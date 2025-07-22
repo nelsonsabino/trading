@@ -116,26 +116,27 @@
     margin-top: 0.5rem;
     padding-top: 0.5rem;
     border-top: 1px solid #e9ecef;
-    gap: 0.8rem; /* Aumenta o espaçamento geral na linha inferior */
+    gap: 0.8rem;
+    flex-wrap: wrap; /* PERMITE A QUEBRA DE LINHA EM MOBILE */
 }
 .card-chart-price-group {
     display: flex;
     align-items: center;
-    gap: 0.6rem; /* Espaçamento entre sparkline e dados de preço */
-    flex-grow: 1; /* Permite que este grupo cresça */
-    min-width: 0; /* Permite que o grupo encolha se necessário */
+    gap: 0.6rem;
+    flex-grow: 1;
+    min-width: 0;
 }
 .card-sparkline {
     width: 60px;
     height: 25px;
-    flex-shrink: 0; /* Impede que o sparkline seja esmagado */
+    flex-shrink: 0;
 }
 .card-price-data {
     display: flex;
     flex-direction: row; 
     align-items: baseline; 
     gap: 0.4rem; 
-    flex-shrink: 0; /* Impede que o bloco de preço seja esmagado */
+    flex-shrink: 0;
 }
 .card-price {
     font-weight: 600;
@@ -151,15 +152,14 @@
     gap: 0.3rem;
     flex-shrink: 0;
 }
-/* CORREÇÃO: Garante que os botões inferiores têm o mesmo tamanho */
 .card-secondary-actions .icon-action-btn {
     width: 30px;
     height: 30px;
     padding: 4px;
-    box-sizing: border-box; /* A chave para a consistência de tamanho */
+    box-sizing: border-box;
 }
 .card-secondary-actions .icon-action-btn i {
-    font-size: 1em;
+    font-size: 0.9em;
 }
 
 
