@@ -1,4 +1,4 @@
-// js/ui.js - VERSÃO COM CARDS DO DASHBOARD OTIMIZADOS
+// js/ui.js - VERSÃO COM CARDS DO DASHBOARD RESTRUTURADOS E COMPACTOS
 
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openImageModal } from './modals.js';
@@ -113,28 +113,26 @@ export function createTradeCard(trade, marketData = {}) {
     if (trade.data.status === 'ARMED') card.classList.add('armed');
     if (trade.data.status === 'LIVE') card.classList.add('live');
 
-    // Botão de ação principal (Armar / Executar / Fechar)
+    // Botão de ação principal (Armar / Executar / Fechar) - AGORA COM TEXTO
     let mainActionButtonHtml = '';
     let mainActionButtonClass = '';
     let mainActionButtonIcon = '';
-    let mainActionButtonTitle = '';
+    let mainActionButtonText = ''; // NOVO: Para o texto do botão
 
     if (trade.data.status === 'POTENTIAL') {
         mainActionButtonClass = 'action-arm';
         mainActionButtonIcon = 'fa-solid fa-bolt';
-        mainActionButtonTitle = 'Validar e Armar Setup';
-        mainActionButtonHtml = `<button class="icon-action-btn ${mainActionButtonClass}" data-action="arm" title="${mainActionButtonTitle}"><i class="${mainActionButtonIcon}"></i></button>`;
+        mainActionButtonText = 'Armar';
     } else if (trade.data.status === 'ARMED') {
         mainActionButtonClass = 'action-execute';
         mainActionButtonIcon = 'fa-solid fa-play';
-        mainActionButtonTitle = 'Executar Trade';
-        mainActionButtonHtml = `<button class="icon-action-btn ${mainActionButtonClass}" data-action="execute" title="${mainActionButtonTitle}"><i class="${mainActionButtonIcon}"></i></button>`;
+        mainActionButtonText = 'Executar';
     } else if (trade.data.status === 'LIVE') {
         mainActionButtonClass = 'action-close';
         mainActionButtonIcon = 'fa-solid fa-stop';
-        mainActionButtonTitle = 'Fechar Trade';
-        mainActionButtonHtml = `<button class="icon-action-btn ${mainActionButtonClass}" data-action="close" title="${mainActionButtonTitle}"><i class="${mainActionButtonIcon}"></i></button>`;
+        mainActionButtonText = 'Fechar';
     }
+    mainActionButtonHtml = `<button class="icon-action-btn ${mainActionButtonClass}" data-action="${trade.data.status.toLowerCase()}" title="${mainActionButtonText}"><i class="${mainActionButtonIcon}"></i> <span>${mainActionButtonText}</span></button>`;
     
     // Formatação de preço (reutilizado do Market Scanner)
     let formattedPrice;
@@ -150,29 +148,29 @@ export function createTradeCard(trade, marketData = {}) {
         : '';
 
     card.innerHTML = `
-        <div class="card-top-row">
+        <div class="card-header-row">
             <h3 class="asset-title-card"><a href="asset-details.html?symbol=${assetName}" class="asset-link">${assetName}</a></h3>
-            <div class="card-top-buttons">
-                ${mainActionButtonHtml}
-                <button class="icon-action-btn card-edit-btn" data-action="edit" title="Editar"><i class="fas fa-pencil"></i></button>
-            </div>
+            <button class="icon-action-btn card-edit-btn" data-action="edit" title="Editar"><i class="fas fa-pencil"></i></button>
+            <div class="card-main-action-button">${mainActionButtonHtml}</div>
         </div>
         <p class="strategy-name">Estratégia: ${trade.data.strategyName || 'N/A'}</p>
         
         ${notesHtml}
 
-        <div class="card-market-data">
-            <div class="card-sparkline" id="sparkline-card-${trade.id}"></div>
-            <div class="card-price-data">
-                <div class="card-price">${formattedPrice}</div>
-                <div class="${priceChangeClass} price-change-percent">${assetMarketData.change.toFixed(2)}%</div>
+        <div class="card-bottom-row">
+            <div class="card-chart-price-group">
+                <div class="card-sparkline" id="sparkline-card-${trade.id}"></div>
+                <div class="card-price-data">
+                    <div class="card-price">${formattedPrice}</div>
+                    <div class="${priceChangeClass} price-change-percent">${assetMarketData.change.toFixed(2)}%</div>
+                </div>
+            </div>
+            <div class="card-secondary-actions">
+                <button class="icon-action-btn action-summary" data-action="toggle-chart" data-symbol="${tradingViewSymbol}" title="Ver gráfico interativo"><i class="fa-solid fa-chart-simple"></i></button>
+                <a href="https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}" target="_blank" rel="noopener noreferrer" class="icon-action-btn action-full-chart" title="Abrir no TradingView para análise completa"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
             </div>
         </div>
-        
-        <div class="card-bottom-actions">
-            <button class="icon-action-btn action-summary" data-action="toggle-chart" data-symbol="${tradingViewSymbol}" title="Ver gráfico interativo"><i class="fa-solid fa-chart-simple"></i></button>
-            <a href="https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}" target="_blank" rel="noopener noreferrer" class="icon-action-btn action-full-chart" title="Abrir no TradingView para análise completa"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-        </div>
+        <div class="mini-chart-container" id="advanced-chart-${trade.id}"></div>
     `;
     return card;
 }
