@@ -5,9 +5,9 @@ import { getTradesForAsset } from './firebase-service.js';
 
 const CRYPTOCOMPARE_API_KEY = "92d8c73125edcc9a95da0a5f30a6ca4720e5fdba544dba9bae2cd3495039aba7";
 
-let currentAssetSymbol = null; // Para guardar o símbolo do ativo atual
-let currentChartTimeframe = '1h'; // Para guardar o timeframe atual
-let currentChartType = 'area'; // Para guardar o tipo de gráfico atual
+let currentAssetSymbol = null; 
+let currentChartTimeframe = '1h'; 
+let currentChartType = 'area'; 
 
 /**
  * Busca dados de klines e indicadores da Edge Function e renderiza o gráfico principal do ativo.
@@ -20,77 +20,72 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
     if (!chartContainer) return;
     chartContainer.innerHTML = '<p>A carregar gráfico...</p>';
 
-    currentAssetSymbol = symbol; // Atualiza o estado
-    currentChartTimeframe = interval; // Atualiza o estado
-    currentChartType = chartType; // Atualiza o estado
+    currentAssetSymbol = symbol; 
+    currentChartTimeframe = interval; 
+    currentChartType = chartType; 
 
     try {
-        // Invoca a Edge Function para obter dados de klines e indicadores para o timeframe do gráfico
-        const { data: edgeFunctionData, error: edgeFunctionError } = await supabase.functions.invoke('get-sparklines-data', {
-            body: { 
-                symbol: symbol, 
-                timeframes: [interval], // Pedimos apenas o timeframe selecionado para o gráfico
-                // Para simplificar, estamos a assumir que a Edge Function devolverá OHLC e EMAs
-                // na propriedade 'ohlc' e 'indicators' dentro do objeto do símbolo
-            },
+        // Invoca a NOVA Edge Function para obter dados de klines e indicadores
+        const { data: edgeFunctionResponse, error: edgeFunctionError } = await supabase.functions.invoke('get-asset-details-data', {
+            body: { symbol: symbol, interval: interval },
         });
 
         if (edgeFunctionError) throw edgeFunctionError;
-        if (!edgeFunctionData || !edgeFunctionData[symbol] || !edgeFunctionData[symbol].indicators || !edgeFunctionData[symbol].ohlc) {
+        if (!edgeFunctionResponse || !edgeFunctionResponse.ohlc || !edgeFunctionResponse.indicators) {
             throw new Error('Dados de gráfico ou indicadores não encontrados na Edge Function.');
         }
 
-        const klinesData = edgeFunctionData[symbol].ohlc; // Dados OHLC do timeframe selecionado
-        const indicatorsData = edgeFunctionData[symbol].indicators[interval]; // Indicadores para o timeframe selecionado
+        const klinesData = edgeFunctionResponse.ohlc;
+        const indicatorsData = edgeFunctionResponse.indicators;
 
-        // Formata os dados para o ApexCharts
+        // Se não houver dados de klines, não renderiza o gráfico
+        if (klinesData.length === 0) {
+            chartContainer.innerHTML = '<p style="color:red;">Não há dados de preço para este timeframe.</p>';
+            return;
+        }
+
         let series = [];
         let primaryData = [];
-        let plotType = chartType; // Assume o tipo de gráfico padrão
+        let plotType = chartType; // Começa com o tipo selecionado
 
+        // Formatação dos dados primários (preço)
         if (chartType === 'candlestick' || chartType === 'bar') {
             primaryData = klinesData.map(kline => ({
                 x: kline[0], // Timestamp
-                y: [kline[0], kline[1], kline[2], kline[3], kline[4]] // OHLCV (open, high, low, close, volume)
+                y: [kline[1], kline[2], kline[3], kline[4]] // Open, High, Low, Close
             }));
-            series.push({ name: 'Velas', type: chartType, data: primaryData });
-            plotType = 'candlestick'; // Força para candlestick ou bar se OHLC
-        } else { // Area ou Line
+            series.push({ name: 'Preço', type: chartType, data: primaryData });
+        } else { // 'area' ou 'line'
             primaryData = klinesData.map(kline => ({
                 x: kline[0],
-                y: kline[4] // Preço de fecho
+                y: kline[4] // Close price
             }));
             series.push({ name: 'Preço (USD)', type: chartType, data: primaryData });
-            plotType = 'area'; // Assume area ou line
         }
-
-        // Adiciona as EMAs como séries de linha secundárias, se existirem
-        if (indicatorsData.ema50) {
-            const ema50SeriesData = klinesData.map((kline, index) => ({
-                x: kline[0],
-                y: edgeFunctionData[symbol].indicators[interval].ema50_data && edgeFunctionData[symbol].indicators[interval].ema50_data[index] !== undefined
-                    ? parseFloat(edgeFunctionData[symbol].indicators[interval].ema50_data[index].toFixed(2))
-                    : null
-            })).filter(d => d.y !== null); // Filtra nulos se houver dados incompletos
+        
+        // Adiciona as EMAs como séries de linha secundárias, se existirem e houver dados suficientes
+        if (indicatorsData.ema50_data && indicatorsData.ema50_data.length > 0) {
+            const ema50SeriesData = indicatorsData.ema50_data.map((emaVal, index) => ({
+                x: klinesData[index] ? klinesData[index][0] : null, // Usa o timestamp da vela correspondente
+                y: emaVal
+            })).filter(d => d.x !== null); // Remove pontos sem timestamp
             if (ema50SeriesData.length > 0) {
-                 series.push({ name: 'EMA 50', type: 'line', data: ema50SeriesData });
+                series.push({ name: 'EMA 50', type: 'line', data: ema50SeriesData });
             }
         }
-        if (indicatorsData.ema200) {
-            const ema200SeriesData = klinesData.map((kline, index) => ({
-                x: kline[0],
-                y: edgeFunctionData[symbol].indicators[interval].ema200_data && edgeFunctionData[symbol].indicators[interval].ema200_data[index] !== undefined
-                    ? parseFloat(edgeFunctionData[symbol].indicators[interval].ema200_data[index].toFixed(2))
-                    : null
-            })).filter(d => d.y !== null);
+        if (indicatorsData.ema200_data && indicatorsData.ema200_data.length > 0) {
+            const ema200SeriesData = indicatorsData.ema200_data.map((emaVal, index) => ({
+                x: klinesData[index] ? klinesData[index][0] : null,
+                y: emaVal
+            })).filter(d => d.x !== null);
             if (ema200SeriesData.length > 0) {
                 series.push({ name: 'EMA 200', type: 'line', data: ema200SeriesData });
             }
         }
         
         // Define as cores do gráfico principal e das EMAs
-        const currentPrice = primaryData[primaryData.length - 1]?.y;
-        const firstPrice = primaryData[0]?.y;
+        const currentPrice = klinesData[klinesData.length - 1][4];
+        const firstPrice = klinesData[0][4];
         const priceChartColor = currentPrice >= firstPrice ? '#28a745' : '#dc3545';
         const ema50Color = '#ffc107'; // Amarelo
         const ema200Color = '#0d6efd'; // Azul
@@ -99,14 +94,14 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
         const options = {
             series: series,
             chart: {
-                type: plotType, // Usa o tipo de plotagem determinado
+                type: plotType, // Usa o tipo de plotagem selecionado
                 height: 400, toolbar: { show: true, tools: { download: false, pan: true } },
                 zoom: { enabled: true }
             },
             dataLabels: { enabled: false },
             stroke: { 
                 curve: (plotType === 'area' || plotType === 'line') ? 'smooth' : 'straight', 
-                width: (plotType === 'area' || plotType === 'line') ? 2 : undefined // Sem width para candlestick/bar
+                width: (plotType === 'area' || plotType === 'line') ? 2 : undefined 
             },
             colors: colors,
             fill: { 
@@ -118,19 +113,27 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
                 labels: { 
                     formatter: (val) => `$${val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` 
                 },
-                tooltip: { enabled: true } // Ativa tooltip no Y-axis
+                tooltip: { enabled: true } 
             },
             tooltip: {
                 x: { format: 'dd MMM yyyy HH:mm' },
                 y: { 
-                    formatter: (val) => `$${val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 8})}` 
+                    formatter: (val) => {
+                        if (chartType === 'candlestick' || chartType === 'bar') {
+                            // Para velas/barras, o val é um array [O, H, L, C]
+                            if (Array.isArray(val)) {
+                                return `O: $${val[0].toLocaleString()} H: $${val[1].toLocaleString()} L: $${val[2].toLocaleString()} C: $${val[3].toLocaleString()}`;
+                            }
+                        }
+                        return `$${val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 8})}`; 
+                    }
                 }
             },
-            plotOptions: { // Opções específicas para candlestick e bar
+            plotOptions: { 
                 candlestick: {
                     colors: {
-                        upward: '#28a745', // Verde para vela de alta
-                        downward: '#dc3545' // Vermelho para vela de baixa
+                        upward: '#28a745', 
+                        downward: '#dc3545' 
                     }
                 },
                 bar: {
@@ -274,20 +277,20 @@ document.addEventListener('DOMContentLoaded', () => {
     document.title = `Detalhes de ${assetSymbol}`;
     document.getElementById('asset-title').textContent = `Análise de ${assetSymbol}`;
     
-    // Configura o seletor de timeframe e o listener
+    // Configura os seletores de timeframe e tipo de gráfico e seus listeners
     const timeframeSelect = document.getElementById('chart-timeframe-select');
-    const chartTypeSelect = document.getElementById('chart-type-select'); // NOVO: Seletor de tipo de gráfico
+    const chartTypeSelect = document.getElementById('chart-type-select'); 
 
-    const loadChartAndIndicators = () => {
+    const loadChart = () => {
         const selectedTimeframe = timeframeSelect ? timeframeSelect.value : '1h';
         const selectedChartType = chartTypeSelect ? chartTypeSelect.value : 'area';
         renderMainAssetChart(assetSymbol, selectedTimeframe, selectedChartType);
     };
 
-    if (timeframeSelect) timeframeSelect.addEventListener('change', loadChartAndIndicators);
-    if (chartTypeSelect) chartTypeSelect.addEventListener('change', loadChartAndIndicators);
+    if (timeframeSelect) timeframeSelect.addEventListener('change', loadChart);
+    if (chartTypeSelect) chartTypeSelect.addEventListener('change', loadChart);
     
-    loadChartAndIndicators(); // Carrega o gráfico e indicadores iniciais
+    loadChart(); // Carrega o gráfico inicial
 
     const watchlistBtn = document.getElementById('add-to-watchlist-btn');
     const alarmBtn = document.getElementById('add-alarm-btn');
@@ -317,9 +320,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Listener para o evento de mudança de tema
     document.addEventListener('themeChange', () => {
-        loadChartAndIndicators(); // Redesenha o gráfico principal e o widget TV
+        loadChart(); // Redesenha o gráfico principal com o timeframe e tipo atual
         renderTradingViewTechnicalAnalysisWidget(assetSymbol); // Redesenha o widget de análise técnica
     });
 
+    // Renderiza o widget de análise técnica (inicial)
     renderTradingViewTechnicalAnalysisWidget(assetSymbol);
 });
