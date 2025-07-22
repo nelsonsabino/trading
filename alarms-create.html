@@ -6,7 +6,6 @@
     <title>Criar Alarme</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- NOVOS FICHEIROS CSS IMPORTADOS -->
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/components.css">
@@ -18,6 +17,7 @@
     <link rel="stylesheet" href="css/footer.css">
     <link rel="stylesheet" href="css/dark-mode.css">
     <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/navigation-menu.css"> <!-- NOVO: Estilos para o menu de navegação -->
 
     <script>
         (function() {
@@ -41,13 +41,24 @@
     <header>
         <h1><i class="fa-solid fa-bell-plus"></i> Criar ou Editar Alarme</h1>
         <p class="mantra">Defina os seus gatilhos e deixe que o mercado venha até si.</p>
-        <nav>
-            <a href="index.html" class="nav-link">Dashboard</a>
-            <a href="market-scan.html" class="nav-link">Scanner</a>
-            <a href="alarms-manage.html" class="nav-link">Meus Alarmes</a>
-            <button id="theme-toggle-btn" class="btn" title="Alternar tema">
+        <nav class="main-nav">
+            <a href="index.html" class="nav-icon-link" title="Dashboard"><i class="fas fa-home"></i></a>
+            <a href="market-scan.html" class="nav-icon-link" title="Scanner de Mercado"><i class="fas fa-search-dollar"></i></a>
+            <a href="alarms-create.html" class="nav-icon-link" title="Criar Alarme"><i class="fas fa-bell-plus"></i></a>
+            <a href="alarms-manage.html" class="nav-icon-link" title="Meus Alarmes"><i class="fas fa-bell"></i></a>
+            
+            <div class="nav-dropdown">
+                <button id="management-toggle" class="nav-icon-link" title="Gerir e Estatísticas"><i class="fas fa-cog"></i></button>
+                <div class="nav-dropdown-content">
+                    <a href="strategies-manager.html" class="nav-link">Gerir Estratégias</a>
+                    <a href="manage.html" class="nav-link">Todas as Operações</a>
+                    <a href="stats.html" class="nav-link">Ver Estatísticas</a>
+                </div>
+            </div>
+
+            <button id="theme-toggle-btn" class="btn nav-icon-link" title="Alternar tema">
                 <i class="fas fa-moon"></i>
-            </button> 
+            </button>
         </nav>
     </header>
 
@@ -296,7 +307,6 @@
             <div id="alarm-feedback" class="alarm-feedback"></div>
         </section>
         
-        <!-- O modal de gráfico do TradingView é mantido, se necessário, mas não é primário desta página -->
         <div id="chart-modal" class="modal-overlay">
             <div class="modal-content" style="max-width: 90%; height: 90%; padding: 1rem;">
                 <span id="close-chart-modal" style="position: absolute; top: 15px; right: 25px; font-size: 2.5rem; color: #adb5bd; font-weight: 300; cursor: pointer; z-index: 10;">×</span>
@@ -311,7 +321,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="js/services.js"></script>
     <script type="module" src="js/utils.js"></script>
-    <script type="module" src="js/alarms-create.js"></script> <!-- NOVO SCRIPT -->
+    <script type="module" src="js/alarms-create.js"></script>
+    <script type="module" src="js/navigation.js"></script> <!-- NOVO SCRIPT -->
     <script type="module" src="js/version.js"></script>
     <script type="module" src="js/dark-mode.js"></script>
 </body>
