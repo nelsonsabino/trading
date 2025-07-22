@@ -39,18 +39,50 @@
         font-size: 0.95rem; 
     }
 
-    /* --- CORREÇÃO FINAL PARA OS CARDS DO DASHBOARD EM MOBILE --- */
-    .trade-card .card-bottom-row {
-        flex-direction: column; /* Empilha os elementos na linha inferior */
-        align-items: flex-start; /* Alinha tudo à esquerda */
-        gap: 0.5rem; /* Reduz o espaçamento vertical */
+    /* Tabelas em mobile (transforma linhas em blocos) */
+    .alarms-table thead, 
+    #trades-table thead,
+    .market-table thead { 
+        display: none; 
     }
-    .trade-card .card-chart-price-group {
-        width: 100%; /* Ocupa a largura total */
-        justify-content: space-between; /* Espaço entre sparkline e preço */
+    .alarms-table tr, 
+    #trades-table tr,
+    .market-table tr { 
+        display: block; 
+        margin-bottom: 1.5rem; 
+        border: 1px solid #dee2e6; 
+        border-radius: 8px; 
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+        background-color: #fff; 
     }
-    .trade-card .card-secondary-actions {
-        margin-top: 0.5rem; /* Adiciona uma pequena margem acima dos botões */
+    .alarms-table td, 
+    #trades-table td,
+    .market-table td { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        padding: 0.8rem 1rem; 
+        border-bottom: 1px solid #f1f1f1; 
+    }
+    .alarms-table td::before, 
+    #trades-table td::before,
+    .market-table td::before { 
+        content: attr(data-label); 
+        font-weight: 600; 
+        color: #495057; 
+        padding-right: 1rem; 
+    }
+    .alarms-table tr td:last-child, 
+    #trades-table tr td:last-child,
+    .market-table tr td:last-child { 
+        border-bottom: none; 
+    }
+    .alarms-table td .cell-value, 
+    #trades-table td .cell-value,
+    .market-table td .cell-value { 
+        text-align: right; 
+        flex-shrink: 0; 
+        max-width: 60%; 
     }
 
     /* Controlos do mercado em mobile */
