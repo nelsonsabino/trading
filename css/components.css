@@ -88,7 +88,7 @@
     opacity: 1;
 }
 
-/* --- SEÇÃO DO MEIO DO CARD --- */
+/* --- SEÇÃO DO MEIO (ESTRATÉGIA E NOTAS) --- */
 .strategy-name {
     margin: 0;
     font-size: 0.85em;
@@ -128,8 +128,10 @@
 }
 .card-price-data {
     display: flex;
-    flex-direction: column;
-    text-align: right;
+    /* CORREÇÃO: Altera para row para alinhar preço e percentagem */
+    flex-direction: row; 
+    align-items: baseline; /* Alinha pela base do texto */
+    gap: 0.5rem; /* Espaço entre o preço e a percentagem */
 }
 .card-price {
     font-weight: 600;
