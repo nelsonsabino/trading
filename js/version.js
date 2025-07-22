@@ -2,15 +2,25 @@
 
 export const changelogData = {
     current: {
-        number: '9.1.0', // <-- VERSÃO ATUALIZADA (Nova versão de navegação)
+        number: '9.1.1', // <-- VERSÃO CORRIGIDA
         changes: [
-            "**Reestruturação da Navegação da Aplicação:**",
-            "Menu de navegação principal redesenhado para uma organização mais lógica e intuitiva.",
-            "A secção 'Gerir Alarmes' foi dividida em duas páginas: 'Criar Alarme' (`alarms-create.html`) e 'Meus Alarmes' (`alarms-manage.html`), cada uma com a sua lógica e interface dedicadas (`js/alarms-create.js` e `js/alarms-manage.js`).",
-            "Os links de navegação em todas as páginas HTML foram atualizados para refletir a nova estrutura e agrupamento (Dashboard, Scanner, Criar Alarme, Meus Alarmes, Gerir Estratégias, Todas as Operações, Ver Estatísticas)."
+            "**Correções de UI Pós-Reestruturação da Navegação:**",
+            "Resolvidos múltiplos problemas de layout e alinhamento em todas as tabelas (Dashboard, Scanner, Alarmes, Gestão e Detalhes do Ativo), tanto em desktop como em mobile, restaurando a aparência original e consistente.",
+            "Corrigido o layout dos cards do Dashboard, garantindo que o gráfico Sparkline e os dados de preço são exibidos corretamente lado a lado.",
+            "As tabelas de análise na página de Estatísticas agora estão alinhadas corretamente à esquerda e formatadas de forma consistente.",
+            "Garantida a compatibilidade total com o novo sistema de navegação e as correções de CSS anteriores."
         ]
     },
     releases: [
+        {
+            number: '9.1.0',
+            changes: [
+                "**Reestruturação da Navegação (UI/UX):**",
+                "Menu de navegação principal simplificado, utilizando ícones sugestivos para as páginas mais usadas (Dashboard, Scanner, Criar Alarme, Meus Alarmes).",
+                "Páginas de gestão e análise (Gerir Estratégias, Todas as Operações, Ver Estatísticas) agrupadas num menu suspenso acessível através de um ícone de roda dentada, reduzindo a sobrecarga visual.",
+                "Um novo script (`js/navigation.js`) foi adicionado para gerir a lógica de abrir/fechar este menu, proporcionando uma experiência de utilizador mais limpa e organizada em todas as páginas.",
+            ]
+        },
         {
             number: '9.0.0',
             changes: [
