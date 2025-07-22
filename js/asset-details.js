@@ -25,6 +25,7 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
     currentChartType = chartType; 
 
     try {
+        // Invoca a NOVA Edge Function para obter dados de klines e indicadores para o timeframe do gráfico
         const { data: edgeFunctionResponse, error: edgeFunctionError } = await supabase.functions.invoke('get-asset-details-data', {
             body: { symbol: symbol, interval: interval },
         });
@@ -44,6 +45,7 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
 
         let series = [];
         
+        // Formatação dos dados primários (preço)
         if (chartType === 'candlestick') {
             const ohlcSeriesData = klinesData.map(kline => ({
                 x: kline[0], // Timestamp
@@ -58,6 +60,7 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
             series.push({ name: 'Preço (USD)', type: chartType, data: closePriceSeriesData });
         }
         
+        // Adiciona as EMAs como séries de linha secundárias
         if (indicatorsData.ema50_data && indicatorsData.ema50_data.length > 0) {
             const ema50SeriesData = indicatorsData.ema50_data.map((emaVal, index) => ({
                 x: klinesData[index][0], 
