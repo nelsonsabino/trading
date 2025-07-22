@@ -116,46 +116,52 @@
     margin-top: 0.5rem;
     padding-top: 0.5rem;
     border-top: 1px solid #e9ecef;
-    gap: 0.5rem; /* Espaçamento geral na linha inferior */
+    gap: 0.8rem; /* Aumenta o espaçamento geral na linha inferior */
 }
 .card-chart-price-group {
     display: flex;
     align-items: center;
-    gap: 0.5rem; /* Espaçamento entre sparkline e dados de preço */
+    gap: 0.6rem; /* Espaçamento entre sparkline e dados de preço */
+    flex-grow: 1; /* Permite que este grupo cresça */
+    min-width: 0; /* Permite que o grupo encolha se necessário */
 }
 .card-sparkline {
-    width: 60px; /* Reduz a largura do sparkline */
-    height: 25px; /* Reduz a altura do sparkline */
+    width: 60px;
+    height: 25px;
+    flex-shrink: 0; /* Impede que o sparkline seja esmagado */
 }
 .card-price-data {
     display: flex;
     flex-direction: row; 
     align-items: baseline; 
-    gap: 0.4rem; /* Espaçamento entre preço e percentagem */
+    gap: 0.4rem; 
+    flex-shrink: 0; /* Impede que o bloco de preço seja esmagado */
 }
 .card-price {
     font-weight: 600;
-    font-size: 0.9em; /* Ligeiramente menor */
+    font-size: 0.9em; 
 }
 .price-change-percent {
-    font-size: 0.8em; /* Ligeiramente menor */
+    font-size: 0.8em; 
 }
 
 /* Ações secundárias */
 .card-secondary-actions {
     display: flex;
-    gap: 0.3rem; /* Espaçamento compacto entre os botões */
+    gap: 0.3rem;
     flex-shrink: 0;
 }
-/* CORREÇÃO: Tamanho dos botões inferiores */
+/* CORREÇÃO: Garante que os botões inferiores têm o mesmo tamanho */
 .card-secondary-actions .icon-action-btn {
-    width: 28px;  /* Tamanho menor */
-    height: 28px; /* Tamanho menor */
-    padding: 4px; /* Padding menor */
+    width: 30px;
+    height: 30px;
+    padding: 4px;
+    box-sizing: border-box; /* A chave para a consistência de tamanho */
 }
 .card-secondary-actions .icon-action-btn i {
-    font-size: 0.9em; /* Ícone menor */
+    font-size: 1em;
 }
+
 
 /* --- SECÇÃO DE PORTFÓLIO E NOTÍCIAS (sem alterações) --- */
 .portfolio-section, .news-article {
