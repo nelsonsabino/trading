@@ -6,7 +6,6 @@
     <title>Gestão de Estratégias</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- NOVOS FICHEIROS CSS IMPORTADOS -->
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/components.css">
@@ -41,10 +40,20 @@
         <h1>Gestão de Estratégias</h1>
         <p class="mantra">Crie e refine os seus sistemas de trading.</p>
         <nav>
-            <a href="index.html" class="nav-link">Voltar ao Dashboard</a>
+            <a href="index.html" class="nav-link">Dashboard</a>
+            <a href="market-scan.html" class="nav-link">Scanner</a>
+            <a href="alarms-create.html" class="nav-link">Criar Alarme</a>
+            <a href="alarms-manage.html" class="nav-link">Meus Alarmes</a>
             <button id="create-strategy-btn" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Criar Nova Estratégia
             </button>
+            <button id="theme-toggle-btn" class="btn" title="Alternar tema">
+                <i class="fas fa-moon"></i>
+            </button>
+        </nav>
+        <nav style="margin-top: 1rem; border-top: 1px solid #e9ecef; padding-top: 1rem;">
+            <a href="manage.html" class="nav-link">Todas as Operações</a>
+            <a href="stats.html" class="nav-link">Ver Estatísticas</a>
         </nav>
     </header>
 
@@ -57,7 +66,6 @@
             </div>
         </section>
 
-    <!-- Modais (sem alterações no conteúdo HTML) -->
     <div id="strategy-modal" class="modal-overlay">
         <div class="modal-content" style="max-width: 800px;">
             <span id="close-strategy-modal">×</span>
