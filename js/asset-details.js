@@ -13,7 +13,7 @@ let currentChartType = 'area';
  * Busca dados de klines e indicadores da Edge Function e renderiza o gráfico principal do ativo.
  * @param {string} symbol - O símbolo do ativo (ex: "BTCUSDC").
  * @param {string} interval - O intervalo de tempo (ex: "1h", "1d").
- * @param {string} chartType - O tipo de gráfico (ex: "area", "candlestick", "bar", "line").
+ * @param {string} chartType - O tipo de gráfico (ex: "area", "candlestick", "line").
  */
 async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area') {
     const chartContainer = document.getElementById('main-asset-chart');
@@ -25,7 +25,6 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
     currentChartType = chartType; 
 
     try {
-        // Invoca a Edge Function para obter dados de klines e indicadores para o timeframe do gráfico
         const { data: edgeFunctionResponse, error: edgeFunctionError } = await supabase.functions.invoke('get-asset-details-data', {
             body: { symbol: symbol, interval: interval },
         });
@@ -35,8 +34,8 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
             throw new Error('Dados de gráfico ou indicadores não encontrados na Edge Function.');
         }
 
-        const klinesData = edgeFunctionResponse.ohlc; // [timestamp, open, high, low, close]
-        const indicatorsData = edgeFunctionResponse.indicators; // Contém ema50_data, ema200_data, etc.
+        const klinesData = edgeFunctionResponse.ohlc;
+        const indicatorsData = edgeFunctionResponse.indicators;
 
         if (klinesData.length === 0) {
             chartContainer.innerHTML = '<p style="color:red;">Não há dados de preço para este timeframe.</p>';
@@ -45,13 +44,12 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
 
         let series = [];
         
-        // Formatação dos dados primários (preço)
-        if (chartType === 'candlestick' || chartType === 'bar') {
+        if (chartType === 'candlestick') {
             const ohlcSeriesData = klinesData.map(kline => ({
                 x: kline[0], // Timestamp
                 y: [kline[1], kline[2], kline[3], kline[4]] // Open, High, Low, Close
             }));
-            series.push({ name: 'Preço', type: chartType, data: ohlcSeriesData });
+            series.push({ name: 'Preço', type: 'candlestick', data: ohlcSeriesData });
         } else { // 'area' ou 'line'
             const closePriceSeriesData = klinesData.map(kline => ({
                 x: kline[0],
@@ -60,7 +58,6 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
             series.push({ name: 'Preço (USD)', type: chartType, data: closePriceSeriesData });
         }
         
-        // Adiciona as EMAs como séries de linha secundárias
         if (indicatorsData.ema50_data && indicatorsData.ema50_data.length > 0) {
             const ema50SeriesData = indicatorsData.ema50_data.map((emaVal, index) => ({
                 x: klinesData[index][0], 
@@ -82,26 +79,25 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
         const ema50Color = '#ffc107'; 
         const ema200Color = '#0d6efd'; 
         const colors = [];
-        if (chartType === 'candlestick' || chartType === 'bar') { /* Cores para velas/barras definidas em plotOptions */ }
-        else { colors.push(priceChartColor); } 
+        if (chartType === 'candlestick') { /* As cores para candlestick são definidas em plotOptions */ }
+        else { colors.push(priceChartColor); }
         colors.push(ema50Color);
         colors.push(ema200Color);
 
         let options = {
             series: series,
             chart: {
-                type: chartType, 
+                type: 'line', // Tipo base é linha, mas as séries definem o seu próprio tipo
                 height: 400, 
                 toolbar: { 
                     show: true, 
                     tools: { 
                         download: false, 
-                        // ADICIONADO: Ferramentas de pan e reset
-                        pan: true, 
-                        zoom: true,
-                        zoomin: true,
-                        zoomout: true,
-                        selection: true,
+                        selection: true, 
+                        zoom: true, 
+                        zoomin: true, 
+                        zoomout: true, 
+                        pan: true, // Ferramenta de arrastar
                         reset: true // Botão de reset
                     } 
                 },
@@ -120,10 +116,9 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
                 x: { format: 'dd MMM yyyy HH:mm' },
                 y: { 
                     formatter: (val, { seriesIndex, dataPointIndex, w }) => {
-                        if ((chartType === 'candlestick' || chartType === 'bar') && seriesIndex === 0) {
-                            if (Array.isArray(val)) { 
-                                return `O: $${val[0].toLocaleString()} H: $${val[1].toLocaleString()} L: $${val[2].toLocaleString()} C: $${val[3].toLocaleString()}`;
-                            }
+                        if (chartType === 'candlestick' && seriesIndex === 0) {
+                            const ohlc = w.globals.initialSeries[0].data[dataPointIndex].y;
+                            return `O: $${ohlc[0].toLocaleString()} H: $${ohlc[1].toLocaleString()} L: $${ohlc[2].toLocaleString()} C: $${ohlc[3].toLocaleString()}`;
                         }
                         const seriesName = w.globals.seriesNames[seriesIndex];
                         return `${seriesName}: $${val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 8})}`; 
@@ -135,11 +130,6 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
                     colors: {
                         upward: '#28a745', 
                         downward: '#dc3545' 
-                    }
-                },
-                bar: {
-                    colors: {
-                        ranges: [{ from: -Infinity, to: 0, color: '#dc3545' }, { from: 0, to: Infinity, color: '#28a745' }]
                     }
                 }
             },
@@ -154,14 +144,16 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'area')
                 curve: 'smooth',
                 width: 2
             };
-            options.fill = {
-                type: 'gradient',
-                gradient: { opacityFrom: 0.6, opacityTo: 0.1 }
-            };
-        } else { // Para 'candlestick' e 'bar'
+            if (chartType === 'area') {
+                options.fill = {
+                    type: 'gradient',
+                    gradient: { opacityFrom: 0.6, opacityTo: 0.1 }
+                };
+            }
+        } else { 
             options.stroke = {
                 width: 1, 
-                colors: ['#333'] 
+                colors: undefined // Para que cada série use a sua cor
             };
         }
 
