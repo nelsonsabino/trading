@@ -1,4 +1,4 @@
-// js/app.js - VERSÃO AJUSTADA PARA A NOVA ESTRUTURA DE DADOS DA EDGE FUNCTION
+// js/app.js - VERSÃO COM REGISTO DO SERVICE WORKER
 
 import { listenToTrades, fetchActiveStrategies } from './firebase-service.js';
 import { supabase } from './services.js';
@@ -54,7 +54,7 @@ async function fetchMarketDataForDashboard(trades) {
             marketData[symbol] = {
                 price: ticker ? parseFloat(ticker.lastPrice) : 0,
                 change: ticker ? parseFloat(ticker.priceChangePercent) : 0,
-                sparkline: symbolExtraData.sparkline || [] // Já extrai corretamente a propriedade sparkline aninhada
+                sparkline: symbolExtraData.sparkline || []
             };
         });
 
@@ -89,6 +89,19 @@ async function initializeApp() {
 // --- PONTO DE ENTRADA DO SCRIPT ---
 document.addEventListener('DOMContentLoaded', () => {
     
+    // REGISTO DO SERVICE WORKER (NOVO)
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(registration => {
+                    console.log('Service Worker registado com sucesso:', registration.scope);
+                })
+                .catch(error => {
+                    console.error('Falha no registo do Service Worker:', error);
+                });
+        });
+    }
+
     const addOpportunityBtn = document.getElementById('add-opportunity-btn');
     if (addOpportunityBtn) addOpportunityBtn.addEventListener('click', openAddModal);
     
