@@ -1,7 +1,7 @@
 /* css/buttons.css */
 
-/* --- BOTÕES GERAIS (.btn, .nav-link) --- */
-.btn, .nav-link { 
+/* --- BOTÕES GERAIS (.btn) --- */
+.btn { 
     display: inline-block; 
     padding: 10px 20px; 
     font-size: 1rem; 
@@ -17,21 +17,20 @@
 /* Cores e efeitos para os botões gerais */
 .btn-primary, #add-opportunity-btn { background-color: #007bff; color: white; }
 .btn-primary:hover, #add-opportunity-btn:hover { background-color: #0056b3; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-.nav-link { background-color: #6c757d; color: white; }
-.nav-link:hover { background-color: #5a6268; transform: translateY(-2px); }
+
 .btn-secondary { background-color: #6c757d; color: white; }
 .btn-secondary:hover { background-color: #5a6268; }
 .btn-tertiary { background-color: #ffc107; color: #212529; }
 .btn-tertiary:hover { background-color: #e0a800; }
 
 
-/* --- BOTÕES DE ÍCONE (icon-action-btn) --- */
+/* --- icon-action-btn (BOTÕES COM ÍCONE EM CONTEÚDO) --- */
 
-/* Base para TODOS os icon-action-btn (cards e tabelas) */
+/* Base para todos os icon-action-btn (cards e tabelas) */
 .icon-action-btn {
     display: inline-flex; 
     align-items: center;
-    justify-content: center; /* Centra o conteúdo */
+    justify-content: center; 
     gap: 0.4rem; /* Espaçamento entre ícone e texto */
     padding: 8px 12px; /* Padding padrão para botões com texto (nos cards) */
     font-size: 0.9em;
@@ -42,8 +41,8 @@
     cursor: pointer; 
     transition: all 0.2s ease-in-out;
     background-color: #f1f3f5; 
-    color: #495057; /* Cor padrão do texto/ícone (cinzento) */
-    flex-shrink: 0; /* Impede que o botão encolha */
+    color: #495057; 
+    flex-shrink: 0; 
 }
 
 /* Efeito hover geral para todos os icon-action-btn */
@@ -56,54 +55,50 @@
 /* Garante o tamanho correto do ícone */
 .icon-action-btn i {
     font-size: 1.1em;
-    line-height: 1; /* Ajuda a alinhar verticalmente */
+    line-height: 1; 
 }
-
 
 /* --- Estilos para containers de botões de Ações (Ex: dentro de cards ou tabelas) --- */
-.card-actions, /* Container de ações nos cards do dashboard */
+.card-actions, 
 .market-table .action-buttons,
 .alarms-table .action-buttons,
-#trades-table .action-buttons, /* Na página de gestão e detalhes do ativo */
-.asset-related-data .action-buttons { /* Para pegar a tabela em asset-details.html */
+#trades-table .action-buttons, 
+.asset-related-data .action-buttons { 
     display: flex;
     flex-direction: row;
-    gap: 0.5rem; /* Espaçamento padrão entre os botões */
+    gap: 0.5rem; 
     align-items: center; 
-    justify-content: flex-end; /* Alinha os botões à direita dentro da célula/card */
+    justify-content: flex-end; 
 }
 
-
-/* --- ESTILOS ESPECÍFICOS: Botões de ícone compactos dentro das TABELAS --- */
-/* Aplica-se aos botões .icon-action-btn que ESTÃO dentro de um .action-buttons numa TABLE */
+/* ESTILOS ESPECÍFICOS: Botões de ícone compactos dentro das TABELAS */
 .market-table .action-buttons .icon-action-btn,
 .alarms-table .action-buttons .icon-action-btn,
 #trades-table .action-buttons .icon-action-btn,
 .asset-related-data .action-buttons .icon-action-btn {
-    padding: 6px; /* Padding uniforme para todos os lados, torna-o quadrado */
-    width: 32px;  /* Largura fixa */
-    height: 32px; /* Altura fixa */
-    border-radius: 6px; /* Bordas arredondadas */
-    /* IMPORTANTE: Garante que o texto DENTRO destes botões (apenas tabelas) NÃO aparece */
+    padding: 6px; 
+    width: 32px;  
+    height: 32px; 
+    border-radius: 6px; 
     & span { 
         display: none; 
     }
 }
 
-
-/* --- CORES ESPECÍFICAS DOS ÍCONES (Aplicadas ao <i> elemento) --- */
-/* Estas classes são usadas em todos os icon-action-btn, tanto em cards como em tabelas */
-.icon-action-btn.action-summary i, .icon-action-btn.view-chart-btn i { color: #198754; } /* Gráfico (verde) */
-.icon-action-btn.action-full-chart i { color: #0d6efd; } /* TradingView (azul) */
-.icon-action-btn.action-bell i { color: #0d6efd; } /* Alarme (azul) */
-.icon-action-btn.action-plus i { color: #0d6efd; } /* Adicionar (azul) */
-.icon-action-btn.action-arm i { color: #ffc107; } /* Armar (amarelo) */
-.icon-action-btn.action-execute i { color: #20c997; } /* Executar (verde água) */
-.icon-action-btn.action-close i { color: #dc3545; } /* Fechar (vermelho) */
+/* Cores específicas para os ÍCONES (Aplicadas ao <i> elemento) */
+.icon-action-btn.action-summary i, .icon-action-btn.view-chart-btn i { color: #198754; } 
+.icon-action-btn.action-full-chart i { color: #0d6efd; }
+.icon-action-btn.action-bell i { color: #0d6efd; }
+.icon-action-btn.action-plus i { color: #0d6efd; }
+.icon-action-btn.action-arm i { color: #ffc107; }
+.icon-action-btn.action-execute i { color: #20c997; }
+.icon-action-btn.action-close i { color: #dc3545; }
 
 
-/* --- BOTÃO DE TEMA (Estilo específico, não um icon-action-btn genérico) --- */
-#theme-toggle-btn { 
+/* --- BOTÃO DE TEMA --- */
+/* NOTA: O botão de tema agora usa a classe .nav-icon-link em HTML */
+/* Se houver conflito, esta regra pode ser removida se .nav-icon-link for suficiente */
+/* #theme-toggle-btn { 
     background-color: #f8f9fa; 
     color: #495057; 
     border: 1px solid #dee2e6; 
@@ -116,4 +111,20 @@
 }
 #theme-toggle-btn:hover { 
     background-color: #e9ecef; 
+} */
+
+
+/* --- LINKS DE NAVEGAÇÃO SECUNDÁRIOS (dentro do dropdown) --- */
+/* São os únicos que ainda usam a classe .nav-link agora */
+a.nav-link { 
+    background-color: #6c757d; /* Cor base mais escura */
+    color: white; 
+    border: none;
+    text-decoration: none; /* Garante que links não são sublinhados */
+    border-radius: 6px; /* Para os botões normais */
+}
+a.nav-link:hover { 
+    background-color: #5a6268; 
+    transform: translateY(-2px); 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
 }
