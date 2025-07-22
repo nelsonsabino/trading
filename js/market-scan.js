@@ -116,16 +116,16 @@ function createTableRow(ticker, index, extraData) {
         formattedPrice = '$' + price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
     }
 
+    // --- CORREÇÃO: Adicionados os atributos data-label para o layout móvel ---
     return `
         <tr>
-            <td>${index + 1}</td>
-            <td><div class="asset-name"><strong><a href="asset-details.html?symbol=${ticker.symbol}" class="asset-link">${baseAsset}</a></strong> ${rsiSignalHtml} ${stochSignalHtml}</div></td>
-            <td>${formattedPrice}</td>
-            <td class="sparkline-cell"><div class="sparkline-container" id="sparkline-${ticker.symbol}"></div></td>
-            <td>${formatVolume(volume)}</td>
-            <td class="${priceChangeClass}">${priceChangePercent.toFixed(2)}%</td>
-            <td>
-                <!-- CORREÇÃO: O botão é agora um link <a> para consistência -->
+            <td data-label="#">${index + 1}</td>
+            <td data-label="Ativo"><div class="asset-name"><strong><a href="asset-details.html?symbol=${ticker.symbol}" class="asset-link">${baseAsset}</a></strong> ${rsiSignalHtml} ${stochSignalHtml}</div></td>
+            <td data-label="Último Preço">${formattedPrice}</td>
+            <td data-label="Sparkline (24h)" class="sparkline-cell"><div class="sparkline-container" id="sparkline-${ticker.symbol}"></div></td>
+            <td data-label="Volume (24h)">${formatVolume(volume)}</td>
+            <td data-label="Variação (24h)" class="${priceChangeClass}">${priceChangePercent.toFixed(2)}%</td>
+            <td data-label="Ações">
                 <div class="action-buttons">
                     <a href="#" class="icon-action-btn view-chart-btn" data-symbol="${ticker.symbol}" title="Ver Gráfico no Modal"><i class="fa-solid fa-chart-simple"></i></a>
                     <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn" title="Abrir no TradingView"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
@@ -165,6 +165,7 @@ function applyFiltersAndSort() {
     });
     renderPageContent(processedTickers);
 }
+
 
 async function fetchAndDisplayMarketData() {
     const tbody = document.getElementById('market-scan-tbody');
@@ -212,6 +213,7 @@ async function fetchAndDisplayMarketData() {
     }
 }
 
+
 document.addEventListener('DOMContentLoaded', () => {
     const tbody = document.getElementById('market-scan-tbody');
     const sortBySelect = document.getElementById('sort-by');
@@ -244,7 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tbody.addEventListener('click', function(e) {
             const button = e.target.closest('.view-chart-btn');
             if (button) {
-                e.preventDefault(); // Impede o link de navegar
+                e.preventDefault(); 
                 const symbol = button.dataset.symbol;
                 openChartModal(symbol);
             }
