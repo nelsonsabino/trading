@@ -1,11 +1,10 @@
+// service-worker.js - COM CAMINHOS ABSOLUTOS CORRETOS PARA GITHUB PAGES
 
-// service-worker.js - COM CAMINHOS CORRETOS PARA GITHUB PAGES
-
-const CACHE_NAME = 'trading-app-v1.2'; // Atualizamos a versão para forçar um novo cache
+const CACHE_NAME = 'trading-app-v1.3'; // Atualizamos a versão para forçar um novo cache
 const BASE_PATH = '/trading'; // O nome do seu repositório
 
 const urlsToCache = [
-  `${BASE_PATH}/`,
+  `${BASE_PATH}/`, 
   `${BASE_PATH}/index.html`,
   `${BASE_PATH}/alarms-create.html`,
   `${BASE_PATH}/alarms-manage.html`,
