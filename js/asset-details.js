@@ -3,11 +3,9 @@
 import { supabase } from './services.js';
 import { getTradesForAsset } from './firebase-service.js';
 
-const CRYPTOCOMPARE_API_KEY = "92d8c73125edcc9a95da0a5f30a6ca4720e5fdba544dba9bae2cd3495039aba7";
-
 let currentAssetSymbol = null; 
 let currentChartTimeframe = '1h'; 
-let currentChartType = 'line'; // Default para 'line'
+let currentChartType = 'line'; 
 
 /**
  * Busca dados de klines e indicadores da Edge Function e renderiza o gráfico principal do ativo.
@@ -87,7 +85,7 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
                 height: 400, 
                 toolbar: { 
                     show: true, 
-                    autoSelected: 'pan' // A "mão" (pan) começa ativa por defeito
+                    autoSelected: 'pan' 
                 },
                 zoom: { enabled: true }
             },
@@ -130,6 +128,13 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
             }
         };
 
+        if (chartType === 'candlestick') {
+            options.stroke = {
+                width: 1, 
+                colors: undefined 
+            };
+        }
+
         chartContainer.innerHTML = '';
         const chart = new ApexCharts(chartContainer, options);
         chart.render();
@@ -167,34 +172,7 @@ function renderTradingViewTechnicalAnalysisWidget(symbol) {
     container.appendChild(script); 
 }
 
-
 // --- Funções de Notícias, Alarmes e Trades (sem alterações) ---
-async function displayNewsForAsset(baseAssetSymbol) {
-    const newsContainer = document.getElementById('asset-news-container');
-    if (!newsContainer) return;
-    if (!CRYPTOCOMPARE_API_KEY || CRYPTOCOMPARE_API_KEY.includes("COLOQUE A SUA CHAVE")) {
-        newsContainer.innerHTML = `<p style="color: #ffc107;">Por favor, adicione uma chave de API da CryptoCompare no ficheiro 'asset-details.js' para ver as notícias.</p>`;
-        return;
-    }
-    const apiUrl = `https://min-api.cryptocompare.com/data/v2/news/?lang=EN&categories=${baseAssetSymbol}&api_key=${CRYPTOCOMPARE_API_KEY}`;
-    try {
-        const response = await fetch(apiUrl);
-        if (!response.ok) throw new Error(`Erro da API: ${response.statusText}`);
-        const newsData = await response.json();
-        if (newsData.Type !== 100 || newsData.Data.length === 0) {
-            newsContainer.innerHTML = '<p>Nenhuma notícia recente encontrada para este ativo.</p>';
-            return;
-        }
-        const newsHtml = newsData.Data.slice(0, 3).map(article => {
-            const timeAgo = new Date(article.published_on * 1000).toLocaleString('pt-PT');
-            return `<div class="news-article stat-card" style="text-align: left; margin-bottom: 1rem;"><h4 style="margin-bottom: 0.5rem;"><a href="${article.url}" target="_blank" rel="noopener noreferrer" class="asset-link">${article.title}</a></h4><p style="font-size: 0.9em; color: #6c757d;"><strong>${article.source_info.name}</strong> - ${timeAgo}</p></div>`;
-        }).join('');
-        newsContainer.innerHTML = newsHtml;
-    } catch (err) {
-        console.error("Erro ao buscar notícias:", err);
-        newsContainer.innerHTML = '<p style="color:red;">Não foi possível carregar as notícias.</p>';
-    }
-}
 async function displayAlarmsForAsset(symbol) {
     const tbody = document.getElementById('asset-alarms-tbody');
     if (!tbody) return;
@@ -265,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const loadChart = () => {
         const selectedTimeframe = timeframeSelect ? timeframeSelect.value : '1h';
-        const selectedChartType = chartTypeSelect ? chartTypeSelect.value : 'line'; // Default para 'line'
+        const selectedChartType = chartTypeSelect ? chartTypeSelect.value : 'line';
         renderMainAssetChart(assetSymbol, selectedTimeframe, selectedChartType);
     };
 
@@ -283,7 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const baseAsset = assetSymbol.replace(/USDC|USDT|BUSD/, '');
 
-    displayNewsForAsset(baseAsset);
+    // REMOVIDO: Chamada para displayNewsForAsset(baseAsset);
     displayAlarmsForAsset(assetSymbol);
     displayTradesForAsset(assetSymbol);
 
