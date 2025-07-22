@@ -72,97 +72,28 @@ async function renderMainAssetChart(symbol, interval = '1h') {
 }
 
 /**
- * Renderiza uma visualização de indicadores técnicos (RSI e Estocástico) em vários timeframes.
- * AGORA OBTEM DADOS DA EDGE FUNCTION.
+ * Renderiza o widget de Análise Técnica da TradingView.
  * @param {string} symbol - O símbolo do ativo.
  */
-async function renderIndicatorOverview(symbol) {
-    const container = document.getElementById('indicator-overview-chart-container');
+function renderTradingViewTechnicalAnalysisWidget(symbol) {
+    const container = document.getElementById('tradingview-tech-analysis-container');
     if (!container) return;
-    container.innerHTML = '<p>A carregar indicadores...</p>';
+    container.innerHTML = ''; // Limpa o container para garantir que o widget é carregado corretamente
+    
+    const currentTheme = document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light';
 
-    try {
-        // Define os timeframes para os quais queremos dados de indicadores
-        const timeframes = ['1h', '4h', '1d', '1w'];
-        
-        // NOVO: Chama a Edge Function para obter todos os dados de indicadores de uma vez
-        const { data: edgeFunctionData, error: edgeFunctionError } = await supabase.functions.invoke('get-sparklines-data', {
-            body: { symbol: symbol, timeframes: timeframes },
-        });
-
-        if (edgeFunctionError) throw edgeFunctionError;
-        if (!edgeFunctionData || !edgeFunctionData[symbol]) {
-            throw new Error('Dados de indicadores não encontrados na Edge Function.');
-        }
-
-        const indicatorsByTimeframe = edgeFunctionData[symbol]; // Pega os resultados para o símbolo específico
-
-        const rsiSeries = timeframes.map(tf => indicatorsByTimeframe[tf]?.rsi !== null ? indicatorsByTimeframe[tf].rsi : 0);
-        const stochKSeries = timeframes.map(tf => indicatorsByTimeframe[tf]?.stochK !== null ? indicatorsByTimeframe[tf].stochK : 0);
-        const stochDSeries = timeframes.map(tf => indicatorsByTimeframe[tf]?.stochD !== null ? indicatorsByTimeframe[tf].stochD : 0);
-        
-        const options = {
-            series: [
-                { name: 'RSI', data: rsiSeries },
-                { name: 'Stoch %K', data: stochKSeries },
-                { name: 'Stoch %D', data: stochDSeries }
-            ],
-            chart: {
-                type: 'bar',
-                height: 300,
-                stacked: false,
-                toolbar: { show: false }
-            },
-            plotOptions: {
-                bar: {
-                    horizontal: false,
-                    columnWidth: '50%',
-                    endingShape: 'rounded'
-                },
-            },
-            dataLabels: {
-                enabled: true,
-                formatter: function(val) { return val.toFixed(1); }
-            },
-            stroke: {
-                show: true,
-                width: 2,
-                colors: ['transparent']
-            },
-            xaxis: {
-                categories: timeframes,
-                title: { text: 'Timeframe' }
-            },
-            yaxis: {
-                title: { text: 'Valor do Indicador' },
-                min: 0,
-                max: 100
-            },
-            fill: {
-                opacity: 1
-            },
-            tooltip: {
-                y: {
-                    formatter: function (val) {
-                        return val.toFixed(1);
-                    }
-                }
-            },
-            colors: ['#6f42c1', '#007bff', '#20c997'],
-            theme: {
-                mode: document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light'
-            }
-        };
-
-        container.innerHTML = '';
-        const chart = new ApexCharts(container, options);
-        chart.render();
-
-
-    } catch (err) {
-        console.error("Erro ao renderizar overview de indicadores:", err);
-        container.innerHTML = '<p style="color:red;">Não foi possível carregar indicadores. ' + err.message + '</p>';
-    }
+    new TradingView.widget({
+        "container_id": "tradingview-tech-analysis-container",
+        "width": "100%",
+        "height": "100%",
+        "symbol": `BINANCE:${symbol}`,
+        "interval": "1h", // Pode ajustar este intervalo se quiser um padrão diferente
+        "showIntervalTabs": true,
+        "displayMode": "multiple",
+        "locale": "pt", // Mantido em português
+        "colorTheme": currentTheme,
+        "isTransparent": false
+    });
 }
 
 
@@ -294,5 +225,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    renderIndicatorOverview(assetSymbol); // Agora chama a função que usa a Edge Function
+    // NOVO: Renderiza o widget de análise técnica da TradingView
+    renderTradingViewTechnicalAnalysisWidget(assetSymbol);
 });
