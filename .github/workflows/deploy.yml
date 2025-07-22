@@ -19,15 +19,16 @@ jobs:
 
       - name: Replace Secrets 🔑
         run: |
+          # Substitui os placeholders no config.js
           sed -i "s|__FIREBASE_API_KEY__|${{ secrets.FIREBASE_API_KEY }}|g" js/config.js
           sed -i "s|__SUPABASE_URL__|${{ secrets.SUPABASE_URL }}|g" js/config.js
           sed -i "s|__SUPABASE_ANON_KEY__|${{ secrets.SUPABASE_ANON_KEY }}|g" js/config.js
+          # Substitui os placeholders no asset-details.js
           sed -i "s|__CRYPTOCOMPARE_API_KEY__|${{ secrets.CRYPTOCOMPARE_API_KEY }}|g" js/asset-details.js
-      
-      - name: Build and Deploy with Jekyll 🚀
+
+      - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          branch: gh-pages # A branch onde a versão publicada será guardada
-          folder: . # O diretório raiz do seu projeto
-          # ADICIONADO: Configuração para usar o Jekyll
-          jekyll: true
+          branch: gh-pages
+          folder: .
+          # REMOVIDO: jekyll: true
