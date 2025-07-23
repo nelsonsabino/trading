@@ -8,7 +8,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 import { auth } from './firebase-service.js';
 
-const ADMIN_EMAIL = "o.seu.email.aqui@gmail.com"; // <-- IMPORTANTE: SUBSTITUIR PELO SEU EMAIL
+const ADMIN_EMAIL = "sabino.nelson@gmail.com"; // <-- IMPORTANTE: SUBSTITUIR PELO SEU EMAIL
 const provider = new GoogleAuthProvider();
 
 // --- FUNÇÃO DE LOGIN ---
