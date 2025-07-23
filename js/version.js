@@ -2,15 +2,26 @@
 
 export const changelogData = {
     current: {
-        number: '10.2.1', // <-- VERSÃO ATUALIZADA
+        number: '11.0.0', // <-- VERSÃO ATUALIZADA
         changes: [
-            "**Correção de Permissões (Firebase):**",
-            "Resolvido o erro de 'permissões insuficientes' que impedia a eliminação de trades na página de Gestão e o registo de transações na página de Estatísticas.",
-            "A causa foi identificada como regras de segurança restritivas do Firebase, que foram ajustadas para permitir operações de escrita e eliminação durante o desenvolvimento.",
-            "Melhorada a estrutura do `manage.js` para garantir que o script só é executado após o carregamento completo da página."
+            "**Implementação do Sistema de Autenticação (Versão 11):**",
+            "Adicionado sistema de login seguro utilizando Firebase Authentication com o provedor Google.",
+            "Criada uma nova página de login (`login.html`) como porta de entrada para a aplicação.",
+            "Implementada a proteção de rotas: utilizadores não autenticados são automaticamente redirecionados para a página de login.",
+            "Adicionada a secção do utilizador no cabeçalho de todas as páginas, exibindo a foto do perfil e um botão de logout.",
+            "As Regras de Segurança do Firestore foram atualizadas para exigir autenticação para todas as operações de escrita e eliminação, protegendo a integridade dos dados."
         ]
     },
     releases: [
+        {
+            number: '10.2.1',
+            changes: [
+                "**Correção de Permissões (Firebase):**",
+                "Resolvido o erro de 'permissões insuficientes' que impedia a eliminação de trades na página de Gestão e o registo de transações na página de Estatísticas.",
+                "A causa foi identificada como regras de segurança restritivas do Firebase, que foram ajustadas para permitir operações de escrita e eliminação durante o desenvolvimento.",
+                "Melhorada a estrutura do `manage.js` para garantir que o script só é executado após o carregamento completo da página."
+            ]
+        },
         {
             number: '10.2.0',
             changes: [
