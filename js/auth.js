@@ -24,7 +24,7 @@ const signInWithGoogle = () => {
         });
 };
 
-// --- FUNÇÃO DE LOGOUT (será usada mais tarde) ---
+// --- FUNÇÃO DE LOGOUT ---
 export const signOutUser = () => {
     signOut(auth).then(() => {
         console.log("Logout bem-sucedido.");
@@ -36,16 +36,22 @@ export const signOutUser = () => {
 
 // --- CONTROLO CENTRAL DE AUTENTICAÇÃO ---
 onAuthStateChanged(auth, (user) => {
-    const isLoginPage = window.location.pathname.endsWith('login.html');
+    const isLoginPage = window.location.pathname.endsWith('login.html') || window.location.pathname === '/'; // Considera a raiz como página de login
+    const userSessionDiv = document.getElementById('user-session');
+    const userPhotoImg = document.getElementById('user-photo');
 
     if (user) {
         // O utilizador está logado.
         if (isLoginPage) {
             // Se ele está na página de login, redireciona para o dashboard.
             window.location.replace('index.html');
+        } else {
+           // Mostra a secção do utilizador e preenche os dados
+           if (userSessionDiv && userPhotoImg) {
+               userPhotoImg.src = user.photoURL || './pic/default-user.png'; // Usa uma imagem padrão se não houver foto
+               userSessionDiv.style.display = 'flex';
+           }
         }
-        // Se estiver em outra página, tudo bem, ele pode ficar.
-        
     } else {
         // O utilizador NÃO está logado.
         if (!isLoginPage) {
@@ -53,7 +59,10 @@ onAuthStateChanged(auth, (user) => {
             console.log("Utilizador não autenticado. A redirecionar para o login...");
             window.location.replace('login.html');
         }
-        // Se já estiver na página de login, não faz nada.
+       // Esconde a secção do utilizador se ele não estiver logado
+       if (userSessionDiv) {
+           userSessionDiv.style.display = 'none';
+       }
     }
 });
 
@@ -63,5 +72,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginButton = document.getElementById('login-google-btn');
     if (loginButton) {
         loginButton.addEventListener('click', signInWithGoogle);
+    }
+    const logoutButton = document.getElementById('logout-btn');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', signOutUser);
     }
 });
