@@ -1,14 +1,13 @@
 // js/auth.js
 
 import { 
-    getAuth, 
     GoogleAuthProvider, 
     signInWithPopup, 
     onAuthStateChanged,
     signOut
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+import { auth } from './firebase-service.js'; // NOVO: Importa o auth já inicializado
 
-const auth = getAuth();
 const provider = new GoogleAuthProvider();
 
 // --- FUNÇÃO DE LOGIN ---
