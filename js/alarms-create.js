@@ -2,8 +2,8 @@
 
 import { supabase } from './services.js';
 import { setupAutocomplete } from './utils.js';
-import { setLastCreatedAlarmId, getAlarmsData, setAlarmsData } from './state.js'; // Importa funções de estado
-import { openChartModal } from './alarms-manage.js'; // Reutiliza o modal de gráfico daqui
+import { setLastCreatedAlarmId } from './state.js';
+import { openChartModal } from './alarms-manage.js';
 
 let editingAlarmId = null;
 
@@ -33,6 +33,7 @@ async function fetchPriceForPair(pair) {
 function enterEditMode(alarm) {
     editingAlarmId = alarm.id;
     document.getElementById('alarm-asset').value = alarm.asset_pair;
+    fetchPriceForPair(alarm.asset_pair);
     const alarmType = alarm.alarm_type || 'price';
     document.getElementById('alarm-type-select').value = alarmType;
     document.getElementById('alarm-type-select').dispatchEvent(new Event('change'));
@@ -56,8 +57,8 @@ function enterEditMode(alarm) {
     } else if (alarmType === 'rsi_crossover') { 
         document.getElementById('rsi-condition').value = alarm.condition; 
         document.getElementById('rsi-timeframe').value = alarm.indicator_timeframe; 
-        document.getElementById('rsi-period').value = alarm.rsi_period; // Certifica-se que estes existem ou são definidos
-        document.getElementById('rsi-ma-period').value = alarm.rsi_ma_period;
+        if(document.getElementById('rsi-period')) document.getElementById('rsi-period').value = alarm.rsi_period || 14;
+        if(document.getElementById('rsi-ma-period')) document.getElementById('rsi-ma-period').value = alarm.rsi_ma_period || 14;
     } else if (alarmType === 'ema_touch') { 
         document.getElementById('ema-condition').value = alarm.condition; 
         document.getElementById('ema-period').value = alarm.ema_period; 
@@ -68,7 +69,7 @@ function enterEditMode(alarm) {
         document.getElementById('combo-stoch-condition').value = alarm.combo_condition; 
         document.getElementById('combo-stoch-value').value = alarm.combo_target_price; 
         document.getElementById('combo-timeframe').value = alarm.indicator_timeframe; 
-        document.getElementById('combo-period').value = alarm.combo_period; // Certifica-se que este existe
+        if(document.getElementById('combo-period')) document.getElementById('combo-period').value = alarm.combo_period || 14;
     } else { // price
         document.getElementById('alarm-condition-standalone').value = alarm.condition; 
         document.getElementById('alarm-price-standalone').value = alarm.target_price; 
@@ -81,13 +82,13 @@ function enterEditMode(alarm) {
 function exitEditMode() {
     editingAlarmId = null;
     document.getElementById('alarm-form').reset();
-    document.getElementById('alarm-type-select').dispatchEvent(new Event('change')); // Para esconder/mostrar campos corretamente
+    document.getElementById('alarm-type-select').dispatchEvent(new Event('change'));
     document.querySelector('#alarm-form button[type="submit"]').textContent = 'Definir Alarme';
     document.getElementById('cancel-edit-btn').style.display = 'none';
     document.getElementById('asset-current-price').textContent = '';
+    window.history.replaceState({}, document.title, window.location.pathname);
 }
 
-// Exporta enterEditMode para que alarms-manage.js possa chamá-la
 export { enterEditMode };
 
 
@@ -97,10 +98,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const feedbackDiv = document.getElementById('alarm-feedback');
     const assetInput = document.getElementById('alarm-asset');
     const resultsDiv = document.getElementById('autocomplete-results');
-    const mainContainer = document.querySelector('main'); // Necessário para delegation de eventos
+    const mainContainer = document.querySelector('main');
     const alarmTypeSelect = document.getElementById('alarm-type-select');
     
-    // Mapeamento dos campos para cada tipo de alarme
     const fields = { 
         price: document.getElementById('price-fields'), 
         rsi_level: document.getElementById('rsi-level-fields'), 
@@ -111,7 +111,6 @@ document.addEventListener('DOMContentLoaded', () => {
         combo: document.getElementById('combo-fields') 
     };
     
-    // Listener para mudar os campos visíveis com base no tipo de alarme
     alarmTypeSelect.addEventListener('change', () => {
         const selectedType = alarmTypeSelect.value;
         for (const type in fields) { 
@@ -119,12 +118,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 fields[type].style.display = type === selectedType ? 'block' : 'none'; 
             } 
         }
-        // Dispara eventos para preencher valores por defeito para RSI/Stoch
         if (selectedType === 'rsi_level') { document.getElementById('rsi-level-condition').dispatchEvent(new Event('change')); }
         if (selectedType === 'stochastic') { document.getElementById('stoch-condition').dispatchEvent(new Event('change')); }
     });
 
-    // Listeners para preencher valores por defeito no RSI e Estocástico
     const rsiLevelConditionSelect = document.getElementById('rsi-level-condition');
     if(rsiLevelConditionSelect) { rsiLevelConditionSelect.addEventListener('change', (e) => { const rsiValueInput = document.getElementById('rsi-level-value'); if(e.target.value === 'below') { rsiValueInput.value = 35; } else { rsiValueInput.value = 70; } }); }
 
@@ -136,10 +133,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Pré-preenchimento do ativo se vier da URL
     const urlParams = new URLSearchParams(window.location.search);
     const assetPairFromUrl = urlParams.get('assetPair');
-    const alarmIdToEdit = urlParams.get('editAlarmId'); // NOVO: Para modo de edição
+    const alarmIdToEdit = urlParams.get('editAlarmId');
     
     if (assetPairFromUrl && assetInput) {
         const pair = assetPairFromUrl.toUpperCase();
@@ -147,37 +143,45 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchPriceForPair(pair); 
     }
 
-    // Se estiver em modo de edição, busca o alarme e preenche o formulário
     if (alarmIdToEdit) {
-        const alarmsData = getAlarmsData();
-        const alarmToEdit = alarmsData.find(a => a.id === alarmIdToEdit);
-        if (alarmToEdit) {
-            enterEditMode(alarmToEdit);
-        } else {
-            // Se o alarme não estiver nos dados atuais (ex: página de gestão ainda não carregou),
-            // podemos fazer um fetch direto (mas por agora, o estado é mais eficiente)
-            console.warn("Alarme a editar não encontrado nos dados em cache.");
-        }
+        const fetchAndEditAlarm = async (id) => {
+            feedbackDiv.textContent = 'A carregar dados do alarme para edição...';
+            try {
+                const { data: alarmToEdit, error } = await supabase
+                    .from('alarms')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+
+                if (error) throw error;
+
+                if (alarmToEdit) {
+                    feedbackDiv.textContent = '';
+                    enterEditMode(alarmToEdit);
+                } else {
+                    console.warn(`Alarme com ID ${id} não encontrado na base de dados.`);
+                    feedbackDiv.textContent = 'Erro: Alarme a editar não encontrado.';
+                }
+            } catch (err) {
+                console.error("Erro ao buscar alarme para edição:", err);
+                feedbackDiv.textContent = 'Erro ao carregar os dados do alarme para edição.';
+            }
+        };
+        fetchAndEditAlarm(alarmIdToEdit);
     }
 
-
-    // Listener para o modal de gráfico (reutilizado)
     mainContainer.addEventListener('click', (e) => {
         const chartBtn = e.target.closest('.view-chart-btn');
         if (chartBtn) {
-            // Aqui o botão de ver gráfico abre o modal que pertence a alarms-manage.js
             const symbol = chartBtn.dataset.symbol;
-            if (symbol) openChartModal(symbol); // openChartModal é importado de alarms-manage.js
+            if (symbol) openChartModal(symbol);
         }
     });
     
-    // Listener para o botão de cancelar edição
     document.getElementById('cancel-edit-btn').addEventListener('click', exitEditMode);
 
-    // Setup do autocomplete para o campo de ativo
     setupAutocomplete(assetInput, resultsDiv, async (selectedPair) => fetchPriceForPair(selectedPair));
 
-    // Handler para submissão do formulário de alarme
     alarmForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const submitButton = alarmForm.querySelector('button[type="submit"]');
@@ -189,7 +193,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const alarmType = alarmTypeSelect.value;
             let alarmData = { asset_pair: assetPair, alarm_type: alarmType };
             
-            // Recolha de dados do formulário com base no tipo de alarme
             if (alarmType === 'price') { 
                 alarmData.condition = document.getElementById('alarm-condition-standalone').value; 
                 alarmData.target_price = parseFloat(document.getElementById('alarm-price-standalone').value); 
@@ -230,15 +233,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (editingAlarmId) {
                 const { error } = await supabase.from('alarms').update(alarmData).eq('id', editingAlarmId);
                 if (error) throw error;
-                setLastCreatedAlarmId(null); // Limpa o ID se for uma edição
-                // Redireciona para a página de gestão após a edição
-                window.location.href = 'alarms-manage.html'; 
+                setLastCreatedAlarmId(null);
+                window.location.href = 'alarms-manage.html';
             } else {
                 alarmData.status = 'active';
                 const { data, error } = await supabase.from('alarms').insert([alarmData]).select('id').single();
                 if (error) throw error;
                 setLastCreatedAlarmId(data.id);
-                // Redireciona para a página de gestão após a criação
                 window.location.href = 'alarms-manage.html';
             }
 
