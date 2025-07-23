@@ -87,6 +87,33 @@ header .main-nav {
     display: block;
 }
 
+/* --- SECÇÃO DO UTILIZADOR (LOGOUT) --- */
+.user-session {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-left: 1rem; /* Adiciona um espaço à esquerda */
+}
+
+.user-photo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #dee2e6;
+}
+
+#logout-btn {
+    padding: 8px 16px;
+    font-size: 0.9em;
+    background-color: #dc3545; /* Vermelho para logout */
+    color: white; /* Garante que o texto é branco */
+    border: none;
+}
+
+#logout-btn:hover {
+    background-color: #c82333;
+}
+
 /* Ajustes para o dark mode */
 .dark-mode .main-nav .nav-icon-link {
     background-color: #2c2c2c;
@@ -106,4 +133,7 @@ header .main-nav {
 }
 .dark-mode .nav-dropdown-content a.nav-link:hover {
     background-color: #2c2c2c;
+}
+.dark-mode .user-photo {
+    border-color: #444;
 }
