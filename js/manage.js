@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function editTrade(tradeId) {
         localStorage.setItem('tradeToEdit', tradeId);
-        window.location.href = 'index.html';
+        window.location.href = 'dashboard.html'; // CORRIGIDO AQUI
     }
 
     function fetchAndDisplayAllTrades() {
