@@ -2,14 +2,23 @@
 
 export const changelogData = {
     current: {
-        number: '10.1.0', // <-- VERSÃO ATUALIZADA
+        number: '10.2.0', // <-- VERSÃO ATUALIZADA
         changes: [
-            "**Correção da Edição de Alarmes (Multi-dispositivo):**",
-            "Resolvido o problema onde a edição de um alarme falhava ao navegar entre páginas ou dispositivos.",
-            "A página de criação/edição de alarmes (`alarms-create.js`) agora busca os dados do alarme a ser editado diretamente da base de dados (Supabase) em vez de depender de um cache local, garantindo que a funcionalidade de edição é robusta e funciona de forma consistente em qualquer cenário."
+            "**Gráfico do Market Scanner Melhorado:**",
+            "O gráfico de visualização rápida no modal da página do Market Scanner foi substituído.",
+            "Agora utiliza o mesmo motor de gráfico avançado (ApexCharts) da página de detalhes do ativo, exibindo por defeito um gráfico de linhas com as EMAs 50 e 200.",
+            "Esta alteração unifica a experiência de análise, proporcionando uma ferramenta consistente e poderosa em toda a aplicação."
         ]
     },
     releases: [
+        {
+            number: '10.1.0',
+            changes: [
+                "**Correção da Edição de Alarmes (Multi-dispositivo):**",
+                "Resolvido o problema onde a edição de um alarme falhava ao navegar entre páginas ou dispositivos.",
+                "A página de criação/edição de alarmes (`alarms-create.js`) agora busca os dados do alarme a ser editado diretamente da base de dados (Supabase) em vez de depender de um cache local, garantindo que a funcionalidade de edição é robusta e funciona de forma consistente em qualquer cenário."
+            ]
+        },
         {
             number: '10.0.0',
             changes: [
