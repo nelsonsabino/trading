@@ -8,15 +8,21 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 import { auth } from './firebase-service.js';
 
+const ADMIN_EMAIL = "o.seu.email.aqui@gmail.com"; // <-- IMPORTANTE: SUBSTITUIR PELO SEU EMAIL
 const provider = new GoogleAuthProvider();
 
 // --- FUNÇÃO DE LOGIN ---
 const signInWithGoogle = () => {
     signInWithPopup(auth, provider)
         .then((result) => {
-            console.log("Login com Google bem-sucedido!", result.user);
-            // AGORA, esta função trata do redirecionamento após o sucesso.
-            window.location.href = 'index.html';
+            const userEmail = result.user.email;
+            if (userEmail === ADMIN_EMAIL) {
+                console.log("Administrador logado com sucesso!", result.user);
+                window.location.href = 'dashboard.html'; // Redireciona para o novo dashboard
+            } else {
+                alert("Acesso negado. Esta é uma aplicação privada.");
+                signOutUser(); // Faz logout imediatamente
+            }
         })
         .catch((error) => {
             console.error("Erro no login com Google:", error);
@@ -28,7 +34,7 @@ const signInWithGoogle = () => {
 export const signOutUser = () => {
     signOut(auth).then(() => {
         console.log("Logout bem-sucedido.");
-        // O onAuthStateChanged irá redirecionar para a página de login
+        // O onAuthStateChanged irá redirecionar para a landing page
     }).catch((error) => {
         console.error("Erro no logout:", error);
     });
@@ -36,23 +42,30 @@ export const signOutUser = () => {
 
 // --- CONTROLO CENTRAL DE AUTENTICAÇÃO ---
 onAuthStateChanged(auth, (user) => {
-    const isLoginPage = window.location.pathname.endsWith('login.html') || window.location.pathname === '/';
+    // As páginas públicas são a landing page e a página de login
+    const isPublicPage = window.location.pathname.endsWith('/') || window.location.pathname.endsWith('index.html') || window.location.pathname.endsWith('login.html');
     const userSessionDiv = document.getElementById('user-session');
     const userPhotoImg = document.getElementById('user-photo');
 
     if (user) {
         // O utilizador está logado.
-        // Apenas mostra ou esconde a informação do utilizador. Não redireciona daqui.
-        if (!isLoginPage && userSessionDiv && userPhotoImg) {
+        if (user.email !== ADMIN_EMAIL) {
+            // Segurança extra: se um utilizador não autorizado chegar aqui, faz logout.
+            signOutUser();
+            return;
+        }
+
+        // Mostra a secção do utilizador nas páginas privadas
+        if (!isPublicPage && userSessionDiv && userPhotoImg) {
             userPhotoImg.src = user.photoURL || './pic/default-user.png';
             userSessionDiv.style.display = 'flex';
         }
     } else {
         // O utilizador NÃO está logado.
-        if (!isLoginPage) {
-            // Se ele não está na página de login, redireciona para lá.
-            console.log("Utilizador não autenticado. A redirecionar para o login...");
-            window.location.replace('login.html');
+        if (!isPublicPage) {
+            // Se ele não está numa página pública, redireciona para a landing page.
+            console.log("Utilizador não autenticado. A redirecionar para a página inicial...");
+            window.location.replace('index.html');
         }
        // Esconde a secção do utilizador se ele não estiver logado
        if (userSessionDiv) {
