@@ -57,7 +57,7 @@
         <nav class="main-nav">
             <a href="index.html" class="nav-icon-link" title="Dashboard"><i class="fas fa-home"></i></a>
             <a href="market-scan.html" class="nav-icon-link" title="Scanner de Mercado"><i class="fas fa-search-dollar"></i></a>
-            <a href="alarms-create.html" class="nav-icon-link" title="Criar Alarme"><i class="fas fa-plus-circle"></i></a> <!-- ÍCONE ALTERADO AQUI -->
+            <a href="alarms-create.html" class="nav-icon-link" title="Criar Alarme"><i class="fas fa-plus-circle"></i></a>
             <a href="alarms-manage.html" class="nav-icon-link" title="Meus Alarmes"><i class="fas fa-bell"></i></a>
             
             <div class="nav-dropdown">
@@ -72,6 +72,12 @@
             <button id="theme-toggle-btn" class="btn nav-icon-link" title="Alternar tema">
                 <i class="fas fa-moon"></i>
             </button> 
+
+            <!-- NOVO: Secção do Utilizador -->
+            <div id="user-session" class="user-session" style="display: none;">
+                <img id="user-photo" src="" alt="Foto do Utilizador" class="user-photo">
+                <button id="logout-btn" class="btn btn-secondary">Sair</button>
+            </div>
         </nav>
     </header>
 
@@ -338,5 +344,6 @@
     <script type="module" src="js/navigation.js"></script>
     <script type="module" src="js/version.js"></script>
     <script type="module" src="js/dark-mode.js"></script>
+    <script type="module" src="js/auth.js"></script>
 </body>
 </html>
