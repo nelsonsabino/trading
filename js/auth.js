@@ -8,7 +8,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 import { auth } from './firebase-service.js';
 
-const ADMIN_EMAIL = "sabino.nelson@gmail.com"; // <-- IMPORTANTE: SUBSTITUIR PELO SEU EMAIL
+const ADMIN_EMAIL = "o.seu.email.aqui@gmail.com"; // <-- IMPORTANTE: SUBSTITUIR PELO SEU EMAIL
 const provider = new GoogleAuthProvider();
 
 // --- FUNÇÃO DE LOGIN ---
@@ -16,7 +16,13 @@ const signInWithGoogle = () => {
     signInWithPopup(auth, provider)
         .then((result) => {
             const userEmail = result.user.email;
-            if (userEmail === ADMIN_EMAIL) {
+            
+            // DEBUG: Mostra na consola o que estamos a comparar
+            console.log("Email do Utilizador (Google):", `'${userEmail}'`);
+            console.log("Email de Administrador (Código):", `'${ADMIN_EMAIL}'`);
+            
+            // COMPARAÇÃO ROBUSTA: ignora maiúsculas/minúsculas e espaços
+            if (userEmail.toLowerCase().trim() === ADMIN_EMAIL.toLowerCase().trim()) {
                 console.log("Administrador logado com sucesso!", result.user);
                 window.location.href = 'dashboard.html'; // Redireciona para o novo dashboard
             } else {
@@ -49,8 +55,13 @@ onAuthStateChanged(auth, (user) => {
 
     if (user) {
         // O utilizador está logado.
-        if (user.email !== ADMIN_EMAIL) {
+        // DEBUG: Mostra na consola o que estamos a comparar em tempo real
+        console.log("onAuthStateChanged - Email do Utilizador:", `'${user.email}'`);
+        console.log("onAuthStateChanged - Email de Administrador:", `'${ADMIN_EMAIL}'`);
+        
+        if (user.email.toLowerCase().trim() !== ADMIN_EMAIL.toLowerCase().trim()) {
             // Segurança extra: se um utilizador não autorizado chegar aqui, faz logout.
+            console.warn("Utilizador logado não autorizado. A fazer logout.");
             signOutUser();
             return;
         }
