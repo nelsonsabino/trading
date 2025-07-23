@@ -1,5 +1,6 @@
-// js/ui.js - VERSÃO COM LAYOUT DOS CARDS PERFEITO E COMPACTO
+// js/ui.js
 
+import { supabase } from './services.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openImageModal } from './modals.js';
 import { loadAndOpenForEditing } from './handlers.js';
@@ -99,7 +100,74 @@ export function populateStrategySelect(strategies) {
     }
 }
 
-// --- LÓGICA DE CRIAÇÃO E EXIBIÇÃO DE CARDS (OTIMIZADA) ---
+async function toggleAdvancedChart(tradeId, symbol, button) {
+    const chartContainer = document.getElementById(`advanced-chart-${tradeId}`);
+    if (!chartContainer) return;
+
+    const isVisible = chartContainer.classList.contains('visible');
+
+    if (isVisible) {
+        chartContainer.innerHTML = '';
+        chartContainer.classList.remove('visible');
+        button.innerHTML = `<i class="fa-solid fa-chart-simple"></i>`;
+        return;
+    }
+
+    // Lógica para abrir o gráfico
+    chartContainer.classList.add('visible');
+    chartContainer.innerHTML = '<p style="text-align: center; padding: 2rem;">A carregar gráfico...</p>';
+    button.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
+
+    try {
+        const cleanSymbol = symbol.replace('BINANCE:', '');
+        const { data: response, error } = await supabase.functions.invoke('get-asset-details-data', {
+            body: { symbol: cleanSymbol, interval: '1h' },
+        });
+
+        if (error) throw error;
+        if (!response || !response.ohlc || !response.indicators) {
+            throw new Error('Dados de gráfico ou indicadores não foram encontrados.');
+        }
+
+        const klinesData = response.ohlc;
+        const indicatorsData = response.indicators;
+        let series = [];
+
+        const closePriceSeriesData = klinesData.map(kline => ({ x: kline[0], y: kline[4] }));
+        series.push({ name: 'Preço (USD)', type: 'line', data: closePriceSeriesData });
+
+        if (indicatorsData.ema50_data) {
+            const ema50SeriesData = indicatorsData.ema50_data.map((emaVal, index) => ({ x: klinesData[index][0], y: emaVal }));
+            series.push({ name: 'EMA 50', type: 'line', data: ema50SeriesData });
+        }
+        if (indicatorsData.ema200_data) {
+            const ema200SeriesData = indicatorsData.ema200_data.map((emaVal, index) => ({ x: klinesData[index][0], y: emaVal }));
+            series.push({ name: 'EMA 200', type: 'line', data: ema200SeriesData });
+        }
+
+        const options = {
+            series: series,
+            chart: { type: 'line', height: 400, toolbar: { show: true, autoSelected: 'pan' } },
+            colors: ['#007bff', '#ffc107', '#dc3545'],
+            stroke: { curve: 'smooth', width: 2 },
+            xaxis: { type: 'datetime' },
+            yaxis: { labels: { formatter: (val) => `$${val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 4})}` }, tooltip: { enabled: true } },
+            tooltip: { x: { format: 'dd MMM yyyy HH:mm' } },
+            theme: { mode: document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light' }
+        };
+
+        chartContainer.innerHTML = '';
+        const chart = new ApexCharts(chartContainer, options);
+        chart.render();
+        button.innerHTML = `<i class="fa-solid fa-eye-slash"></i>`;
+
+    } catch (err) {
+        console.error("Erro ao carregar o gráfico no card:", err);
+        chartContainer.innerHTML = `<p style="text-align: center; padding: 2rem; color: red;">Erro ao carregar: ${err.message}</p>`;
+        button.innerHTML = `<i class="fa-solid fa-exclamation-triangle"></i>`;
+    }
+}
+
 export function createTradeCard(trade, marketData = {}) {
     const card = document.createElement('div');
     card.className = 'trade-card';
@@ -177,26 +245,6 @@ export function createTradeCard(trade, marketData = {}) {
     return card;
 }
 
-// ... (Restante do ficheiro sem alterações) ...
-function toggleAdvancedChart(tradeId, symbol, button) {
-    const chartContainer = document.getElementById(`advanced-chart-${tradeId}`);
-    if (!chartContainer) return;
-    const isVisible = chartContainer.classList.contains('visible');
-    if (isVisible) {
-        chartContainer.innerHTML = ''; chartContainer.classList.remove('visible');
-        button.innerHTML = `<i class="fa-solid fa-chart-simple"></i>`;
-    } else {
-        button.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
-        const currentTheme = document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light';
-        new TradingView.widget({
-            "container_id": chartContainer.id, "autosize": true, "symbol": symbol, "interval": "60", "timezone": "Etc/UTC", 
-            "theme": currentTheme, "style": "1", "locale": "pt", "hide_side_toolbar": true, "hide_top_toolbar": true, "hide_legend": true,
-            "save_image": false, "allow_symbol_change": false
-        });
-        chartContainer.classList.add('visible');
-        button.innerHTML = `<i class="fa-solid fa-eye-slash"></i>`;
-    }
-}
 let tradesForEventListeners = [];
 export function displayTrades(trades, marketData) {
     tradesForEventListeners = trades;
