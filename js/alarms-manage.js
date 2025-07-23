@@ -1,10 +1,10 @@
 // js/alarms-manage.js
 
 import { supabase } from './services.js';
-import { setAlarmsData, getAlarmsData, getLastCreatedAlarmId, setLastCreatedAlarmId } from './state.js';
-import { enterEditMode } from './alarms-create.js'; // Importa a função de edição do alarms-create.js
+import { setAlarmsData, getLastCreatedAlarmId, setLastCreatedAlarmId } from './state.js';
+import { enterEditMode } from './alarms-create.js';
 
-// --- LÓGICA DO MODAL DO GRÁFICO (CENTRALIZADA AQUI PARA ALARMES) ---
+// --- LÓGICA DO MODAL DO GRÁFICO ---
 const chartModal = document.getElementById('chart-modal');
 const closeChartModalBtn = document.getElementById('close-chart-modal');
 const chartContainer = document.getElementById('chart-modal-container');
@@ -28,7 +28,6 @@ function closeChartModal() {
     chartModal.style.display = 'none';
 }
 
-// Configura os listeners do modal de gráfico
 if (chartModal) {
     closeChartModalBtn.addEventListener('click', closeChartModal);
     chartModal.addEventListener('click', (e) => { if (e.target.id === 'chart-modal') closeChartModal(); });
@@ -48,13 +47,14 @@ async function fetchAndDisplayAlarms() {
         const { data, error } = await supabase.from('alarms').select('*').order('created_at', { ascending: false });
         if (error) throw error;
 
-        setAlarmsData(data); // Guarda os dados no estado global
+        setAlarmsData(data);
+        sessionStorage.setItem('allAlarmsData', JSON.stringify(data));
+
         const activeAlarmsHtml = [], triggeredAlarmsHtml = [];
 
         for (const alarm of data) {
             const formattedDate = new Date(alarm.created_at).toLocaleString('pt-PT');
             let alarmDescription = '';
-            // Lógica de descrição do alarme (mantida)
             if (alarm.alarm_type === 'stochastic') { alarmDescription = `Estocástico(${alarm.indicator_period}) ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} no ${alarm.indicator_timeframe}`; }
             else if (alarm.alarm_type === 'rsi_level') { alarmDescription = `RSI(${alarm.indicator_period}) ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} no ${alarm.indicator_timeframe}`; }
             else if (alarm.alarm_type === 'stochastic_crossover') { alarmDescription = `Estocástico %K(${alarm.indicator_period}) cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} de %D(${alarm.combo_period}) no ${alarm.indicator_timeframe}`; } 
@@ -64,7 +64,7 @@ async function fetchAndDisplayAlarms() {
             else { alarmDescription = `Preço ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} USD`; }
             
             const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${alarm.asset_pair}`;
-            const addOpportunityUrl = `index.html?assetPair=${alarm.asset_pair}`;
+            const addOpportunityUrl = `dashboard.html?assetPair=${alarm.asset_pair}`; // CORRIGIDO AQUI
             const assetHtml = `<strong><a href="asset-details.html?symbol=${alarm.asset_pair}" class="asset-link">${alarm.asset_pair}</a></strong>`;
 
             if (alarm.status === 'active') {
@@ -105,7 +105,6 @@ async function fetchAndDisplayAlarms() {
         activeTbody.innerHTML = activeAlarmsHtml.length > 0 ? activeAlarmsHtml.join('') : '<tr><td colspan="4" style="text-align:center;">Nenhum alarme ativo.</td></tr>';
         triggeredTbody.innerHTML = triggeredAlarmsHtml.length > 0 ? triggeredAlarmsHtml.join('') : '<tr><td colspan="5" style="text-align:center;">Nenhum alarme no histórico.</td></tr>';
 
-        // Lógica de destaque do último alarme criado
         const lastId = getLastCreatedAlarmId();
         if (lastId) {
             const newRow = document.querySelector(`tr[data-alarm-id="${lastId}"]`);
@@ -127,17 +126,14 @@ async function deleteAlarm(alarmId) {
     if (!confirm("Tem a certeza que quer apagar este registo?")) return;
     try { 
         await supabase.from('alarms').delete().eq('id', alarmId); 
-        fetchAndDisplayAlarms(); // Atualiza a tabela após apagar
+        fetchAndDisplayAlarms();
     } catch (error) { 
         console.error("Erro ao apagar alarme:", error); 
         alert("Erro ao apagar alarme.");
     }
 }
 
-
-// --- PONTO DE ENTRADA DO SCRIPT ---
 document.addEventListener('DOMContentLoaded', () => {
-    // Listener para delegação de eventos para botões de ação nas tabelas
     const mainContainer = document.querySelector('main');
     if (mainContainer) {
         mainContainer.addEventListener('click', (e) => {
@@ -148,21 +144,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const chartBtn = e.target.closest('.view-chart-btn');
             if (chartBtn) {
-                e.preventDefault(); // Impede o link de navegar
+                e.preventDefault();
                 const symbol = chartBtn.dataset.symbol;
                 if (symbol) openChartModal(symbol);
                 return;
             }
-            // NOVO: Redireciona para a página de criação/edição ao clicar no botão de editar
-            const editLink = e.target.closest('a[href^="alarms-create.html?editAlarmId="]');
-            if (editLink) {
-                // Ao clicar no link, o browser já fará a navegação,
-                // mas garantimos que a lógica de estado é preparada, se necessário,
-                // ou que o alarms-create.js pode ler o ID da URL.
-            }
         });
     }
 
-    // Busca e exibe os alarmes ao carregar a página
     fetchAndDisplayAlarms();
 });
