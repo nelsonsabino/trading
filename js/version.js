@@ -2,17 +2,26 @@
 
 export const changelogData = {
     current: {
-        number: '11.0.0', // <-- VERSÃO ATUALIZADA
+        number: '11.1.0', // <-- VERSÃO ATUALIZADA
         changes: [
-            "**Implementação do Sistema de Autenticação (Versão 11):**",
-            "Adicionado sistema de login seguro utilizando Firebase Authentication com o provedor Google.",
-            "Criada uma nova página de login (`login.html`) como porta de entrada para a aplicação.",
-            "Implementada a proteção de rotas: utilizadores não autenticados são automaticamente redirecionados para a página de login.",
-            "Adicionada a secção do utilizador no cabeçalho de todas as páginas, exibindo a foto do perfil e um botão de logout.",
-            "As Regras de Segurança do Firestore foram atualizadas para exigir autenticação para todas as operações de escrita e eliminação, protegendo a integridade dos dados."
+            "**Correção e Finalização do Sistema de Autenticação:**",
+            "Resolvido o problema de falha no login com Google nos ambientes de produção (GitHub Pages e Netlify).",
+            "Corrigida a configuração de segurança autorizando os domínios da aplicação tanto no 'Firebase Authentication' (Domínios Autorizados) como na 'Google Cloud Console' (Restrições de Chave de API).",
+            "O fluxo de login está agora totalmente funcional e seguro em todos os domínios."
         ]
     },
     releases: [
+        {
+            number: '11.0.0',
+            changes: [
+                "**Implementação do Sistema de Autenticação (Versão 11):**",
+                "Adicionado sistema de login seguro utilizando Firebase Authentication com o provedor Google.",
+                "Criada uma nova página de login (`login.html`) como porta de entrada para a aplicação.",
+                "Implementada a proteção de rotas: utilizadores não autenticados são automaticamente redirecionados para a página de login.",
+                "Adicionada a secção do utilizador no cabeçalho de todas as páginas, exibindo a foto do perfil e um botão de logout.",
+                "As Regras de Segurança do Firestore foram atualizadas para exigir autenticação para todas as operações de escrita e eliminação, protegendo a integridade dos dados."
+            ]
+        },
         {
             number: '10.2.1',
             changes: [
