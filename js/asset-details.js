@@ -7,12 +7,6 @@ let currentAssetSymbol = null;
 let currentChartTimeframe = '1h'; 
 let currentChartType = 'line'; 
 
-/**
- * Busca dados de klines e indicadores da Edge Function e renderiza o gráfico principal do ativo.
- * @param {string} symbol - O símbolo do ativo (ex: "BTCUSDC").
- * @param {string} interval - O intervalo de tempo (ex: "1h", "1d").
- * @param {string} chartType - O tipo de gráfico (ex: "line", "candlestick").
- */
 async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line') {
     const chartContainer = document.getElementById('main-asset-chart');
     if (!chartContainer) return;
@@ -145,10 +139,6 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
     }
 }
 
-/**
- * Renderiza o widget de Análise Técnica da TradingView.
- * @param {string} symbol - O símbolo do ativo.
- */
 function renderTradingViewTechnicalAnalysisWidget(symbol) {
     const container = document.getElementById('tradingview-tech-analysis-container');
     if (!container) return;
@@ -172,7 +162,6 @@ function renderTradingViewTechnicalAnalysisWidget(symbol) {
     container.appendChild(script); 
 }
 
-// --- Funções de Notícias, Alarmes e Trades (sem alterações) ---
 async function displayAlarmsForAsset(symbol) {
     const tbody = document.getElementById('asset-alarms-tbody');
     if (!tbody) return;
@@ -196,6 +185,7 @@ async function displayAlarmsForAsset(symbol) {
         tbody.innerHTML = '<tr><td colspan="3" style="color:red;text-align:center;">Erro ao carregar alarmes.</td></tr>';
     }
 }
+
 async function displayTradesForAsset(symbol) {
     const tbody = document.getElementById('asset-trades-tbody');
     if (!tbody) return;
@@ -219,12 +209,12 @@ async function displayTradesForAsset(symbol) {
         tbody.innerHTML = '<tr><td colspan="5" style="color:red;text-align:center;">Erro ao carregar trades.</td></td>';
     }
 }
+
 function editTrade(tradeId) {
     localStorage.setItem('tradeToEdit', tradeId);
-    window.location.href = 'index.html';
+    window.location.href = 'dashboard.html'; // CORRIGIDO AQUI
 }
 
-// --- PONTO DE ENTRADA DO SCRIPT ---
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const assetSymbol = urlParams.get('symbol');
@@ -255,13 +245,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const watchlistBtn = document.getElementById('add-to-watchlist-btn');
     const alarmBtn = document.getElementById('add-alarm-btn');
     const tvBtn = document.getElementById('open-tv-btn');
-    if (watchlistBtn) watchlistBtn.href = `index.html?assetPair=${assetSymbol}`;
+    if (watchlistBtn) watchlistBtn.href = `dashboard.html?assetPair=${assetSymbol}`; // CORRIGIDO AQUI
     if (alarmBtn) alarmBtn.href = `alarms-create.html?assetPair=${assetSymbol}`;
     if (tvBtn) tvBtn.href = `https://www.tradingview.com/chart/?symbol=BINANCE:${assetSymbol}`;
 
     const baseAsset = assetSymbol.replace(/USDC|USDT|BUSD/, '');
 
-    // REMOVIDO: Chamada para displayNewsForAsset(baseAsset);
     displayAlarmsForAsset(assetSymbol);
     displayTradesForAsset(assetSymbol);
 
