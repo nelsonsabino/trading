@@ -1,6 +1,6 @@
 // js/alarms-create.js
 
-import { supabase, getAlarm } from './services.js'; // Importa getAlarm
+import { supabase } from './services.js';
 import { setupAutocomplete } from './utils.js';
 import { setLastCreatedAlarmId, getAlarmsData, setAlarmsData } from './state.js'; // Importa funções de estado
 import { openChartModal } from './alarms-manage.js'; // Reutiliza o modal de gráfico daqui
@@ -149,19 +149,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Se estiver em modo de edição, busca o alarme e preenche o formulário
     if (alarmIdToEdit) {
-        try {
-            // Agora busca o alarme diretamente do Supabase, não do estado em cache
-            const alarmToEdit = await getAlarm(alarmIdToEdit); 
-            if (alarmToEdit) {
-                enterEditMode(alarmToEdit);
-            } else {
-                console.warn(`Alarme com ID ${alarmIdToEdit} não encontrado.`);
-                // Pode adicionar um feedback visual ao utilizador aqui
-                feedbackDiv.textContent = 'Erro: Alarme não encontrado.';
-            }
-        } catch (error) {
-            console.error("Erro ao carregar alarme para edição:", error);
-            feedbackDiv.textContent = 'Erro ao carregar alarme para edição.';
+        const alarmsData = getAlarmsData();
+        const alarmToEdit = alarmsData.find(a => a.id === alarmIdToEdit);
+        if (alarmToEdit) {
+            enterEditMode(alarmToEdit);
+        } else {
+            // Se o alarme não estiver nos dados atuais (ex: página de gestão ainda não carregou),
+            // podemos fazer um fetch direto (mas por agora, o estado é mais eficiente)
+            console.warn("Alarme a editar não encontrado nos dados em cache.");
         }
     }
 
