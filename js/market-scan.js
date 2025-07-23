@@ -16,18 +16,64 @@ const chartModal = document.getElementById('chart-modal');
 const closeChartModalBtn = document.getElementById('close-chart-modal');
 const chartContainer = document.getElementById('chart-modal-container');
 
-function openChartModal(symbol) {
+async function openChartModal(symbol) {
     if (!chartModal || !chartContainer) return;
-    chartContainer.innerHTML = ''; 
-    const currentTheme = document.body.classList.contains('dark-mode') ? 'dark' : 'light';
-    new TradingView.widget({
-        "container_id": "chart-modal-container", "autosize": true, "symbol": `BINANCE:${symbol}`,
-        "interval": "240", "timezone": "Etc/UTC", "theme": currentTheme, "style": "1", "locale": "pt",
-        "hide_side_toolbar": false, "allow_symbol_change": true,
-        "studies": ["STD;MA%Ribbon", "STD;RSI"]
-    });
+
+    chartContainer.innerHTML = '<p style="padding: 2rem; text-align: center;">A carregar gráfico detalhado...</p>';
     chartModal.style.display = 'flex';
+
+    try {
+        // 1. Chamar a mesma Edge Function da página de detalhes
+        const { data: response, error } = await supabase.functions.invoke('get-asset-details-data', {
+            body: { symbol: symbol, interval: '1h' }, // Usamos 1h como um bom padrão
+        });
+
+        if (error) throw error;
+        if (!response || !response.ohlc || !response.indicators) {
+            throw new Error('Dados de gráfico ou indicadores não foram encontrados.');
+        }
+
+        const klinesData = response.ohlc;
+        const indicatorsData = response.indicators;
+
+        // 2. Construir as séries do gráfico (preço + EMAs)
+        let series = [];
+        
+        const closePriceSeriesData = klinesData.map(kline => ({ x: kline[0], y: kline[4] }));
+        series.push({ name: 'Preço (USD)', type: 'line', data: closePriceSeriesData });
+
+        if (indicatorsData.ema50_data) {
+            const ema50SeriesData = indicatorsData.ema50_data.map((emaVal, index) => ({ x: klinesData[index][0], y: emaVal }));
+            series.push({ name: 'EMA 50', type: 'line', data: ema50SeriesData });
+        }
+        if (indicatorsData.ema200_data) {
+            const ema200SeriesData = indicatorsData.ema200_data.map((emaVal, index) => ({ x: klinesData[index][0], y: emaVal }));
+            series.push({ name: 'EMA 200', type: 'line', data: ema200SeriesData });
+        }
+
+        // 3. Configurar as opções do ApexCharts para replicar a página de detalhes
+        const options = {
+            series: series,
+            chart: { type: 'line', height: '100%', toolbar: { show: true, autoSelected: 'pan' } },
+            title: { text: `${symbol} - Gráfico de 1 Hora`, align: 'left' },
+            colors: ['#007bff', '#ffc107', '#dc3545'], // Cores para Preço, EMA50, EMA200
+            stroke: { curve: 'smooth', width: 2 },
+            xaxis: { type: 'datetime' },
+            yaxis: { labels: { formatter: (val) => `$${val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 4})}` }, tooltip: { enabled: true } },
+            tooltip: { x: { format: 'dd MMM yyyy HH:mm' } },
+            theme: { mode: document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light' }
+        };
+
+        chartContainer.innerHTML = '';
+        const chart = new ApexCharts(chartContainer, options);
+        chart.render();
+
+    } catch (err) {
+        console.error("Erro ao carregar o gráfico no modal:", err);
+        chartContainer.innerHTML = `<p style="padding: 2rem; text-align: center; color: red;">Erro ao carregar o gráfico: ${err.message}</p>`;
+    }
 }
+
 
 function closeChartModal() {
     if (!chartModal || !chartContainer) return;
@@ -88,7 +134,7 @@ function createTableRow(ticker, index, extraData) {
     const priceChangePercent = parseFloat(ticker.priceChangePercent);
     const priceChangeClass = priceChangePercent >= 0 ? 'positive-pnl' : 'negative-pnl';
     const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${ticker.symbol}`;
-    const createAlarmUrl = `alarms-create.html?assetPair=${ticker.symbol}`; // CORRIGIDO AQUI
+    const createAlarmUrl = `alarms-create.html?assetPair=${ticker.symbol}`;
     const addOpportunityUrl = `index.html?assetPair=${ticker.symbol}`;
 
     let rsiSignalHtml = '';
@@ -116,7 +162,6 @@ function createTableRow(ticker, index, extraData) {
         formattedPrice = '$' + price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
     }
 
-    // --- CORREÇÃO: Adicionados os atributos data-label para o layout móvel ---
     return `
         <tr>
             <td data-label="#">${index + 1}</td>
@@ -248,7 +293,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (button) {
                 e.preventDefault(); 
                 const symbol = button.dataset.symbol;
-                openChartModal(symbol);
+                if (symbol) {
+                    openChartModal(symbol);
+                }
             }
         });
     }
