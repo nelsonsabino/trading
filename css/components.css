@@ -136,9 +136,8 @@
     align-items: baseline; 
     gap: 0.4rem; 
     flex-shrink: 0;
-    /* CORREÇÃO FINAL: Garante que o bloco de preço tem uma largura mínima para não ser esmagado */
     min-width: 100px; 
-    justify-content: flex-end; /* Alinha o conteúdo à direita dentro do seu espaço */
+    justify-content: flex-end;
 }
 .card-price {
     font-weight: 600;
@@ -191,7 +190,7 @@
 }
 
 #login-google-btn {
-    background-color: #4285F4; /* Cor oficial do Google */
+    background-color: #4285F4;
     color: white;
     width: 100%;
     font-size: 1.1rem;
@@ -208,4 +207,29 @@
 
 #login-google-btn:hover {
     background-color: #357ae8;
+}
+
+/* --- COMPONENTE: SECÇÃO DE PORTFÓLIO (PÁGINA STATS) --- */
+.portfolio-section h4 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.portfolio-balance {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.balance-label {
+    font-size: 1.1rem;
+    color: #6c757d;
+}
+
+.balance-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #28a745;
+    line-height: 1.2;
 }
