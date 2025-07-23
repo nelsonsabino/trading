@@ -1,6 +1,7 @@
 // js/firebase-service.js
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 import { 
     getFirestore, 
     collection, 
@@ -22,6 +23,7 @@ import { firebaseConfig } from './config.js';
 // Inicializa o Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+export const auth = getAuth(app); // NOVO: Inicializa e exporta o serviço de autenticação
 
 // --- FUNÇÕES PARA A COLEÇÃO "TRADES" ---
 
