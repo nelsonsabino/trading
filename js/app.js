@@ -1,4 +1,4 @@
-// js/app.js - VERSÃO COM REGISTO DO SERVICE WORKER
+// js/app.js - VERSÃO COM REGISTO DO SERVICE WORKER ORIGINAL
 
 import { listenToTrades, fetchActiveStrategies } from './firebase-service.js';
 import { supabase } from './services.js';
@@ -9,11 +9,6 @@ import { handleAddSubmit, handleArmSubmit, handleExecSubmit, handleCloseSubmit, 
 import { setupAutocomplete } from './utils.js';
 import { setCurrentStrategies, getStrategies } from './state.js';
 
-/**
- * Busca os dados de mercado (preço, variação, sparkline) para os ativos no dashboard.
- * @param {Array} trades - A lista de trades atuais no dashboard.
- * @returns {object} Um objeto com os dados de mercado agregados.
- */
 async function fetchMarketDataForDashboard(trades) {
     if (trades.length === 0) return {};
     const symbols = [...new Set(trades.map(trade => trade.data.asset))];
@@ -86,10 +81,9 @@ async function initializeApp() {
     }
 }
 
-// --- PONTO DE ENTRADA DO SCRIPT ---
 document.addEventListener('DOMContentLoaded', () => {
     
-    // REGISTO DO SERVICE WORKER (NOVO)
+    // REGISTO DO SERVICE WORKER (VERSÃO ORIGINAL)
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('/service-worker.js')
