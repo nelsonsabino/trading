@@ -5,32 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Watchlist de Trading Cripto</title>
 
-<!-- FAVICONS GERADOS -->
-<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
-<link rel="manifest" href="./site.webmanifest">
-<link rel="mask-icon" href="./safari-pinned-tab.svg" color="#5bbad5">
-<meta name="msapplication-TileColor" content="#ffffff">
-<meta name="theme-color" content="#ffffff">
-<link rel="icon" href="./favicon.ico" type="image/x-icon">
-<link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
-<!-- FIM DOS FAVICONS GERADOS -->
+<script>
+    const BASE_PATH = location.hostname.includes('github.io') ? '/trading' : '';
+  </script>
+
+  <!-- FAVICONS GERADOS -->
+  <script>
+    document.write(`
+      <link rel="apple-touch-icon" sizes="180x180" href="${BASE_PATH}/apple-touch-icon.png">
+      <link rel="icon" type="image/png" sizes="32x32" href="${BASE_PATH}/favicon-32x32.png">
+      <link rel="icon" type="image/png" sizes="16x16" href="${BASE_PATH}/favicon-16x16.png">
+      <link rel="manifest" href="${BASE_PATH}/site.webmanifest">
+      <link rel="mask-icon" href="${BASE_PATH}/safari-pinned-tab.svg" color="#5bbad5">
+      <link rel="icon" href="${BASE_PATH}/favicon.ico" type="image/x-icon">
+      <link rel="shortcut icon" href="${BASE_PATH}/favicon.ico" type="image/x-icon">
+    `);
+  </script>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/layout.css">
-    <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/buttons.css">
-    <link rel="stylesheet" href="css/tables.css">
-    <link rel="stylesheet" href="css/forms-modals.css">
-    <link rel="stylesheet" href="css/charts.css">
-    <link rel="stylesheet" href="css/strategy-builder.css">
-    <link rel="stylesheet" href="css/footer.css">
-    <link rel="stylesheet" href="css/dark-mode.css">
-    <link rel="stylesheet" href="css/responsive.css">
-    <link rel="stylesheet" href="css/navigation-menu.css">
+   <!-- Estilos -->
+  <script>
+    const stylesheets = [
+      'css/base.css', 'css/layout.css', 'css/components.css', 'css/buttons.css',
+      'css/tables.css', 'css/forms-modals.css', 'css/charts.css', 'css/strategy-builder.css',
+      'css/footer.css', 'css/dark-mode.css', 'css/responsive.css', 'css/navigation-menu.css'
+    ];
+    stylesheets.forEach(file => {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = `${BASE_PATH}/${file}`;
+      document.head.appendChild(link);
+    });
+  </script>    
 
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     
@@ -181,14 +188,22 @@
 
     <footer></footer>    
 
-    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script type="module" src="js/services.js"></script>
-    <script type="module" src="js/utils.js"></script>
-    <script type="module" src="js/app.js"></script>
-    <script type="module" src="js/navigation.js"></script>
-    <script type="module" src="js/version.js"></script>
-    <script type="module" src="js/dark-mode.js"></script>
+     <script>
+    const scripts = [
+      'js/services.js', 'js/utils.js', 'js/app.js',
+      'js/navigation.js', 'js/version.js', 'js/dark-mode.js'
+    ];
+    scripts.forEach(file => {
+      const script = document.createElement('script');
+      script.type = 'module';
+      script.src = `${BASE_PATH}/${file}`;
+      document.body.appendChild(script);
+    });
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register(`${BASE_PATH}/service-worker.js`).catch(console.error);
+    }
+  </script>
 
     
 <script>
@@ -217,15 +232,7 @@
   });
 </script>
 
- <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js')
-        .then(reg => console.log('Service Worker registado com sucesso:', reg))
-        .catch(err => console.error('Erro ao registar o Service Worker:', err));
-    });
-  }
-</script>
+
 
     
 </body>
