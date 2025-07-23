@@ -2,23 +2,34 @@
 
 export const changelogData = {
     current: {
-    number: '11.1.1',
-    changes: [
-        "**Correção de Estilo (Página de Estatísticas):**",
-        "Ajustado o layout da secção 'Gestão de Portfólio' para corresponder ao design visual de referência, incluindo o aumento do título, a adição de um separador e o correto alinhamento do saldo."
-    ]
-},
-   releases: [
-    {
-        number: '11.1.0',
+        number: '11.2.0', // <-- VERSÃO ATUALIZADA
         changes: [
-            "**Correção e Finalização do Sistema de Autenticação:**",
-            "Resolvido o problema de falha no login com Google nos ambientes de produção (GitHub Pages e Netlify).",
-            "Corrigida a configuração de segurança autorizando os domínios da aplicação tanto no 'Firebase Authentication' (Domínios Autorizados) como na 'Google Cloud Console' (Restrições de Chave de API).",
-            "O fluxo de login está agora totalmente funcional e seguro em todos os domínios."
+            "**Implementação Completa de Acesso Privado e Landing Page:**",
+            "Criada uma nova 'Landing Page' (`index.html`) como a página de entrada pública da aplicação.",
+            "O Dashboard principal foi renomeado para `dashboard.html` e agora é uma página privada, acessível apenas após o login.",
+            "Implementada uma 'whitelist' de acesso: apenas o email do administrador configurado em `js/auth.js` tem permissão para fazer login e aceder às funcionalidades da aplicação. Outros utilizadores Google são bloqueados.",
+            "Todas as ligações internas da aplicação foram atualizadas para refletir a nova estrutura de `index.html` (landing page) e `dashboard.html` (dashboard principal).",
+            "Resolvidos todos os problemas de redirecionamento e autenticação que impediam o fluxo de login e acesso exclusivo."
         ]
     },
-         {
+    releases: [
+        {
+            number: '11.1.1',
+            changes: [
+                "**Correção de Estilo (Página de Estatísticas):**",
+                "Ajustado o layout da secção 'Gestão de Portfólio' para corresponder ao design visual de referência, incluindo o aumento do título, a adição de um separador e o correto alinhamento do saldo."
+            ]
+        },
+        {
+            number: '11.1.0',
+            changes: [
+                "**Correção e Finalização do Sistema de Autenticação:**",
+                "Resolvido o problema de falha no login com Google nos ambientes de produção (GitHub Pages e Netlify).",
+                "Corrigida a configuração de segurança autorizando os domínios da aplicação tanto no 'Firebase Authentication' (Domínios Autorizados) como na 'Google Cloud Console' (Restrições de Chave de API).",
+                "O fluxo de login está agora totalmente funcional e seguro em todos os domínios."
+            ]
+        },
+        {
             number: '11.0.0',
             changes: [
                 "**Implementação do Sistema de Autenticação (Versão 11):**",
@@ -104,7 +115,7 @@ export const changelogData = {
             changes: [
                 "**Correção de Tema em Gráficos (Página de Detalhes):**",
                 "Resolvido o problema onde os gráficos (ApexCharts e widget de Análise Técnica TradingView) na página de detalhes do ativo não mudavam de tema (claro/escuro) dinamicamente.",
-                "Implementado um sistema de notificação de mudança de tema (`CustomEvent`) para que os gráficos se redesenhem automaticamente com o tema correto ao alternar.",
+                "Implementado um sistema de notificação de mudança de tema (`CustomEvent`) para que os gráficos se redesenham automaticamente com o tema correto ao alternar.",
             ]
         },
         {
