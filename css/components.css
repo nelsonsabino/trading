@@ -209,27 +209,32 @@
     background-color: #357ae8;
 }
 
-/* --- COMPONENTE: SECÇÃO DE PORTFÓLIO (PÁGINA STATS) --- */
+/* --- COMPONENTE: SECÇÃO DE PORTFÓLIO (PÁGINA STATS) - VERSÃO CORRIGIDA --- */
 .portfolio-section h4 {
     text-align: center;
+    font-size: 1.5em; /* Aumenta o tamanho do título */
+    color: #495057;
+    border-bottom: 1px solid #e9ecef; /* Adiciona o separador */
+    padding-bottom: 1rem;
     margin-bottom: 1.5rem;
 }
 
 .portfolio-balance {
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    justify-content: center; /* Centra o grupo "Saldo: $Valor" */
+    align-items: baseline;   /* Alinha texto de tamanhos diferentes na base */
+    gap: 0.75rem;            /* Espaço entre "Saldo Atual:" e o valor */
     margin-bottom: 1.5rem;
 }
 
 .balance-label {
-    font-size: 1.1rem;
+    font-size: 1.5rem;       /* Tamanho do texto "Saldo Atual:" */
     color: #6c757d;
+    font-weight: 500;
 }
 
 .balance-value {
-    font-size: 2.5rem;
+    font-size: 2.5rem;       /* Tamanho GRANDE para o valor */
     font-weight: 700;
     color: #28a745;
-    line-height: 1.2;
 }
