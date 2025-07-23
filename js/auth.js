@@ -6,7 +6,7 @@ import {
     onAuthStateChanged,
     signOut
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
-import { auth } from './firebase-service.js'; // NOVO: Importa o auth já inicializado
+import { auth } from './firebase-service.js';
 
 const provider = new GoogleAuthProvider();
 
@@ -14,8 +14,9 @@ const provider = new GoogleAuthProvider();
 const signInWithGoogle = () => {
     signInWithPopup(auth, provider)
         .then((result) => {
-            // Login bem-sucedido, o onAuthStateChanged irá redirecionar
             console.log("Login com Google bem-sucedido!", result.user);
+            // AGORA, esta função trata do redirecionamento após o sucesso.
+            window.location.href = 'index.html';
         })
         .catch((error) => {
             console.error("Erro no login com Google:", error);
@@ -35,21 +36,16 @@ export const signOutUser = () => {
 
 // --- CONTROLO CENTRAL DE AUTENTICAÇÃO ---
 onAuthStateChanged(auth, (user) => {
-    const isLoginPage = window.location.pathname.endsWith('login.html') || window.location.pathname === '/'; // Considera a raiz como página de login
+    const isLoginPage = window.location.pathname.endsWith('login.html') || window.location.pathname === '/';
     const userSessionDiv = document.getElementById('user-session');
     const userPhotoImg = document.getElementById('user-photo');
 
     if (user) {
         // O utilizador está logado.
-        if (isLoginPage) {
-            // Se ele está na página de login, redireciona para o dashboard.
-            window.location.replace('index.html');
-        } else {
-           // Mostra a secção do utilizador e preenche os dados
-           if (userSessionDiv && userPhotoImg) {
-               userPhotoImg.src = user.photoURL || './pic/default-user.png'; // Usa uma imagem padrão se não houver foto
-               userSessionDiv.style.display = 'flex';
-           }
+        // Apenas mostra ou esconde a informação do utilizador. Não redireciona daqui.
+        if (!isLoginPage && userSessionDiv && userPhotoImg) {
+            userPhotoImg.src = user.photoURL || './pic/default-user.png';
+            userSessionDiv.style.display = 'flex';
         }
     } else {
         // O utilizador NÃO está logado.
