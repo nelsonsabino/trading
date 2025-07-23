@@ -23,9 +23,8 @@ async function openChartModal(symbol) {
     chartModal.style.display = 'flex';
 
     try {
-        // 1. Chamar a mesma Edge Function da página de detalhes
         const { data: response, error } = await supabase.functions.invoke('get-asset-details-data', {
-            body: { symbol: symbol, interval: '1h' }, // Usamos 1h como um bom padrão
+            body: { symbol: symbol, interval: '1h' },
         });
 
         if (error) throw error;
@@ -35,8 +34,6 @@ async function openChartModal(symbol) {
 
         const klinesData = response.ohlc;
         const indicatorsData = response.indicators;
-
-        // 2. Construir as séries do gráfico (preço + EMAs)
         let series = [];
         
         const closePriceSeriesData = klinesData.map(kline => ({ x: kline[0], y: kline[4] }));
@@ -51,12 +48,11 @@ async function openChartModal(symbol) {
             series.push({ name: 'EMA 200', type: 'line', data: ema200SeriesData });
         }
 
-        // 3. Configurar as opções do ApexCharts para replicar a página de detalhes
         const options = {
             series: series,
             chart: { type: 'line', height: '100%', toolbar: { show: true, autoSelected: 'pan' } },
             title: { text: `${symbol} - Gráfico de 1 Hora`, align: 'left' },
-            colors: ['#007bff', '#ffc107', '#dc3545'], // Cores para Preço, EMA50, EMA200
+            colors: ['#007bff', '#ffc107', '#dc3545'],
             stroke: { curve: 'smooth', width: 2 },
             xaxis: { type: 'datetime' },
             yaxis: { labels: { formatter: (val) => `$${val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 4})}` }, tooltip: { enabled: true } },
@@ -135,7 +131,7 @@ function createTableRow(ticker, index, extraData) {
     const priceChangeClass = priceChangePercent >= 0 ? 'positive-pnl' : 'negative-pnl';
     const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${ticker.symbol}`;
     const createAlarmUrl = `alarms-create.html?assetPair=${ticker.symbol}`;
-    const addOpportunityUrl = `index.html?assetPair=${ticker.symbol}`;
+    const addOpportunityUrl = `dashboard.html?assetPair=${ticker.symbol}`; // CORRIGIDO AQUI
 
     let rsiSignalHtml = '';
     let stochSignalHtml = '';
