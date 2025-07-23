@@ -2,7 +2,15 @@
 
 export const changelogData = {
     current: {
-        number: '11.1.0', // <-- VERSÃO ATUALIZADA
+    number: '11.1.1',
+    changes: [
+        "**Correção de Estilo (Página de Estatísticas):**",
+        "Ajustado o layout da secção 'Gestão de Portfólio' para corresponder ao design visual de referência, incluindo o aumento do título, a adição de um separador e o correto alinhamento do saldo."
+    ]
+},
+   releases: [
+    {
+        number: '11.1.0',
         changes: [
             "**Correção e Finalização do Sistema de Autenticação:**",
             "Resolvido o problema de falha no login com Google nos ambientes de produção (GitHub Pages e Netlify).",
@@ -10,8 +18,7 @@ export const changelogData = {
             "O fluxo de login está agora totalmente funcional e seguro em todos os domínios."
         ]
     },
-    releases: [
-        {
+         {
             number: '11.0.0',
             changes: [
                 "**Implementação do Sistema de Autenticação (Versão 11):**",
