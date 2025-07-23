@@ -5,3 +5,15 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 // Exportamos a instância do cliente Supabase para ser usada por toda a aplicação
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// Função para obter um alarme específico por ID
+export async function getAlarm(alarmId) {
+    try {
+        const { data, error } = await supabase.from('alarms').select('*').eq('id', alarmId).single();
+        if (error) throw error;
+        return data;
+    } catch (error) {
+        console.error("Erro ao buscar alarme:", error.message);
+        return null;
+    }
+}
