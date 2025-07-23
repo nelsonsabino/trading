@@ -1,8 +1,9 @@
-// service-worker.js - VERSÃO ORIGINAL
-
 const CACHE_NAME = 'trading-app-v1';
+
+// Determina o caminho base da app (ex: "/trading" no GitHub Pages)
+const BASE_PATH = self.location.pathname.replace(/\/service-worker\.js$/, '');
+
 const urlsToCache = [
-  '/',
   '/index.html',
   '/alarms-create.html',
   '/alarms-manage.html',
@@ -12,7 +13,6 @@ const urlsToCache = [
   '/market-scan.html',
   '/stats.html',
   '/strategies-manager.html',
-  // CSS
   '/css/base.css',
   '/css/layout.css',
   '/css/components.css',
@@ -25,7 +25,6 @@ const urlsToCache = [
   '/css/dark-mode.css',
   '/css/responsive.css',
   '/css/navigation-menu.css',
-  // JS
   '/js/alarms-create.js',
   '/js/alarms-manage.js',
   '/js/app.js',
@@ -47,7 +46,6 @@ const urlsToCache = [
   '/js/ui.js',
   '/js/utils.js',
   '/js/version.js',
-  // Ícones e Manifest
   '/apple-touch-icon.png',
   '/favicon-32x32.png',
   '/favicon-16x16.png',
@@ -56,7 +54,7 @@ const urlsToCache = [
   '/web-app-manifest-192x192.png',
   '/web-app-manifest-512x512.png',
   '/site.webmanifest'
-];
+].map(path => `${BASE_PATH}${path}`);
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -74,9 +72,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request)
-      .then((response) => {
-        return response || fetch(event.request);
-      })
+      .then((response) => response || fetch(event.request))
       .catch((error) => {
         console.error('Service Worker: Falha no fetch:', event.request.url, error);
       })
