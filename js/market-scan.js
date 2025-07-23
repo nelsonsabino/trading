@@ -88,7 +88,7 @@ function createTableRow(ticker, index, extraData) {
     const priceChangePercent = parseFloat(ticker.priceChangePercent);
     const priceChangeClass = priceChangePercent >= 0 ? 'positive-pnl' : 'negative-pnl';
     const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${ticker.symbol}`;
-    const createAlarmUrl = `alarms.html?assetPair=${ticker.symbol}`;
+    const createAlarmUrl = `alarms-create.html?assetPair=${ticker.symbol}`; // CORRIGIDO AQUI
     const addOpportunityUrl = `index.html?assetPair=${ticker.symbol}`;
 
     let rsiSignalHtml = '';
