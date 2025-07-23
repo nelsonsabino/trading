@@ -2,15 +2,24 @@
 
 export const changelogData = {
     current: {
-        number: '10.2.0', // <-- VERSÃO ATUALIZADA
+        number: '10.2.1', // <-- VERSÃO ATUALIZADA
         changes: [
-            "**Gráfico do Market Scanner Melhorado:**",
-            "O gráfico de visualização rápida no modal da página do Market Scanner foi substituído.",
-            "Agora utiliza o mesmo motor de gráfico avançado (ApexCharts) da página de detalhes do ativo, exibindo por defeito um gráfico de linhas com as EMAs 50 e 200.",
-            "Esta alteração unifica a experiência de análise, proporcionando uma ferramenta consistente e poderosa em toda a aplicação."
+            "**Correção de Permissões (Firebase):**",
+            "Resolvido o erro de 'permissões insuficientes' que impedia a eliminação de trades na página de Gestão e o registo de transações na página de Estatísticas.",
+            "A causa foi identificada como regras de segurança restritivas do Firebase, que foram ajustadas para permitir operações de escrita e eliminação durante o desenvolvimento.",
+            "Melhorada a estrutura do `manage.js` para garantir que o script só é executado após o carregamento completo da página."
         ]
     },
     releases: [
+        {
+            number: '10.2.0',
+            changes: [
+                "**Gráfico do Market Scanner Melhorado:**",
+                "O gráfico de visualização rápida no modal da página do Market Scanner foi substituído.",
+                "Agora utiliza o mesmo motor de gráfico avançado (ApexCharts) da página de detalhes do ativo, exibindo por defeito um gráfico de linhas com as EMAs 50 e 200.",
+                "Esta alteração unifica a experiência de análise, proporcionando uma ferramenta consistente e poderosa em toda a aplicação."
+            ]
+        },
         {
             number: '10.1.0',
             changes: [
