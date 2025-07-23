@@ -75,6 +75,12 @@
             <button id="theme-toggle-btn" class="btn nav-icon-link" title="Alternar tema">
                 <i class="fas fa-moon"></i>
             </button>
+
+            <!-- NOVO: Secção do Utilizador -->
+            <div id="user-session" class="user-session" style="display: none;">
+                <img id="user-photo" src="" alt="Foto do Utilizador" class="user-photo">
+                <button id="logout-btn" class="btn btn-secondary">Sair</button>
+            </div>
         </nav>
     </header>
 
@@ -116,8 +122,6 @@
                 <div id="tradingview-tech-analysis-container" class="tradingview-widget-wrapper"></div> 
             </div>
         </section>
-
-        <!-- SECÇÃO DAS NOTÍCIAS REMOVIDA -->
 
         <hr class="section-divider">
 
@@ -168,5 +172,6 @@
     <script type="module" src="js/navigation.js"></script>
     <script type="module" src="js/version.js"></script>
     <script type="module" src="js/dark-mode.js"></script>
+    <script type="module" src="js/auth.js"></script>
 </body>
 </html>
