@@ -1,31 +1,32 @@
 // js/manage.js
 
-import { listenToTrades, deleteTrade as deleteTradeService, listenToTransactions, deleteTransaction as deleteTransactionService } from './firebase-service.js'; // Importa a função de apagar com um novo nome
+import { listenToTrades, deleteTrade as deleteTradeService, listenToTransactions, deleteTransaction as deleteTransactionService } from './firebase-service.js';
 
-function runManagePage() {
+// Adiciona um listener para garantir que o DOM está carregado antes de executar o código
+document.addEventListener('DOMContentLoaded', () => {
+
     const tableBody = document.getElementById('trades-table-body');
-    if (!tableBody) return;
+    const transactionsTableBody = document.getElementById('transactions-table-body');
 
-    // Função para apagar um trade, agora usando o serviço
+    // --- LÓGICA PARA A TABELA DE TRADES ---
+
     async function deleteTrade(tradeId) {
         if (!confirm("Tem a certeza que quer apagar este trade? Esta ação é irreversível.")) {
             return;
         }
         try {
-            await deleteTradeService(tradeId); // Usa a função importada
+            await deleteTradeService(tradeId);
             console.log("Pedido de apagar enviado para o serviço.");
         } catch (error) {
             alert("Ocorreu um erro ao apagar o trade.");
         }
     }
 
-    // Função para redirecionar para edição (sem alterações)
     function editTrade(tradeId) {
         localStorage.setItem('tradeToEdit', tradeId);
         window.location.href = 'index.html';
     }
 
-    // Função para buscar e mostrar todos os trades (sem alterações na lógica principal)
     function fetchAndDisplayAllTrades() {
         listenToTrades((trades, error) => {
             if (error) {
@@ -61,21 +62,13 @@ function runManagePage() {
         });
     }
 
-    // Iniciar a página
-    fetchAndDisplayAllTrades();
-    fetchAndDisplayTransactions(); 
-}
-
-
-    // --- NOVA LÓGICA PARA A TABELA DE TRANSAÇÕES DO PORTFÓLIO ---
-    const transactionsTableBody = document.getElementById('transactions-table-body');
+    // --- LÓGICA PARA A TABELA DE TRANSAÇÕES DO PORTFÓLIO ---
 
     async function deleteTransaction(transactionId, amount, type) {
         if (!confirm("Tem a certeza que quer apagar esta transação? O seu saldo será ajustado.")) {
             return;
         }
         try {
-            // A função de serviço irá lidar com a lógica complexa de reverter o saldo
             await deleteTransactionService(transactionId, amount, type);
             console.log("Pedido para apagar transação enviado.");
         } catch (error) {
@@ -85,8 +78,6 @@ function runManagePage() {
     }
 
     function fetchAndDisplayTransactions() {
-        if (!transactionsTableBody) return; // Não faz nada se a tabela não existir
-
         listenToTransactions((transactions, error) => {
             if (error) {
                 transactionsTableBody.innerHTML = `<tr><td colspan="5" style="color: red;">Erro ao carregar.</td></tr>`;
@@ -121,5 +112,11 @@ function runManagePage() {
         });
     }
 
-
-runManagePage();
+    // --- INICIAR A PÁGINA ---
+    if (tableBody) {
+        fetchAndDisplayAllTrades();
+    }
+    if (transactionsTableBody) {
+        fetchAndDisplayTransactions();
+    }
+});
