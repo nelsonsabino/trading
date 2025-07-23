@@ -1,4 +1,4 @@
-// js/app.js - VERSÃO COM REGISTO DO SERVICE WORKER
+// js/app.js - VERSÃO COM REGISTO DO SERVICE WORKER E CAMINHO CORRETO
 
 import { listenToTrades, fetchActiveStrategies } from './firebase-service.js';
 import { supabase } from './services.js';
@@ -89,10 +89,12 @@ async function initializeApp() {
 // --- PONTO DE ENTRADA DO SCRIPT ---
 document.addEventListener('DOMContentLoaded', () => {
     
-    // REGISTO DO SERVICE WORKER (NOVO)
+    // REGISTO DO SERVICE WORKER (CORRIGIDO PARA GITHUB PAGES)
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/service-worker.js')
+            // Caminho deve incluir o nome do repositório para GitHub Pages
+            const serviceWorkerPath = '/trading/service-worker.js'; 
+            navigator.serviceWorker.register(serviceWorkerPath)
                 .then(registration => {
                     console.log('Service Worker registado com sucesso:', registration.scope);
                 })
