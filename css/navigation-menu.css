@@ -33,9 +33,25 @@ header .main-nav {
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-/* Ajustes para o botão de tema (já existia, mas garante que usa o novo estilo) */
-#theme-toggle-btn.nav-icon-link {
-    padding: 0; /* Garantir que o padding é 0 para o círculo perfeito */
+/* --- BOTÃO DE TEMA FIXO --- */
+#theme-toggle-btn {
+    position: fixed; /* Fixo na janela de visualização */
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 1001; /* Garante que fica por cima de outros elementos */
+    /* Reutiliza o estilo de botão circular que já estava a ser aplicado */
+    width: 45px;
+    height: 45px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    border: 1px solid #dee2e6;
+    background-color: #f8f9fa; 
+    color: #495057; 
+}
+
+#theme-toggle-btn:hover {
+    background-color: #e9ecef; 
 }
 
 /* Estilos para o dropdown (menu da roda dentada) */
@@ -113,23 +129,9 @@ header .main-nav {
     background-color: #c82333;
 }
 
-/* --- BOTÃO DE AÇÃO RÁPIDA (ADD TO WATCHLIST) --- */
-.nav-icon-link.action-add-watchlist {
-    background-color: #007bff; /* Cor primária para destaque */
-    color: white;
-    font-size: 1.1rem;
-}
+/* --- BOTÃO DE AÇÃO RÁPIDA (ADD TO WATCHLIST - REMOVIDO DAQUI) --- */
+/* O estilo deste botão foi movido para buttons.css como .btn-contextual */
 
-.nav-icon-link.action-add-watchlist:hover {
-    background-color: #0056b3;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-/* Se quiser garantir que o ícone dentro também tem um bom visual */
-.nav-icon-link.action-add-watchlist i {
-    line-height: 1;
-}
 
 /* Ajustes para o dark mode */
 .dark-mode .main-nav .nav-icon-link {
@@ -138,6 +140,14 @@ header .main-nav {
     color: #e0e0e0;
 }
 .dark-mode .main-nav .nav-icon-link:hover {
+    background-color: #3a3a3a;
+}
+.dark-mode #theme-toggle-btn {
+    background-color: #2c2c2c;
+    border-color: #444;
+    color: #e0e0e0;
+}
+.dark-mode #theme-toggle-btn:hover {
     background-color: #3a3a3a;
 }
 .dark-mode .nav-dropdown-content {
