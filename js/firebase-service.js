@@ -1,7 +1,5 @@
-// js/firebase-service.js
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+import { getAuth, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 import { 
     getFirestore, 
     collection, 
@@ -23,7 +21,16 @@ import { firebaseConfig } from './config.js';
 // Inicializa o Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-export const auth = getAuth(app); // NOVO: Inicializa e exporta o serviço de autenticação
+export const auth = getAuth(app); // Inicializa e exporta o serviço de autenticação
+
+// Configura a persistência local para a autenticação
+setPersistence(auth, browserLocalPersistence)
+  .then(() => {
+    console.log("Persistência de autenticação configurada para LOCAL.");
+  })
+  .catch((error) => {
+    console.error("Erro ao configurar persistência:", error);
+  });
 
 // --- FUNÇÕES PARA A COLEÇÃO "TRADES" ---
 
@@ -101,9 +108,7 @@ export async function deleteTrade(tradeId) {
     }
 }
 
-
 // --- FUNÇÕES PARA O PORTFÓLIO E TRANSAÇÕES ---
-// ... (sem alterações) ...
 export function listenToPortfolioSummary(callback) {
     const portfolioRef = doc(db, "portfolio", "summary");
     return onSnapshot(portfolioRef, (doc) => {
@@ -114,6 +119,7 @@ export function listenToPortfolioSummary(callback) {
         callback(null, error);
     });
 }
+
 export function listenToClosedTrades(callback) {
     const q = query(collection(db, 'trades'), where('status', '==', 'CLOSED'));
     return onSnapshot(q, (snapshot) => {
@@ -125,6 +131,7 @@ export function listenToClosedTrades(callback) {
         callback([], error);
     });
 }
+
 export async function addTransactionAndUpdateBalance(transactionData) {
     const portfolioRef = doc(db, "portfolio", "summary");
     const amountToApply = transactionData.type === 'withdraw' ? -transactionData.amount : transactionData.amount;
@@ -139,11 +146,13 @@ export async function addTransactionAndUpdateBalance(transactionData) {
         });
     } catch (error) { console.error("Erro na transação de adicionar:", error); throw error; }
 }
+
 export async function adjustPortfolioBalance(newBalance) {
     const portfolioRef = doc(db, "portfolio", "summary");
     try { await setDoc(portfolioRef, { balance: newBalance }); } 
     catch (error) { console.error("Erro no serviço ao ajustar saldo:", error); throw error; }
 }
+
 export function listenToTransactions(callback) {
     const q = query(collection(db, 'transactions'), orderBy('date', 'desc'));
     onSnapshot(q, (snapshot) => {
@@ -152,6 +161,7 @@ export function listenToTransactions(callback) {
         callback(transactions);
     }, (error) => { console.error("Erro ao escutar transações:", error); callback([], error); });
 }
+
 export async function deleteTransaction(transactionId, amount, type) {
     const amountToRevert = type === 'deposit' ? -amount : amount;
     const transactionRef = doc(db, 'transactions', transactionId);
@@ -167,6 +177,7 @@ export async function deleteTransaction(transactionId, amount, type) {
         });
     } catch (error) { console.error("Erro na transação de apagar:", error); throw error; }
 }
+
 export async function closeTradeAndUpdateBalance(tradeId, closeDetails) {
     const tradeRef = doc(db, 'trades', tradeId);
     const portfolioRef = doc(db, 'portfolio', 'summary');
@@ -183,9 +194,7 @@ export async function closeTradeAndUpdateBalance(tradeId, closeDetails) {
     } catch (error) { console.error("Erro na transação de fecho de trade:", error); throw error; }
 }
 
-
 // --- FUNÇÕES PARA A COLEÇÃO "STRATEGIES" ---
-// ... (sem alterações) ...
 export function listenToStrategies(callback) {
     const q = query(collection(db, 'strategies'), orderBy('createdAt', 'desc'));
     onSnapshot(q, (snapshot) => {
@@ -194,12 +203,14 @@ export function listenToStrategies(callback) {
         callback(strategies);
     }, (error) => { console.error("Erro ao escutar por estratégias:", error); callback([], error); });
 }
+
 export async function getStrategy(strategyId) {
     try {
         const docSnap = await getDoc(doc(db, 'strategies', strategyId));
         return docSnap.exists() ? { id: docSnap.id, data: docSnap.data() } : null;
     } catch (error) { console.error("Erro ao buscar estratégia:", error); return null; }
 }
+
 export async function fetchActiveStrategies() {
     try {
         const q = query(collection(db, 'strategies'), where("isActive", "==", true), orderBy('createdAt', 'desc'));
@@ -209,6 +220,7 @@ export async function fetchActiveStrategies() {
         return strategies;
     } catch (error) { console.error("Erro ao buscar estratégias ativas:", error); return []; }
 }
+
 export async function addStrategy(strategyData) {
     try {
         const dataToSave = { ...strategyData, createdAt: new Date(), isActive: true };
@@ -216,12 +228,14 @@ export async function addStrategy(strategyData) {
         return docRef.id;
     } catch (error) { console.error("Erro no serviço ao adicionar estratégia:", error); throw error; }
 }
+
 export async function updateStrategy(strategyId, strategyData) {
     try {
         const strategyRef = doc(db, 'strategies', strategyId);
         await updateDoc(strategyRef, strategyData);
     } catch (error) { console.error("Erro no serviço ao atualizar estratégia:", error); throw error; }
 }
+
 export async function deleteStrategy(strategyId) {
     try {
         const strategyRef = doc(db, 'strategies', strategyId);
