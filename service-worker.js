@@ -1,18 +1,14 @@
-// js/service-worker.js
-
-const CACHE_NAME = 'trading-app-v2'; // <--- VERSÃO DO CACHE ATUALIZADA
-
-// Determina o caminho base da app (ex: "/trading" no GitHub Pages)
+const CACHE_NAME = 'trading-app-v2';
 const BASE_PATH = self.location.pathname.replace(/\/service-worker\.js$/, '');
 
 const urlsToCache = [
-  '/index.html', // É a nova landing page
-  '/dashboard.html', // O novo dashboard
+  '/index.html',
+  '/dashboard.html',
   '/alarms-create.html',
   '/alarms-manage.html',
   '/asset-details.html',
   '/changelog.html',
-  '/login.html', // A nova página de login
+  '/login.html',
   '/manage.html',
   '/market-scan.html',
   '/stats.html',
@@ -33,7 +29,7 @@ const urlsToCache = [
   '/js/alarms-manage.js',
   '/js/app.js',
   '/js/asset-details.js',
-  '/js/auth.js', // O novo módulo de autenticação
+  '/js/auth.js',
   '/js/changelog.js',
   '/js/config.js',
   '/js/dark-mode.js',
@@ -75,13 +71,33 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => response || fetch(event.request))
-      .catch((error) => {
-        console.error('Service Worker: Falha no fetch:', event.request.url, error);
+  const requestUrl = new URL(event.request.url);
+  // Evita cachear requisições ao Firebase Authentication
+  if (requestUrl.pathname.includes('firebase') || requestUrl.hostname.includes('firebase')) {
+    event.respondWith(fetch(event.request).catch((error) => {
+      console.error('Service Worker: Falha no fetch para Firebase:', event.request.url, error);
+    }));
+    return;
+  }
+  // Para páginas HTML, tenta a rede primeiro se houver conexão
+  if (event.request.destination === 'document') {
+    event.respondWith(
+      fetch(event.request).catch(() => {
+        return caches.match(event.request).then((response) => {
+          return response || caches.match(BASE_PATH + '/index.html');
+        });
       })
-  );
+    );
+  } else {
+    // Para outros recursos, usa cache-first
+    event.respondWith(
+      caches.match(event.request)
+        .then((response) => response || fetch(event.request))
+        .catch((error) => {
+          console.error('Service Worker: Falha no fetch:', event.request.url, error);
+        })
+    );
+  }
 });
 
 self.addEventListener('activate', (event) => {
