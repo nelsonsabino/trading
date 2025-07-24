@@ -1,5 +1,7 @@
 // js/navigation.js
 
+import { openAddModal } from './modals.js'; // Importa a função para abrir o modal
+
 document.addEventListener('DOMContentLoaded', () => {
     const managementToggle = document.getElementById('management-toggle');
     const navDropdown = managementToggle ? managementToggle.closest('.nav-dropdown') : null;
@@ -24,6 +26,15 @@ document.addEventListener('DOMContentLoaded', () => {
             link.addEventListener('click', () => {
                 navDropdown.classList.remove('show');
             });
+        });
+    }
+
+    // NOVO: Adiciona listener para o botão "Adicionar à Watchlist"
+    const addToWatchlistBtn = document.querySelector('.nav-icon-link.action-add-watchlist');
+    if (addToWatchlistBtn) {
+        addToWatchlistBtn.addEventListener('click', (e) => {
+            e.preventDefault(); // Evita que o link navegue para '#' ou outra página.
+            openAddModal(); // Abre o modal para adicionar oportunidade
         });
     }
 });
