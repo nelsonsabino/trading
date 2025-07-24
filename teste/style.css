@@ -1,0 +1,352 @@
+/* --- GERAL & TIPOGRAFIA --- */
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; background-color: #f8f9fa; color: #343a40; margin: 0; }
+main { max-width: 1400px; margin: auto; padding: 0 2rem 2rem 2rem; }
+h1, h2, h3 { font-weight: 600; }
+h2 { color: #495057; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem; margin-bottom: 1.5rem; }
+.section-divider { border: none; border-top: 1px solid #dee2e6; margin: 3rem 0; }
+
+/* --- LINKS DE ATIVOS --- */
+.asset-link { color: inherit; text-decoration: none; transition: color 0.2s ease; }
+.asset-link:hover { color: #007bff; text-decoration: underline; }
+.dark-mode .asset-link:hover { color: #4dabf7; }
+
+/* --- CABEÇALHO E NAVEGAÇÃO --- */
+header { text-align: center; padding: 2rem 1rem; background-color: #fff; border-bottom: 1px solid #dee2e6; margin-bottom: 2rem; }
+.mantra { font-style: italic; color: #6c757d; }
+header nav { margin-top: 1.5rem; display: flex; justify-content: center; align-items: center; gap: 1rem; flex-wrap: wrap; }
+
+/* --- BOTÕES GERAIS (.btn) --- */
+.btn, .nav-link { 
+    display: inline-block; 
+    padding: 10px 20px; 
+    font-size: 1rem; 
+    font-weight: 600; 
+    text-align: center; 
+    text-decoration: none; 
+    border: none; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    transition: all 0.2s ease-in-out; 
+}
+.btn-primary, #add-opportunity-btn { background-color: #007bff; color: white; }
+.btn-primary:hover, #add-opportunity-btn:hover { background-color: #0056b3; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+.nav-link { background-color: #6c757d; color: white; }
+.nav-link:hover { background-color: #5a6268; transform: translateY(-2px); }
+.btn-secondary { background-color: #6c757d; color: white; }
+.btn-secondary:hover { background-color: #5a6268; }
+.btn-tertiary { background-color: #ffc107; color: #212529; }
+.btn-tertiary:hover { background-color: #e0a800; }
+
+/* --- DASHBOARD & CARDS --- */
+.dashboard-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+.potential-trades, .armed-trades, .live-trades { background-color: #fff; padding: 1.5rem; border-radius: 8px; border-top: 4px solid #6c757d; }
+.armed-trades { border-top-color: #ffc107; }
+.live-trades { border-top-color: #28a745; }
+.trade-card { position: relative; background: #fdfdfd; border: 1px solid #e9ecef; padding: 1rem 1.5rem; border-radius: 6px; margin-bottom: 1rem; transition: box-shadow 0.2s ease-in-out; border-left: 5px solid #6c757d; }
+.trade-card:hover { box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
+.trade-card.armed { border-left-color: #ffc107; }
+.trade-card.live { border-left-color: #28a745; }
+.trade-card h3 { margin-top: 0; margin-bottom: 0.5rem; }
+.trade-card p { margin: 0.25rem 0; font-size: 0.95em; color: #495057; }
+.card-edit-btn { background-color: #ffc107; color: #212529; padding: 4px 8px; font-size: 0.8em; border-radius: 4px; border: none; cursor: pointer; position: absolute; top: 1rem; right: 1.5rem; opacity: 0; transition: opacity 0.2s; }
+.trade-card:hover .card-edit-btn { opacity: 1; }
+
+/* --- ESTILOS PARA DADOS EM TEMPO REAL NOS CARDS --- */
+.card-market-data { display: flex; align-items: center; justify-content: space-between; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e9ecef; }
+.card-price-data { text-align: right; }
+.card-price { font-weight: 600; font-size: 1.1em; color: #212529; }
+.card-sparkline { width: 100px; height: 40px; }
+.dark-mode .card-market-data { border-top-color: #333; }
+.dark-mode .card-price { color: #ffffff; }
+
+/* --- PÁGINA DE DETALHES DO ATIVO --- */
+.asset-charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
+
+/* --- MODAIS & FORMULÁRIOS --- */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(33, 37, 41, 0.6); display: none; justify-content: center; align-items: center; z-index: 1000; box-sizing: border-box; overflow-y: auto; padding: 2rem 1rem; }
+.modal-content { background: #fff; padding: 2rem 2.5rem; border-radius: 12px; width: 100%; max-width: 550px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.1); animation: fadeIn 0.3s ease-out; margin: auto; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+.modal-overlay.visible { display: flex !important; }
+.modal-content > span[id^="close-"] { position: absolute; top: 15px; right: 25px; font-size: 2.5rem; color: #adb5bd; font-weight: 300; cursor: pointer; line-height: 1; transition: color 0.2s; }
+.modal-content > span[id^="close-"]:hover { color: #495057; }
+.modal-content h3 { margin-top: 0; margin-bottom: 0.5rem; color: #212529; }
+.modal-content p { margin-top: 0; margin-bottom: 2rem; color: #6c757d; border-bottom: 1px solid #e9ecef; padding-bottom: 1rem; }
+.modal-content h4 { margin-top: 1.5rem; margin-bottom: 1rem; padding-bottom: 0.5rem; font-size: 1.1rem; color: #007bff; border-bottom: 2px solid #e9ecef; display: flex; align-items: center; }
+.input-item label { display: block; margin-bottom: 8px; font-weight: 500; color: #495057; }
+.input-item input, .input-item select, .input-item textarea { width: 100%; padding: 12px; font-size: 1rem; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box; transition: border-color 0.2s, box-shadow 0.2s; }
+.input-item input:focus, .input-item select:focus, .input-item textarea:focus { outline: none; border-color: #80bdff; box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); }
+.modal-content form button[type="submit"] { width: 100%; padding: 14px; margin-top: 1.5rem; font-size: 1.1rem; font-weight: 600; background-color: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; transition: background-color 0.2s; }
+.modal-content form button[type="submit"]:hover { background-color: #218838; }
+
+/* --- TABELAS --- */
+.table-wrapper { overflow-x: auto; width: 100%; }
+.market-table, .alarms-table, #trades-table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; background: #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: hidden; font-size: 0.95em; }
+.market-table thead tr, .alarms-table thead tr, #trades-table thead tr { background-color: #f8f9fa; border-bottom: 2px solid #dee2e6; }
+.market-table th, .alarms-table th, #trades-table th { padding: 1rem; text-align: left; font-weight: 600; color: #495057; }
+.market-table td, .alarms-table td, #trades-table td { padding: 1rem; border-bottom: 1px solid #e9ecef; vertical-align: middle; }
+.market-table tbody tr:last-child td, .alarms-table tbody tr:last-child td, #trades-table tbody tr:last-child td { border-bottom: none; }
+.positive-pnl { color: #28a745; font-weight: bold; }
+.negative-pnl { color: #dc3545; font-weight: bold; }
+.asset-name { display: flex; align-items: center; gap: 8px; }
+
+/* --- SINAIS E BADGES --- */
+.rsi-signal, .stoch-signal {
+    display: inline-block;
+    width: 22px; 
+    height: 22px;
+    line-height: 22px;
+    font-size: 0.7em;
+    font-weight: bold;
+    color: white;
+    background-color: #6f42c1; 
+    border-radius: 50%;
+    text-align: center;
+    cursor: help;
+    position: relative;
+    flex-shrink: 0;
+    margin-left: 5px; 
+}
+.stoch-signal {
+    background-color: #007bff; 
+}
+
+/* Tooltip básico para os sinais */
+.rsi-signal::after, .stoch-signal::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #343a40;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s;
+    z-index: 10;
+}
+.rsi-signal:hover::after, .stoch-signal:hover::after { opacity: 1; visibility: visible; }
+
+/* --- CONTROLES DO MERCADO --- */
+.market-controls {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1rem;
+    background-color: #f1f3f5;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+.dark-mode .market-controls {
+    background-color: #2c2c2c;
+    border: 1px solid #444;
+}
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.market-controls label {
+    font-weight: 500;
+    color: #495057;
+}
+.dark-mode .market-controls label {
+    color: #e0e0e0;
+}
+.market-controls select {
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    background-color: #fff;
+    color: #343a40;
+    font-size: 0.95em;
+    transition: all 0.2s;
+}
+.dark-mode .market-controls select {
+    background-color: #1e1e1e;
+    border-color: #444;
+    color: #e0e0e0;
+}
+.market-controls select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+.market-controls input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    cursor: pointer;
+}
+.market-controls input[type="checkbox"] + label {
+    cursor: pointer;
+    margin-left: 0.25rem; /* Ajuste para o label da checkbox */
+}
+
+/* --- ESTILOS PARA icon-action-btn (BOTÕES DE ÍCONE GERAL) --- */
+.icon-action-btn {
+    display: inline-flex; 
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem; /* Espaçamento entre ícone e texto */
+    padding: 8px 12px; /* Padding padrão para botões com texto */
+    font-size: 0.9em;
+    font-weight: 500;
+    text-decoration: none; /* Garante que não há sublinhado para links */
+    border: 1px solid #dee2e6; 
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    background-color: #f1f3f5; 
+    color: #495057; /* Cor padrão do texto/ícone */
+    flex-shrink: 0;
+}
+
+/* Efeito hover geral para botões de ícone */
+.icon-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+    background-color: #e9ecef; 
+}
+
+/* Garante o tamanho correto do ícone */
+.icon-action-btn i {
+    font-size: 1.1em;
+    line-height: 1; 
+}
+
+/* Estilos ESPECÍFICOS para a DIV que contém os botões de Ações nas TABELAS */
+.market-table .action-buttons,
+.alarms-table .action-buttons,
+#trades-table .action-buttons, /* Aplicável à tabela de gestão e detalhes do ativo */
+.asset-related-data .action-buttons { /* Para ter a certeza que pega a tabela em asset-details.html */
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem; /* Espaçamento entre os botões na tabela */
+    align-items: center; 
+    justify-content: flex-end; /* Alinha os botões à direita dentro da célula */
+}
+
+/* ESTILO CRÍTICO: Botões de ícone dentro das tabelas */
+/* Isto faz com que sejam todos quadrados e com apenas o ícone visível */
+.market-table .action-buttons .icon-action-btn,
+.alarms-table .action-buttons .icon-action-btn,
+#trades-table .action-buttons .icon-action-btn,
+.asset-related-data .action-buttons .icon-action-btn {
+    padding: 6px; /* Padding uniforme para todos os lados */
+    width: 32px;  /* Largura fixa */
+    height: 32px; /* Altura fixa */
+    border-radius: 6px; /* Bordas arredondadas */
+    /* Garante que qualquer texto dentro do botão é escondido */
+    & span { 
+        display: none; 
+    }
+}
+
+/* Cores específicas para os ÍCONES dentro dos botões de ação */
+/* As cores são para o <i> elemento dentro do .icon-action-btn */
+.icon-action-btn.view-chart-btn i { color: #198754; } /* Gráfico (verde) */
+.icon-action-btn.action-full-chart i { color: #0d6efd; } /* TradingView (azul) */
+.icon-action-btn.action-bell i { color: #0d6efd; } /* Alarme (azul) */
+.icon-action-btn.action-plus i { color: #0d6efd; } /* Adicionar (azul) */
+
+/* Cores para os botões de ação do dashboard (com texto) - caso existam estas classes */
+.icon-action-btn.action-arm { color: #ffc107; }
+.icon-action-btn.action-execute { color: #20c997; }
+.icon-action-btn.action-close { color: #dc3545; }
+
+
+/* Ajustes para o Dark Mode */
+.dark-mode .icon-action-btn {
+    background-color: #2c2c2c;
+    border-color: #444;
+    color: #e0e0e0; 
+}
+.dark-mode .icon-action-btn:hover {
+    background-color: #3a3a3a;
+}
+/* Dark mode hover para botões com cores específicas */
+.dark-mode .icon-action-btn.view-chart-btn:hover { background-color: #1a4f2b; } /* Fundo no hover */
+.dark-mode .icon-action-btn.action-full-chart:hover,
+.dark-mode .icon-action-btn.action-bell:hover,
+.dark-mode .icon-action-btn.action-plus:hover { background-color: #0b4991; } 
+.dark-mode .icon-action-btn.action-arm:hover { background-color: #8c7b00; } 
+.dark-mode .icon-action-btn.action-execute:hover { background-color: #1f6b57; } 
+.dark-mode .icon-action-btn.action-close:hover { background-color: #a02a3a; }
+
+
+/* --- PÁGINA DE ESTATÍSTICAS --- */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem; }
+.stat-card { background-color: #fff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.08); text-align: center; }
+.stat-card h4 { margin-top: 0; margin-bottom: 0.5rem; color: #6c757d; font-size: 1em; }
+.stat-card p { margin: 0; font-size: 2em; font-weight: bold; color: #343a40; }
+.portfolio-section { background-color: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.08); text-align: center; margin-bottom: 2rem; }
+.portfolio-balance { font-size: 1.5rem; color: #495057; }
+.portfolio-balance strong { font-size: 2.5rem; color: #28a745; margin-left: 1rem; }
+.portfolio-actions { margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem; }
+
+/* --- GRÁFICOS & WIDGETS --- */
+.mini-chart-container { height: 0; overflow: hidden; transition: height 0.35s ease-in-out; margin-top: 1rem; border-radius: 6px; }
+.mini-chart-container.visible { height: 400px; }
+.sparkline-cell { padding: 0 !important; vertical-align: middle !important; }
+.sparkline-container { width: 150px; height: 50px; margin: auto; }
+
+/* --- CONSTRUTOR DE ESTRATÉGIAS --- */
+.phase-block { background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; position: relative; }
+.phase-block-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.phase-block-header h5 { margin: 0; color: #0d6efd; }
+
+/* --- FOOTER --- */
+footer { text-align: center; padding: 1rem 0; margin-top: 2rem; color: #6c757d; font-size: 0.9em; border-top: 1px solid #e9ecef; }
+
+/* --- RESPONSIVIDADE --- */
+@media (max-width: 992px) { 
+    .dashboard-columns { grid-template-columns: 1fr 1fr; } 
+    .asset-charts-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+    html { font-size: 14px; }
+    header { padding: 1.5rem 1rem; margin-bottom: 1rem; }
+    main { padding: 0 1rem 1rem 1rem; }
+    .dashboard-columns { grid-template-columns: 1fr; }
+    h1 { font-size: 1.8rem; }
+    h2 { font-size: 1.4rem; margin-bottom: 1rem; }
+    .btn, .nav-link { padding: 8px 16px; font-size: 0.95rem; }
+    .alarms-table thead, #trades-table thead { display: none; }
+    .alarms-table tr, #trades-table tr { display: block; margin-bottom: 1.5rem; border: 1px solid #dee2e6; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); background-color: #fff; }
+    .alarms-table td, #trades-table td { display: flex; justify-content: space-between; align-items: center; padding: 0.8rem 1rem; border-bottom: 1px solid #f1f1f1; }
+    .alarms-table td::before, #trades-table td::before { content: attr(data-label); font-weight: 600; color: #495057; padding-right: 1rem; }
+    .alarms-table tr td:last-child, #trades-table tr td:last-child { border-bottom: none; }
+    .alarms-table td .cell-value, #trades-table td .cell-value { text-align: right; flex-shrink: 0; max-width: 60%; }
+    .market-controls {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 0.75rem;
+    }
+    .market-controls .control-group {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    .dark-mode .market-controls select {
+        background-color: #2c2c2c;
+    }
+}
+
+/* --- BOTÃO DE TEMA --- */
+#theme-toggle-btn { background-color: #f8f9fa; color: #495057; border: 1px solid #dee2e6; width: 45px; height: 45px; padding: 0; line-height: 45px; border-radius: 50%; font-size: 1.2rem; }
+#theme-toggle-btn:hover { background-color: #e9ecef; }
+.dark-mode #theme-toggle-btn { background-color: #2c2c2c; border-color: #444; color: #e0e0e0; }
+.dark-mode #theme-toggle-btn:hover { background-color: #3a3a3a; }
+
+/* --- ANIMAÇÃO DE DESTAQUE --- */
+@keyframes flash-yellow {
+  from { background-color: rgba(255, 220, 0, 0.5); }
+  to { background-color: transparent; }
+}
+.new-item-flash { animation: flash-yellow 1.5s ease-out; }
