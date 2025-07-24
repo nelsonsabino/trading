@@ -2,7 +2,18 @@
 
 export const changelogData = {
     current: {
-        number: '11.2.0', // <-- VERSÃO ATUALIZADA
+        number: '11.3.0',
+       changes: [
+           "**Reorganização do Menu de Navegação (UI/UX):**",
+           "O cabeçalho foi reestruturado com uma navegação de duas linhas para melhor clareza e organização.",
+           "A primeira linha (`main-nav`) contém a navegação global e a gestão de sessão (logout).",
+           "A segunda linha (`contextual-nav`) agora exibe botões de ação específicos da página atual (ex: 'Adicionar à Watchlist' no Dashboard), com um estilo visual distinto.",
+           "O botão para alternar o tema (claro/escuro) foi movido para uma posição fixa no canto superior direito do ecrã, garantindo acesso constante em todas as páginas."
+       ]
+    },
+    releases: [
+        {
+        number: '11.2.0', 
         changes: [
             "**Implementação Completa de Acesso Privado e Landing Page:**",
             "Criada uma nova 'Landing Page' (`index.html`) como a página de entrada pública da aplicação.",
@@ -12,7 +23,6 @@ export const changelogData = {
             "Resolvidos todos os problemas de redirecionamento e autenticação que impediam o fluxo de login e acesso exclusivo."
         ]
     },
-    releases: [
         {
             number: '11.1.1',
             changes: [
