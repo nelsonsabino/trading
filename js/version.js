@@ -2,27 +2,35 @@
 
 export const changelogData = {
     current: {
-        number: '11.3.0',
-       changes: [
-           "**Reorganização do Menu de Navegação (UI/UX):**",
-           "O cabeçalho foi reestruturado com uma navegação de duas linhas para melhor clareza e organização.",
-           "A primeira linha (`main-nav`) contém a navegação global e a gestão de sessão (logout).",
-           "A segunda linha (`contextual-nav`) agora exibe botões de ação específicos da página atual (ex: 'Adicionar à Watchlist' no Dashboard), com um estilo visual distinto.",
-           "O botão para alternar o tema (claro/escuro) foi movido para uma posição fixa no canto superior direito do ecrã, garantindo acesso constante em todas as páginas."
-       ]
+        number: '11.3.1', // <-- VERSÃO ATUALIZADA
+        changes: [
+            "**Refatoração do Código de Autenticação:**",
+            "Centralizada toda a configuração de autenticação do Firebase no ficheiro `firebase-service.js`, incluindo a inicialização e a definição da persistência da sessão.",
+            "Esta alteração melhora a organização do código e estabelece uma base mais limpa para futuras depurações do sistema de login."
+        ]
     },
     releases: [
         {
-        number: '11.2.0', 
-        changes: [
-            "**Implementação Completa de Acesso Privado e Landing Page:**",
-            "Criada uma nova 'Landing Page' (`index.html`) como a página de entrada pública da aplicação.",
-            "O Dashboard principal foi renomeado para `dashboard.html` e agora é uma página privada, acessível apenas após o login.",
-            "Implementada uma 'whitelist' de acesso: apenas o email do administrador configurado em `js/auth.js` tem permissão para fazer login e aceder às funcionalidades da aplicação. Outros utilizadores Google são bloqueados.",
-            "Todas as ligações internas da aplicação foram atualizadas para refletir a nova estrutura de `index.html` (landing page) e `dashboard.html` (dashboard principal).",
-            "Resolvidos todos os problemas de redirecionamento e autenticação que impediam o fluxo de login e acesso exclusivo."
-        ]
-    },
+            number: '11.3.0',
+            changes: [
+                "**Reorganização do Menu de Navegação (UI/UX):**",
+                "O cabeçalho foi reestruturado com uma navegação de duas linhas para melhor clareza e organização.",
+                "A primeira linha (`main-nav`) contém a navegação global e a gestão de sessão (logout).",
+                "A segunda linha (`contextual-nav`) agora exibe botões de ação específicos da página atual (ex: 'Adicionar à Watchlist' no Dashboard), com um estilo visual distinto.",
+                "O botão para alternar o tema (claro/escuro) foi movido para uma posição fixa no canto superior direito do ecrã, garantindo acesso constante em todas as páginas."
+            ]
+        },
+        {
+            number: '11.2.0',
+            changes: [
+                "**Implementação Completa de Acesso Privado e Landing Page:**",
+                "Criada uma nova 'Landing Page' (`index.html`) como a página de entrada pública da aplicação.",
+                "O Dashboard principal foi renomeado para `dashboard.html` e agora é uma página privada, acessível apenas após o login.",
+                "Implementada uma 'whitelist' de acesso: apenas o email do administrador configurado em `js/auth.js` tem permissão para fazer login e aceder às funcionalidades da aplicação. Outros utilizadores Google são bloqueados.",
+                "Todas as ligações internas da aplicação foram atualizadas para refletir a nova estrutura de `index.html` (landing page) e `dashboard.html` (dashboard principal).",
+                "Resolvidos todos os problemas de redirecionamento e autenticação que impediam o fluxo de login e acesso exclusivo."
+            ]
+        },
         {
             number: '11.1.1',
             changes: [
@@ -125,7 +133,7 @@ export const changelogData = {
             changes: [
                 "**Correção de Tema em Gráficos (Página de Detalhes):**",
                 "Resolvido o problema onde os gráficos (ApexCharts e widget de Análise Técnica TradingView) na página de detalhes do ativo não mudavam de tema (claro/escuro) dinamicamente.",
-                "Implementado um sistema de notificação de mudança de tema (`CustomEvent`) para que os gráficos se redesenham automaticamente com o tema correto ao alternar.",
+                "Implementado um sistema de notificação de mudança de tema (`CustomEvent`) para que os gráficos se redesenhem automaticamente com o tema correto ao alternar.",
             ]
         },
         {
