@@ -15,8 +15,8 @@ const provider = new GoogleAuthProvider();
 
 // --- FUNÇÃO DE LOGIN ---
 const signInWithGoogle = () => {
-    // Usamos signInWithRedirect. A verificação do email acontecerá depois do redirecionamento.
     localStorage.removeItem('userLoggedOut'); // Limpa a bandeira de logout intencional
+    sessionStorage.setItem('authRedirect', 'true'); // Define a bandeira antes de redirecionar
     signInWithRedirect(auth, provider);
 };
 
@@ -35,6 +35,7 @@ export const signOutUser = () => {
 // Esta parte executa quando a página carrega após um redirecionamento do Google
 getRedirectResult(auth)
     .then((result) => {
+        sessionStorage.removeItem('authRedirect'); // Limpa a bandeira assim que o resultado é processado
         if (result && result.user) {
             // O utilizador acabou de fazer login via redirect
             const userEmail = result.user.email;
@@ -50,6 +51,7 @@ getRedirectResult(auth)
             }
         }
     }).catch((error) => {
+        sessionStorage.removeItem('authRedirect'); // Limpa a bandeira também em caso de erro
         console.error("Erro ao obter o resultado do redirecionamento:", error);
     });
 
@@ -77,6 +79,7 @@ onAuthStateChanged(auth, (user) => {
     } else {
         // O utilizador NÃO está logado.
         const userLoggedOut = localStorage.getItem('userLoggedOut') === 'true';
+        const isAuthRedirect = sessionStorage.getItem('authRedirect') === 'true'; // Verifica se estamos a meio de um redirect
 
         if (!isPublicPage) {
             // Se não está numa página pública, precisa de autenticação.
@@ -84,11 +87,13 @@ onAuthStateChanged(auth, (user) => {
                 // Se o utilizador fez logout de propósito, vai para a landing page.
                 console.log("Utilizador fez logout explícito. A redirecionar para a página inicial...");
                 window.location.replace('index.html');
-            } else {
+            } else if (!isAuthRedirect) { // SÓ TENTA re-autenticar se NÃO estivermos a meio de um redirect
                 // Se não fez logout, tenta a re-autenticação silenciosa.
                 console.log("Sessão não encontrada, a tentar re-autenticação silenciosa...");
+                sessionStorage.setItem('authRedirect', 'true'); // Define a bandeira
                 signInWithRedirect(auth, provider);
             }
+            // Se isAuthRedirect for true, não faz nada e espera que o getRedirectResult resolva.
         } else {
            // Se está numa página pública e fez logout, limpa a bandeira.
            if (userLoggedOut) {
