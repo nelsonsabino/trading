@@ -14,7 +14,6 @@ import { auth } from './firebase-service.js';
 
 const ADMIN_EMAIL = "sabino.nelson@gmail.com";
 const provider = new GoogleAuthProvider();
-let redirectHandled = false;
 
 function isPWA() {
     return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
@@ -43,12 +42,8 @@ async function signInWithGoogle() {
         await setPersistence(auth, browserLocalPersistence);
 
         if (isPWA()) {
-            if (!isRedirectPending()) {
-                setRedirectPending(true);
-                await signInWithRedirect(auth, provider);
-            } else {
-                console.log("Redirect já pendente...");
-            }
+            setRedirectPending(true);
+            await signInWithRedirect(auth, provider);
         } else {
             const result = await signInWithPopup(auth, provider);
             handleLoginResult(result);
@@ -60,6 +55,11 @@ async function signInWithGoogle() {
 }
 
 function handleLoginResult(result) {
+    if (!result || !result.user) {
+        console.warn("Resultado inválido.");
+        return;
+    }
+
     const email = result.user.email;
     if (email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
         console.log("Autenticação bem-sucedida.");
@@ -71,19 +71,7 @@ function handleLoginResult(result) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        const result = await getRedirectResult(auth);
-        if (result && result.user && !redirectHandled) {
-            redirectHandled = true;
-            handleLoginResult(result);
-            return;
-        }
-    } catch (error) {
-        console.error("Erro no getRedirectResult:", error);
-        setRedirectPending(false);
-    }
-
+document.addEventListener('DOMContentLoaded', () => {
     const loginBtn = document.getElementById('login-google-btn');
     if (loginBtn) loginBtn.addEventListener('click', signInWithGoogle);
 
@@ -91,7 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (logoutBtn) logoutBtn.addEventListener('click', signOutUser);
 });
 
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
     const isPublicPage =
         location.pathname.endsWith('/') ||
         location.pathname.endsWith('index.html') ||
@@ -106,16 +94,25 @@ onAuthStateChanged(auth, (user) => {
             return;
         }
 
+        setRedirectPending(false);
+
         if (!isPublicPage) {
             if (userPhotoImg) userPhotoImg.src = user.photoURL;
             if (userSessionDiv) userSessionDiv.style.display = 'flex';
         }
-
-        // Reset redirect pending (login concluído com sucesso)
-        setRedirectPending(false);
+    } else if (isRedirectPending()) {
+        // Esperar 300ms para garantir que auth está inicializado na PWA
+        setTimeout(async () => {
+            try {
+                const result = await getRedirectResult(auth);
+                handleLoginResult(result);
+            } catch (error) {
+                console.error("Erro ao obter resultado de redirecionamento:", error);
+                setRedirectPending(false);
+            }
+        }, 300);
     } else {
-        if (!isPublicPage && !isRedirectPending()) {
-            console.log("Utilizador não autenticado. A redirecionar.");
+        if (!isPublicPage) {
             window.location.href = "index.html";
         }
 
