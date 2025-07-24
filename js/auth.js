@@ -36,60 +36,68 @@ export const signOutUser = () => {
 
 // --- CONTROLO CENTRAL DE AUTENTICAÇÃO ---
 document.addEventListener('DOMContentLoaded', () => {
-  // Exibe um indicador de carregamento enquanto verifica a sessão
   console.log("Página carregada, verificando estado de autenticação...");
   const loadingIndicator = document.getElementById('loading-indicator');
+  const content = document.getElementById('content');
+
+  // Exibe o indicador de carregamento
   if (loadingIndicator) {
     loadingIndicator.style.display = 'block';
   }
 
   // Aguarda a verificação da sessão
-  getRedirectResult(auth).then(() => {
-    onAuthStateChanged(auth, (user) => {
-      console.log("onAuthStateChanged chamado. Usuário:", user ? user.email : "Nenhum usuário logado");
-      const isPublicPage = window.location.pathname.endsWith('/') || 
-                          window.location.pathname.endsWith('index.html') || 
-                          window.location.pathname.endsWith('login.html');
-      const userSessionDiv = document.getElementById('user-session');
-      const userPhotoImg = document.getElementById('user-photo');
+  getRedirectResult(auth)
+    .then(() => {
+      onAuthStateChanged(auth, (user) => {
+        console.log("onAuthStateChanged chamado. Usuário:", user ? user.email : "Nenhum usuário logado");
+        const isPublicPage = window.location.pathname.endsWith('/') || 
+                            window.location.pathname.endsWith('index.html') || 
+                            window.location.pathname.endsWith('login.html');
+        const userSessionDiv = document.getElementById('user-session');
+        const userPhotoImg = document.getElementById('user-photo');
 
-      if (user) {
-        console.log("onAuthStateChanged - Email do Utilizador:", `'${user.email}'`);
-        console.log("onAuthStateChanged - Email de Administrador:", `'${ADMIN_EMAIL}'`);
-        if (user.email.toLowerCase().trim() !== ADMIN_EMAIL.toLowerCase().trim()) {
-          console.warn("Utilizador logado não autorizado. A fazer logout.");
-          signOutUser();
-          return;
+        if (user) {
+          console.log("onAuthStateChanged - Email do Utilizador:", `'${user.email}'`);
+          console.log("onAuthStateChanged - Email de Administrador:", `'${ADMIN_EMAIL}'`);
+          if (user.email.toLowerCase().trim() !== ADMIN_EMAIL.toLowerCase().trim()) {
+            console.warn("Utilizador logado não autorizado. A fazer logout.");
+            signOutUser();
+            return;
+          }
+          if (!isPublicPage && userSessionDiv && userPhotoImg) {
+            userPhotoImg.src = user.photoURL || './pic/default-user.png';
+            userSessionDiv.style.display = 'flex';
+          }
+          if (isPublicPage) {
+            console.log("Usuário autenticado, redirecionando para dashboard...");
+            window.location.href = 'dashboard.html';
+          }
+        } else {
+          console.log("Nenhum usuário autenticado detectado.");
+          if (!isPublicPage) {
+            console.log("Utilizador não autenticado. A redirecionar para a página inicial...");
+            window.location.replace('index.html');
+          }
+          if (userSessionDiv) {
+            userSessionDiv.style.display = 'none';
+          }
         }
-        if (!isPublicPage && userSessionDiv && userPhotoImg) {
-          userPhotoImg.src = user.photoURL || './pic/default-user.png';
-          userSessionDiv.style.display = 'flex';
+
+        // Esconde o indicador de carregamento e exibe o conteúdo
+        if (loadingIndicator && content) {
+          loadingIndicator.style.display = 'none';
+          content.style.display = 'block';
         }
-        if (isPublicPage) {
-          console.log("Usuário autenticado, redirecionando para dashboard...");
-          window.location.href = 'dashboard.html';
-        }
-      } else {
-        console.log("Nenhum usuário autenticado detectado.");
-        if (!isPublicPage) {
-          console.log("Utilizador não autenticado. A redirecionar para a página inicial...");
-          window.location.replace('index.html');
-        }
-        if (userSessionDiv) {
-          userSessionDiv.style.display = 'none';
-        }
-      }
-      // Esconde o indicador de carregamento após verificar a sessão
-      if (loadingIndicator) {
+      });
+    })
+    .catch((error) => {
+      console.error("Erro ao verificar resultado de redirecionamento:", error);
+      // Esconde o indicador de carregamento mesmo em caso de erro
+      if (loadingIndicator && content) {
         loadingIndicator.style.display = 'none';
+        content.style.display = 'block';
       }
     });
-  }).catch((error) => {
-    console.error("Erro ao verificar resultado de redirecionamento:", error);
-    if (loadingIndicator) {
-      loadingIndicator.style.display = 'none';
-    }
-  });
 
   const loginButton = document.getElementById('login-google-btn');
   if (loginButton) {
