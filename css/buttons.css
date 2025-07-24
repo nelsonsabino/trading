@@ -24,15 +24,25 @@
 .btn-tertiary:hover { background-color: #e0a800; }
 
 
-/* --- icon-action-btn (BOTÕES COM ÍCONE EM CONTEÚDO) --- */
+/* --- BOTÕES CONTEXTUAIS (segunda linha da navegação) --- */
+.btn-contextual {
+    background-color: #20c997; /* Um verde-azulado para diferenciar */
+    color: white;
+    font-size: 0.9em;
+    padding: 8px 16px;
+}
 
-/* Base para todos os icon-action-btn (cards e tabelas) */
+.btn-contextual:hover {
+    background-color: #1aab8a;
+}
+
+/* --- icon-action-btn (BOTÕES COM ÍCONE EM CONTEÚDO) --- */
 .icon-action-btn {
     display: inline-flex; 
     align-items: center;
     justify-content: center; 
-    gap: 0.4rem; /* Espaçamento entre ícone e texto */
-    padding: 8px 12px; /* Padding padrão para botões com texto (nos cards) */
+    gap: 0.4rem;
+    padding: 8px 12px;
     font-size: 0.9em;
     font-weight: 500;
     text-decoration: none; 
@@ -45,20 +55,18 @@
     flex-shrink: 0; 
 }
 
-/* Efeito hover geral para todos os icon-action-btn */
 .icon-action-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 3px 6px rgba(0,0,0,0.08);
     background-color: #e9ecef; 
 }
 
-/* Garante o tamanho correto do ícone */
 .icon-action-btn i {
     font-size: 1.1em;
     line-height: 1; 
 }
 
-/* --- Estilos para containers de botões de Ações (Ex: dentro de cards ou tabelas) --- */
+/* --- Estilos para containers de botões de Ações --- */
 .card-actions, 
 .market-table .action-buttons,
 .alarms-table .action-buttons,
@@ -71,7 +79,7 @@
     justify-content: flex-end; 
 }
 
-/* ESTILOS ESPECÍFICOS: Botões de ícone compactos dentro das TABELAS */
+/* Botões de ícone compactos dentro das TABELAS */
 .market-table .action-buttons .icon-action-btn,
 .alarms-table .action-buttons .icon-action-btn,
 #trades-table .action-buttons .icon-action-btn,
@@ -95,36 +103,24 @@
 .icon-action-btn.action-close i { color: #dc3545; }
 
 
-/* --- BOTÃO DE TEMA --- */
-/* NOTA: O botão de tema agora usa a classe .nav-icon-link em HTML */
-/* Se houver conflito, esta regra pode ser removida se .nav-icon-link for suficiente */
-/* #theme-toggle-btn { 
-    background-color: #f8f9fa; 
-    color: #495057; 
-    border: 1px solid #dee2e6; 
-    width: 45px; 
-    height: 45px; 
-    padding: 0; 
-    line-height: 45px; 
-    border-radius: 50%; 
-    font-size: 1.2rem; 
-}
-#theme-toggle-btn:hover { 
-    background-color: #e9ecef; 
-} */
-
-
 /* --- LINKS DE NAVEGAÇÃO SECUNDÁRIOS (dentro do dropdown) --- */
-/* São os únicos que ainda usam a classe .nav-link agora */
 a.nav-link { 
-    background-color: #6c757d; /* Cor base mais escura */
+    background-color: #6c757d;
     color: white; 
     border: none;
-    text-decoration: none; /* Garante que links não são sublinhados */
-    border-radius: 6px; /* Para os botões normais */
+    text-decoration: none;
+    border-radius: 6px;
 }
 a.nav-link:hover { 
     background-color: #5a6268; 
     transform: translateY(-2px); 
     box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+}
+
+/* --- DARK MODE PARA BOTÕES --- */
+.dark-mode .btn-contextual {
+    background-color: #1aab8a;
+}
+.dark-mode .btn-contextual:hover {
+    background-color: #158a6e;
 }
