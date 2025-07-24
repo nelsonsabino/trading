@@ -1,128 +1,102 @@
-// js/auth.js
-
+// auth.js
 import {
-    GoogleAuthProvider,
-    signInWithPopup,
-    onAuthStateChanged,
-    signOut,
-    signInWithRedirect,
-    getRedirectResult,
-    setPersistence,
-    browserLocalPersistence
+  GoogleAuthProvider,
+  signInWithRedirect,
+  getRedirectResult,
+  onAuthStateChanged,
+  signOut,
+  setPersistence,
+  browserLocalPersistence
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+
 import { auth } from './firebase-service.js';
 
-// --- DEFINIR PERSISTÊNCIA DURÁVEL ---
-setPersistence(auth, browserLocalPersistence)
-    .then(() => {
-        console.log("Persistência definida para localStorage.");
-    })
-    .catch((error) => {
-        console.error("Erro ao definir persistência:", error);
-    });
-
-const ADMIN_EMAIL = "o.seu.email.aqui@gmail.com"; // Substituir pelo teu e-mail real
+const ADMIN_EMAIL = "o.seu.email@gmail.com";
 const provider = new GoogleAuthProvider();
 
-// --- FUNÇÃO DE LOGIN ---
+// Define persistência antes de qualquer outra operação
+await setPersistence(auth, browserLocalPersistence);
+
+// LOGIN
 const signInWithGoogle = () => {
-    localStorage.removeItem('userLoggedOut'); // Limpa flag de logout intencional
-    sessionStorage.setItem('authRedirect', 'true'); // Define flag de redirect
-    signInWithRedirect(auth, provider);
+  sessionStorage.setItem('authRedirect', 'true');
+  localStorage.removeItem('userLoggedOut');
+  signInWithRedirect(auth, provider);
 };
 
-// --- FUNÇÃO DE LOGOUT ---
+// LOGOUT
 export const signOutUser = () => {
-    localStorage.setItem('userLoggedOut', 'true'); // Define flag de logout
-    signOut(auth)
-        .then(() => {
-            console.log("Logout bem-sucedido.");
-        })
-        .catch((error) => {
-            console.error("Erro no logout:", error);
-        });
+  localStorage.setItem('userLoggedOut', 'true');
+  signOut(auth).then(() => {
+    console.log("Logout feito com sucesso.");
+    window.location.replace('index.html');
+  });
 };
 
-// --- GESTÃO DO RESULTADO DO REDIRECT ---
-getRedirectResult(auth)
-    .then((result) => {
-        sessionStorage.removeItem('authRedirect'); // Limpa flag mesmo em sucesso
-        if (result && result.user) {
-            const userEmail = result.user.email;
-            if (userEmail.toLowerCase().trim() === ADMIN_EMAIL.toLowerCase().trim()) {
-                console.log("Administrador autenticado com sucesso.");
-                if (!window.location.pathname.endsWith('dashboard.html')) {
-                    window.location.href = 'dashboard.html';
-                }
-            } else {
-                alert("Acesso negado. Esta é uma aplicação privada.");
-                signOutUser();
-            }
-        }
-    })
-    .catch((error) => {
-        sessionStorage.removeItem('authRedirect'); // Limpa mesmo em erro
-        console.error("Erro no redirect:", error);
-    });
+// Esta função controla tudo
+const handleAuth = async () => {
+  try {
+    const result = await getRedirectResult(auth);
+    sessionStorage.removeItem('authRedirect');
 
-// --- CONTROLO GERAL DE AUTENTICAÇÃO ---
-onAuthStateChanged(auth, (user) => {
-    const isPublicPage =
+    if (result?.user) {
+      if (result.user.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+        alert("Conta não autorizada.");
+        return signOutUser();
+      }
+
+      if (!window.location.pathname.endsWith('dashboard.html')) {
+        window.location.href = 'dashboard.html';
+      }
+      return;
+    }
+
+    // Só agora avaliamos o estado da auth
+    onAuthStateChanged(auth, (user) => {
+      const isPublic =
         window.location.pathname.endsWith('/') ||
         window.location.pathname.endsWith('index.html') ||
         window.location.pathname.endsWith('login.html');
 
-    const userSessionDiv = document.getElementById('user-session');
-    const userPhotoImg = document.getElementById('user-photo');
-
-    if (user) {
-        // Verifica se o utilizador é o admin
-        if (user.email.toLowerCase().trim() !== ADMIN_EMAIL.toLowerCase().trim()) {
-            console.warn("Utilizador não autorizado. A terminar sessão.");
-            signOutUser();
-            return;
+      if (user) {
+        if (user.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+          return signOutUser();
         }
 
-        // Mostra avatar se estiver na página privada
-        if (!isPublicPage && userSessionDiv && userPhotoImg) {
-            userPhotoImg.src = user.photoURL || './pic/default-user.png';
-            userSessionDiv.style.display = 'flex';
+        const userPhoto = document.getElementById('user-photo');
+        const sessionDiv = document.getElementById('user-session');
+        if (userPhoto) userPhoto.src = user.photoURL;
+        if (sessionDiv) sessionDiv.style.display = 'flex';
+
+      } else {
+        const isRedirecting = sessionStorage.getItem('authRedirect') === 'true';
+        const isLogout = localStorage.getItem('userLoggedOut') === 'true';
+
+        if (!isPublic && !isRedirecting && !isLogout) {
+          console.log("Utilizador não autenticado. A redirecionar para login.");
+          sessionStorage.setItem('authRedirect', 'true');
+          signInWithRedirect(auth, provider);
         }
 
-    } else {
-        const userLoggedOut = localStorage.getItem('userLoggedOut') === 'true';
-        const isAuthRedirect = sessionStorage.getItem('authRedirect') === 'true';
+        const sessionDiv = document.getElementById('user-session');
+        if (sessionDiv) sessionDiv.style.display = 'none';
+      }
+    });
 
-        if (!isPublicPage) {
-            if (userLoggedOut) {
-                console.log("Logout manual detectado. A redirecionar...");
-                window.location.replace('index.html');
-            } else if (!isAuthRedirect) {
-                console.log("Sessão em falta. A iniciar redirect...");
-                sessionStorage.setItem('authRedirect', 'true');
-                signInWithRedirect(auth, provider);
-            }
-        } else {
-            if (userLoggedOut) {
-                localStorage.removeItem('userLoggedOut');
-            }
-        }
+  } catch (error) {
+    console.error("Erro na autenticação:", error);
+    sessionStorage.removeItem('authRedirect');
+  }
+};
 
-        if (userSessionDiv) {
-            userSessionDiv.style.display = 'none';
-        }
-    }
-});
+// Run logo ao carregar
+handleAuth();
 
-// --- EVENT LISTENERS ---
+// Botões
 document.addEventListener('DOMContentLoaded', () => {
-    const loginButton = document.getElementById('login-google-btn');
-    if (loginButton) {
-        loginButton.addEventListener('click', signInWithGoogle);
-    }
+  const loginBtn = document.getElementById('login-google-btn');
+  if (loginBtn) loginBtn.addEventListener('click', signInWithGoogle);
 
-    const logoutButton = document.getElementById('logout-btn');
-    if (logoutButton) {
-        logoutButton.addEventListener('click', signOutUser);
-    }
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) logoutBtn.addEventListener('click', signOutUser);
 });
