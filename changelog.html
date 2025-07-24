@@ -50,13 +50,28 @@
 </head>
 <body>
 
-    <header>
-        <h1>Histórico de Alterações (Changelog)</h1>
-        <p class="mantra">A evolução da nossa ferramenta de trading.</p>
-        <nav>
-            <a href="dashboard.html" class="nav-link">Voltar ao Dashboard Principal</a>
-        </nav>
-    </header>
+
+
+<!-- NOVO BOTÃO DE TEMA (fora do header) -->
+<button id="theme-toggle-btn" class="nav-icon-link" title="Alternar tema">
+    <i class="fas fa-moon"></i>
+</button>
+
+<header>
+    <h1>Histórico de Alterações (Changelog)</h1>
+    <p class="mantra">A evolução da nossa ferramenta de trading.</p>
+
+    <!-- Navegação simplificada nesta página -->
+    <nav class="main-nav">
+        <a href="dashboard.html" class="btn btn-primary">Voltar ao Dashboard</a>
+        <!-- Secção do Utilizador -->
+        <div id="user-session" class="user-session" style="display: none;">
+            <img id="user-photo" src="" alt="Foto do Utilizador" class="user-photo">
+            <button id="logout-btn" class="btn btn-secondary">Sair</button>
+        </div>
+    </nav>
+</header>
+    
 
     <main>
         <section id="changelog-container">
