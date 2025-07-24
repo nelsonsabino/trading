@@ -10,56 +10,24 @@
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/buttons.css">
     <link rel="stylesheet" href="css/dark-mode.css">
-    <style>
-        #loading-indicator {
-            display: block;
-            text-align: center;
-            padding: 20px;
-            margin-top: 20vh;
-        }
-        #loading-indicator::after {
-            content: '';
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            border: 3px solid #ccc;
-            border-top: 3px solid #007bff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        #content {
-            display: none;
-        }
-    </style>
+    <script>
+        (function() {
+            try {
+                const theme = localStorage.getItem('theme');
+                if (theme === 'dark') { document.documentElement.classList.add('dark-mode'); }
+            } catch (e) {}
+        })();
+    </script>
 </head>
 <body>
     <main>
-        <div id="loading-indicator">Carregando...</div>
-        <div id="content" class="login-container" style="margin-top: 10vh;">
+        <div class="login-container" style="margin-top: 10vh;">
             <h1>Trading Web-App</h1>
             <p>A sua ferramenta pessoal de apoio e gestão de trading.</p>
-            <a href="login.html" class="btn btn-primary" id="login-google-btn" style="font-size: 1.1rem; padding: 14px;">
+            <a href="login.html" class="btn btn-primary" style="font-size: 1.1rem; padding: 14px;">
                 <i class="fas fa-sign-in-alt" style="margin-right: 8px;"></i> Aceder à Aplicação
             </a>
         </div>
     </main>
-    <script src="js/auth.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const content = document.getElementById('content');
-            const loadingIndicator = document.getElementById('loading-indicator');
-            // Fallback: exibe o conteúdo após 5 segundos, mesmo se a autenticação falhar
-            setTimeout(() => {
-                if (content && loadingIndicator) {
-                    loadingIndicator.style.display = 'none';
-                    content.style.display = 'block';
-                }
-            }, 5000);
-        });
-    </script>
 </body>
 </html>
