@@ -1,0 +1,192 @@
+/* css/forms-modals.css */
+
+/* --- MODAIS & FORMULÁRIOS --- */
+.modal-overlay { 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background-color: rgba(33, 37, 41, 0.6); 
+    display: none; /* Escondido por padrão */
+    justify-content: center; 
+    align-items: center; 
+    z-index: 1000; 
+    box-sizing: border-box; 
+    overflow-y: auto; /* Permite scroll se o conteúdo for grande */
+    padding: 2rem 1rem; 
+}
+.modal-content { 
+    background: #fff; 
+    padding: 2rem 2.5rem; 
+    border-radius: 12px; 
+    width: 100%; 
+    max-width: 550px; 
+    position: relative; 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+    animation: fadeIn 0.3s ease-out; 
+    margin: auto; /* Centra o modal verticalmente */
+}
+/* Animação para o aparecimento do modal */
+@keyframes fadeIn { 
+    from { opacity: 0; transform: translateY(-20px); } 
+    to { opacity: 1; transform: translateY(0); } 
+}
+/* Classe para tornar o modal visível */
+.modal-overlay.visible { 
+    display: flex !important; /* Força display flex */
+}
+
+/* Botão de fechar (X) do modal */
+.modal-content > span[id^="close-"] { 
+    position: absolute; 
+    top: 15px; 
+    right: 25px; 
+    font-size: 2.5rem; 
+    color: #adb5bd; 
+    font-weight: 300; 
+    cursor: pointer; 
+    line-height: 1; 
+    transition: color 0.2s; 
+}
+.modal-content > span[id^="close-"]:hover { 
+    color: #495057; 
+}
+
+/* Títulos dentro do modal */
+.modal-content h3 { 
+    margin-top: 0; 
+    margin-bottom: 0.5rem; 
+    color: #212529; 
+}
+.modal-content p { 
+    margin-top: 0; 
+    margin-bottom: 2rem; 
+    color: #6c757d; 
+    border-bottom: 1px solid #e9ecef; 
+    padding-bottom: 1rem; 
+}
+.modal-content h4 { 
+    margin-top: 1.5rem; 
+    margin-bottom: 1rem; 
+    padding-bottom: 0.5rem; 
+    font-size: 1.1rem; 
+    color: #007bff; 
+    border-bottom: 2px solid #e9ecef; 
+    display: flex; 
+    align-items: center; 
+}
+
+/* NOVO: Estilo para linhas de formulário com múltiplos itens lado a lado */
+.form-row {
+    display: flex;
+    gap: 1rem; /* Espaçamento entre os itens na linha */
+    flex-wrap: wrap; /* Permite quebrar linha em ecrãs pequenos */
+}
+.form-row .input-item,
+.form-row .input-item-styled {
+    flex: 1; /* Faz com que os itens ocupem o espaço disponível igualmente */
+    min-width: 150px; /* Garante que não encolhem demasiado */
+}
+
+
+/* Estilos para grupos de input (label + input/select/textarea) */
+.input-item { 
+    margin-bottom: 1.25rem; 
+}
+.input-item label { 
+    display: block; 
+    margin-bottom: 8px; 
+    font-weight: 500; 
+    color: #495057; 
+}
+/* Estilo geral para campos de input, select e textarea */
+.input-item input, 
+.input-item select, 
+.input-item textarea { 
+    width: 100%; 
+    padding: 12px; 
+    font-size: 1rem; 
+    border: 1px solid #ced4da; 
+    border-radius: 6px; 
+    box-sizing: border-box; 
+    transition: border-color 0.2s, box-shadow 0.2s; 
+}
+/* Foco nos campos de input */
+.input-item input:focus, 
+.input-item select:focus, 
+.input-item textarea:focus { 
+    outline: none; 
+    border-color: #80bdff; 
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); 
+}
+
+/* Botões de submissão dentro de formulários de modal */
+.modal-content form button[type="submit"] { 
+    width: 100%; 
+    padding: 14px; 
+    margin-top: 1.5rem; 
+    font-size: 1.1rem; 
+    font-weight: 600; 
+    background-color: #28a745; 
+    color: white; 
+    border: none; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    transition: background-color 0.2s; 
+}
+.modal-content form button[type="submit"]:hover { 
+    background-color: #218838; 
+}
+
+/* Estilos para itens de checklist dinâmicos */
+.checklist-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.checklist-item i {
+    font-size: 1.2em;
+    color: #6c757d;
+}
+.checklist-item input[type="checkbox"] {
+    width: auto; 
+    margin: 0;
+}
+.checklist-item label {
+    margin-bottom: 0; 
+    cursor: pointer;
+    font-weight: normal; 
+}
+.checklist-item .required-asterisk {
+    color: #dc3545; 
+}
+
+/* Estilos para campos de input dinâmicos (estratégias) */
+.input-item-styled {
+    display: flex;
+    align-items: flex-start; 
+    gap: 10px;
+    margin-bottom: 1.25rem; 
+}
+.input-item-styled i {
+    font-size: 1.2em;
+    color: #6c757d;
+    padding-top: 10px; 
+}
+.input-item-styled label {
+    margin-bottom: 5px; 
+}
+.input-item-styled .input-item-field {
+    width: 100%;
+}
+
+/* Rodapé dos formulários */
+.form-footnote {
+    font-size: 0.85em;
+    color: #6c757d;
+    margin-top: 1.5rem;
+    padding-bottom: 0;
+    border-bottom: none;
+}

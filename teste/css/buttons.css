@@ -1,0 +1,126 @@
+/* css/buttons.css */
+
+/* --- BOTÕES GERAIS (.btn) --- */
+.btn { 
+    display: inline-block; 
+    padding: 10px 20px; 
+    font-size: 1rem; 
+    font-weight: 600; 
+    text-align: center; 
+    text-decoration: none; 
+    border: none; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    transition: all 0.2s ease-in-out; 
+}
+
+/* Cores e efeitos para os botões gerais */
+.btn-primary, #add-opportunity-btn { background-color: #007bff; color: white; }
+.btn-primary:hover, #add-opportunity-btn:hover { background-color: #0056b3; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+
+.btn-secondary { background-color: #6c757d; color: white; }
+.btn-secondary:hover { background-color: #5a6268; }
+.btn-tertiary { background-color: #ffc107; color: #212529; }
+.btn-tertiary:hover { background-color: #e0a800; }
+
+
+/* --- BOTÕES CONTEXTUAIS (segunda linha da navegação) --- */
+.btn-contextual {
+    background-color: #20c997; /* Um verde-azulado para diferenciar */
+    color: white;
+    font-size: 0.9em;
+    padding: 8px 16px;
+}
+
+.btn-contextual:hover {
+    background-color: #1aab8a;
+}
+
+/* --- icon-action-btn (BOTÕES COM ÍCONE EM CONTEÚDO) --- */
+.icon-action-btn {
+    display: inline-flex; 
+    align-items: center;
+    justify-content: center; 
+    gap: 0.4rem;
+    padding: 8px 12px;
+    font-size: 0.9em;
+    font-weight: 500;
+    text-decoration: none; 
+    border: 1px solid #dee2e6; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    transition: all 0.2s ease-in-out;
+    background-color: #f1f3f5; 
+    color: #495057; 
+    flex-shrink: 0; 
+}
+
+.icon-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+    background-color: #e9ecef; 
+}
+
+.icon-action-btn i {
+    font-size: 1.1em;
+    line-height: 1; 
+}
+
+/* --- Estilos para containers de botões de Ações --- */
+.card-actions, 
+.market-table .action-buttons,
+.alarms-table .action-buttons,
+#trades-table .action-buttons, 
+.asset-related-data .action-buttons { 
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem; 
+    align-items: center; 
+    justify-content: flex-end; 
+}
+
+/* Botões de ícone compactos dentro das TABELAS */
+.market-table .action-buttons .icon-action-btn,
+.alarms-table .action-buttons .icon-action-btn,
+#trades-table .action-buttons .icon-action-btn,
+.asset-related-data .action-buttons .icon-action-btn {
+    padding: 6px; 
+    width: 32px;  
+    height: 32px; 
+    border-radius: 6px; 
+    & span { 
+        display: none; 
+    }
+}
+
+/* Cores específicas para os ÍCONES (Aplicadas ao <i> elemento) */
+.icon-action-btn.action-summary i, .icon-action-btn.view-chart-btn i { color: #198754; } 
+.icon-action-btn.action-full-chart i { color: #0d6efd; }
+.icon-action-btn.action-bell i { color: #0d6efd; }
+.icon-action-btn.action-plus i { color: #0d6efd; }
+.icon-action-btn.action-arm i { color: #ffc107; }
+.icon-action-btn.action-execute i { color: #20c997; }
+.icon-action-btn.action-close i { color: #dc3545; }
+
+
+/* --- LINKS DE NAVEGAÇÃO SECUNDÁRIOS (dentro do dropdown) --- */
+a.nav-link { 
+    background-color: #6c757d;
+    color: white; 
+    border: none;
+    text-decoration: none;
+    border-radius: 6px;
+}
+a.nav-link:hover { 
+    background-color: #5a6268; 
+    transform: translateY(-2px); 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+}
+
+/* --- DARK MODE PARA BOTÕES --- */
+.dark-mode .btn-contextual {
+    background-color: #1aab8a;
+}
+.dark-mode .btn-contextual:hover {
+    background-color: #158a6e;
+}
