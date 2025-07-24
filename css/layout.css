@@ -12,13 +12,24 @@ header {
     font-style: italic; 
     color: #6c757d; 
 }
-header nav { 
+header .main-nav { 
     margin-top: 1.5rem; 
     display: flex; 
     justify-content: center; 
     align-items: center; 
     gap: 1rem; 
     flex-wrap: wrap; 
+}
+
+/* Navegação contextual (segunda linha) */
+.contextual-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 1.5rem; /* Espaço abaixo da navegação principal */
+    padding-top: 1rem;
+    border-top: 1px solid #e9ecef;
 }
 
 /* --- GRIDS DE LAYOUT PRINCIPAL --- */
@@ -35,7 +46,6 @@ header nav {
     align-items: start;
 }
 
-/* CORREÇÃO: A regra para a grelha de estatísticas foi restaurada aqui */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -59,4 +69,9 @@ header nav {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+}
+
+/* --- DARK MODE PARA LAYOUT --- */
+.dark-mode .contextual-nav {
+    border-top-color: #333;
 }
