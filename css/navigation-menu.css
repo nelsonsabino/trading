@@ -35,7 +35,6 @@ header .main-nav {
 
 /* Ajustes para o botão de tema (já existia, mas garante que usa o novo estilo) */
 #theme-toggle-btn.nav-icon-link {
-    /* Pode ser preciso remover o padding do .btn base se causar conflito, ou ajustar aqui */
     padding: 0; /* Garantir que o padding é 0 para o círculo perfeito */
 }
 
@@ -136,4 +135,22 @@ header .main-nav {
 }
 .dark-mode .user-photo {
     border-color: #444;
+}
+
+/* --- BOTÃO DE AÇÃO RÁPIDA (ADD TO WATCHLIST) --- */
+.nav-icon-link.action-add-watchlist {
+    background-color: #007bff; /* Cor primária para destaque */
+    color: white;
+    font-size: 1.1rem;
+}
+
+.nav-icon-link.action-add-watchlist:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Se quiser garantir que o ícone dentro também tem um bom visual */
+.nav-icon-link.action-add-watchlist i {
+    line-height: 1;
 }
