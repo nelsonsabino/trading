@@ -4,12 +4,24 @@ import {
     GoogleAuthProvider, 
     signInWithPopup, 
     onAuthStateChanged,
-    signOut
+    signOut,
+    setPersistence, // Importa a função para definir a persistência
+    browserLocalPersistence // Importa o tipo de persistência (localStorage)
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 import { auth } from './firebase-service.js';
 
-const ADMIN_EMAIL = "sabino.nelson@gmail.com"; // <-- IMPORTANTE: SUBSTITUIR PELO SEU EMAIL
+const ADMIN_EMAIL = "o.seu.email.aqui@gmail.com"; // Lembre-se de substituir pelo seu email real
 const provider = new GoogleAuthProvider();
+
+// Define a persistência da autenticação para localStorage
+setPersistence(auth, browserLocalPersistence)
+    .then(() => {
+        console.log("Firebase Auth persistence set to LOCAL.");
+    })
+    .catch((error) => {
+        // Lida com erros ao definir a persistência (por exemplo, storage full)
+        console.error("Erro ao definir a persistência do Firebase Auth:", error);
+    });
 
 // --- FUNÇÃO DE LOGIN ---
 const signInWithGoogle = () => {
