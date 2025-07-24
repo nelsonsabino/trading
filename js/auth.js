@@ -1,5 +1,15 @@
 // js/auth.js
 
+import { setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+
+setPersistence(auth, browserLocalPersistence).then(() => {
+    console.log("Persistência definida como LOCAL.");
+}).catch((error) => {
+    console.error("Erro ao definir persistência:", error);
+});
+
+
+
 import { 
     GoogleAuthProvider, 
     signInWithPopup, 
@@ -87,7 +97,7 @@ onAuthStateChanged(auth, (user) => {
                 // Se o utilizador fez logout de propósito, vai para a landing page.
                 console.log("Utilizador fez logout explícito. A redirecionar para a página inicial...");
                 window.location.replace('index.html');
-            } else if (!isAuthRedirect) { // SÓ TENTA re-autenticar se NÃO estivermos a meio de um redirect
+} else if (!isAuthRedirect && typeof result === 'undefined') {
                 // Se não fez logout, tenta a re-autenticação silenciosa.
                 console.log("Sessão não encontrada, a tentar re-autenticação silenciosa...");
                 sessionStorage.setItem('authRedirect', 'true'); // Define a bandeira
