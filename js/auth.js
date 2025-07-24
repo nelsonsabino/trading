@@ -10,7 +10,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 import { auth } from './firebase-service.js';
 
-const ADMIN_EMAIL = "o.seu.email.aqui@gmail.com"; // Lembre-se de substituir pelo seu email real
+const ADMIN_EMAIL = "sabino.nelson@gmail.com"; // Lembre-se de substituir pelo seu email real
 const provider = new GoogleAuthProvider();
 
 // Define a persistência da autenticação para localStorage
