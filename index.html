@@ -10,15 +10,6 @@
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/buttons.css">
     <link rel="stylesheet" href="css/dark-mode.css">
-    <script>
-        (function() {
-            try {
-                const theme = localStorage.getItem('theme');
-                if (theme === 'dark') { document.documentElement.classList.add('dark-mode'); }
-            } catch (e) {}
-        })();
-    </script>
-    <!-- Estilo do indicador de carregamento -->
     <style>
         #loading-indicator {
             display: block;
@@ -60,9 +51,14 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const content = document.getElementById('content');
-            if (content) {
-                content.style.display = 'block';
-            }
+            const loadingIndicator = document.getElementById('loading-indicator');
+            // Fallback: exibe o conteúdo após 5 segundos, mesmo se a autenticação falhar
+            setTimeout(() => {
+                if (content && loadingIndicator) {
+                    loadingIndicator.style.display = 'none';
+                    content.style.display = 'block';
+                }
+            }, 5000);
         });
     </script>
 </body>
