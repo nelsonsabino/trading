@@ -51,35 +51,47 @@
 </head>
 <body>
 
-    <header>
-        <h1>Dashboard de Estatísticas</h1>
-        <p class="mantra">Os dados não mentem. Analise os seus resultados para encontrar a sua vantagem.</p>
-        <nav class="main-nav">
-            <a href="dashboard.html" class="nav-icon-link" title="Dashboard"><i class="fas fa-home"></i></a>
-            <a href="market-scan.html" class="nav-icon-link" title="Scanner de Mercado"><i class="fas fa-search-dollar"></i></a>
-            <a href="alarms-create.html" class="nav-icon-link" title="Criar Alarme"><i class="fas fa-plus-circle"></i></a>
-            <a href="alarms-manage.html" class="nav-icon-link" title="Meus Alarmes"><i class="fas fa-bell"></i></a>
-            
-            <div class="nav-dropdown">
-                <button id="management-toggle" class="nav-icon-link" title="Gerir e Estatísticas"><i class="fas fa-cog"></i></button>
-                <div class="nav-dropdown-content">
-                    <a href="strategies-manager.html" class="nav-link">Gerir Estratégias</a>
-                    <a href="manage.html" class="nav-link">Todas as Operações</a>
-                    <a href="stats.html" class="nav-link">Ver Estatísticas</a>
-                </div>
-            </div>
+  
 
-            <button id="theme-toggle-btn" class="btn nav-icon-link" title="Alternar tema">
-                <i class="fas fa-moon"></i>
-            </button>
+<!-- NOVO BOTÃO DE TEMA (fora do header) -->
+<button id="theme-toggle-btn" class="nav-icon-link" title="Alternar tema">
+    <i class="fas fa-moon"></i>
+</button>
 
-            <!-- Secção do Utilizador -->
-            <div id="user-session" class="user-session" style="display: none;">
-                <img id="user-photo" src="" alt="Foto do Utilizador" class="user-photo">
-                <button id="logout-btn" class="btn btn-secondary">Sair</button>
+<header>
+    <h1>Dashboard de Estatísticas</h1>
+    <p class="mantra">Os dados não mentem. Analise os seus resultados para encontrar a sua vantagem.</p>
+
+    <!-- Primeira Linha: Navegação Global -->
+    <nav class="main-nav">
+        <a href="dashboard.html" class="nav-icon-link" title="Dashboard"><i class="fas fa-home"></i></a>
+        <a href="market-scan.html" class="nav-icon-link" title="Scanner de Mercado"><i class="fas fa-search-dollar"></i></a>
+        <a href="alarms-create.html" class="nav-icon-link" title="Criar Alarme"><i class="fas fa-plus-circle"></i></a>
+        <a href="alarms-manage.html" class="nav-icon-link" title="Meus Alarmes"><i class="fas fa-bell"></i></a>
+        
+        <div class="nav-dropdown">
+            <button id="management-toggle" class="nav-icon-link" title="Gerir e Estatísticas"><i class="fas fa-cog"></i></button>
+            <div class="nav-dropdown-content">
+                <a href="strategies-manager.html" class="nav-link">Gerir Estratégias</a>
+                <a href="manage.html" class="nav-link">Todas as Operações</a>
+                <a href="stats.html" class="nav-link">Ver Estatísticas</a>
             </div>
-        </nav>
-    </header>
+        </div>
+
+        <!-- Secção do Utilizador -->
+        <div id="user-session" class="user-session" style="display: none;">
+            <img id="user-photo" src="" alt="Foto do Utilizador" class="user-photo">
+            <button id="logout-btn" class="btn btn-secondary">Sair</button>
+        </div>
+    </nav>
+    
+    <!-- Segunda Linha: Ações da Página (vazia nesta página) -->
+    <nav class="contextual-nav">
+        <!-- Sem ações contextuais aqui -->
+    </nav>
+</header>
+
+    
 
     <main>
 
