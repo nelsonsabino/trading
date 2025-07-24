@@ -29,11 +29,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // NOVO: Adiciona listener para o botão "Adicionar à Watchlist"
+    // Adiciona listener para o botão "Adicionar à Watchlist"
     const addToWatchlistBtn = document.querySelector('.nav-icon-link.action-add-watchlist');
     if (addToWatchlistBtn) {
         addToWatchlistBtn.addEventListener('click', (e) => {
-            e.preventDefault(); // Evita que o link navegue para '#' ou outra página.
+            e.preventDefault(); // Evita que o link navegue para '#'.
             openAddModal(); // Abre o modal para adicionar oportunidade
         });
     }
