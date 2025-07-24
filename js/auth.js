@@ -1,99 +1,110 @@
 // js/auth.js
 
-import { 
-    GoogleAuthProvider, 
-    signInWithPopup, 
+import {
+    GoogleAuthProvider,
+    signInWithPopup,
+    signInWithRedirect,
+    getRedirectResult,
     onAuthStateChanged,
     signOut
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 import { auth } from './firebase-service.js';
 
-const ADMIN_EMAIL = "sabino.nelson@gmail.com"; // <-- IMPORTANTE: SUBSTITUIR PELO SEU EMAIL
+const ADMIN_EMAIL = "sabino.nelson@gmail.com";
 const provider = new GoogleAuthProvider();
 
-// --- FUNÇÃO DE LOGIN ---
+function isRunningAsPWA() {
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
+// --- LOGIN ---
 const signInWithGoogle = () => {
-    signInWithPopup(auth, provider)
-        .then((result) => {
-            const userEmail = result.user.email;
-            
-            // DEBUG: Mostra na consola o que estamos a comparar
-            console.log("Email do Utilizador (Google):", `'${userEmail}'`);
-            console.log("Email de Administrador (Código):", `'${ADMIN_EMAIL}'`);
-            
-            // COMPARAÇÃO ROBUSTA: ignora maiúsculas/minúsculas e espaços
-            if (userEmail.toLowerCase().trim() === ADMIN_EMAIL.toLowerCase().trim()) {
-                console.log("Administrador logado com sucesso!", result.user);
-                window.location.href = 'dashboard.html'; // Redireciona para o novo dashboard
-            } else {
-                alert("Acesso negado. Esta é uma aplicação privada.");
-                signOutUser(); // Faz logout imediatamente
-            }
-        })
-        .catch((error) => {
-            console.error("Erro no login com Google:", error);
-            alert("Ocorreu um erro durante o login. Por favor, tente novamente.");
-        });
+    if (isRunningAsPWA()) {
+        signInWithRedirect(auth, provider)
+            .catch((error) => {
+                console.error("Erro no login com redirect:", error);
+                alert("Erro ao iniciar sessão. Tenta novamente.");
+            });
+    } else {
+        signInWithPopup(auth, provider)
+            .then((result) => handleLoginResult(result))
+            .catch((error) => {
+                console.error("Erro no login com popup:", error);
+                alert("Erro ao iniciar sessão. Tenta novamente.");
+            });
+    }
 };
 
-// --- FUNÇÃO DE LOGOUT ---
+const handleLoginResult = (result) => {
+    const userEmail = result.user.email;
+    if (userEmail.toLowerCase().trim() === ADMIN_EMAIL.toLowerCase().trim()) {
+        console.log("Administrador logado com sucesso!", result.user);
+        window.location.href = 'dashboard.html';
+    } else {
+        alert("Acesso negado. Esta é uma aplicação privada.");
+        signOutUser();
+    }
+};
+
+// --- LOGOUT ---
 export const signOutUser = () => {
     signOut(auth).then(() => {
         console.log("Logout bem-sucedido.");
-        // O onAuthStateChanged irá redirecionar para a landing page
     }).catch((error) => {
         console.error("Erro no logout:", error);
     });
 };
 
-// --- CONTROLO CENTRAL DE AUTENTICAÇÃO ---
+// --- RECUPERA REDIRECT LOGIN ---
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const result = await getRedirectResult(auth);
+        if (result && result.user) {
+            handleLoginResult(result);
+        }
+    } catch (error) {
+        console.error("Erro ao recuperar resultado do redirect:", error);
+    }
+
+    const loginButton = document.getElementById('login-google-btn');
+    if (loginButton) {
+        loginButton.addEventListener('click', signInWithGoogle);
+    }
+
+    const logoutButton = document.getElementById('logout-btn');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', signOutUser);
+    }
+});
+
+// --- AUTH STATE CONTROLO ---
 onAuthStateChanged(auth, (user) => {
-    // As páginas públicas são a landing page e a página de login
-    const isPublicPage = window.location.pathname.endsWith('/') || window.location.pathname.endsWith('index.html') || window.location.pathname.endsWith('login.html');
+    const isPublicPage =
+        window.location.pathname.endsWith('/') ||
+        window.location.pathname.endsWith('index.html') ||
+        window.location.pathname.endsWith('login.html');
+
     const userSessionDiv = document.getElementById('user-session');
     const userPhotoImg = document.getElementById('user-photo');
 
     if (user) {
-        // O utilizador está logado.
-        // DEBUG: Mostra na consola o que estamos a comparar em tempo real
-        console.log("onAuthStateChanged - Email do Utilizador:", `'${user.email}'`);
-        console.log("onAuthStateChanged - Email de Administrador:", `'${ADMIN_EMAIL}'`);
-        
         if (user.email.toLowerCase().trim() !== ADMIN_EMAIL.toLowerCase().trim()) {
-            // Segurança extra: se um utilizador não autorizado chegar aqui, faz logout.
-            console.warn("Utilizador logado não autorizado. A fazer logout.");
+            console.warn("Utilizador não autorizado. Logout forçado.");
             signOutUser();
             return;
         }
 
-        // Mostra a secção do utilizador nas páginas privadas
         if (!isPublicPage && userSessionDiv && userPhotoImg) {
             userPhotoImg.src = user.photoURL || './pic/default-user.png';
             userSessionDiv.style.display = 'flex';
         }
     } else {
-        // O utilizador NÃO está logado.
         if (!isPublicPage) {
-            // Se ele não está numa página pública, redireciona para a landing page.
-            console.log("Utilizador não autenticado. A redirecionar para a página inicial...");
+            console.log("Não autenticado. A redirecionar...");
             window.location.replace('index.html');
         }
-       // Esconde a secção do utilizador se ele não estiver logado
-       if (userSessionDiv) {
-           userSessionDiv.style.display = 'none';
-       }
-    }
-});
-
-
-// --- EVENT LISTENERS ---
-document.addEventListener('DOMContentLoaded', () => {
-    const loginButton = document.getElementById('login-google-btn');
-    if (loginButton) {
-        loginButton.addEventListener('click', signInWithGoogle);
-    }
-    const logoutButton = document.getElementById('logout-btn');
-    if (logoutButton) {
-        logoutButton.addEventListener('click', signOutUser);
+        if (userSessionDiv) {
+            userSessionDiv.style.display = 'none';
+        }
     }
 });
