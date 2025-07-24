@@ -6,7 +6,9 @@ import {
     signInWithRedirect,
     getRedirectResult,
     onAuthStateChanged,
-    signOut
+    signOut,
+    setPersistence,
+    browserLocalPersistence
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 import { auth } from './firebase-service.js';
 
@@ -17,28 +19,37 @@ function isRunningAsPWA() {
     return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 }
 
-// --- LOGIN ---
-const signInWithGoogle = () => {
-    if (isRunningAsPWA()) {
-        signInWithRedirect(auth, provider)
-            .catch((error) => {
-                console.error("Erro no login com redirect:", error);
-                alert("Erro ao iniciar sessão. Tenta novamente.");
-            });
-    } else {
-        signInWithPopup(auth, provider)
-            .then((result) => handleLoginResult(result))
-            .catch((error) => {
-                console.error("Erro no login com popup:", error);
-                alert("Erro ao iniciar sessão. Tenta novamente.");
-            });
+// ---------- LOGIN ----------
+const signInWithGoogle = async () => {
+    try {
+        await setPersistence(auth, browserLocalPersistence); // Garante que mantém login após fecho da app
+
+        // Anti-loop: impede múltiplos redireccionamentos em sequência
+        if (sessionStorage.getItem('authPending') === 'true') {
+            console.warn("Autenticação já em curso. Ignorado.");
+            return;
+        }
+
+        sessionStorage.setItem('authPending', 'true');
+
+        if (isRunningAsPWA()) {
+            await signInWithRedirect(auth, provider);
+        } else {
+            const result = await signInWithPopup(auth, provider);
+            handleLoginResult(result);
+        }
+    } catch (error) {
+        console.error("Erro no login:", error);
+        sessionStorage.removeItem('authPending');
+        alert("Erro ao iniciar sessão. Tenta novamente.");
     }
 };
 
 const handleLoginResult = (result) => {
     const userEmail = result.user.email;
     if (userEmail.toLowerCase().trim() === ADMIN_EMAIL.toLowerCase().trim()) {
-        console.log("Administrador logado com sucesso!", result.user);
+        console.log("Administrador autenticado.");
+        sessionStorage.removeItem('authPending');
         window.location.href = 'dashboard.html';
     } else {
         alert("Acesso negado. Esta é uma aplicação privada.");
@@ -46,38 +57,42 @@ const handleLoginResult = (result) => {
     }
 };
 
-// --- LOGOUT ---
+// ---------- LOGOUT ----------
 export const signOutUser = () => {
+    sessionStorage.removeItem('authPending');
     signOut(auth).then(() => {
-        console.log("Logout bem-sucedido.");
+        console.log("Logout feito.");
+        window.location.href = "index.html";
     }).catch((error) => {
-        console.error("Erro no logout:", error);
+        console.error("Erro ao sair:", error);
     });
 };
 
-// --- RECUPERA REDIRECT LOGIN ---
+// ---------- REDIRECT RESULT ----------
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         const result = await getRedirectResult(auth);
         if (result && result.user) {
             handleLoginResult(result);
+            return;
         }
     } catch (error) {
-        console.error("Erro ao recuperar resultado do redirect:", error);
+        console.error("Erro ao obter resultado do redirect:", error);
+        sessionStorage.removeItem('authPending');
     }
 
-    const loginButton = document.getElementById('login-google-btn');
-    if (loginButton) {
-        loginButton.addEventListener('click', signInWithGoogle);
+    const loginBtn = document.getElementById('login-google-btn');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', signInWithGoogle);
     }
 
-    const logoutButton = document.getElementById('logout-btn');
-    if (logoutButton) {
-        logoutButton.addEventListener('click', signOutUser);
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', signOutUser);
     }
 });
 
-// --- AUTH STATE CONTROLO ---
+// ---------- AUTH STATE ----------
 onAuthStateChanged(auth, (user) => {
     const isPublicPage =
         window.location.pathname.endsWith('/') ||
