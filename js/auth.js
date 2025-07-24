@@ -14,52 +14,22 @@ import { auth } from './firebase-service.js';
 
 const ADMIN_EMAIL = "sabino.nelson@gmail.com";
 const provider = new GoogleAuthProvider();
+let redirectHandled = false;
 
-function isRunningAsPWA() {
-    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+function isPWA() {
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 }
 
-// ---------- LOGIN ----------
-const signInWithGoogle = async () => {
-    try {
-        await setPersistence(auth, browserLocalPersistence); // Garante que mantém login após fecho da app
+function setRedirectPending(value) {
+    localStorage.setItem('redirectPending', value ? 'true' : 'false');
+}
 
-        // Anti-loop: impede múltiplos redireccionamentos em sequência
-        if (sessionStorage.getItem('authPending') === 'true') {
-            console.warn("Autenticação já em curso. Ignorado.");
-            return;
-        }
+function isRedirectPending() {
+    return localStorage.getItem('redirectPending') === 'true';
+}
 
-        sessionStorage.setItem('authPending', 'true');
-
-        if (isRunningAsPWA()) {
-            await signInWithRedirect(auth, provider);
-        } else {
-            const result = await signInWithPopup(auth, provider);
-            handleLoginResult(result);
-        }
-    } catch (error) {
-        console.error("Erro no login:", error);
-        sessionStorage.removeItem('authPending');
-        alert("Erro ao iniciar sessão. Tenta novamente.");
-    }
-};
-
-const handleLoginResult = (result) => {
-    const userEmail = result.user.email;
-    if (userEmail.toLowerCase().trim() === ADMIN_EMAIL.toLowerCase().trim()) {
-        console.log("Administrador autenticado.");
-        sessionStorage.removeItem('authPending');
-        window.location.href = 'dashboard.html';
-    } else {
-        alert("Acesso negado. Esta é uma aplicação privada.");
-        signOutUser();
-    }
-};
-
-// ---------- LOGOUT ----------
 export const signOutUser = () => {
-    sessionStorage.removeItem('authPending');
+    localStorage.removeItem('redirectPending');
     signOut(auth).then(() => {
         console.log("Logout feito.");
         window.location.href = "index.html";
@@ -68,58 +38,88 @@ export const signOutUser = () => {
     });
 };
 
-// ---------- REDIRECT RESULT ----------
+async function signInWithGoogle() {
+    try {
+        await setPersistence(auth, browserLocalPersistence);
+
+        if (isPWA()) {
+            if (!isRedirectPending()) {
+                setRedirectPending(true);
+                await signInWithRedirect(auth, provider);
+            } else {
+                console.log("Redirect já pendente...");
+            }
+        } else {
+            const result = await signInWithPopup(auth, provider);
+            handleLoginResult(result);
+        }
+    } catch (error) {
+        console.error("Erro no login:", error);
+        setRedirectPending(false);
+    }
+}
+
+function handleLoginResult(result) {
+    const email = result.user.email;
+    if (email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+        console.log("Autenticação bem-sucedida.");
+        setRedirectPending(false);
+        window.location.href = "dashboard.html";
+    } else {
+        alert("Acesso negado. Esta é uma aplicação privada.");
+        signOutUser();
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         const result = await getRedirectResult(auth);
-        if (result && result.user) {
+        if (result && result.user && !redirectHandled) {
+            redirectHandled = true;
             handleLoginResult(result);
             return;
         }
     } catch (error) {
-        console.error("Erro ao obter resultado do redirect:", error);
-        sessionStorage.removeItem('authPending');
+        console.error("Erro no getRedirectResult:", error);
+        setRedirectPending(false);
     }
 
     const loginBtn = document.getElementById('login-google-btn');
-    if (loginBtn) {
-        loginBtn.addEventListener('click', signInWithGoogle);
-    }
+    if (loginBtn) loginBtn.addEventListener('click', signInWithGoogle);
 
     const logoutBtn = document.getElementById('logout-btn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', signOutUser);
-    }
+    if (logoutBtn) logoutBtn.addEventListener('click', signOutUser);
 });
 
-// ---------- AUTH STATE ----------
 onAuthStateChanged(auth, (user) => {
     const isPublicPage =
-        window.location.pathname.endsWith('/') ||
-        window.location.pathname.endsWith('index.html') ||
-        window.location.pathname.endsWith('login.html');
+        location.pathname.endsWith('/') ||
+        location.pathname.endsWith('index.html') ||
+        location.pathname.endsWith('login.html');
 
     const userSessionDiv = document.getElementById('user-session');
     const userPhotoImg = document.getElementById('user-photo');
 
     if (user) {
-        if (user.email.toLowerCase().trim() !== ADMIN_EMAIL.toLowerCase().trim()) {
-            console.warn("Utilizador não autorizado. Logout forçado.");
+        if (user.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
             signOutUser();
             return;
         }
 
-        if (!isPublicPage && userSessionDiv && userPhotoImg) {
-            userPhotoImg.src = user.photoURL || './pic/default-user.png';
-            userSessionDiv.style.display = 'flex';
-        }
-    } else {
         if (!isPublicPage) {
-            console.log("Não autenticado. A redirecionar...");
-            window.location.replace('index.html');
+            if (userPhotoImg) userPhotoImg.src = user.photoURL;
+            if (userSessionDiv) userSessionDiv.style.display = 'flex';
         }
-        if (userSessionDiv) {
-            userSessionDiv.style.display = 'none';
+
+        // Reset redirect pending (login concluído com sucesso)
+        setRedirectPending(false);
+    } else {
+        if (!isPublicPage && !isRedirectPending()) {
+            console.log("Utilizador não autenticado. A redirecionar.");
+            window.location.href = "index.html";
         }
+
+        if (userSessionDiv) userSessionDiv.style.display = 'none';
     }
 });
+
