@@ -1,3 +1,4 @@
+<!-- dashboard.html -->
 <!DOCTYPE html>
 <html lang="pt">
 <head>
@@ -32,8 +33,6 @@
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/navigation-menu.css">
 
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    
     <script>
         (function() {
             try {
@@ -75,11 +74,11 @@
                 <i class="fas fa-moon"></i>
             </button>
 
-            <!-- Secção do Utilizador -->
-            <div id="user-session" class="user-session" style="display: none;">
-                <img id="user-photo" src="" alt="Foto do Utilizador" class="user-photo">
-                <button id="logout-btn" class="btn btn-secondary">Sair</button>
-            </div>
++           <!-- Secção do Utilizador -->
++           <div id="user-session" class="user-session" style="display: none;">
++               <img id="user-photo" src="" alt="Foto do Utilizador" class="user-photo">
++               <button id="logout-btn" class="btn btn-secondary">Sair</button>
++           </div>
         </nav>
         
     </header>  
@@ -196,40 +195,5 @@
     <script type="module" src="js/version.js"></script>
     <script type="module" src="js/dark-mode.js"></script>
     <script type="module" src="js/auth.js"></script>
-
-    
-<script>
-  let deferredPrompt;
-
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-   
-    document.getElementById('installBtn').addEventListener('click', () => {
-      installBanner.classList.add('hidden');
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then((choiceResult) => {
-        if (choiceResult.outcome === 'accepted') {
-          console.log('O utilizador aceitou instalar');
-        } else {
-          console.log('O utilizador recusou instalar');
-        }
-        deferredPrompt = null;
-      });
-    });
-  });
-</script>
-
- <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js')
-        .then(reg => console.log('Service Worker registado com sucesso:', reg))
-        .catch(err => console.error('Erro ao registar o Service Worker:', err));
-    });
-  }
-</script>
-
-    
 </body>
 </html>
