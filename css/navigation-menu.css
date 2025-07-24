@@ -113,6 +113,24 @@ header .main-nav {
     background-color: #c82333;
 }
 
+/* --- BOTÃO DE AÇÃO RÁPIDA (ADD TO WATCHLIST) --- */
+.nav-icon-link.action-add-watchlist {
+    background-color: #007bff; /* Cor primária para destaque */
+    color: white;
+    font-size: 1.1rem;
+}
+
+.nav-icon-link.action-add-watchlist:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Se quiser garantir que o ícone dentro também tem um bom visual */
+.nav-icon-link.action-add-watchlist i {
+    line-height: 1;
+}
+
 /* Ajustes para o dark mode */
 .dark-mode .main-nav .nav-icon-link {
     background-color: #2c2c2c;
@@ -135,22 +153,4 @@ header .main-nav {
 }
 .dark-mode .user-photo {
     border-color: #444;
-}
-
-/* --- BOTÃO DE AÇÃO RÁPIDA (ADD TO WATCHLIST) --- */
-.nav-icon-link.action-add-watchlist {
-    background-color: #007bff; /* Cor primária para destaque */
-    color: white;
-    font-size: 1.1rem;
-}
-
-.nav-icon-link.action-add-watchlist:hover {
-    background-color: #0056b3;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-/* Se quiser garantir que o ícone dentro também tem um bom visual */
-.nav-icon-link.action-add-watchlist i {
-    line-height: 1;
 }
