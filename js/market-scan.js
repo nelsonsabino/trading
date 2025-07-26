@@ -131,7 +131,7 @@ function createTableRow(ticker, index, extraData) {
     const priceChangeClass = priceChangePercent >= 0 ? 'positive-pnl' : 'negative-pnl';
     const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${ticker.symbol}`;
     const createAlarmUrl = `alarms-create.html?assetPair=${ticker.symbol}`;
-    const addOpportunityUrl = `dashboard.html?assetPair=${ticker.symbol}`; // CORRIGIDO AQUI
+    const addOpportunityUrl = `dashboard.html?assetPair=${ticker.symbol}`;
 
     let rsiSignalHtml = '';
     let stochSignalHtml = '';
@@ -146,8 +146,9 @@ function createTableRow(ticker, index, extraData) {
     if (assetExtraData && assetExtraData.stoch_1h !== null) {
         const stochK = assetExtraData.stoch_1h.k;
         const stochD = assetExtraData.stoch_1h.d;
-        if (stochK < 20 || stochD < 20) {
+        if (stochK < 60 || stochD < 60) { // Condição ATUALIZADA
             stochSignalHtml = `<span class="stoch-signal" data-tooltip="Stoch (1h) K:${stochK.toFixed(1)} D:${stochD.toFixed(1)}">STC</span>`;
+            console.log(`STOCH Signal gerado para ${ticker.symbol}: K=${stochK.toFixed(1)}, D=${stochD.toFixed(1)}`); // DEBUG
         }
     }
 
@@ -189,7 +190,7 @@ function applyFiltersAndSort() {
         processedTickers = processedTickers.filter(ticker => {
             const assetExtraData = allExtraData[ticker.symbol];
             return assetExtraData && assetExtraData.stoch_1h !== null && 
-                   (assetExtraData.stoch_1h.k < 20 || assetExtraData.stoch_1h.d < 20);
+                   (assetExtraData.stoch_1h.k < 60 || assetExtraData.stoch_1h.d < 60); // Filtro ATUALIZADO
         });
     }
     processedTickers.sort((a, b) => {
