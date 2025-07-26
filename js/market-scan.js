@@ -144,12 +144,11 @@ function createTableRow(ticker, index, extraData) {
     }
     
     if (assetExtraData && assetExtraData.stoch_1h !== null) {
-        const stochK = assetExtraData.stoch_1h.k;
-        const stochD = assetExtraData.stoch_1h.d;
+        const stochK = assetExtraData.stoch_1h; // stoch_1h agora é diretamente o valor K
         // Condição para fins de depuração
-        if (stochK > 20 || stochD > 20) { 
-            stochSignalHtml = `<span class="stoch-signal" data-tooltip="Stoch (1h) K:${stochK.toFixed(1)} D:${stochD.toFixed(1)}">STC</span>`;
-            console.log(`STOCH Signal gerado para ${ticker.symbol}: K=${stochK.toFixed(1)}, D=${stochD.toFixed(1)}`); // DEBUG
+        if (typeof stochK === 'number' && stochK > 20) { 
+            stochSignalHtml = `<span class="stoch-signal" data-tooltip="Stoch (1h) K:${stochK.toFixed(1)}">STC</span>`; // Tooltip agora exibe apenas K
+            console.log(`STOCH Signal gerado para ${ticker.symbol}: K=${stochK.toFixed(1)}`); // DEBUG
         }
     }
 
@@ -190,16 +189,14 @@ function applyFiltersAndSort() {
     if (filterStoch) {
         processedTickers = processedTickers.filter(ticker => {
             const assetExtraData = allExtraData[ticker.symbol];
-            // Garante que stochK e stochD são definidos aqui para o filtro
-            const stochK = assetExtraData?.stoch_1h?.k;
-            const stochD = assetExtraData?.stoch_1h?.d;
+            const stochK = assetExtraData?.stoch_1h; // stoch_1h agora é diretamente o valor K
             
             // Verifica se os dados do estocástico existem e são válidos
-            if (stochK === undefined || stochD === undefined || stochK === null || stochD === null || typeof stochK !== 'number' || typeof stochD !== 'number') {
+            if (stochK === undefined || stochK === null || typeof stochK !== 'number') {
                 return false; // Exclui tickers sem dados válidos de estocástico
             }
             // Condição do filtro atualizada para fins de depuração
-            return (stochK > 20 || stochD > 20); 
+            return (stochK > 20); 
         });
     }
     processedTickers.sort((a, b) => {
