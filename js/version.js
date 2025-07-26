@@ -1,16 +1,25 @@
 // js/version.js - Ponto central de controlo de versão e changelog
 
 export const changelogData = {
-    current: {
-        number: '11.3.1', // <-- VERSÃO ATUALIZADA
+   current: {
+    number: '11.3.2', // <-- VERSÃO ATUALIZADA
+    changes: [
+        "**Correção do Sinal e Filtro Estocástico (Market Scanner):**",
+        "Resolvido o problema onde o sinal do Estocástico (STOCH) não aparecia e o filtro não devolvia resultados no Market Scanner.",
+        "Corrigida a incompatibilidade na leitura dos dados do Estocástico da Edge Function (`get-sparklines-data`) no `market-scan.js`, garantindo que o valor K é interpretado corretamente.",
+        "Ajustada a condição para exibir o sinal e para o filtro, com o valor padrão de `< 20` para os níveis do Estocástico."
+    ]
+},
+    releases: [
+    {
+        number: '11.3.1', // <-- VERSÃO ANTERIOR, AGORA NO HISTÓRICO
         changes: [
             "**Refatoração do Código de Autenticação:**",
             "Centralizada toda a configuração de autenticação do Firebase no ficheiro `firebase-service.js`, incluindo a inicialização e a definição da persistência da sessão.",
             "Esta alteração melhora a organização do código e estabelece uma base mais limpa para futuras depurações do sistema de login."
         ]
     },
-    releases: [
-        {
+    {
             number: '11.3.0',
             changes: [
                 "**Reorganização do Menu de Navegação (UI/UX):**",
