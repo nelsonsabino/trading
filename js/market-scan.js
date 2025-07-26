@@ -190,9 +190,12 @@ function applyFiltersAndSort() {
     if (filterStoch) {
         processedTickers = processedTickers.filter(ticker => {
             const assetExtraData = allExtraData[ticker.symbol];
+            // Garante que stochK e stochD são definidos aqui para o filtro
+            const stochK = assetExtraData?.stoch_1h?.k;
+            const stochD = assetExtraData?.stoch_1h?.d;
             // Condição do filtro atualizada para fins de depuração
             return assetExtraData && assetExtraData.stoch_1h !== null && 
-                   (stochK > 20 || stochD > 20); 
+                   (stochK !== null && stochD !== null && (stochK > 20 || stochD > 20)); 
         });
     }
     processedTickers.sort((a, b) => {
