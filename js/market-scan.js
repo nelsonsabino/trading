@@ -193,9 +193,13 @@ function applyFiltersAndSort() {
             // Garante que stochK e stochD são definidos aqui para o filtro
             const stochK = assetExtraData?.stoch_1h?.k;
             const stochD = assetExtraData?.stoch_1h?.d;
+            
+            // Verifica se os dados do estocástico existem e são válidos
+            if (stochK === undefined || stochD === undefined || stochK === null || stochD === null || typeof stochK !== 'number' || typeof stochD !== 'number') {
+                return false; // Exclui tickers sem dados válidos de estocástico
+            }
             // Condição do filtro atualizada para fins de depuração
-            return assetExtraData && assetExtraData.stoch_1h !== null && 
-                   (stochK !== null && stochD !== null && (stochK > 20 || stochD > 20)); 
+            return (stochK > 20 || stochD > 20); 
         });
     }
     processedTickers.sort((a, b) => {
