@@ -2,14 +2,24 @@
 
 export const changelogData = {
  current: {
-    number: '11.8.0', // <-- NOVA VERSÃO ATUALIZADA
+    number: '11.9.0', // <-- NOVA VERSÃO ATUALIZADA
     changes: [
-        "**Dashboard de Estatísticas - Correção da Curva de Capital:**",
-        "Resolvido o problema onde o gráfico 'Curva de Capital' não era renderizado corretamente com um ou dois trades realizados.",
-        "A função de renderização foi otimizada para garantir que os dados são formatados de forma robusta e que instâncias anteriores do gráfico são destruídas antes de criar uma nova."
+        "**Dashboard de Estatísticas - Histórico de Trades Fechados:**",
+        "Adicionada uma nova secção expansível no final da página de Estatísticas para exibir um histórico detalhado de todos os trades fechados.",
+        "Os trades são listados do mais recente para o mais antigo, com informações como ativo, estratégia, preços de entrada/saída, P&L, razão de fecho e notas.",
+        "Incluído um link para o screenshot de saída do trade (se disponível), com visualização em modal.",
+        "A secção pode ser expandida e recolhida para otimizar o espaço na página."
     ]
 },
  releases: [
+    {
+        number: '11.8.0', // <-- VERSÃO ANTERIOR, AGORA NO HISTÓRICO
+        changes: [
+            "**Dashboard de Estatísticas - Correção da Curva de Capital:**",
+            "Resolvido o problema onde o gráfico 'Curva de Capital' não era renderizado corretamente com um ou dois trades realizados.",
+            "A função de renderização foi otimizada para garantir que os dados são formatados de forma robusta e que instâncias anteriores do gráfico são destruídas antes de criar uma nova."
+        ]
+    },
     {
         number: '11.7.0', // <-- VERSÃO ANTERIOR, AGORA NO HISTÓRICO
         changes: [
