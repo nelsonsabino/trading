@@ -125,6 +125,37 @@
             <h2 style="margin-top: 2rem;">Análise por Motivo de Fecho</h2>
             <div id="reason-stats" class="table-wrapper"></div>
         </section>
+
+        <hr class="section-divider">
+
+        <section class="closed-trades-history-section">
+            <h2><i class="fa-solid fa-folder-open"></i> Histórico Detalhado de Trades Fechados</h2>
+            <button id="toggle-closed-trades" class="btn btn-secondary" style="margin-bottom: 1.5rem;">
+                <i class="fas fa-chevron-down"></i> Expandir Histórico
+            </button>
+            <div id="closed-trades-history" style="display: none;">
+                <div class="table-wrapper">
+                    <table class="trades-history-table">
+                        <thead>
+                            <tr>
+                                <th>Ativo</th>
+                                <th>Estratégia</th>
+                                <th>Entrada</th>
+                                <th>Saída</th>
+                                <th>P&L ($)</th>
+                                <th>Razão Fecho</th>
+                                <th>Notas Finais</th>
+                                <th>Screenshot</th>
+                            </tr>
+                        </thead>
+                        <tbody id="closed-trades-table-body">
+                            <!-- Trades serão inseridos aqui pelo JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <!-- Modal de transações (sem alterações) -->
