@@ -1,16 +1,25 @@
 // js/version.js - Ponto central de controlo de versão e changelog
 
 export const changelogData = {
-  current: {
-    number: '11.5.0', // <-- NOVA VERSÃO ATUALIZADA
+ current: {
+    number: '11.6.0', // <-- NOVA VERSÃO ATUALIZADA
     changes: [
-        "**Market Scanner - Controlo de Top N Moedas:**",
-        "Implementada a opção para exibir um número configurável de ativos (Top 30, 50, 100, 200) na tabela do Market Scanner.",
-        "O estado da seleção do 'Top N' é persistente: a aplicação lembra a preferência do utilizador entre sessões (utilizando `localStorage`).",
-        "A lista de tickers é agora inicialmente buscada em maior quantidade (Top 200) para garantir que todas as opções de exibição de 'Top N' estão disponíveis sem novas chamadas de API."
+        "**Market Scanner - Zoom nos Gráficos do Modal:**",
+        "A visualização de gráficos no modal do Market Scanner foi otimizada para exibir um período de tempo mais curto (~9 dias para o timeframe de 1h), proporcionando um 'zoom' automático nos dados mais recentes.",
+        "A Edge Function `get-asset-details-data` foi atualizada para aceitar um parâmetro `limit`, permitindo que o frontend solicite um número específico de klines.",
+        "Resolvidos múltiplos erros de deploy e `Module not found` na Edge Function, estabilizando a importação de bibliotecas externas (`technicalindicators`)."
     ]
 },
   releases: [
+    {
+        number: '11.5.0', // <-- VERSÃO ANTERIOR, AGORA NO HISTÓRICO
+        changes: [
+            "**Market Scanner - Controlo de Top N Moedas:**",
+            "Implementada a opção para exibir um número configurável de ativos (Top 30, 50, 100, 200) na tabela do Market Scanner.",
+            "O estado da seleção do 'Top N' é persistente: a aplicação lembra a preferência do utilizador entre sessões (utilizando `localStorage`).",
+            "A lista de tickers é agora inicialmente buscada em maior quantidade (Top 200) para garantir que todas as opções de exibição de 'Top N' estão disponíveis sem novas chamadas de API."
+        ]
+    },
     {
         number: '11.4.0', // <-- VERSÃO ANTERIOR, AGORA NO HISTÓRICO
         changes: [
