@@ -123,3 +123,87 @@
 .market-table.hide-sparkline-column td:nth-child(4) {
     display: none;
 }
+
+/* --- TABELA DE HISTÓRICO DE TRADES FECHADOS --- */
+.trades-history-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    overflow: hidden;
+    font-size: 0.9em; /* Ligeiramente menor para mais densidade */
+}
+
+.trades-history-table thead tr {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.trades-history-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #495057;
+}
+
+.trades-history-table td {
+    padding: 0.8rem 1rem; /* Padding mais compacto */
+    border-bottom: 1px solid #e9ecef;
+    vertical-align: top; /* Alinha o conteúdo ao topo */
+    word-wrap: break-word; /* Permite quebrar palavras longas */
+    white-space: normal; /* Garante que o texto quebra linha */
+}
+
+.trades-history-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.trades-history-table .pnl-value {
+    font-weight: bold;
+}
+
+/* Estilo para o link/botão de screenshot */
+.screenshot-link-btn {
+    display: inline-block;
+    padding: 4px 8px;
+    font-size: 0.8em;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.screenshot-link-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Dark mode para a tabela de histórico */
+.dark-mode .trades-history-table {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.dark-mode .trades-history-table thead tr {
+    background-color: #2c2c2c;
+    border-bottom-color: #444;
+}
+
+.dark-mode .trades-history-table th {
+    color: #ffffff;
+}
+
+.dark-mode .trades-history-table td {
+    border-bottom-color: #333;
+}
+
+.dark-mode .screenshot-link-btn {
+    background-color: #0b4991;
+}
+
+.dark-mode .screenshot-link-btn:hover {
+    background-color: #003a80;
+}
