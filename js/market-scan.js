@@ -26,7 +26,7 @@ async function openChartModal(symbol) {
 
     try {
         const { data: response, error } = await supabase.functions.invoke('get-asset-details-data', {
-            body: { symbol: symbol, interval: '1h', limit: 125 }, // NOVO: Pedir menos klines para zoom
+            body: { symbol: symbol, interval: '1h', limit: 60 }, // Diminuir o limite para mais zoom
         });
 
         if (error) throw error;
