@@ -1,17 +1,27 @@
 // js/version.js - Ponto central de controlo de versão e changelog
 
 export const changelogData = {
-   current: {
-    number: '11.3.3', // <-- NOVA VERSÃO ATUALIZADA
+  current: {
+    number: '11.4.0', // <-- NOVA VERSÃO ATUALIZADA
     changes: [
-        "**Sinalização e Gestão de Alarmes nos Cards da Watchlist (Dashboard):**",
-        "Implementada a visualização de alarmes ativos nos cards do dashboard com um ícone de sino vermelho.",
-        "Cards de ativos com alarmes disparados e não reconhecidos são agora realçados com uma borda vermelha e sombra.",
-        "Adicionado um botão 'OK' no card para 'reconhecer' alarmes disparados, removendo a sinalização visual do card (atualiza o campo `acknowledged` no Supabase).",
-        "Corrigido o erro de subscrição em tempo real de alarmes (`TypeError`) no `services.js` para garantir a atualização dinâmica dos cards com base no estado dos alarmes."
+        "**Market Scanner - Controlo de Sparklines e Persistência:**",
+        "Implementada a opção para ligar/desligar a exibição dos sparklines na tabela do Market Scanner, através de um novo checkbox.",
+        "Quando desativados, a coluna 'Sparkline (24h)' é agora completamente oculta (cabeçalho e células), otimizando o espaço.",
+        "O estado da exibição dos sparklines é persistente: a aplicação lembra a preferência do utilizador entre sessões (utilizando `localStorage`).",
+        "Resolvido o `ReferenceError` no filtro do Estocástico no `market-scan.js` e assegurada a sua funcionalidade correta, ajustando a condição de volta para `< 20`."
     ]
 },
    releases: [
+    {
+        number: '11.3.3', // <-- VERSÃO ANTERIOR, AGORA NO HISTÓRICO
+        changes: [
+            "**Sinalização e Gestão de Alarmes nos Cards da Watchlist (Dashboard):**",
+            "Implementada a visualização de alarmes ativos nos cards do dashboard com um ícone de sino vermelho.",
+            "Cards de ativos com alarmes disparados e não reconhecidos são agora realçados com uma borda vermelha e sombra.",
+            "Adicionado um botão 'OK' no card para 'reconhecer' alarmes disparados, removendo a sinalização visual do card (atualiza o campo `acknowledged` no Supabase).",
+            "Corrigido o erro de subscrição em tempo real de alarmes (`TypeError`) no `services.js` para garantir a atualização dinâmica dos cards com base no estado dos alarmes."
+        ]
+    },
     {
         number: '11.3.2', // <-- VERSÃO ANTERIOR, AGORA NO HISTÓRICO
         changes: [
