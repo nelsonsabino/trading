@@ -2,6 +2,16 @@
 
 export const changelogData = {
  current: {
+    number: '11.9.1', // <-- NOVA VERSÃO ATUALIZADA
+    changes: [
+        "**Dashboard de Estatísticas - Correção da Curva de Capital (Final):**",
+        "Resolvido o problema onde o gráfico 'Curva de Capital' não era renderizado ou mostrava comportamento inesperado, especialmente com múltiplos trades.",
+        "A causa foi identificada e corrigida ao garantir que os trades fechados são ordenados cronologicamente na base de dados (`firebase-service.js`), eliminando a 'curva dupla' e assegurando a representação correta do P&L acumulado.",
+        "Criado o índice composto necessário no Firebase Firestore para a consulta eficiente de trades fechados, resolvendo o `FirebaseError` de permissões."
+    ]
+},
+ releases: [
+  {
     number: '11.9.0', // <-- NOVA VERSÃO ATUALIZADA
     changes: [
         "**Dashboard de Estatísticas - Histórico de Trades Fechados:**",
@@ -10,9 +20,8 @@ export const changelogData = {
         "Incluído um link para o screenshot de saída do trade (se disponível), com visualização em modal.",
         "A secção pode ser expandida e recolhida para otimizar o espaço na página."
     ]
-},
- releases: [
-    {
+},  
+  {
         number: '11.8.0', // <-- VERSÃO ANTERIOR, AGORA NO HISTÓRICO
         changes: [
             "**Dashboard de Estatísticas - Correção da Curva de Capital:**",
