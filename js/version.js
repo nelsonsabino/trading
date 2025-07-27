@@ -2,15 +2,25 @@
 
 export const changelogData = {
    current: {
-    number: '11.3.2', // <-- VERSÃO ATUALIZADA
+    number: '11.3.3', // <-- NOVA VERSÃO ATUALIZADA
     changes: [
-        "**Correção do Sinal e Filtro Estocástico (Market Scanner):**",
-        "Resolvido o problema onde o sinal do Estocástico (STOCH) não aparecia e o filtro não devolvia resultados no Market Scanner.",
-        "Corrigida a incompatibilidade na leitura dos dados do Estocástico da Edge Function (`get-sparklines-data`) no `market-scan.js`, garantindo que o valor K é interpretado corretamente.",
-        "Ajustada a condição para exibir o sinal e para o filtro, com o valor padrão de `< 20` para os níveis do Estocástico."
+        "**Sinalização e Gestão de Alarmes nos Cards da Watchlist (Dashboard):**",
+        "Implementada a visualização de alarmes ativos nos cards do dashboard com um ícone de sino vermelho.",
+        "Cards de ativos com alarmes disparados e não reconhecidos são agora realçados com uma borda vermelha e sombra.",
+        "Adicionado um botão 'OK' no card para 'reconhecer' alarmes disparados, removendo a sinalização visual do card (atualiza o campo `acknowledged` no Supabase).",
+        "Corrigido o erro de subscrição em tempo real de alarmes (`TypeError`) no `services.js` para garantir a atualização dinâmica dos cards com base no estado dos alarmes."
     ]
 },
-    releases: [
+   releases: [
+    {
+        number: '11.3.2', // <-- VERSÃO ANTERIOR, AGORA NO HISTÓRICO
+        changes: [
+            "**Correção do Sinal e Filtro Estocástico (Market Scanner):**",
+            "Resolvido o problema onde o sinal do Estocástico (STOCH) não aparecia e o filtro não devolvia resultados no Market Scanner.",
+            "Corrigida a incompatibilidade na leitura dos dados do Estocástico da Edge Function (`get-sparklines-data`) no `market-scan.js`, garantindo que o valor K é interpretado corretamente.",
+            "Ajustada a condição para exibir o sinal e para o filtro, com o valor padrão de `< 20` para os níveis do Estocástico."
+        ]
+    },  
     {
         number: '11.3.1', // <-- VERSÃO ANTERIOR, AGORA NO HISTÓRICO
         changes: [
