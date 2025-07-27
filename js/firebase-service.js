@@ -1,3 +1,5 @@
+// js/firebase-service.js
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
 import { getAuth, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 import { 
@@ -121,7 +123,8 @@ export function listenToPortfolioSummary(callback) {
 }
 
 export function listenToClosedTrades(callback) {
-    const q = query(collection(db, 'trades'), where('status', '==', 'CLOSED'));
+    // Adiciona orderBy('dateClosed', 'asc') para garantir a ordem cronológica
+    const q = query(collection(db, 'trades'), where('status', '==', 'CLOSED'), orderBy('dateClosed', 'asc'));
     return onSnapshot(q, (snapshot) => {
         const closedTrades = [];
         snapshot.forEach(doc => { closedTrades.push(doc.data()); });
