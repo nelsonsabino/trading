@@ -12,7 +12,7 @@ let currentSortBy = 'volume';
 let filterRsi = false;
 let filterStoch = false;
 let showSparklines = true;
-let currentTopN = 50; // NOVO: Variável de estado para o Top N
+let currentTopN = 50;
 
 const chartModal = document.getElementById('chart-modal');
 const closeChartModalBtn = document.getElementById('close-chart-modal');
@@ -26,7 +26,7 @@ async function openChartModal(symbol) {
 
     try {
         const { data: response, error } = await supabase.functions.invoke('get-asset-details-data', {
-            body: { symbol: symbol, interval: '1h' },
+            body: { symbol: symbol, interval: '1h', limit: 125 }, // NOVO: Pedir menos klines para zoom
         });
 
         if (error) throw error;
@@ -118,14 +118,13 @@ function renderPageContent(processedTickers) {
         tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Nenhum ativo corresponde aos filtros.</td></tr>';
         return;
     }
-    // A fatia do TOP N acontece aqui, depois de filtrar e ordenar
     const finalTickersToDisplay = processedTickers.slice(0, currentTopN); 
 
     const tableRowsHtml = finalTickersToDisplay.map((ticker, index) => createTableRow(ticker, index, allExtraData)).join('');
     tbody.innerHTML = tableRowsHtml;
     
     if (showSparklines) {
-        finalTickersToDisplay.forEach(ticker => { // Renderiza sparklines apenas para os tickers exibidos
+        finalTickersToDisplay.forEach(ticker => {
             const symbolData = allExtraData[ticker.symbol];
             if (symbolData && symbolData.sparkline) {
                 renderSparkline(`sparkline-${ticker.symbol}`, symbolData.sparkline);
@@ -229,7 +228,6 @@ function applyFiltersAndSort() {
         }
         return 0;
     });
-    // A fatia do TOP N já acontece em renderPageContent, então não fatiamos aqui
     renderPageContent(processedTickers);
 }
 
@@ -257,17 +255,15 @@ async function fetchAndDisplayMarketData() {
         if (!response.ok) throw new Error('Falha ao comunicar com a API da Binance.');
         const allFetchedTickers = await response.json();
 
-        // Filtra para ter apenas pares USDC e com volume > 0, e mantém uma lista maior para o TOP N
         const initialFilteredTickers = allFetchedTickers
             .filter(ticker => ticker.symbol.endsWith('USDC') && parseFloat(ticker.quoteVolume) > 0)
-            .sort((a, b) => parseFloat(b.quoteVolume) - parseFloat(a.quoteVolume)); // Mantém a lista completa para poder fatiar por TOP N
+            .sort((a, b) => parseFloat(b.quoteVolume) - parseFloat(a.quoteVolume));
 
-        // Buscamos dados extra apenas para um número maior de símbolos (ex: top 200)
         const symbolsForExtraData = initialFilteredTickers.slice(0, 200).map(t => t.symbol);
         const { data: extraData, error: extraDataError } = await supabase.functions.invoke('get-sparklines-data', { body: { symbols: symbolsForExtraData } });
         if (extraDataError) throw extraDataError;
 
-        allTickersData = initialFilteredTickers; // Armazena a lista completa (ou maior)
+        allTickersData = initialFilteredTickers;
         allExtraData = extraData;
 
         const dataToCache = { tickers: allTickersData, extraData: allExtraData };
@@ -288,9 +284,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterRsiCheckbox = document.getElementById('filter-rsi');
     const filterStochCheckbox = document.getElementById('filter-stoch');
     const toggleSparklinesCheckbox = document.getElementById('toggle-sparklines');
-    const topNSelect = document.getElementById('top-n-select'); // NOVO: Elemento do dropdown Top N
+    const topNSelect = document.getElementById('top-n-select');
 
-    // Inicializa showSparklines a partir do localStorage e do checkbox
     const savedSparklinesState = localStorage.getItem('showSparklines');
     if (savedSparklinesState !== null) {
         showSparklines = JSON.parse(savedSparklinesState);
@@ -311,7 +306,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // NOVO: Inicializa currentTopN a partir do localStorage e do dropdown
     const savedTopNState = localStorage.getItem('marketScannerTopN');
     if (savedTopNState !== null) {
         currentTopN = parseInt(savedTopNState);
@@ -333,12 +327,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // NOVO: Listener para o dropdown Top N
     if (topNSelect) {
         topNSelect.addEventListener('change', (e) => {
             currentTopN = parseInt(e.target.value);
             localStorage.setItem('marketScannerTopN', currentTopN.toString());
-            // Re-fetch dos dados (se necessário para garantir que temos suficientes) e re-aplicar filtros/ordenação
             fetchAndDisplayMarketData(); 
         });
     }
