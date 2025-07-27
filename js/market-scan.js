@@ -11,7 +11,8 @@ let allExtraData = {};
 let currentSortBy = 'volume';
 let filterRsi = false;
 let filterStoch = false;
-let showSparklines = true; // Variável de estado para os sparklines
+let showSparklines = true;
+let currentTopN = 50; // NOVO: Variável de estado para o Top N
 
 const chartModal = document.getElementById('chart-modal');
 const closeChartModalBtn = document.getElementById('close-chart-modal');
@@ -104,7 +105,6 @@ function renderPageContent(processedTickers) {
     const tbody = document.getElementById('market-scan-tbody');
     if (!tbody) return;
     
-    // NOVO: Seleciona a tabela para aplicar/remover classe
     const marketTable = tbody.closest('.market-table'); 
     if (marketTable) {
         if (!showSparklines) {
@@ -118,12 +118,14 @@ function renderPageContent(processedTickers) {
         tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Nenhum ativo corresponde aos filtros.</td></tr>';
         return;
     }
-    const tableRowsHtml = processedTickers.map((ticker, index) => createTableRow(ticker, index, allExtraData)).join('');
+    // A fatia do TOP N acontece aqui, depois de filtrar e ordenar
+    const finalTickersToDisplay = processedTickers.slice(0, currentTopN); 
+
+    const tableRowsHtml = finalTickersToDisplay.map((ticker, index) => createTableRow(ticker, index, allExtraData)).join('');
     tbody.innerHTML = tableRowsHtml;
     
-    // Renderiza sparklines apenas se showSparklines for true
     if (showSparklines) {
-        processedTickers.forEach(ticker => {
+        finalTickersToDisplay.forEach(ticker => { // Renderiza sparklines apenas para os tickers exibidos
             const symbolData = allExtraData[ticker.symbol];
             if (symbolData && symbolData.sparkline) {
                 renderSparkline(`sparkline-${ticker.symbol}`, symbolData.sparkline);
@@ -173,10 +175,9 @@ function createTableRow(ticker, index, extraData) {
         formattedPrice = '$' + price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
     }
 
-    // Condicionalmente renderiza a célula do sparkline
     const sparklineCellHtml = showSparklines 
         ? `<td data-label="Sparkline (24h)" class="sparkline-cell"><div class="sparkline-container" id="sparkline-${ticker.symbol}"></div></td>`
-        : `<td data-label="Sparkline (24h)"></td>`; // Célula vazia ou com um traço
+        : `<td data-label="Sparkline (24h)"></td>`;
 
     return `
         <tr>
@@ -228,6 +229,7 @@ function applyFiltersAndSort() {
         }
         return 0;
     });
+    // A fatia do TOP N já acontece em renderPageContent, então não fatiamos aqui
     renderPageContent(processedTickers);
 }
 
@@ -249,22 +251,23 @@ async function fetchAndDisplayMarketData() {
         return;
     }
     
-    console.log("Cache do scanner inválgido. A buscar novos dados da API.");
+    console.log("Cache do scanner inválido. A buscar novos dados da API.");
     try {
         const response = await fetch('https://api.binance.com/api/v3/ticker/24hr');
         if (!response.ok) throw new Error('Falha ao comunicar com a API da Binance.');
         const allFetchedTickers = await response.json();
 
+        // Filtra para ter apenas pares USDC e com volume > 0, e mantém uma lista maior para o TOP N
         const initialFilteredTickers = allFetchedTickers
             .filter(ticker => ticker.symbol.endsWith('USDC') && parseFloat(ticker.quoteVolume) > 0)
-            .sort((a, b) => parseFloat(b.quoteVolume) - parseFloat(a.quoteVolume))
-            .slice(0, 50);
+            .sort((a, b) => parseFloat(b.quoteVolume) - parseFloat(a.quoteVolume)); // Mantém a lista completa para poder fatiar por TOP N
 
-        const symbols = initialFilteredTickers.map(t => t.symbol);
-        const { data: extraData, error: extraDataError } = await supabase.functions.invoke('get-sparklines-data', { body: { symbols } });
+        // Buscamos dados extra apenas para um número maior de símbolos (ex: top 200)
+        const symbolsForExtraData = initialFilteredTickers.slice(0, 200).map(t => t.symbol);
+        const { data: extraData, error: extraDataError } = await supabase.functions.invoke('get-sparklines-data', { body: { symbols: symbolsForExtraData } });
         if (extraDataError) throw extraDataError;
 
-        allTickersData = initialFilteredTickers;
+        allTickersData = initialFilteredTickers; // Armazena a lista completa (ou maior)
         allExtraData = extraData;
 
         const dataToCache = { tickers: allTickersData, extraData: allExtraData };
@@ -285,8 +288,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterRsiCheckbox = document.getElementById('filter-rsi');
     const filterStochCheckbox = document.getElementById('filter-stoch');
     const toggleSparklinesCheckbox = document.getElementById('toggle-sparklines');
+    const topNSelect = document.getElementById('top-n-select'); // NOVO: Elemento do dropdown Top N
 
-    // Sincroniza o estado inicial de showSparklines com o localStorage e o checkbox
+    // Inicializa showSparklines a partir do localStorage e do checkbox
     const savedSparklinesState = localStorage.getItem('showSparklines');
     if (savedSparklinesState !== null) {
         showSparklines = JSON.parse(savedSparklinesState);
@@ -294,12 +298,10 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleSparklinesCheckbox.checked = showSparklines;
         }
     } else {
-        // Se não há estado guardado, usa o valor padrão (true)
         if (toggleSparklinesCheckbox) {
-            showSparklines = toggleSparklinesCheckbox.checked; // Ou defina como true por padrão se preferir
+            showSparklines = toggleSparklinesCheckbox.checked;
         }
     }
-    // Aplica o estado inicial da coluna Sparkline
     const marketTable = tbody ? tbody.closest('.market-table') : null;
     if (marketTable) {
         if (!showSparklines) {
@@ -309,12 +311,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // NOVO: Inicializa currentTopN a partir do localStorage e do dropdown
+    const savedTopNState = localStorage.getItem('marketScannerTopN');
+    if (savedTopNState !== null) {
+        currentTopN = parseInt(savedTopNState);
+        if (topNSelect) {
+            topNSelect.value = currentTopN.toString();
+        }
+    } else {
+        if (topNSelect) {
+            currentTopN = parseInt(topNSelect.value);
+        }
+    }
+
 
     if (toggleSparklinesCheckbox) {
         toggleSparklinesCheckbox.addEventListener('change', (e) => {
             showSparklines = e.target.checked;
             localStorage.setItem('showSparklines', JSON.stringify(showSparklines));
-            applyFiltersAndSort(); // Re-renderiza para mostrar/esconder
+            applyFiltersAndSort();
+        });
+    }
+
+    // NOVO: Listener para o dropdown Top N
+    if (topNSelect) {
+        topNSelect.addEventListener('change', (e) => {
+            currentTopN = parseInt(e.target.value);
+            localStorage.setItem('marketScannerTopN', currentTopN.toString());
+            // Re-fetch dos dados (se necessário para garantir que temos suficientes) e re-aplicar filtros/ordenação
+            fetchAndDisplayMarketData(); 
         });
     }
 
