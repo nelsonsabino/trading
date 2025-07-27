@@ -9,7 +9,6 @@ import {
 
 // --- Variáveis para os Gráficos ---
 let equityCurveChart = null;
-let strategyPerformanceChart = null;
 
 // --- FUNÇÕES DE RENDERIZAÇÃO DE GRÁFICOS ---
 
@@ -46,32 +45,6 @@ function renderPnlCurveChart(trades) {
 
     equityCurveChart = new ApexCharts(chartContainer, options);
     equityCurveChart.render();
-}
-
-function renderStrategyPerformanceChart(statsByStrategy) {
-    const chartContainer = document.getElementById('strategy-performance-chart');
-    if (!chartContainer) return;
-    chartContainer.innerHTML = '';
-
-    const sortedStrategies = Object.entries(statsByStrategy).sort(([,a], [,b]) => b.pnl - a.pnl);
-
-    const categories = sortedStrategies.map(([name]) => name);
-    const seriesData = sortedStrategies.map(([, data]) => data.pnl.toFixed(2));
-
-    const options = {
-        series: [{ name: 'P&L Total', data: seriesData }],
-        chart: { type: 'bar', height: 350, toolbar: { show: false } },
-        plotOptions: { bar: { borderRadius: 4, horizontal: false, distributed: true } },
-        dataLabels: { enabled: false },
-        xaxis: { categories: categories },
-        yaxis: { title: { text: 'P&L ($)' } },
-        legend: { show: false },
-        colors: seriesData.map(pnl => pnl >= 0 ? '#28a745' : '#dc3545'),
-        theme: { mode: document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light' }
-    };
-
-    strategyPerformanceChart = new ApexCharts(chartContainer, options);
-    strategyPerformanceChart.render();
 }
 
 
@@ -157,9 +130,8 @@ function runStatsPage() {
             generateDetailTable('strategy-stats', 'Estratégia', statsByStrategy);
             generateDetailTable('reason-stats', 'Motivo', statsByReason);
 
-            // Renderiza os gráficos com os dados processados
+            // Renderiza o gráfico da curva de P&L
             renderPnlCurveChart(validTrades);
-            renderStrategyPerformanceChart(statsByStrategy);
         });
     }
     
