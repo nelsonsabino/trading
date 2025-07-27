@@ -1,60 +1,60 @@
 /* css/components.css */
 
 /* --- COMPONENTES GERAIS --- */
-.stat-card { 
-    background-color: #fff; 
-    padding: 1.5rem; 
-    border-radius: 8px; 
-    box-shadow: 0 4px 8px rgba(0,0,0,0.08); 
-    text-align: center; 
+.stat-card {
+    background-color: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    text-align: center;
 }
-.stat-card h4 { 
-    margin-top: 0; 
-    margin-bottom: 0.5rem; 
-    color: #6c757d; 
-    font-size: 1em; 
+.stat-card h4 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: #6c757d;
+    font-size: 1em;
 }
-.stat-card p { 
-    margin: 0; 
-    font-size: 2em; 
-    font-weight: bold; 
-    color: #343a40; 
+.stat-card p {
+    margin: 0;
+    font-size: 2em;
+    font-weight: bold;
+    color: #343a40;
 }
 
 /* --- CARDS DO DASHBOARD (POTENCIAL, ARMADO, ATIVO) --- */
-.potential-trades, .armed-trades, .live-trades { 
-    background-color: #fff; 
-    padding: 1.5rem; 
-    border-radius: 8px; 
-    border-top: 4px solid #6c757d; 
+.potential-trades, .armed-trades, .live-trades {
+    background-color: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-top: 4px solid #6c757d;
 }
-.armed-trades { 
-    border-top-color: #ffc107; 
+.armed-trades {
+    border-top-color: #ffc107;
 }
-.live-trades { 
-    border-top-color: #28a745; 
+.live-trades {
+    border-top-color: #28a745;
 }
 
 /* Base do trade-card */
-.trade-card { 
-    background: #fdfdfd; 
-    border: 1px solid #e9ecef; 
+.trade-card {
+    background: #fdfdfd;
+    border: 1px solid #e9ecef;
     padding: 0.8rem 1rem;
-    border-radius: 6px; 
-    margin-bottom: 1rem; 
-    transition: box-shadow 0.2s ease-in-out; 
-    border-left: 5px solid #6c757d; 
-    display: flex; 
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    transition: box-shadow 0.2s ease-in-out;
+    border-left: 5px solid #6c757d;
+    display: flex;
     flex-direction: column;
 }
-.trade-card:hover { 
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08); 
+.trade-card:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
 }
-.trade-card.armed { 
-    border-left-color: #ffc107; 
+.trade-card.armed {
+    border-left-color: #ffc107;
 }
-.trade-card.live { 
-    border-left-color: #28a745; 
+.trade-card.live {
+    border-left-color: #28a745;
 }
 
 /* --- LINHA SUPERIOR DO CARD --- */
@@ -116,7 +116,7 @@
     margin-top: 0.5rem;
     padding-top: 0.5rem;
     border-top: 1px solid #e9ecef;
-    gap: 0.5rem; 
+    gap: 0.5rem;
 }
 .card-chart-price-group {
     display: flex;
@@ -132,19 +132,19 @@
 }
 .card-price-data {
     display: flex;
-    flex-direction: row; 
-    align-items: baseline; 
-    gap: 0.4rem; 
+    flex-direction: row;
+    align-items: baseline;
+    gap: 0.4rem;
     flex-shrink: 0;
-    min-width: 100px; 
+    min-width: 100px;
     justify-content: flex-end;
 }
 .card-price {
     font-weight: 600;
-    font-size: 0.9em; 
+    font-size: 0.9em;
 }
 .price-change-percent {
-    font-size: 0.8em; 
+    font-size: 0.8em;
 }
 
 /* Ações secundárias */
@@ -241,14 +241,14 @@
 
 /* --- ALARMES NOS TRADES CARDS (DASHBOARD) --- */
 .alarm-active-bell {
-    color: #dc3545; /* Vermelho para alarmes ativos */
-    font-size: 0.9em; /* Tamanho pequeno para o ícone */
+    color: #dc3545;
+    font-size: 0.9em;
     margin-left: 0.25rem;
-    transition: transform 0.2s ease-out; /* Animação para o ícone */
+    transition: transform 0.2s ease-out;
 }
 
 .alarm-active-bell.ringing {
-    animation: bell-ring 1s ease-in-out infinite; /* Animação de sino a tocar */
+    animation: bell-ring 1s ease-in-out infinite;
 }
 
 @keyframes bell-ring {
@@ -262,21 +262,21 @@
 }
 
 .trade-card.alarm-triggered {
-    border: 2px solid #dc3545; /* Borda vermelha para alarme disparado */
-    box-shadow: 0 0 15px rgba(220, 53, 69, 0.5); /* Sombra para destaque */
+    border: 2px solid #dc3545;
+    box-shadow: 0 0 15px rgba(220, 53, 69, 0.5);
 }
 
 .trade-card.alarm-triggered .card-main-action-button button {
-    background-color: #dc3545; /* Cor vermelha para o botão de ação principal */
+    background-color: #dc3545;
 }
 
 .trade-card.alarm-triggered .card-main-action-button button:hover {
     background-color: #c82333;
 }
 
-/* Estilo para o botão de reconhecer alarme (aparecerá dentro do card) */
+/* Estilo para o botão de reconhecer alarme */
 .acknowledge-alarm-btn {
-    background-color: #ffc107; /* Amarelo/laranja */
+    background-color: #ffc107;
     color: #212529;
     font-size: 0.8em;
     padding: 4px 8px;
@@ -302,4 +302,21 @@
 
 .dark-mode .acknowledge-alarm-btn:hover {
     background-color: #8a5e00;
+}
+
+/* Secções de Histórico (para o botão expandir/recolher) */
+.closed-trades-history-section {
+    background-color: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+}
+.closed-trades-history-section h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.dark-mode .closed-trades-history-section {
+    background-color: #1e1e1e;
 }
