@@ -2,13 +2,21 @@
 
 export const changelogData = {
  current: {
-    number: '11.7.0', // <-- NOVA VERSÃO ATUALIZADA
+    number: '11.8.0', // <-- NOVA VERSÃO ATUALIZADA
     changes: [
-        "**Dashboard de Estatísticas - Remoção de Gráfico:**",
-        "Removido o gráfico 'Desempenho por Estratégia' da página de Estatísticas para simplificar a visualização e focar nas métricas principais."
+        "**Dashboard de Estatísticas - Correção da Curva de Capital:**",
+        "Resolvido o problema onde o gráfico 'Curva de Capital' não era renderizado corretamente com um ou dois trades realizados.",
+        "A função de renderização foi otimizada para garantir que os dados são formatados de forma robusta e que instâncias anteriores do gráfico são destruídas antes de criar uma nova."
     ]
 },
  releases: [
+    {
+        number: '11.7.0', // <-- VERSÃO ANTERIOR, AGORA NO HISTÓRICO
+        changes: [
+            "**Dashboard de Estatísticas - Remoção de Gráfico:**",
+            "Removido o gráfico 'Desempenho por Estratégia' da página de Estatísticas para simplificar a visualização e focar nas métricas principais."
+        ]
+    },
     {
         number: '11.6.0', // <-- VERSÃO ANTERIOR, AGORA NO HISTÓRICO
         changes: [
