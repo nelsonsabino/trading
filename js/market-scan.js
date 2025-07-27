@@ -11,7 +11,7 @@ let allExtraData = {};
 let currentSortBy = 'volume';
 let filterRsi = false;
 let filterStoch = false;
-let showSparklines = true; // NOVO: Variável de estado para os sparklines
+let showSparklines = true; // Variável de estado para os sparklines
 
 const chartModal = document.getElementById('chart-modal');
 const closeChartModalBtn = document.getElementById('close-chart-modal');
@@ -103,14 +103,26 @@ function renderSparkline(containerId, dataSeries) {
 function renderPageContent(processedTickers) {
     const tbody = document.getElementById('market-scan-tbody');
     if (!tbody) return;
+    
+    // NOVO: Seleciona a tabela para aplicar/remover classe
+    const marketTable = tbody.closest('.market-table'); 
+    if (marketTable) {
+        if (!showSparklines) {
+            marketTable.classList.add('hide-sparkline-column');
+        } else {
+            marketTable.classList.remove('hide-sparkline-column');
+        }
+    }
+
     if (processedTickers.length === 0) {
         tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Nenhum ativo corresponde aos filtros.</td></tr>';
         return;
     }
     const tableRowsHtml = processedTickers.map((ticker, index) => createTableRow(ticker, index, allExtraData)).join('');
     tbody.innerHTML = tableRowsHtml;
+    
     // Renderiza sparklines apenas se showSparklines for true
-    if (showSparklines) { // Condição adicionada aqui
+    if (showSparklines) {
         processedTickers.forEach(ticker => {
             const symbolData = allExtraData[ticker.symbol];
             if (symbolData && symbolData.sparkline) {
@@ -237,7 +249,7 @@ async function fetchAndDisplayMarketData() {
         return;
     }
     
-    console.log("Cache do scanner inválido. A buscar novos dados da API.");
+    console.log("Cache do scanner inválgido. A buscar novos dados da API.");
     try {
         const response = await fetch('https://api.binance.com/api/v3/ticker/24hr');
         if (!response.ok) throw new Error('Falha ao comunicar com a API da Binance.');
@@ -272,14 +284,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const sortBySelect = document.getElementById('sort-by');
     const filterRsiCheckbox = document.getElementById('filter-rsi');
     const filterStochCheckbox = document.getElementById('filter-stoch');
-    const toggleSparklinesCheckbox = document.getElementById('toggle-sparklines'); // NOVO: Checkbox para sparklines
+    const toggleSparklinesCheckbox = document.getElementById('toggle-sparklines');
 
-    // Sincroniza o estado inicial de showSparklines com o checkbox
+    // Sincroniza o estado inicial de showSparklines com o localStorage e o checkbox
+    const savedSparklinesState = localStorage.getItem('showSparklines');
+    if (savedSparklinesState !== null) {
+        showSparklines = JSON.parse(savedSparklinesState);
+        if (toggleSparklinesCheckbox) {
+            toggleSparklinesCheckbox.checked = showSparklines;
+        }
+    } else {
+        // Se não há estado guardado, usa o valor padrão (true)
+        if (toggleSparklinesCheckbox) {
+            showSparklines = toggleSparklinesCheckbox.checked; // Ou defina como true por padrão se preferir
+        }
+    }
+    // Aplica o estado inicial da coluna Sparkline
+    const marketTable = tbody ? tbody.closest('.market-table') : null;
+    if (marketTable) {
+        if (!showSparklines) {
+            marketTable.classList.add('hide-sparkline-column');
+        } else {
+            marketTable.classList.remove('hide-sparkline-column');
+        }
+    }
+
+
     if (toggleSparklinesCheckbox) {
-        showSparklines = toggleSparklinesCheckbox.checked;
         toggleSparklinesCheckbox.addEventListener('change', (e) => {
             showSparklines = e.target.checked;
-            applyFiltersAndSort(); // Re-aplica filtros e re-renderiza para mostrar/esconder
+            localStorage.setItem('showSparklines', JSON.stringify(showSparklines));
+            applyFiltersAndSort(); // Re-renderiza para mostrar/esconder
         });
     }
 
