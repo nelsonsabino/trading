@@ -4,7 +4,8 @@ import {
     listenToPortfolioSummary,
     listenToClosedTrades,
     addTransactionAndUpdateBalance,
-    adjustPortfolioBalance
+    adjustPortfolioBalance,
+    deleteTrade // Importa deleteTrade para o botão de apagar no futuro, se necessário (mas não fazemos aqui)
 } from './firebase-service.js';
 
 // --- Variáveis para os Gráficos ---
@@ -64,6 +65,57 @@ function renderPnlCurveChart(trades) {
 
     equityCurveChart = new ApexCharts(chartContainer, options);
     equityCurveChart.render();
+}
+
+
+// --- FUNÇÕES PARA O HISTÓRICO DE TRADES FECHADOS ---
+function displayClosedTradesHistory(trades) {
+    const tbody = document.getElementById('closed-trades-table-body');
+    if (!tbody) return;
+    tbody.innerHTML = ''; // Limpa a tabela
+
+    const closedTrades = trades.filter(trade => trade.status === 'CLOSED'); // Garante que só os fechados são mostrados
+    if (closedTrades.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 2rem;">Nenhum trade fechado no histórico.</td></tr>';
+        return;
+    }
+
+    // Ordena do mais recente para o mais antigo
+    const sortedClosedTrades = closedTrades.sort((a, b) => {
+        const dateA = a.dateClosed?.seconds || 0;
+        const dateB = b.dateClosed?.seconds || 0;
+        return dateB - dateA; // Ordem descendente
+    });
+
+    sortedClosedTrades.forEach(trade => {
+        const tr = document.createElement('tr');
+        const pnl = parseFloat(trade.closeDetails?.pnl || 0);
+        const pnlClass = pnl > 0 ? 'positive-pnl' : (pnl < 0 ? 'negative-pnl' : '');
+        
+        const dateAddedStr = trade.dateAdded?.toDate().toLocaleString('pt-PT') || 'N/A';
+        const dateClosedStr = trade.dateClosed?.toDate().toLocaleString('pt-PT') || 'N/A';
+        const entryPrice = trade.executionDetails?.['entry-price'] || 'N/A';
+        const exitPrice = trade.closeDetails?.exitPrice || 'N/A';
+        const closeReason = trade.closeDetails?.closeReason || 'Não especificado';
+        const finalNotes = trade.closeDetails?.finalNotes || '';
+        const screenshotUrl = trade.closeDetails?.exitScreenshotUrl || '';
+
+        const screenshotHtml = screenshotUrl 
+            ? `<a href="${screenshotUrl}" target="_blank" class="screenshot-link-btn"><i class="fas fa-image"></i> Ver</a>`
+            : '-';
+
+        tr.innerHTML = `
+            <td data-label="Ativo"><strong><a href="asset-details.html?symbol=${trade.asset}" class="asset-link">${trade.asset || 'N/A'}</a></strong></td>
+            <td data-label="Estratégia">${trade.strategyName || 'N/A'}</td>
+            <td data-label="Entrada">${entryPrice !== 'N/A' ? `$${entryPrice}` : 'N/A'} (${dateAddedStr})</td>
+            <td data-label="Saída">${exitPrice !== 'N/A' ? `$${exitPrice}` : 'N/A'} (${dateClosedStr})</td>
+            <td data-label="P&L ($)" class="${pnlClass}">${pnl !== 0 ? `$${pnl.toFixed(2)}` : 'N/A'}</td>
+            <td data-label="Razão Fecho">${closeReason}</td>
+            <td data-label="Notas Finais" class="notes-cell">${finalNotes || '-'}</td>
+            <td data-label="Screenshot">${screenshotHtml}</td>
+        `;
+        tbody.appendChild(tr);
+    });
 }
 
 
@@ -151,6 +203,9 @@ function runStatsPage() {
 
             // Renderiza o gráfico da curva de P&L
             renderPnlCurveChart(validTrades);
+            
+            // Renderiza o histórico de trades fechados
+            displayClosedTradesHistory(trades); // Passa 'trades' (todos os fechados)
         });
     }
     
@@ -185,6 +240,20 @@ function runStatsPage() {
  
     // Iniciar a página
     calculateAndDisplayStats();
+
+    // Listener para expandir/recolher histórico de trades fechados
+    const toggleClosedTradesBtn = document.getElementById('toggle-closed-trades');
+    const closedTradesHistoryDiv = document.getElementById('closed-trades-history');
+
+    if (toggleClosedTradesBtn && closedTradesHistoryDiv) {
+        toggleClosedTradesBtn.addEventListener('click', () => {
+            const isHidden = closedTradesHistoryDiv.style.display === 'none';
+            closedTradesHistoryDiv.style.display = isHidden ? 'block' : 'none';
+            toggleClosedTradesBtn.innerHTML = isHidden 
+                ? '<i class="fas fa-chevron-up"></i> Recolher Histórico' 
+                : '<i class="fas fa-chevron-down"></i> Expandir Histórico';
+        });
+    }
 }
 
 document.addEventListener('DOMContentLoaded', runStatsPage);
