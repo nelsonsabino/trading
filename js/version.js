@@ -2,15 +2,22 @@
 
 export const changelogData = {
  current: {
-    number: '11.6.0', // <-- NOVA VERSÃO ATUALIZADA
+    number: '11.7.0', // <-- NOVA VERSÃO ATUALIZADA
     changes: [
-        "**Market Scanner - Zoom nos Gráficos do Modal:**",
-        "A visualização de gráficos no modal do Market Scanner foi otimizada para exibir um período de tempo mais curto (~9 dias para o timeframe de 1h), proporcionando um 'zoom' automático nos dados mais recentes.",
-        "A Edge Function `get-asset-details-data` foi atualizada para aceitar um parâmetro `limit`, permitindo que o frontend solicite um número específico de klines.",
-        "Resolvidos múltiplos erros de deploy e `Module not found` na Edge Function, estabilizando a importação de bibliotecas externas (`technicalindicators`)."
+        "**Dashboard de Estatísticas - Remoção de Gráfico:**",
+        "Removido o gráfico 'Desempenho por Estratégia' da página de Estatísticas para simplificar a visualização e focar nas métricas principais."
     ]
 },
-  releases: [
+ releases: [
+    {
+        number: '11.6.0', // <-- VERSÃO ANTERIOR, AGORA NO HISTÓRICO
+        changes: [
+            "**Market Scanner - Zoom nos Gráficos do Modal:**",
+            "A visualização de gráficos no modal do Market Scanner foi otimizada para exibir um período de tempo mais curto (~9 dias para o timeframe de 1h), proporcionando um 'zoom' automático nos dados mais recentes.",
+            "A Edge Function `get-asset-details-data` foi atualizada para aceitar um parâmetro `limit`, permitindo que o frontend solicite um número específico de klines.",
+            "Resolvidos múltiplos erros de deploy e `Module not found` na Edge Function, estabilizando a importação de bibliotecas externas (`technicalindicators`)."
+        ]
+    },
     {
         number: '11.5.0', // <-- VERSÃO ANTERIOR, AGORA NO HISTÓRICO
         changes: [
