@@ -1,6 +1,6 @@
 // js/navigation.js
 
-import { openAddModal } from './modals.js'; // Importa a função para abrir o modal
+import { openAddModal } from './modals.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const managementToggle = document.getElementById('management-toggle');
@@ -37,4 +37,29 @@ document.addEventListener('DOMContentLoaded', () => {
             openAddModal(); // Abre o modal para adicionar oportunidade
         });
     }
+
+    // NOVO: Lógica para destacar o botão da página ativa
+    const currentPath = window.location.pathname;
+    // Normaliza o path para comparar apenas o nome do ficheiro (ex: "/dashboard.html")
+    const currentPage = currentPath.substring(currentPath.lastIndexOf('/') + 1);
+
+    // Seleciona todos os links da navegação principal
+    const navLinks = document.querySelectorAll('.main-nav .nav-icon-link');
+
+    navLinks.forEach(link => {
+        // Ignora o botão de tema e a secção do utilizador, que não são links de página
+        // O botão de tema está agora fora do header, mas mantemos a verificação para robustez
+        if (link.id === 'theme-toggle-btn' || link.closest('#user-session')) {
+            return;
+        }
+
+        const linkHref = link.getAttribute('href');
+        if (linkHref) {
+            const linkPage = linkHref.substring(linkHref.lastIndexOf('/') + 1);
+            // Compara a página do link com a página atual. A raiz (/) corresponde a index.html (agora dashboard.html via redirect)
+            if (linkPage === currentPage || (linkPage === 'dashboard.html' && (currentPage === '' || currentPage === 'index.html'))) {
+                link.classList.add('nav-active');
+            }
+        }
+    });
 });
