@@ -6,14 +6,6 @@ import { openArmModal, openExecModal, openCloseTradeModal, openImageModal, openA
 import { loadAndOpenForEditing } from './handlers.js';
 import { getLastCreatedTradeId, setLastCreatedTradeId } from './state.js';
 
-// Variáveis para o modal do gráfico no dashboard
-const dashboardChartModal = document.getElementById('chart-modal');
-const closeDashboardChartModalBtn = document.getElementById('close-chart-modal');
-const dashboardChartContainer = document.getElementById('chart-modal-container');
-
-// Revertido: Mapa para armazenar instâncias de gráficos ApexCharts por tradeId não é mais necessário aqui
-// Revertido: Flag para evitar cliques múltiplos não é mais necessária aqui
-
 function renderSparkline(containerId, dataSeries) {
     const container = document.getElementById(containerId);
     if (!container || !dataSeries || dataSeries.length < 2) return;
@@ -108,18 +100,28 @@ export function populateStrategySelect(strategies) {
     }
 }
 
-// NOVO: Função para abrir o modal de gráfico no dashboard
-async function openDashboardChartModal(symbol) {
-    if (!dashboardChartModal || !dashboardChartContainer) return;
+async function toggleAdvancedChart(tradeId, symbol, button) {
+    const chartContainer = document.getElementById(`advanced-chart-${tradeId}`);
+    if (!chartContainer) return;
 
-    dashboardChartContainer.innerHTML = '<p style="padding: 2rem; text-align: center;">A carregar gráfico...</p>';
-    dashboardChartModal.style.display = 'flex';
+    const isVisible = chartContainer.classList.contains('visible');
+
+    if (isVisible) {
+        chartContainer.innerHTML = '';
+        chartContainer.classList.remove('visible');
+        button.innerHTML = `<i class="fa-solid fa-chart-simple"></i>`;
+        return;
+    }
+
+    // Lógica para abrir o gráfico
+    chartContainer.classList.add('visible');
+    chartContainer.innerHTML = '<p style="text-align: center; padding: 2rem;">A carregar gráfico...</p>';
+    button.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
 
     try {
         const cleanSymbol = symbol.replace('BINANCE:', '');
-        // Usamos limit: 220 para ter consistência com o Market Scanner (~9 dias de 1h)
         const { data: response, error } = await supabase.functions.invoke('get-asset-details-data', {
-            body: { symbol: cleanSymbol, interval: '1h', limit: 220 },
+            body: { symbol: cleanSymbol, interval: '1h' },
         });
 
         if (error) throw error;
@@ -154,32 +156,16 @@ async function openDashboardChartModal(symbol) {
             theme: { mode: document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light' }
         };
 
-        dashboardChartContainer.innerHTML = '';
-        const chart = new ApexCharts(dashboardChartContainer, options);
+        chartContainer.innerHTML = '';
+        const chart = new ApexCharts(chartContainer, options);
         chart.render();
+        button.innerHTML = `<i class="fa-solid fa-eye-slash"></i>`;
 
     } catch (err) {
-        console.error("Erro ao carregar o gráfico no modal do Dashboard:", err);
-        dashboardChartContainer.innerHTML = `<p style="text-align: center; padding: 2rem; color: red;">Erro ao carregar: ${err.message}</p>`;
+        console.error("Erro ao carregar o gráfico no card:", err);
+        chartContainer.innerHTML = `<p style="text-align: center; padding: 2rem; color: red;">Erro ao carregar: ${err.message}</p>`;
+        button.innerHTML = `<i class="fa-solid fa-exclamation-triangle"></i>`;
     }
-}
-
-// NOVO: Função para fechar o modal do gráfico
-function closeDashboardChartModal() {
-    if (!dashboardChartModal || !dashboardChartContainer) return;
-    dashboardChartContainer.innerHTML = ''; // Limpa o gráfico
-    dashboardChartModal.style.display = 'none'; // Esconde o modal
-}
-
-
-// Configura os listeners do modal de gráfico do Dashboard
-if (dashboardChartModal) {
-    closeDashboardChartModalBtn.addEventListener('click', closeDashboardChartModal);
-    dashboardChartModal.addEventListener('click', (e) => { 
-        if (e.target.id === 'chart-modal') { // Fecha o modal se o clique for no overlay (não no conteúdo)
-            closeDashboardChartModal();
-        }
-    });
 }
 
 // Nova função para reconhecer alarmes
@@ -192,10 +178,11 @@ async function acknowledgeAlarm(assetPair) {
             .from('alarms')
             .update({ acknowledged: true })
             .eq('asset_pair', assetPair)
-            .eq('status', 'triggered');
+            .eq('status', 'triggered'); // Apenas reconhece alarmes que já foram disparados
 
         if (error) throw error;
         console.log(`Alarmes disparados para ${assetPair} reconhecidos com sucesso.`);
+        // A re-renderização do dashboard será acionada pelo listener em app.js
     } catch (error) {
         console.error("Erro ao reconhecer alarme:", error);
         alert("Ocorreu um erro ao reconhecer o alarme. Tente novamente.");
@@ -265,6 +252,7 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
     }
     if (hasTriggeredUnacknowledgedAlarm) {
         card.classList.add('alarm-triggered');
+        // Adiciona um botão de reconhecimento apenas para alarmes disparados e não reconhecidos
         acknowledgeButtonHtml = `<button class="acknowledge-alarm-btn" data-action="acknowledge-alarm" data-asset="${assetName}" title="Reconhecer Alarme"><i class="fa-solid fa-check"></i> OK</button>`;
     }
 
@@ -273,7 +261,7 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
         <div class="card-header-row">
             <h3 class="asset-title-card">
                 <a href="asset-details.html?symbol=${assetName}" class="asset-link">${assetName}</a>
-                ${alarmBellHtml}
+                ${alarmBellHtml} <!-- Ícone do sino adicionado aqui -->
                 <button class="icon-action-btn card-edit-btn" data-action="edit" title="Editar"><i class="fas fa-pencil"></i></button>
             </h3>
             <div class="card-main-action-button">${mainActionButtonHtml}</div>
@@ -286,7 +274,7 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
             <div class="card-secondary-actions">
                 <button class="icon-action-btn action-summary" data-action="toggle-chart" data-symbol="${tradingViewSymbol}" title="Ver gráfico interativo"><i class="fa-solid fa-chart-simple"></i></button>
                 <a href="https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}" target="_blank" rel="noopener noreferrer" class="icon-action-btn action-full-chart" title="Abrir no TradingView para análise completa"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                ${acknowledgeButtonHtml}
+                ${acknowledgeButtonHtml} <!-- Botão de reconhecimento adicionado aqui -->
             </div>
             <div class="card-sparkline" id="sparkline-card-${trade.id}"></div>
             <div class="card-price-data">
@@ -294,12 +282,13 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
                 <div class="${priceChangeClass} price-change-percent">${assetMarketData.change.toFixed(2)}%</div>
             </div>
         </div>
-    `; // REMOVIDO: <div class="mini-chart-container" id="advanced-chart-${trade.id}"></div>
+        <div class="mini-chart-container" id="advanced-chart-${trade.id}"></div>
+    `;
     return card;
 }
 
 let tradesForEventListeners = [];
-export function displayTrades(trades, marketData, allAlarms) {
+export function displayTrades(trades, marketData, allAlarms) { // Agora aceita allAlarms
     tradesForEventListeners = trades;
     if (!potentialTradesContainer) return;
     potentialTradesContainer.innerHTML = '<p class="empty-state-message">Nenhum ativo na watchlist.</p>';
@@ -307,7 +296,7 @@ export function displayTrades(trades, marketData, allAlarms) {
     liveTradesContainer.innerHTML = '<p class="empty-state-message">Nenhuma operação ativa.</p>';
     let potentialCount = 0, armedCount = 0, liveCount = 0;
     trades.forEach(trade => {
-        const card = createTradeCard(trade, marketData, allAlarms);
+        const card = createTradeCard(trade, marketData, allAlarms); // Passa allAlarms para createTradeCard
         if (trade.data.status === 'POTENTIAL') { if (potentialCount === 0) potentialTradesContainer.innerHTML = ''; potentialTradesContainer.appendChild(card); potentialCount++; }
         else if (trade.data.status === 'ARMED') { if (armedCount === 0) armedTradesContainer.innerHTML = ''; armedTradesContainer.appendChild(card); armedCount++; }
         else if (trade.data.status === 'LIVE') { if (liveCount === 0) liveTradesContainer.innerHTML = ''; liveTradesContainer.appendChild(card); liveCount++; }
@@ -343,10 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!trade) return;
             const action = button.dataset.action;
             switch (action) {
-                case 'toggle-chart':
-                    // NOVO: Chama a função para abrir o modal de gráfico
-                    openDashboardChartModal(button.dataset.symbol); 
-                    break;
+                case 'toggle-chart': toggleAdvancedChart(tradeId, button.dataset.symbol, button); break;
                 case 'edit': loadAndOpenForEditing(tradeId); break;
                 case 'arm': openArmModal(trade); break;
                 case 'execute': openExecModal(trade); break;
@@ -358,7 +344,7 @@ document.addEventListener('DOMContentLoaded', () => {
                        modalAssetInput.value = button.dataset.symbol.replace('BINANCE:', '');
                    }
                    break;
-                case 'acknowledge-alarm':
+                case 'acknowledge-alarm': // NOVO: Lógica para reconhecer alarme
                     const assetSymbol = button.dataset.asset;
                     if (assetSymbol) {
                         acknowledgeAlarm(assetSymbol);
