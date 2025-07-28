@@ -2,15 +2,22 @@
 
 export const changelogData = {
 current: {
-    number: '11.10.0', // <-- NOVA VERSÃO ATUALIZADA
+    number: '11.11.0',
+    changes: [
+        "**Market Scanner - Gráfico do Modal (Zoom Padrão para 7 Dias):**",
+        "O gráfico do modal na página do Market Scanner foi ajustado para exibir aproximadamente 7 dias de dados no timeframe de 1h.",
+        "O `limit` passado à Edge Function `get-asset-details-data` foi definido para 170 klines, proporcionando o zoom desejado."
+    ]
+},
+ releases: [
+  {
+    number: '11.10.0', 
     changes: [
         "**Navegação - Botão da Página Ativa:**",
         "O botão de navegação correspondente à página atual é agora destacado com uma cor de 'desativado' (cinzento neutro) e não é clicável.",
         "Esta melhoria visual torna a navegação mais intuitiva e indica claramente onde o utilizador se encontra na aplicação."
     ]
 },
- releases: [
-  
 {
     number: '11.9.4', // 
     changes: [
