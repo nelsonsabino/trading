@@ -7,6 +7,12 @@ let currentAssetSymbol = null;
 let currentChartTimeframe = '1h'; 
 let currentChartType = 'line'; 
 
+/**
+ * Busca dados de klines e indicadores da Edge Function e renderiza o gráfico principal do ativo.
+ * @param {string} symbol - O símbolo do ativo (ex: "BTCUSDC").
+ * @param {string} interval - O intervalo de tempo (ex: "1h", "1d").
+ * @param {string} chartType - O tipo de gráfico (ex: "line", "candlestick").
+ */
 async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line') {
     const chartContainer = document.getElementById('main-asset-chart');
     if (!chartContainer) return;
@@ -139,6 +145,10 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
     }
 }
 
+/**
+ * Renderiza o widget de Análise Técnica da TradingView.
+ * @param {string} symbol - O símbolo do ativo.
+ */
 function renderTradingViewTechnicalAnalysisWidget(symbol) {
     const container = document.getElementById('tradingview-tech-analysis-container');
     if (!container) return;
@@ -162,6 +172,7 @@ function renderTradingViewTechnicalAnalysisWidget(symbol) {
     container.appendChild(script); 
 }
 
+// --- Funções de Notícias, Alarmes e Trades ---
 async function displayAlarmsForAsset(symbol) {
     const tbody = document.getElementById('asset-alarms-tbody');
     if (!tbody) return;
@@ -192,16 +203,31 @@ async function displayTradesForAsset(symbol) {
     tbody.innerHTML = '<tr><td colspan="5">A carregar trades...</td></tr>';
     try {
         const trades = await getTradesForAsset(symbol);
+        // DEBUG: Log dos trades recebidos
+        console.log(`Trades recebidos para ${symbol}:`, trades);
+
         if (trades.length === 0) {
             tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Nenhum trade encontrado para este ativo.</td></tr>';
             return;
         }
         const tradesHtml = trades.map(trade => {
+            // Assegura que as propriedades existem antes de tentar aceder
             const pnl = trade.data.status === 'CLOSED' ? (trade.data.closeDetails?.pnl || 0) : '-';
             const pnlClass = parseFloat(pnl) > 0 ? 'positive-pnl' : (parseFloat(pnl) < 0 ? 'negative-pnl' : '');
             const dateStr = trade.data.dateAdded?.toDate().toLocaleString('pt-PT') || 'N/A';
             const status = trade.data.status || 'UNKNOWN';
-            return `<tr data-trade-id="${trade.id}"><td>${trade.data.strategyName || 'N/A'}</td><td><span class="status-badge status-${status.toLowerCase()}">${status}</span></td><td>${dateStr}</td><td class="${pnlClass}">${pnl !== '-' ? `$${parseFloat(pnl).toFixed(2)}` : '-'}</td><td><button class="btn edit-btn" style="padding: 5px 10px; font-size: 0.9em;">Ver/Editar</button></td></tr>`;
+
+            const strategyName = trade.data.strategyName || 'N/A';
+            const tradeId = trade.id; // Assume que o ID do documento é o trade.id
+
+            // Adicionar data-label para responsividade
+            return `<tr data-trade-id="${trade.id}">
+                <td data-label="Estratégia">${strategyName}</td>
+                <td data-label="Status"><span class="status-badge status-${status.toLowerCase()}">${status}</span></td>
+                <td data-label="Data Criação">${dateStr}</td>
+                <td data-label="P&L ($)" class="${pnlClass}">${pnl !== '-' ? `$${parseFloat(pnl).toFixed(2)}` : '-'}</td>
+                <td data-label="Ações"><button class="btn edit-btn" data-trade-id="${tradeId}" style="padding: 5px 10px; font-size: 0.9em;">Ver/Editar</button></td>
+            </tr>`;
         }).join('');
         tbody.innerHTML = tradesHtml;
     } catch (err) {
@@ -212,9 +238,10 @@ async function displayTradesForAsset(symbol) {
 
 function editTrade(tradeId) {
     localStorage.setItem('tradeToEdit', tradeId);
-    window.location.href = 'dashboard.html'; // CORRIGIDO AQUI
+    window.location.href = 'dashboard.html';
 }
 
+// --- PONTO DE ENTRADA DO SCRIPT ---
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const assetSymbol = urlParams.get('symbol');
@@ -245,7 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const watchlistBtn = document.getElementById('add-to-watchlist-btn');
     const alarmBtn = document.getElementById('add-alarm-btn');
     const tvBtn = document.getElementById('open-tv-btn');
-    if (watchlistBtn) watchlistBtn.href = `dashboard.html?assetPair=${assetSymbol}`; // CORRIGIDO AQUI
+    if (watchlistBtn) watchlistBtn.href = `dashboard.html?assetPair=${assetSymbol}`;
     if (alarmBtn) alarmBtn.href = `alarms-create.html?assetPair=${assetSymbol}`;
     if (tvBtn) tvBtn.href = `https://www.tradingview.com/chart/?symbol=BINANCE:${assetSymbol}`;
 
@@ -259,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tradesTable.addEventListener('click', (e) => {
             const button = e.target.closest('.edit-btn');
             if (button) {
-                const tradeId = button.closest('tr').dataset.tradeId;
+                const tradeId = button.dataset.tradeId;
                 if (tradeId) {
                     editTrade(tradeId);
                 }
