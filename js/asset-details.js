@@ -23,8 +23,12 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
     currentChartType = chartType; 
 
     try {
+        // Definir o número base de klines para exibir (para 1h = 7 dias)
+        const baseKlinesLimit = 170; // Aproximadamente 7 dias de dados de 1h
+
+        // A Edge Function get-asset-details-data já está preparada para receber e usar o 'limit'
         const { data: edgeFunctionResponse, error: edgeFunctionError } = await supabase.functions.invoke('get-asset-details-data', {
-            body: { symbol: symbol, interval: interval },
+            body: { symbol: symbol, interval: interval, limit: baseKlinesLimit }, // Passa o mesmo número de klines para todos os TFs
         });
 
         if (edgeFunctionError) throw edgeFunctionError;
@@ -188,7 +192,7 @@ async function displayAlarmsForAsset(symbol) {
         }
         const alarmsHtml = alarms.map(alarm => {
             let alarmDescription = `Preço ${alarm.condition} ${alarm.target_price} USD`;
-            return `<tr><td>${alarmDescription}</td><td>${new Date(alarm.created_at).toLocaleString('pt-PT')}</td><td><a href="alarms-manage.html?editAlarmId=${alarm.id}" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.9em;">Gerir</a></td></tr>`; // Corrigido aqui
+            return `<tr><td>${alarmDescription}</td><td>${new Date(alarm.created_at).toLocaleString('pt-PT')}</td><td><a href="alarms-manage.html?editAlarmId=${alarm.id}" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.9em;">Gerir</a></td></tr>`;
         }).join('');
         tbody.innerHTML = alarmsHtml;
     } catch (err) {
