@@ -121,7 +121,7 @@ async function toggleAdvancedChart(tradeId, symbol, button) {
     try {
         const cleanSymbol = symbol.replace('BINANCE:', '');
         const { data: response, error } = await supabase.functions.invoke('get-asset-details-data', {
-            body: { symbol: cleanSymbol, interval: '1h' },
+            body: { symbol: cleanSymbol, interval: '1h', limit: 220 }, // Usando o limite atual para 9 dias, vamos ajustar para 7 dias depois
         });
 
         if (error) throw error;
@@ -261,7 +261,7 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
         <div class="card-header-row">
             <h3 class="asset-title-card">
                 <a href="asset-details.html?symbol=${assetName}" class="asset-link">${assetName}</a>
-                ${alarmBellHtml} <!-- Ícone do sino adicionado aqui -->
+                ${alarmBellHtml}
                 <button class="icon-action-btn card-edit-btn" data-action="edit" title="Editar"><i class="fas fa-pencil"></i></button>
             </h3>
             <div class="card-main-action-button">${mainActionButtonHtml}</div>
@@ -274,7 +274,7 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
             <div class="card-secondary-actions">
                 <button class="icon-action-btn action-summary" data-action="toggle-chart" data-symbol="${tradingViewSymbol}" title="Ver gráfico interativo"><i class="fa-solid fa-chart-simple"></i></button>
                 <a href="https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}" target="_blank" rel="noopener noreferrer" class="icon-action-btn action-full-chart" title="Abrir no TradingView para análise completa"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                ${acknowledgeButtonHtml} <!-- Botão de reconhecimento adicionado aqui -->
+                ${acknowledgeButtonHtml}
             </div>
             <div class="card-sparkline" id="sparkline-card-${trade.id}"></div>
             <div class="card-price-data">
@@ -288,7 +288,7 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
 }
 
 let tradesForEventListeners = [];
-export function displayTrades(trades, marketData, allAlarms) { // Agora aceita allAlarms
+export function displayTrades(trades, marketData, allAlarms) {
     tradesForEventListeners = trades;
     if (!potentialTradesContainer) return;
     potentialTradesContainer.innerHTML = '<p class="empty-state-message">Nenhum ativo na watchlist.</p>';
@@ -296,7 +296,7 @@ export function displayTrades(trades, marketData, allAlarms) { // Agora aceita a
     liveTradesContainer.innerHTML = '<p class="empty-state-message">Nenhuma operação ativa.</p>';
     let potentialCount = 0, armedCount = 0, liveCount = 0;
     trades.forEach(trade => {
-        const card = createTradeCard(trade, marketData, allAlarms); // Passa allAlarms para createTradeCard
+        const card = createTradeCard(trade, marketData, allAlarms);
         if (trade.data.status === 'POTENTIAL') { if (potentialCount === 0) potentialTradesContainer.innerHTML = ''; potentialTradesContainer.appendChild(card); potentialCount++; }
         else if (trade.data.status === 'ARMED') { if (armedCount === 0) armedTradesContainer.innerHTML = ''; armedTradesContainer.appendChild(card); armedCount++; }
         else if (trade.data.status === 'LIVE') { if (liveCount === 0) liveTradesContainer.innerHTML = ''; liveTradesContainer.appendChild(card); liveCount++; }
@@ -322,6 +322,7 @@ export function displayTrades(trades, marketData, allAlarms) { // Agora aceita a
 document.addEventListener('DOMContentLoaded', () => {
     const dashboard = document.querySelector('.dashboard-columns');
     if (dashboard) {
+        // Usar capture phase para garantir que o evento é pego antes de outros listeners
         dashboard.addEventListener('click', (e) => {
             const button = e.target.closest('[data-action]');
             if (!button) return;
@@ -331,8 +332,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const trade = tradesForEventListeners.find(t => t.id === tradeId);
             if (!trade) return;
             const action = button.dataset.action;
+
+            // DEBUG: Log do evento de clique/toque
+            console.log(`Evento de ${e.type} detectado. Ação: ${action}, Botão:`, button);
+
             switch (action) {
-                case 'toggle-chart': toggleAdvancedChart(tradeId, button.dataset.symbol, button); break;
+                case 'toggle-chart': 
+                    e.preventDefault(); // Garante que o evento não cause rolagem ou outros comportamentos padrão
+                    e.stopPropagation(); // Impede a propagação para elementos pais
+                    toggleAdvancedChart(tradeId, button.dataset.symbol, button); 
+                    break;
                 case 'edit': loadAndOpenForEditing(tradeId); break;
                 case 'arm': openArmModal(trade); break;
                 case 'execute': openExecModal(trade); break;
@@ -344,13 +353,13 @@ document.addEventListener('DOMContentLoaded', () => {
                        modalAssetInput.value = button.dataset.symbol.replace('BINANCE:', '');
                    }
                    break;
-                case 'acknowledge-alarm': // NOVO: Lógica para reconhecer alarme
+                case 'acknowledge-alarm':
                     const assetSymbol = button.dataset.asset;
                     if (assetSymbol) {
                         acknowledgeAlarm(assetSymbol);
                     }
                     break;
             }
-        });
+        }, true); // O 'true' aqui ativa o capture phase
     }
 });
