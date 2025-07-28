@@ -26,7 +26,7 @@ async function openChartModal(symbol) {
 
     try {
         const { data: response, error } = await supabase.functions.invoke('get-asset-details-data', {
-            body: { symbol: symbol, interval: '1h', limit: 220 }, // AJUSTADO: Para ~9 dias de dados de 1h
+            body: { symbol: symbol, interval: '1h', limit: 170 }, // AJUSTADO: Para ~7 dias de dados de 1h
         });
 
         if (error) throw error;
