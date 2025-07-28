@@ -2,7 +2,7 @@
 
 export const changelogData = {
 current: {
-    number: '11.9.2', // <-- NOVA VERSÃO ATUALIZADA
+    number: '11.9.2',
     changes: [
         "**Página de Detalhes do Ativo - Histórico de Trades:**",
         "Corrigida a funcionalidade de exibição do histórico de trades para um ativo específico.",
@@ -12,7 +12,7 @@ current: {
 },
  releases: [
   {
-    number: '11.9.1', // <-- NOVA VERSÃO ATUALIZADA
+    number: '11.9.1',  
     changes: [
         "**Dashboard de Estatísticas - Correção da Curva de Capital (Final):**",
         "Resolvido o problema onde o gráfico 'Curva de Capital' não era renderizado ou mostrava comportamento inesperado, especialmente com múltiplos trades.",
@@ -21,7 +21,7 @@ current: {
     ]
 },
   {
-    number: '11.9.0', // <-- NOVA VERSÃO ATUALIZADA
+    number: '11.9.0',  
     changes: [
         "**Dashboard de Estatísticas - Histórico de Trades Fechados:**",
         "Adicionada uma nova secção expansível no final da página de Estatísticas para exibir um histórico detalhado de todos os trades fechados.",
@@ -31,7 +31,7 @@ current: {
     ]
 },  
   {
-        number: '11.8.0', // <-- VERSÃO ANTERIOR, AGORA NO HISTÓRICO
+        number: '11.8.0', 
         changes: [
             "**Dashboard de Estatísticas - Correção da Curva de Capital:**",
             "Resolvido o problema onde o gráfico 'Curva de Capital' não era renderizado corretamente com um ou dois trades realizados.",
@@ -39,14 +39,14 @@ current: {
         ]
     },
     {
-        number: '11.7.0', // <-- VERSÃO ANTERIOR, AGORA NO HISTÓRICO
+        number: '11.7.0', 
         changes: [
             "**Dashboard de Estatísticas - Remoção de Gráfico:**",
             "Removido o gráfico 'Desempenho por Estratégia' da página de Estatísticas para simplificar a visualização e focar nas métricas principais."
         ]
     },
     {
-        number: '11.6.0', // <-- VERSÃO ANTERIOR, AGORA NO HISTÓRICO
+        number: '11.6.0', 
         changes: [
             "**Market Scanner - Zoom nos Gráficos do Modal:**",
             "A visualização de gráficos no modal do Market Scanner foi otimizada para exibir um período de tempo mais curto (~9 dias para o timeframe de 1h), proporcionando um 'zoom' automático nos dados mais recentes.",
@@ -55,7 +55,7 @@ current: {
         ]
     },
     {
-        number: '11.5.0', // <-- VERSÃO ANTERIOR, AGORA NO HISTÓRICO
+        number: '11.5.0', 
         changes: [
             "**Market Scanner - Controlo de Top N Moedas:**",
             "Implementada a opção para exibir um número configurável de ativos (Top 30, 50, 100, 200) na tabela do Market Scanner.",
@@ -64,7 +64,7 @@ current: {
         ]
     },
     {
-        number: '11.4.0', // <-- VERSÃO ANTERIOR, AGORA NO HISTÓRICO
+        number: '11.4.0', 
         changes: [
             "**Market Scanner - Controlo de Sparklines e Persistência:**",
             "Implementada a opção para ligar/desligar a exibição dos sparklines na tabela do Market Scanner, através de um novo checkbox.",
@@ -74,7 +74,7 @@ current: {
         ]
     },
      {
-        number: '11.3.3', // <-- VERSÃO ANTERIOR, AGORA NO HISTÓRICO
+        number: '11.3.3', 
         changes: [
             "**Sinalização e Gestão de Alarmes nos Cards da Watchlist (Dashboard):**",
             "Implementada a visualização de alarmes ativos nos cards do dashboard com um ícone de sino vermelho.",
@@ -84,7 +84,7 @@ current: {
         ]
     },
     {
-        number: '11.3.2', // <-- VERSÃO ANTERIOR, AGORA NO HISTÓRICO
+        number: '11.3.2', 
         changes: [
             "**Correção do Sinal e Filtro Estocástico (Market Scanner):**",
             "Resolvido o problema onde o sinal do Estocástico (STOCH) não aparecia e o filtro não devolvia resultados no Market Scanner.",
@@ -93,7 +93,7 @@ current: {
         ]
     },  
     {
-        number: '11.3.1', // <-- VERSÃO ANTERIOR, AGORA NO HISTÓRICO
+        number: '11.3.1', 
         changes: [
             "**Refatoração do Código de Autenticação:**",
             "Centralizada toda a configuração de autenticação do Firebase no ficheiro `firebase-service.js`, incluindo a inicialização e a definição da persistência da sessão.",
