@@ -2,15 +2,23 @@
 
 export const changelogData = {
 current: {
-    number: '11.9.3', // <-- NOVA VERSÃO ATUALIZADA
+    number: '11.9.4', // <-- NOVA VERSÃO ATUALIZADA
+    changes: [
+        "**Dashboard (Watchlist) - Redirecionamento de Alarme Corrigido:**",
+        "Resolvido o problema onde a opção 'Criar um alarme para este ativo após guardar' nos modais de criação/edição de trades redirecionava para uma página inexistente (`alarms.html`).",
+        "O redirecionamento agora aponta corretamente para a página de criação de alarmes (`alarms-create.html`), garantindo um fluxo de trabalho contínuo."
+    ]
+},
+ releases: [
+  {
+    number: '11.9.3', 
     changes: [
         "**Página de Detalhes do Ativo - Botão 'Gerir Alarme':**",
         "Corrigido o link do botão 'Gerir' na tabela de alarmes ativos, na página de detalhes do ativo.",
         "O botão agora redireciona corretamente para a página de gestão de alarmes (`alarms-manage.html`), garantindo que o utilizador pode gerir os seus alarmes sem erros 404."
     ]
 },
- releases: [
-  {
+     {
     number: '11.9.2',
     changes: [
         "**Página de Detalhes do Ativo - Histórico de Trades:**",
