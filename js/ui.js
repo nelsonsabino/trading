@@ -7,7 +7,9 @@ import { loadAndOpenForEditing } from './handlers.js';
 import { getLastCreatedTradeId, setLastCreatedTradeId } from './state.js';
 
 // Mapa para armazenar instâncias de gráficos ApexCharts por tradeId
-const activeCharts = {}; // NOVO: Guarda as instâncias de gráficos
+const activeCharts = {};
+
+let isTogglingChart = false; // Flag para evitar cliques múltiplos
 
 function renderSparkline(containerId, dataSeries) {
     const container = document.getElementById(containerId);
@@ -107,28 +109,39 @@ async function toggleAdvancedChart(tradeId, symbol, button) {
     const chartContainer = document.getElementById(`advanced-chart-${tradeId}`);
     if (!chartContainer) return;
 
-    // Obtém o estado atual da visibilidade e da instância ANTES de qualquer modificação
+    if (isTogglingChart) {
+        console.log(`[UI Debug] Ignorando clique: Já a processar gráfico para ${tradeId}.`);
+        return;
+    }
+    isTogglingChart = true;
+
     const isVisibleBeforeToggle = chartContainer.classList.contains('visible');
-    const chartInstanceExists = !!activeCharts[tradeId]; // Verifica se a instância existe no mapa
+    const chartInstance = activeCharts[tradeId];
 
-    console.log(`[UI Debug] Click: ${tradeId}, isVisible CSS: ${isVisibleBeforeToggle}, chartInstance Map: ${chartInstanceExists}`);
+    console.log(`[UI Debug] INÍCIO TOGGLE: ${tradeId}. Estado inicial: isVisible=${isVisibleBeforeToggle}, chartInstance=${!!chartInstance}. ` +
+                `Container classList: ${chartContainer.classList.value}, offsetHeight: ${chartContainer.offsetHeight}px`);
 
-    if (isVisibleBeforeToggle && chartInstanceExists) {
+
+    if (isVisibleBeforeToggle && chartInstance) {
         // Lógica para FECHAR o gráfico
         console.log(`[UI Debug] FECHAR: Chamando destroy e limpando para ${tradeId}.`);
-        activeCharts[tradeId].destroy(); // Destroi explicitamente a instância
-        delete activeCharts[tradeId]; // Remove do mapa
-        chartContainer.innerHTML = ''; // Limpa o conteúdo (duplicado, mas seguro)
-        chartContainer.classList.remove('visible'); // Remove a classe CSS
-        button.innerHTML = `<i class="fa-solid fa-chart-simple"></i>`; // Restaura o ícone original
-        return; // Sai da função após fechar
+        chartInstance.destroy();
+        delete activeCharts[tradeId];
+        chartContainer.innerHTML = '';
+        chartContainer.classList.remove('visible');
+        button.innerHTML = `<i class="fa-solid fa-chart-simple"></i>`;
+        console.log(`[UI Debug] FECHAR: Finalizado para ${tradeId}. Container classList: ${chartContainer.classList.value}, offsetHeight: ${chartContainer.offsetHeight}px`);
+        isTogglingChart = false;
+        return;
     }
 
-    // Lógica para ABRIR o gráfico (se não estiver visível ou não tiver instância ativa)
+    // Lógica para ABRIR o gráfico
     console.log(`[UI Debug] ABRIR: Tentando renderizar para ${tradeId}.`);
-    chartContainer.classList.add('visible'); // Torna o contentor visível
-    chartContainer.innerHTML = '<p style="text-align: center; padding: 2rem;">A carregar gráfico...</p>'; // Mensagem de carregamento
-    button.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`; // Ícone de carregamento
+    chartContainer.classList.add('visible');
+    chartContainer.innerHTML = '<p style="text-align: center; padding: 2rem;">A carregar gráfico...</p>';
+    button.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
+    console.log(`[UI Debug] ABRIR: Após classe 'visible'. Container classList: ${chartContainer.classList.value}, offsetHeight: ${chartContainer.offsetHeight}px`);
+
 
     try {
         const cleanSymbol = symbol.replace('BINANCE:', '');
@@ -170,18 +183,20 @@ async function toggleAdvancedChart(tradeId, symbol, button) {
 
         chartContainer.innerHTML = '';
         const chart = new ApexCharts(chartContainer, options);
-        activeCharts[tradeId] = chart; // Armazena a nova instância
+        activeCharts[tradeId] = chart;
         chart.render();
-        button.innerHTML = `<i class="fa-solid fa-eye-slash"></i>`; // Ícone para fechar
-        console.log(`[UI Debug] ABERTO: Gráfico para ${tradeId} renderizado e instância armazenada.`);
+        button.innerHTML = `<i class="fa-solid fa-eye-slash"></i>`;
+        console.log(`[UI Debug] ABERTO: Gráfico renderizado para ${tradeId}. Instância armazenada.`);
+        isTogglingChart = false;
 
     } catch (err) {
         console.error("Erro ao carregar o gráfico no card:", err);
         chartContainer.innerHTML = `<p style="text-align: center; padding: 2rem; color: red;">Erro ao carregar: ${err.message}</p>`;
         button.innerHTML = `<i class="fa-solid fa-exclamation-triangle"></i>`;
-        chartContainer.classList.remove('visible'); // Esconde em caso de erro
-        delete activeCharts[tradeId]; // Garante que a instância é removida em caso de erro
+        chartContainer.classList.remove('visible');
+        delete activeCharts[tradeId];
         console.log(`[UI Debug] ERRO: Limpeza após falha para ${tradeId}.`);
+        isTogglingChart = false;
     }
 }
 
