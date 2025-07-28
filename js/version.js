@@ -2,15 +2,24 @@
 
 export const changelogData = {
 current: {
-    number: '11.9.4', // <-- NOVA VERSÃO ATUALIZADA
+    number: '11.10.0', // <-- NOVA VERSÃO ATUALIZADA
+    changes: [
+        "**Navegação - Botão da Página Ativa:**",
+        "O botão de navegação correspondente à página atual é agora destacado com uma cor de 'desativado' (cinzento neutro) e não é clicável.",
+        "Esta melhoria visual torna a navegação mais intuitiva e indica claramente onde o utilizador se encontra na aplicação."
+    ]
+},
+ releases: [
+  
+{
+    number: '11.9.4', // 
     changes: [
         "**Dashboard (Watchlist) - Redirecionamento de Alarme Corrigido:**",
         "Resolvido o problema onde a opção 'Criar um alarme para este ativo após guardar' nos modais de criação/edição de trades redirecionava para uma página inexistente (`alarms.html`).",
         "O redirecionamento agora aponta corretamente para a página de criação de alarmes (`alarms-create.html`), garantindo um fluxo de trabalho contínuo."
     ]
-},
- releases: [
-  {
+},     
+{
     number: '11.9.3', 
     changes: [
         "**Página de Detalhes do Ativo - Botão 'Gerir Alarme':**",
