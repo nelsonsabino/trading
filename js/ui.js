@@ -6,10 +6,13 @@ import { openArmModal, openExecModal, openCloseTradeModal, openImageModal, openA
 import { loadAndOpenForEditing } from './handlers.js';
 import { getLastCreatedTradeId, setLastCreatedTradeId } from './state.js';
 
-// Variáveis para o modal do gráfico
+// Variáveis para o modal do gráfico no dashboard
 const dashboardChartModal = document.getElementById('chart-modal');
 const closeDashboardChartModalBtn = document.getElementById('close-chart-modal');
 const dashboardChartContainer = document.getElementById('chart-modal-container');
+
+// Revertido: Mapa para armazenar instâncias de gráficos ApexCharts por tradeId não é mais necessário aqui
+// Revertido: Flag para evitar cliques múltiplos não é mais necessária aqui
 
 function renderSparkline(containerId, dataSeries) {
     const container = document.getElementById(containerId);
@@ -173,8 +176,7 @@ function closeDashboardChartModal() {
 if (dashboardChartModal) {
     closeDashboardChartModalBtn.addEventListener('click', closeDashboardChartModal);
     dashboardChartModal.addEventListener('click', (e) => { 
-        // Fecha o modal se o clique for no overlay (não no conteúdo)
-        if (e.target.id === 'chart-modal') {
+        if (e.target.id === 'chart-modal') { // Fecha o modal se o clique for no overlay (não no conteúdo)
             closeDashboardChartModal();
         }
     });
@@ -292,8 +294,7 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
                 <div class="${priceChangeClass} price-change-percent">${assetMarketData.change.toFixed(2)}%</div>
             </div>
         </div>
-        <div class="mini-chart-container" id="advanced-chart-${trade.id}"></div>
-    `;
+    `; // REMOVIDO: <div class="mini-chart-container" id="advanced-chart-${trade.id}"></div>
     return card;
 }
 
@@ -343,8 +344,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const action = button.dataset.action;
             switch (action) {
                 case 'toggle-chart':
-                    e.stopPropagation(); // Mantido: Impede que o evento se propague e cause cliques duplos
-                    openDashboardChartModal(button.dataset.symbol); // NOVO: Chama a função para abrir o modal
+                    // NOVO: Chama a função para abrir o modal de gráfico
+                    openDashboardChartModal(button.dataset.symbol); 
                     break;
                 case 'edit': loadAndOpenForEditing(tradeId); break;
                 case 'arm': openArmModal(trade); break;
