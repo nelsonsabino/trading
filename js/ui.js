@@ -6,10 +6,8 @@ import { openArmModal, openExecModal, openCloseTradeModal, openImageModal, openA
 import { loadAndOpenForEditing } from './handlers.js';
 import { getLastCreatedTradeId, setLastCreatedTradeId } from './state.js';
 
-// Mapa para armazenar instâncias de gráficos ApexCharts por tradeId
-const activeCharts = {};
-
-let isTogglingChart = false; // Flag para evitar cliques múltiplos
+// Revertido: Mapa para armazenar instâncias de gráficos ApexCharts por tradeId não é mais necessário aqui
+// Revertido: Flag para evitar cliques múltiplos não é mais necessária aqui
 
 function renderSparkline(containerId, dataSeries) {
     const container = document.getElementById(containerId);
@@ -105,102 +103,37 @@ export function populateStrategySelect(strategies) {
     }
 }
 
+// Revertido: A função toggleAdvancedChart volta à sua versão mais simples (TradingView widget)
+// Vamos substituí-la pela nova lógica do modal ApexCharts
 async function toggleAdvancedChart(tradeId, symbol, button) {
     const chartContainer = document.getElementById(`advanced-chart-${tradeId}`);
     if (!chartContainer) return;
 
-    if (isTogglingChart) {
-        console.log(`[UI Debug] Ignorando clique: Já a processar gráfico para ${tradeId}.`);
-        return;
-    }
-    isTogglingChart = true;
-
-    const isVisibleBeforeToggle = chartContainer.classList.contains('visible');
-    const chartInstance = activeCharts[tradeId];
-
-    console.log(`[UI Debug] INÍCIO TOGGLE: ${tradeId}. Estado inicial: isVisible=${isVisibleBeforeToggle}, chartInstance=${!!chartInstance}. ` +
-                `Container classList: ${chartContainer.classList.value}, offsetHeight: ${chartContainer.offsetHeight}px`);
-
-
-    if (isVisibleBeforeToggle && chartInstance) {
-        // Lógica para FECHAR o gráfico
-        console.log(`[UI Debug] FECHAR: Chamando destroy e limpando para ${tradeId}.`);
-        chartInstance.destroy();
-        delete activeCharts[tradeId];
+    const isVisible = chartContainer.classList.contains('visible');
+    if (isVisible) {
         chartContainer.innerHTML = '';
         chartContainer.classList.remove('visible');
         button.innerHTML = `<i class="fa-solid fa-chart-simple"></i>`;
-        console.log(`[UI Debug] FECHAR: Finalizado para ${tradeId}. Container classList: ${chartContainer.classList.value}, offsetHeight: ${chartContainer.offsetHeight}px`);
-        isTogglingChart = false;
         return;
     }
 
-    // Lógica para ABRIR o gráfico
-    console.log(`[UI Debug] ABRIR: Tentando renderizar para ${tradeId}.`);
-    chartContainer.classList.add('visible');
-    chartContainer.innerHTML = '<p style="text-align: center; padding: 2rem;">A carregar gráfico...</p>';
     button.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
-    console.log(`[UI Debug] ABRIR: Após classe 'visible'. Container classList: ${chartContainer.classList.value}, offsetHeight: ${chartContainer.offsetHeight}px`);
+    chartContainer.classList.add('visible'); // Mantém a classe para que o CSS de height funcione
 
-
-    try {
-        const cleanSymbol = symbol.replace('BINANCE:', '');
-        const { data: response, error } = await supabase.functions.invoke('get-asset-details-data', {
-            body: { symbol: cleanSymbol, interval: '1h', limit: 220 },
-        });
-
-        if (error) throw error;
-        if (!response || !response.ohlc || !response.indicators) {
-            throw new Error('Dados de gráfico ou indicadores não foram encontrados.');
-        }
-
-        const klinesData = response.ohlc;
-        const indicatorsData = response.indicators;
-        let series = [];
-
-        const closePriceSeriesData = klinesData.map(kline => ({ x: kline[0], y: kline[4] }));
-        series.push({ name: 'Preço (USD)', type: 'line', data: closePriceSeriesData });
-
-        if (indicatorsData.ema50_data) {
-            const ema50SeriesData = indicatorsData.ema50_data.map((emaVal, index) => ({ x: klinesData[index][0], y: emaVal }));
-            series.push({ name: 'EMA 50', type: 'line', data: ema50SeriesData });
-        }
-        if (indicatorsData.ema200_data) {
-            const ema200SeriesData = indicatorsData.ema200_data.map((emaVal, index) => ({ x: klinesData[index][0], y: emaVal }));
-            series.push({ name: 'EMA 200', type: 'line', data: ema200SeriesData });
-        }
-
-        const options = {
-            series: series,
-            chart: { type: 'line', height: 400, toolbar: { show: true, autoSelected: 'pan' } },
-            colors: ['#007bff', '#ffc107', '#dc3545'],
-            stroke: { curve: 'smooth', width: 2 },
-            xaxis: { type: 'datetime' },
-            yaxis: { labels: { formatter: (val) => `$${val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 4})}` }, tooltip: { enabled: true } },
-            tooltip: { x: { format: 'dd MMM yyyy HH:mm' } },
-            theme: { mode: document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light' }
-        };
-
-        chartContainer.innerHTML = '';
-        const chart = new ApexCharts(chartContainer, options);
-        activeCharts[tradeId] = chart;
-        chart.render();
-        button.innerHTML = `<i class="fa-solid fa-eye-slash"></i>`;
-        console.log(`[UI Debug] ABERTO: Gráfico renderizado para ${tradeId}. Instância armazenada.`);
-        isTogglingChart = false;
-
-    } catch (err) {
-        console.error("Erro ao carregar o gráfico no card:", err);
-        chartContainer.innerHTML = `<p style="text-align: center; padding: 2rem; color: red;">Erro ao carregar: ${err.message}</p>`;
-        button.innerHTML = `<i class="fa-solid fa-exclamation-triangle"></i>`;
-        chartContainer.classList.remove('visible');
-        delete activeCharts[tradeId];
-        console.log(`[UI Debug] ERRO: Limpeza após falha para ${tradeId}.`);
-        isTogglingChart = false;
-    }
+    // Nova Lógica: Chamar a função openChartModal (a ser definida globalmente ou importada)
+    // Para simplificar a reversão, vamos manter o widget TradingView temporariamente aqui.
+    // Este código será sobrescrito pelo próximo passo para abrir o modal ApexCharts.
+    const currentTheme = document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light';
+    new TradingView.widget({
+        "container_id": chartContainer.id, "autosize": true, "symbol": symbol, "interval": "60", "timezone": "Etc/UTC", 
+        "theme": currentTheme, "style": "1", "locale": "pt", "hide_side_toolbar": true, "hide_top_toolbar": true, "hide_legend": true,
+        "save_image": false, "allow_symbol_change": false
+    });
+    button.innerHTML = `<i class="fa-solid fa-eye-slash"></i>`;
 }
 
-// Nova função para reconhecer alarmes
+
+// Nova função para reconhecer alarmes (mantida)
 async function acknowledgeAlarm(assetPair) {
     if (!confirm(`Tem certeza que quer reconhecer os alarmes disparados para ${assetPair}?`)) {
         return;
@@ -271,7 +204,7 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
         ? `<p class="trade-notes">${trade.data.notes}</p>` 
         : '';
 
-    // Lógica para sinalização de alarmes
+    // Lógica para sinalização de alarmes (mantida)
     const relatedAlarms = allAlarms.filter(alarm => alarm.asset_pair === assetName);
     const hasActiveAlarm = relatedAlarms.some(alarm => alarm.status === 'active');
     const hasTriggeredUnacknowledgedAlarm = relatedAlarms.some(alarm => alarm.status === 'triggered' && alarm.acknowledged === false);
@@ -364,8 +297,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const action = button.dataset.action;
             switch (action) {
                 case 'toggle-chart':
-                    e.stopPropagation();
-                    console.log(`[UI Debug] Ação de toggle chart recebida para ${tradeId}. Visível: ${chartContainer.classList.contains('visible')}`);
+                    // e.stopPropagation(); // Revertido: Removido
+                    // Revertido: Logs de depuração removidos
                     toggleAdvancedChart(tradeId, button.dataset.symbol, button);
                     break;
                 case 'edit': loadAndOpenForEditing(tradeId); break;
