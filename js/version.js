@@ -1,4 +1,4 @@
-// js/version.js - Ponto central de controlo de versão e changelog
+// js/version.js - Ponto central de controlo de versão e changelog 
 
 export const changelogData = {
 current: {
