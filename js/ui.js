@@ -6,8 +6,10 @@ import { openArmModal, openExecModal, openCloseTradeModal, openImageModal, openA
 import { loadAndOpenForEditing } from './handlers.js';
 import { getLastCreatedTradeId, setLastCreatedTradeId } from './state.js';
 
-// Revertido: Mapa para armazenar instâncias de gráficos ApexCharts por tradeId não é mais necessário aqui
-// Revertido: Flag para evitar cliques múltiplos não é mais necessária aqui
+// Variáveis para o modal do gráfico
+const dashboardChartModal = document.getElementById('chart-modal');
+const closeDashboardChartModalBtn = document.getElementById('close-chart-modal');
+const dashboardChartContainer = document.getElementById('chart-modal-container');
 
 function renderSparkline(containerId, dataSeries) {
     const container = document.getElementById(containerId);
@@ -103,37 +105,82 @@ export function populateStrategySelect(strategies) {
     }
 }
 
-// Revertido: A função toggleAdvancedChart volta à sua versão mais simples (TradingView widget)
-// Vamos substituí-la pela nova lógica do modal ApexCharts
-async function toggleAdvancedChart(tradeId, symbol, button) {
-    const chartContainer = document.getElementById(`advanced-chart-${tradeId}`);
-    if (!chartContainer) return;
+// NOVO: Função para abrir o modal de gráfico no dashboard
+async function openDashboardChartModal(symbol) {
+    if (!dashboardChartModal || !dashboardChartContainer) return;
 
-    const isVisible = chartContainer.classList.contains('visible');
-    if (isVisible) {
-        chartContainer.innerHTML = '';
-        chartContainer.classList.remove('visible');
-        button.innerHTML = `<i class="fa-solid fa-chart-simple"></i>`;
-        return;
+    dashboardChartContainer.innerHTML = '<p style="padding: 2rem; text-align: center;">A carregar gráfico...</p>';
+    dashboardChartModal.style.display = 'flex';
+
+    try {
+        const cleanSymbol = symbol.replace('BINANCE:', '');
+        // Usamos limit: 220 para ter consistência com o Market Scanner (~9 dias de 1h)
+        const { data: response, error } = await supabase.functions.invoke('get-asset-details-data', {
+            body: { symbol: cleanSymbol, interval: '1h', limit: 220 },
+        });
+
+        if (error) throw error;
+        if (!response || !response.ohlc || !response.indicators) {
+            throw new Error('Dados de gráfico ou indicadores não foram encontrados.');
+        }
+
+        const klinesData = response.ohlc;
+        const indicatorsData = response.indicators;
+        let series = [];
+
+        const closePriceSeriesData = klinesData.map(kline => ({ x: kline[0], y: kline[4] }));
+        series.push({ name: 'Preço (USD)', type: 'line', data: closePriceSeriesData });
+
+        if (indicatorsData.ema50_data) {
+            const ema50SeriesData = indicatorsData.ema50_data.map((emaVal, index) => ({ x: klinesData[index][0], y: emaVal }));
+            series.push({ name: 'EMA 50', type: 'line', data: ema50SeriesData });
+        }
+        if (indicatorsData.ema200_data) {
+            const ema200SeriesData = indicatorsData.ema200_data.map((emaVal, index) => ({ x: klinesData[index][0], y: emaVal }));
+            series.push({ name: 'EMA 200', type: 'line', data: ema200SeriesData });
+        }
+
+        const options = {
+            series: series,
+            chart: { type: 'line', height: 400, toolbar: { show: true, autoSelected: 'pan' } },
+            colors: ['#007bff', '#ffc107', '#dc3545'],
+            stroke: { curve: 'smooth', width: 2 },
+            xaxis: { type: 'datetime' },
+            yaxis: { labels: { formatter: (val) => `$${val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 4})}` }, tooltip: { enabled: true } },
+            tooltip: { x: { format: 'dd MMM yyyy HH:mm' } },
+            theme: { mode: document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light' }
+        };
+
+        dashboardChartContainer.innerHTML = '';
+        const chart = new ApexCharts(dashboardChartContainer, options);
+        chart.render();
+
+    } catch (err) {
+        console.error("Erro ao carregar o gráfico no modal do Dashboard:", err);
+        dashboardChartContainer.innerHTML = `<p style="text-align: center; padding: 2rem; color: red;">Erro ao carregar: ${err.message}</p>`;
     }
+}
 
-    button.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
-    chartContainer.classList.add('visible'); // Mantém a classe para que o CSS de height funcione
-
-    // Nova Lógica: Chamar a função openChartModal (a ser definida globalmente ou importada)
-    // Para simplificar a reversão, vamos manter o widget TradingView temporariamente aqui.
-    // Este código será sobrescrito pelo próximo passo para abrir o modal ApexCharts.
-    const currentTheme = document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light';
-    new TradingView.widget({
-        "container_id": chartContainer.id, "autosize": true, "symbol": symbol, "interval": "60", "timezone": "Etc/UTC", 
-        "theme": currentTheme, "style": "1", "locale": "pt", "hide_side_toolbar": true, "hide_top_toolbar": true, "hide_legend": true,
-        "save_image": false, "allow_symbol_change": false
-    });
-    button.innerHTML = `<i class="fa-solid fa-eye-slash"></i>`;
+// NOVO: Função para fechar o modal do gráfico
+function closeDashboardChartModal() {
+    if (!dashboardChartModal || !dashboardChartContainer) return;
+    dashboardChartContainer.innerHTML = ''; // Limpa o gráfico
+    dashboardChartModal.style.display = 'none'; // Esconde o modal
 }
 
 
-// Nova função para reconhecer alarmes (mantida)
+// Configura os listeners do modal de gráfico do Dashboard
+if (dashboardChartModal) {
+    closeDashboardChartModalBtn.addEventListener('click', closeDashboardChartModal);
+    dashboardChartModal.addEventListener('click', (e) => { 
+        // Fecha o modal se o clique for no overlay (não no conteúdo)
+        if (e.target.id === 'chart-modal') {
+            closeDashboardChartModal();
+        }
+    });
+}
+
+// Nova função para reconhecer alarmes
 async function acknowledgeAlarm(assetPair) {
     if (!confirm(`Tem certeza que quer reconhecer os alarmes disparados para ${assetPair}?`)) {
         return;
@@ -147,7 +194,6 @@ async function acknowledgeAlarm(assetPair) {
 
         if (error) throw error;
         console.log(`Alarmes disparados para ${assetPair} reconhecidos com sucesso.`);
-        // A re-renderização do dashboard será acionada pelo listener em app.js
     } catch (error) {
         console.error("Erro ao reconhecer alarme:", error);
         alert("Ocorreu um erro ao reconhecer o alarme. Tente novamente.");
@@ -204,7 +250,7 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
         ? `<p class="trade-notes">${trade.data.notes}</p>` 
         : '';
 
-    // Lógica para sinalização de alarmes (mantida)
+    // Lógica para sinalização de alarmes
     const relatedAlarms = allAlarms.filter(alarm => alarm.asset_pair === assetName);
     const hasActiveAlarm = relatedAlarms.some(alarm => alarm.status === 'active');
     const hasTriggeredUnacknowledgedAlarm = relatedAlarms.some(alarm => alarm.status === 'triggered' && alarm.acknowledged === false);
@@ -297,9 +343,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const action = button.dataset.action;
             switch (action) {
                 case 'toggle-chart':
-                    // e.stopPropagation(); // Revertido: Removido
-                    // Revertido: Logs de depuração removidos
-                    toggleAdvancedChart(tradeId, button.dataset.symbol, button);
+                    e.stopPropagation(); // Mantido: Impede que o evento se propague e cause cliques duplos
+                    openDashboardChartModal(button.dataset.symbol); // NOVO: Chama a função para abrir o modal
                     break;
                 case 'edit': loadAndOpenForEditing(tradeId); break;
                 case 'arm': openArmModal(trade); break;
