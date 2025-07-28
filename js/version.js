@@ -2,6 +2,16 @@
 
 export const changelogData = {
 current: {
+    number: '11.12.0', 
+    changes: [
+        "**Gráfico Principal (Página de Detalhes) e Modal (Market Scanner) - EMAs Completas e Zoom:**",
+        "Resolvido o problema onde as médias móveis exponenciais (EMAs 50 e 200) não eram desenhadas na totalidade nos gráficos ApexCharts.",
+        "A Edge Function `get-asset-details-data` foi refatorada para sempre buscar dados históricos suficientes da Binance (ex: 450 klines) para o cálculo completo de todas as EMAs, independentemente do 'zoom' pedido pelo frontend.",
+        "Os dados de OHLC e indicadores retornados pela Edge Function são agora fatiados (`.slice()`) para corresponder ao `limit` de visualização pedido pelo frontend (ex: 170 klines para 7 dias no TF de 1h), garantindo o 'zoom' desejado sem comprometer o cálculo dos indicadores."
+    ]
+},
+ releases: [
+  {
     number: '11.11.0',
     changes: [
         "**Market Scanner - Gráfico do Modal (Zoom Padrão para 7 Dias):**",
@@ -9,8 +19,7 @@ current: {
         "O `limit` passado à Edge Function `get-asset-details-data` foi definido para 170 klines, proporcionando o zoom desejado."
     ]
 },
- releases: [
-  {
+     {
     number: '11.10.0', 
     changes: [
         "**Navegação - Botão da Página Ativa:**",
