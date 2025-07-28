@@ -49,10 +49,9 @@ export async function handleAddSubmit(e) {
         if (currentTrade.id) {
             tradeData.dateAdded = currentTrade.data.dateAdded;
             await updateTrade(currentTrade.id, tradeData);
-            setLastCreatedTradeId(null); // Limpa o ID se for uma edição
+            setLastCreatedTradeId(null);
         } else {
             tradeData.dateAdded = new Date();
-            // ALTERAÇÃO: Captura o novo ID e guarda no estado
             const newTradeId = await addTrade(tradeData);
             setLastCreatedTradeId(newTradeId);
         }
@@ -65,14 +64,13 @@ export async function handleAddSubmit(e) {
 
     if (shouldRedirect) {
         if (assetName) {
-            window.location.href = `alarms.html?assetPair=${assetName}`;
+            window.location.href = `alarms-create.html?assetPair=${assetName}`; // Corrigido para alarms-create.html
         } else {
-            window.location.href = 'alarms.html';
+            window.location.href = 'alarms-create.html'; // Corrigido para alarms-create.html
         }
     }
 }
 
-// ... (o resto das funções permanece sem alterações) ...
 export async function handleArmSubmit(e) {
     e.preventDefault();
     const strategies = getStrategies();
