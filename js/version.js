@@ -2,6 +2,15 @@
 
 export const changelogData = {
 current: {
+    number: '11.9.3', // <-- NOVA VERSÃO ATUALIZADA
+    changes: [
+        "**Página de Detalhes do Ativo - Botão 'Gerir Alarme':**",
+        "Corrigido o link do botão 'Gerir' na tabela de alarmes ativos, na página de detalhes do ativo.",
+        "O botão agora redireciona corretamente para a página de gestão de alarmes (`alarms-manage.html`), garantindo que o utilizador pode gerir os seus alarmes sem erros 404."
+    ]
+},
+ releases: [
+  {
     number: '11.9.2',
     changes: [
         "**Página de Detalhes do Ativo - Histórico de Trades:**",
@@ -10,8 +19,7 @@ current: {
         "O botão 'Ver/Editar' nos trades da tabela agora redireciona corretamente para o Dashboard para edição."
     ]
 },
- releases: [
-  {
+     {
     number: '11.9.1',  
     changes: [
         "**Dashboard de Estatísticas - Correção da Curva de Capital (Final):**",
