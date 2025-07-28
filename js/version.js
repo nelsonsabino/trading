@@ -1,7 +1,17 @@
 // js/version.js - Ponto central de controlo de versão e changelog
 
 export const changelogData = {
- current: {
+current: {
+    number: '11.9.2', // <-- NOVA VERSÃO ATUALIZADA
+    changes: [
+        "**Página de Detalhes do Ativo - Histórico de Trades:**",
+        "Corrigida a funcionalidade de exibição do histórico de trades para um ativo específico.",
+        "A tabela agora carrega e exibe corretamente os trades relacionados à moeda, incluindo informações de status, data e P&L.",
+        "O botão 'Ver/Editar' nos trades da tabela agora redireciona corretamente para o Dashboard para edição."
+    ]
+},
+ releases: [
+  {
     number: '11.9.1', // <-- NOVA VERSÃO ATUALIZADA
     changes: [
         "**Dashboard de Estatísticas - Correção da Curva de Capital (Final):**",
@@ -10,7 +20,6 @@ export const changelogData = {
         "Criado o índice composto necessário no Firebase Firestore para a consulta eficiente de trades fechados, resolvendo o `FirebaseError` de permissões."
     ]
 },
- releases: [
   {
     number: '11.9.0', // <-- NOVA VERSÃO ATUALIZADA
     changes: [
