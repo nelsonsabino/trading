@@ -39,7 +39,6 @@ header .main-nav {
     top: 1.5rem;
     right: 1.5rem;
     z-index: 1001; /* Garante que fica por cima de outros elementos */
-    /* Reutiliza o estilo de botão circular que já estava a ser aplicado */
     width: 45px;
     height: 45px;
     padding: 0;
@@ -52,6 +51,17 @@ header .main-nav {
 
 #theme-toggle-btn:hover {
     background-color: #e9ecef; 
+}
+
+/* Estilo para o link/botão da página ativa */
+.nav-icon-link.nav-active {
+    background-color: #6c757d; /* Cor de cinzento neutro para desativado/ativo */
+    color: white; /* Ícone branco */
+    cursor: default; /* Mudar cursor para indicar não clicável */
+    opacity: 0.9; /* Ligeiramente mais opaco */
+    pointer-events: none; /* Desativa eventos de clique */
+    transform: none; /* Remove transformação no hover */
+    box-shadow: none; /* Remove sombra no hover */
 }
 
 /* Estilos para o dropdown (menu da roda dentada) */
@@ -130,7 +140,6 @@ header .main-nav {
 }
 
 /* --- BOTÃO DE AÇÃO RÁPIDA (ADD TO WATCHLIST - REMOVIDO DAQUI) --- */
-/* O estilo deste botão foi movido para buttons.css como .btn-contextual */
 
 
 /* Ajustes para o dark mode */
@@ -163,4 +172,9 @@ header .main-nav {
 }
 .dark-mode .user-photo {
     border-color: #444;
+}
+/* Dark mode para o botão de navegação ativo */
+.dark-mode .nav-icon-link.nav-active {
+    background-color: #495057; /* Cor escura neutra para dark mode */
+    color: #e0e0e0;
 }
