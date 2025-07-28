@@ -188,7 +188,7 @@ async function displayAlarmsForAsset(symbol) {
         }
         const alarmsHtml = alarms.map(alarm => {
             let alarmDescription = `Preço ${alarm.condition} ${alarm.target_price} USD`;
-            return `<tr><td>${alarmDescription}</td><td>${new Date(alarm.created_at).toLocaleString('pt-PT')}</td><td><a href="alarms.html" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.9em;">Gerir</a></td></tr>`;
+            return `<tr><td>${alarmDescription}</td><td>${new Date(alarm.created_at).toLocaleString('pt-PT')}</td><td><a href="alarms-manage.html?editAlarmId=${alarm.id}" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.9em;">Gerir</a></td></tr>`; // Corrigido aqui
         }).join('');
         tbody.innerHTML = alarmsHtml;
     } catch (err) {
