@@ -2,7 +2,7 @@
 
 import { addModal } from './dom-elements.js';
 import { GESTAO_PADRAO } from './config.js';
-import { getTrade, addTrade, updateTrade, closeTradeAndUpdateBalance } from './firebase-service.js';
+import { getTrade, addTrade, updateTrade, closeTradeAndUpdateBalance, deleteTrade } from './firebase-service.js'; // Importa deleteTrade
 import { getCurrentTrade, setCurrentTrade, getStrategies, setLastCreatedTradeId } from './state.js';
 import { closeAddModal, closeArmModal, closeExecModal, closeCloseTradeModal, openAddModal, openArmModal, openExecModal } from './modals.js';
 import { generateDynamicChecklist } from './ui.js';
@@ -64,9 +64,9 @@ export async function handleAddSubmit(e) {
 
     if (shouldRedirect) {
         if (assetName) {
-            window.location.href = `alarms-create.html?assetPair=${assetName}`; // Corrigido para alarms-create.html
+            window.location.href = `alarms-create.html?assetPair=${assetName}`;
         } else {
-            window.location.href = 'alarms-create.html'; // Corrigido para alarms-create.html
+            window.location.href = 'alarms-create.html';
         }
     }
 }
@@ -166,6 +166,10 @@ export async function handleCloseSubmit(e) {
 export async function loadAndOpenForEditing(tradeId) {
     const strategies = getStrategies();
     const trade = await getTrade(tradeId);
+    
+    // Referência ao botão de apagar
+    const deleteBtn = document.getElementById('delete-opportunity-btn');
+
     if (trade) {
         setCurrentTrade(trade);
         const selectedStrategy = strategies.find(s => s.id === trade.data.strategyId);
@@ -182,10 +186,34 @@ export async function loadAndOpenForEditing(tradeId) {
             document.getElementById('image-url').value = trade.data.imageUrl || '';
             document.getElementById('notes').value = trade.data.notes;
 
+            // Mostrar o botão de apagar apenas se estiver a editar e o trade for POTENTIAL
+            if (deleteBtn) {
+                deleteBtn.style.display = 'inline-block';
+                // Adicionar listener ao botão de apagar AQUI
+                deleteBtn.onclick = async () => {
+                    if (confirm("Tem certeza que quer apagar este trade? Esta ação é irreversível.")) {
+                        try {
+                            await deleteTrade(trade.id);
+                            alert("Trade apagado com sucesso!");
+                            closeAddModal(); // Fecha o modal após apagar
+                        } catch (error) {
+                            console.error("Erro ao apagar trade:", error);
+                            alert("Ocorreu um erro ao apagar o trade.");
+                        }
+                    }
+                };
+            }
+
         } else if (trade.data.status === 'ARMED') {
             openArmModal(trade);
+            if (deleteBtn) deleteBtn.style.display = 'none'; // Esconder o botão se não for POTENTIAL
         } else if (trade.data.status === 'LIVE') {
             openExecModal(trade);
+            if (deleteBtn) deleteBtn.style.display = 'none'; // Esconder o botão se não for POTENTIAL
+        } else if (trade.data.status === 'CLOSED') { // Se for um trade fechado, apenas ver (não editar no modal de add)
+            alert("Este trade já está fechado e não pode ser editado através deste modal.");
+            // Pode redirecionar para a página de gestão ou stats aqui se quiser
+            closeAddModal();
         }
     }
 }
