@@ -52,45 +52,47 @@
 </head>
 <body>
 
-   <!-- NOVO BOTÃO DE TEMA (fora do header) -->
+    <!-- NOVO BOTÃO DE TEMA (fora do header) -->
 <button id="theme-toggle-btn" class="nav-icon-link" title="Alternar tema">
     <i class="fas fa-moon"></i>
 </button>
 
-<header>
-    <h1>Watchlist de Trading</h1>
-    <p class="mantra">Tem paciência, usa alarmes, espera que os setups venham.</p>
-   
-    <!-- Primeira Linha: Navegação Global -->
-    <nav class="main-nav">
-        <a href="dashboard.html" class="nav-icon-link" title="Dashboard"><i class="fas fa-home"></i></a>
-        <a href="market-scan.html" class="nav-icon-link" title="Scanner de Mercado"><i class="fas fa-search-dollar"></i></a>
-        <a href="alarms-create.html" class="nav-icon-link" title="Criar Alarme"><i class="fas fa-plus-circle"></i></a>
-        <a href="alarms-manage.html" class="nav-icon-link" title="Meus Alarmes"><i class="fas fa-bell"></i></a>
-        
-        <div class="nav-dropdown">
-            <button id="management-toggle" class="nav-icon-link" title="Gerir e Estatísticas"><i class="fas fa-cog"></i></button>
-            <div class="nav-dropdown-content">
-                <a href="strategies-manager.html" class="nav-link">Gerir Estratégias</a>
-                <a href="manage.html" class="nav-link">Todas as Operações</a>
-                <a href="stats.html" class="nav-link">Ver Estatísticas</a>
+    <header>
+        <h1>Watchlist de Trading</h1>
+        <p class="mantra">Tem paciência, usa alarmes, espera que os setups venham.</p>
+       
+        <nav class="main-nav">
+            <a href="dashboard.html" class="nav-icon-link" title="Dashboard"><i class="fas fa-home"></i></a>
+            <a href="market-scan.html" class="nav-icon-link" title="Scanner de Mercado"><i class="fas fa-search-dollar"></i></a>
+            <a href="alarms-create.html" class="nav-icon-link" title="Criar Alarme"><i class="fas fa-plus-circle"></i></a>
+            <a href="alarms-manage.html" class="nav-icon-link" title="Meus Alarmes"><i class="fas fa-bell"></i></a>
+            
+            <div class="nav-dropdown">
+                <button id="management-toggle" class="nav-icon-link" title="Gerir e Estatísticas"><i class="fas fa-cog"></i></button>
+                <div class="nav-dropdown-content">
+                    <a href="strategies-manager.html" class="nav-link">Gerir Estratégias</a>
+                    <a href="manage.html" class="nav-link">Todas as Operações</a>
+                    <a href="stats.html" class="nav-link">Ver Estatísticas</a>
+                </div>
             </div>
-        </div>
 
-        <!-- Secção do Utilizador -->
-        <div id="user-session" class="user-session" style="display: none;">
-            <img id="user-photo" src="" alt="Foto do Utilizador" class="user-photo">
-            <button id="logout-btn" class="btn btn-secondary">Sair</button>
-        </div>
-    </nav>
-    
-    <!-- Segunda Linha: Ações da Página -->
-    <nav class="contextual-nav">
-        <button id="add-opportunity-btn" class="btn btn-contextual">
-            <i class="fas fa-plus"></i> Adicionar à Watchlist
-        </button>
-    </nav>
-</header>
+            <button id="theme-toggle-btn" class="btn nav-icon-link" title="Alternar tema">
+                <i class="fas fa-moon"></i>
+            </button>
+
+            <!-- Secção do Utilizador -->
+            <div id="user-session" class="user-session" style="display: none;">
+                <img id="user-photo" src="" alt="Foto do Utilizador" class="user-photo">
+                <button id="logout-btn" class="btn btn-secondary">Sair</button>
+            </div>
+            
+            <!-- Botão flutuante para adicionar à Watchlist -->
+            <a href="#" class="nav-icon-link action-add-watchlist" title="Adicionar Ativo à Watchlist">
+                <i class="fa-solid fa-plus"></i>
+            </a>
+        </nav>
+        
+    </header>  
 
     <hr class="section-divider">
     
@@ -142,6 +144,9 @@
                 </div>
                 
                 <button type="submit">Guardar na Watchlist</button>
+                <button type="button" id="delete-opportunity-btn" class="btn btn-secondary" style="display: none; margin-top: 1rem; background-color: #dc3545; color: white;">
+                    <i class="fas fa-trash"></i> Apagar Trade
+                </button>
             </form>
         </div>
     </div>
