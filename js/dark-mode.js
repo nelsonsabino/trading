@@ -2,8 +2,11 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     const themeToggleButton = document.getElementById('theme-toggle-btn');
-    const rootElement = document.documentElement; // Agora usamos o <html>
+    const rootElement = document.documentElement;
     const themeIcon = themeToggleButton ? themeToggleButton.querySelector('i') : null;
+
+    // DEBUG: Confirma se o script carregou e encontrou o botão
+    console.log("Dark Mode Script Loaded. Theme Toggle Button Found:", !!themeToggleButton); 
 
     // Função para atualizar o ícone com base no tema atual
     const updateIcon = () => {
@@ -17,6 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Função para alternar o tema
     const toggleTheme = () => {
+        // DEBUG: Confirma se a função é chamada ao clicar
+        console.log("Theme toggle button clicked!"); 
         rootElement.classList.toggle('dark-mode');
         
         // Guarda a nova preferência
