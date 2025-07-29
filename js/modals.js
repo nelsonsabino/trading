@@ -6,7 +6,20 @@ import { GESTAO_PADRAO } from './config.js';
 import { setCurrentTrade, getStrategies } from './state.js';
 
 export function openAddModal() { if (addModal.container) addModal.container.style.display = 'flex'; }
-export function closeAddModal() { if (addModal.container) { addModal.container.style.display = 'none'; addModal.form.reset(); addModal.checklistContainer.innerHTML = ''; setCurrentTrade({}); } }
+export function closeAddModal() { 
+    if (addModal.container) { 
+        addModal.container.style.display = 'none'; 
+        addModal.form.reset(); 
+        addModal.checklistContainer.innerHTML = ''; 
+        setCurrentTrade({}); 
+        // NOVO: Esconder o botão de apagar ao fechar o modal
+        const deleteBtn = document.getElementById('delete-opportunity-btn');
+        if (deleteBtn) {
+            deleteBtn.style.display = 'none';
+            deleteBtn.onclick = null; // Limpa o listener para evitar múltiplos bindings
+        }
+    } 
+}
 
 export function openArmModal(trade) {
     const strategies = getStrategies();
