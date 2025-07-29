@@ -2,6 +2,16 @@
 
 export const changelogData = {
 current: {
+    number: '11.13.0',
+    changes: [
+        "**Dashboard (Watchlist) - Opção 'Apagar Trade' no Modal de Edição:**",
+        "Adicionado um botão 'Apagar Trade' diretamente no modal de edição/adição de oportunidade, visível apenas ao editar um trade existente.",
+        "A funcionalidade permite apagar trades da watchlist de forma rápida e intuitiva.",
+        "A lógica foi implementada em `js/handlers.js` e `js/modals.js` para gerir a visibilidade do botão e a operação de eliminação."
+    ]
+},
+ releases: [
+  {
     number: '11.12.0', 
     changes: [
         "**Gráfico Principal (Página de Detalhes) e Modal (Market Scanner) - EMAs Completas e Zoom:**",
@@ -10,8 +20,7 @@ current: {
         "Os dados de OHLC e indicadores retornados pela Edge Function são agora fatiados (`.slice()`) para corresponder ao `limit` de visualização pedido pelo frontend (ex: 170 klines para 7 dias no TF de 1h), garantindo o 'zoom' desejado sem comprometer o cálculo dos indicadores."
     ]
 },
- releases: [
-  {
+     {
     number: '11.11.0',
     changes: [
         "**Market Scanner - Gráfico do Modal (Zoom Padrão para 7 Dias):**",
