@@ -22,34 +22,36 @@ function renderSparkline(containerId, dataSeries) {
     chart.render();
 }
 
-// --- Funções de Geração de Formulário (sem alterações) ---
+// --- Funções de Geração de Formulário ---
 function getIconForLabel(labelText) {
     const text = labelText.toLowerCase();
-    if (text.includes('tendência')) return 'fa-solid fa-chart-line';
-    if (text.includes('rsi')) return 'fa-solid fa-wave-square';
-    if (text.includes('stochastic') || text.includes('estocástico')) return 'fa-solid fa-arrows-down-to-line';
-    if (text.includes('suporte')) return 'fa-solid fa-arrow-down';
-    if (text.includes('resistência')) return 'fa-solid fa-arrow-up';
-    if (text.includes('fibo')) return 'fa-solid fa-ruler-vertical';
-    if (text.includes('volume')) return 'fa-solid fa-database';
-    if (text.includes('ema')) return 'fa-solid fa-chart-simple';
-    if (text.includes('alarme')) return 'fa-solid fa-bell';
-    if (text.includes('preço')) return 'fa-solid fa-dollar-sign';
-    if (text.includes('candle')) return 'fa-solid fa-bars-staggered';
-    if (text.includes('timeframe')) return 'fa-solid fa-clock';
-    if (text.includes('val ')) return 'fa-solid fa-magnet';
-    if (text.includes('alvo')) return 'fa-solid fa-crosshairs';
-    return 'fa-solid fa-check';
+    if (text.includes('tendência')) return 'trending_up';
+    if (text.includes('rsi')) return 'show_chart';
+    if (text.includes('stochastic') || text.includes('estocástico')) return 'moving';
+    if (text.includes('suporte')) return 'south';
+    if (text.includes('resistência')) return 'north';
+    if (text.includes('fibo')) return 'straighten';
+    if (text.includes('volume')) return 'database';
+    if (text.includes('ema')) return 'timeline';
+    if (text.includes('alarme')) return 'alarm';
+    if (text.includes('preço')) return 'attach_money';
+    if (text.includes('candle')) return 'candlestick_chart';
+    if (text.includes('timeframe')) return 'schedule';
+    if (text.includes('val ')) return 'magnetism';
+    if (text.includes('alvo')) return 'my_location';
+    return 'check';
 }
+
 function createChecklistItem(item, data) {
     const isRequired = item.required ? 'required' : '';
     const labelText = item.required ? `${item.label} <span class="required-asterisk">*</span>` : item.label;
     const isChecked = data && data[item.id] ? 'checked' : '';
     const element = document.createElement('div');
     element.className = 'checklist-item';
-    element.innerHTML = `<i class="${getIconForLabel(item.label)}"></i><input type="checkbox" id="${item.id}" ${isChecked} ${isRequired}><label for="${item.id}">${labelText}</label>`;
+    element.innerHTML = `<span class="material-symbols-outlined">${getIconForLabel(item.label)}</span><input type="checkbox" id="${item.id}" ${isChecked} ${isRequired}><label for="${item.id}">${labelText}</label>`;
     return element;
 }
+
 function createInputItem(item, data) {
     const element = document.createElement('div');
     element.className = 'input-item-styled'; 
@@ -63,7 +65,7 @@ function createInputItem(item, data) {
     } else {
         fieldHtml = `<input type="${item.type}" id="${item.id}" value="${value}" step="any" ${isRequired} class="input-item-field" placeholder="${item.placeholder || ''}">`;
     }
-    element.innerHTML = `<i class="${getIconForLabel(item.label)}"></i><div style="flex-grow: 1;"><label for="${item.id}">${labelText}</label>${fieldHtml}</div>`;
+    element.innerHTML = `<span class="material-symbols-outlined">${getIconForLabel(item.label)}</span><div style="flex-grow: 1;"><label for="${item.id}">${labelText}</label>${fieldHtml}</div>`;
     return element;
 }
 export function generateDynamicChecklist(container, phases, data = {}) {
@@ -109,19 +111,19 @@ async function toggleAdvancedChart(tradeId, symbol, button) {
     if (isVisible) {
         chartContainer.innerHTML = '';
         chartContainer.classList.remove('visible');
-        button.innerHTML = `<i class="fa-solid fa-chart-simple"></i>`;
+        button.innerHTML = `<span class="material-symbols-outlined">monitoring</span>`;
         return;
     }
 
     // Lógica para abrir o gráfico
     chartContainer.classList.add('visible');
     chartContainer.innerHTML = '<p style="text-align: center; padding: 2rem;">A carregar gráfico...</p>';
-    button.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
+    button.innerHTML = `<span class="material-symbols-outlined">hourglass_top</span>`;
 
     try {
         const cleanSymbol = symbol.replace('BINANCE:', '');
         const { data: response, error } = await supabase.functions.invoke('get-asset-details-data', {
-            body: { symbol: cleanSymbol, interval: '1h', limit: 220 }, // Usando o limite atual para 9 dias, vamos ajustar para 7 dias depois
+            body: { symbol: cleanSymbol, interval: '1h', limit: 170 },
         });
 
         if (error) throw error;
@@ -159,12 +161,12 @@ async function toggleAdvancedChart(tradeId, symbol, button) {
         chartContainer.innerHTML = '';
         const chart = new ApexCharts(chartContainer, options);
         chart.render();
-        button.innerHTML = `<i class="fa-solid fa-eye-slash"></i>`;
+        button.innerHTML = `<span class="material-symbols-outlined">visibility_off</span>`;
 
     } catch (err) {
         console.error("Erro ao carregar o gráfico no card:", err);
         chartContainer.innerHTML = `<p style="text-align: center; padding: 2rem; color: red;">Erro ao carregar: ${err.message}</p>`;
-        button.innerHTML = `<i class="fa-solid fa-exclamation-triangle"></i>`;
+        button.innerHTML = `<span class="material-symbols-outlined">error</span>`;
     }
 }
 
@@ -178,11 +180,10 @@ async function acknowledgeAlarm(assetPair) {
             .from('alarms')
             .update({ acknowledged: true })
             .eq('asset_pair', assetPair)
-            .eq('status', 'triggered'); // Apenas reconhece alarmes que já foram disparados
+            .eq('status', 'triggered');
 
         if (error) throw error;
         console.log(`Alarmes disparados para ${assetPair} reconhecidos com sucesso.`);
-        // A re-renderização do dashboard será acionada pelo listener em app.js
     } catch (error) {
         console.error("Erro ao reconhecer alarme:", error);
         alert("Ocorreu um erro ao reconhecer o alarme. Tente novamente.");
@@ -210,22 +211,22 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
 
     if (trade.data.status === 'POTENTIAL') {
         mainActionButtonClass = 'action-arm';
-        mainActionButtonIcon = 'fa-solid fa-bolt';
+        mainActionButtonIcon = 'bolt';
         mainActionButtonText = 'Armar';
         dataAction = 'arm';
     } else if (trade.data.status === 'ARMED') {
         mainActionButtonClass = 'action-execute';
-        mainActionButtonIcon = 'fa-solid fa-play';
+        mainActionButtonIcon = 'play_arrow';
         mainActionButtonText = 'Executar';
         dataAction = 'execute';
     } else if (trade.data.status === 'LIVE') {
         mainActionButtonClass = 'action-close';
-        mainActionButtonIcon = 'fa-solid fa-stop';
+        mainActionButtonIcon = 'stop';
         mainActionButtonText = 'Fechar';
         dataAction = 'close';
     }
     if (mainActionButtonText) {
-        mainActionButtonHtml = `<button class="icon-action-btn ${mainActionButtonClass}" data-action="${dataAction}" title="${mainActionButtonText}"><i class="${mainActionButtonIcon}"></i> <span>${mainActionButtonText}</span></button>`;
+        mainActionButtonHtml = `<button class="icon-action-btn ${mainActionButtonClass}" data-action="${dataAction}" title="${mainActionButtonText}"><span class="material-symbols-outlined">${mainActionButtonIcon}</span> <span>${mainActionButtonText}</span></button>`;
     }
     
     let formattedPrice;
@@ -239,7 +240,6 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
         ? `<p class="trade-notes">${trade.data.notes}</p>` 
         : '';
 
-    // Lógica para sinalização de alarmes
     const relatedAlarms = allAlarms.filter(alarm => alarm.asset_pair === assetName);
     const hasActiveAlarm = relatedAlarms.some(alarm => alarm.status === 'active');
     const hasTriggeredUnacknowledgedAlarm = relatedAlarms.some(alarm => alarm.status === 'triggered' && alarm.acknowledged === false);
@@ -248,12 +248,11 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
     let acknowledgeButtonHtml = '';
 
     if (hasActiveAlarm) {
-        alarmBellHtml = `<i class="fa-solid fa-bell alarm-active-bell" title="Alarme ativo para este ativo."></i>`;
+        alarmBellHtml = `<span class="material-symbols-outlined alarm-active-bell" title="Alarme ativo para este ativo.">notifications_active</span>`;
     }
     if (hasTriggeredUnacknowledgedAlarm) {
         card.classList.add('alarm-triggered');
-        // Adiciona um botão de reconhecimento apenas para alarmes disparados e não reconhecidos
-        acknowledgeButtonHtml = `<button class="acknowledge-alarm-btn" data-action="acknowledge-alarm" data-asset="${assetName}" title="Reconhecer Alarme"><i class="fa-solid fa-check"></i> OK</button>`;
+        acknowledgeButtonHtml = `<button class="acknowledge-alarm-btn" data-action="acknowledge-alarm" data-asset="${assetName}" title="Reconhecer Alarme"><span class="material-symbols-outlined">check</span> OK</button>`;
     }
 
 
@@ -262,7 +261,7 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
             <h3 class="asset-title-card">
                 <a href="asset-details.html?symbol=${assetName}" class="asset-link">${assetName}</a>
                 ${alarmBellHtml}
-                <button class="icon-action-btn card-edit-btn" data-action="edit" title="Editar"><i class="fas fa-pencil"></i></button>
+                <button class="icon-action-btn card-edit-btn" data-action="edit" title="Editar"><span class="material-symbols-outlined">edit</span></button>
             </h3>
             <div class="card-main-action-button">${mainActionButtonHtml}</div>
         </div>
@@ -272,8 +271,8 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
 
         <div class="card-bottom-row">
             <div class="card-secondary-actions">
-                <button class="icon-action-btn action-summary" data-action="toggle-chart" data-symbol="${tradingViewSymbol}" title="Ver gráfico interativo"><i class="fa-solid fa-chart-simple"></i></button>
-                <a href="https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}" target="_blank" rel="noopener noreferrer" class="icon-action-btn action-full-chart" title="Abrir no TradingView para análise completa"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                <button class="icon-action-btn action-summary" data-action="toggle-chart" data-symbol="${tradingViewSymbol}" title="Ver gráfico interativo"><span class="material-symbols-outlined">monitoring</span></button>
+                <a href="https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}" target="_blank" rel="noopener noreferrer" class="icon-action-btn action-full-chart" title="Abrir no TradingView para análise completa"><span class="material-symbols-outlined">open_in_new</span></a>
                 ${acknowledgeButtonHtml}
             </div>
             <div class="card-sparkline" id="sparkline-card-${trade.id}"></div>
@@ -322,7 +321,6 @@ export function displayTrades(trades, marketData, allAlarms) {
 document.addEventListener('DOMContentLoaded', () => {
     const dashboard = document.querySelector('.dashboard-columns');
     if (dashboard) {
-        // Usar capture phase para garantir que o evento é pego antes de outros listeners
         dashboard.addEventListener('click', (e) => {
             const button = e.target.closest('[data-action]');
             if (!button) return;
@@ -333,13 +331,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!trade) return;
             const action = button.dataset.action;
 
-            // DEBUG: Log do evento de clique/toque
             console.log(`Evento de ${e.type} detectado. Ação: ${action}, Botão:`, button);
 
             switch (action) {
                 case 'toggle-chart': 
-                    e.preventDefault(); // Garante que o evento não cause rolagem ou outros comportamentos padrão
-                    e.stopPropagation(); // Impede a propagação para elementos pais
+                    e.preventDefault();
+                    e.stopPropagation();
                     toggleAdvancedChart(tradeId, button.dataset.symbol, button); 
                     break;
                 case 'edit': loadAndOpenForEditing(tradeId); break;
@@ -360,6 +357,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     break;
             }
-        }, true); // O 'true' aqui ativa o capture phase
+        }, true);
     }
 });
