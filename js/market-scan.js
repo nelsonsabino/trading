@@ -162,7 +162,7 @@ function createTableRow(ticker, index, extraData) {
     
     if (assetExtraData && assetExtraData.stoch_4h !== null) {
         const stochK = assetExtraData.stoch_4h;
-        if (typeof stochK === 'number' && stochK < 45) { // Alterado para < 45
+        if (typeof stochK === 'number' && stochK < 35) { // Alterado para < 35
             stochSignalHtml = `<span class="stoch-signal" data-tooltip="Stoch (4h) K:${stochK.toFixed(1)}">STC</span>`;
         }
     }
@@ -213,7 +213,7 @@ function applyFiltersAndSort() {
             if (stochK === undefined || stochK === null || typeof stochK !== 'number') {
                 return false;
             }
-            return (stochK < 45); // Alterado para < 45
+            return (stochK < 35); // Alterado para < 35
         });
     }
     processedTickers.sort((a, b) => {
