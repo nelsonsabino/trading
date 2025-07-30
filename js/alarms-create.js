@@ -6,6 +6,7 @@ import { setLastCreatedAlarmId } from './state.js';
 import { openChartModal } from './alarms-manage.js';
 
 let editingAlarmId = null;
+let currentAssetPrice = null; // Variável para guardar o preço atual do ativo
 
 // --- FUNÇÕES ESPECÍFICAS DE ALARMS-CREATE ---
 
@@ -13,6 +14,7 @@ async function fetchPriceForPair(pair) {
     const priceDisplay = document.getElementById('asset-current-price');
     if (!priceDisplay || !pair) { 
         if (priceDisplay) priceDisplay.textContent = ''; 
+        currentAssetPrice = null; // Limpa o preço
         return; 
     }
     priceDisplay.textContent = 'A obter preço...';
@@ -21,12 +23,14 @@ async function fetchPriceForPair(pair) {
         if (!response.ok) throw new Error('Par não encontrado na Binance');
         const data = await response.json();
         const price = parseFloat(data.price);
+        currentAssetPrice = price; // Guarda o preço bruto
         let formattedPrice = price >= 1.0 
             ? price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 })
             : '$' + price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
         priceDisplay.innerHTML = `Preço Atual: <span style="color: #28a745;">${formattedPrice}</span>`;
     } catch (error) { 
         priceDisplay.textContent = 'Preço não disponível.';
+        currentAssetPrice = null; // Limpa o preço em caso de erro
     }
 }
 
@@ -100,6 +104,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultsDiv = document.getElementById('autocomplete-results');
     const mainContainer = document.querySelector('main');
     const alarmTypeSelect = document.getElementById('alarm-type-select');
+    const priceInput = document.getElementById('alarm-price-standalone');
+    
+    // NOVO: Listener de duplo clique para preencher o preço
+    if (priceInput) {
+        priceInput.addEventListener('dblclick', () => {
+            if (currentAssetPrice !== null && !isNaN(currentAssetPrice)) {
+                priceInput.value = currentAssetPrice.toString();
+                // Feedback visual opcional
+                priceInput.style.transition = 'background-color 0.3s';
+                priceInput.style.backgroundColor = '#d4edda';
+                setTimeout(() => {
+                    priceInput.style.backgroundColor = '';
+                }, 500);
+            } else {
+                console.warn("Preço atual não disponível para preenchimento automático.");
+            }
+        });
+    }
     
     const fields = { 
         price: document.getElementById('price-fields'), 
