@@ -26,7 +26,7 @@ async function openChartModal(symbol) {
 
     try {
         const { data: response, error } = await supabase.functions.invoke('get-asset-details-data', {
-            body: { symbol: symbol, interval: '1h', limit: 170 }, // AJUSTADO: Para ~7 dias de dados de 1h
+            body: { symbol: symbol, interval: '1h', limit: 170 },
         });
 
         if (error) throw error;
@@ -160,10 +160,10 @@ function createTableRow(ticker, index, extraData) {
         rsiSignalHtml = `<span class="rsi-signal" data-tooltip="RSI (1h) está em ${rsiValue}">RSI</span>`;
     }
     
-    if (assetExtraData && assetExtraData.stoch_1h !== null) {
-        const stochK = assetExtraData.stoch_1h;
+    if (assetExtraData && assetExtraData.stoch_4h !== null) {
+        const stochK = assetExtraData.stoch_4h;
         if (typeof stochK === 'number' && stochK < 20) { 
-            stochSignalHtml = `<span class="stoch-signal" data-tooltip="Stoch (1h) K:${stochK.toFixed(1)}">STC</span>`;
+            stochSignalHtml = `<span class="stoch-signal" data-tooltip="Stoch (4h) K:${stochK.toFixed(1)}">STC</span>`;
         }
     }
 
@@ -188,7 +188,7 @@ function createTableRow(ticker, index, extraData) {
             <td data-label="Variação (24h)" class="${priceChangeClass}">${priceChangePercent.toFixed(2)}%</td>
             <td data-label="Ações">
                 <div class="action-buttons">
-                   <a href="#" class="icon-action-btn view-chart-btn" data-symbol="${ticker.symbol}" title="Ver Gráfico no Modal"><span class="material-symbols-outlined">monitoring</span></a>
+                    <a href="#" class="icon-action-btn view-chart-btn" data-symbol="${ticker.symbol}" title="Ver Gráfico no Modal"><span class="material-symbols-outlined">monitoring</span></a>
                     <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn" title="Abrir no TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
                     <a href="${createAlarmUrl}" class="icon-action-btn" title="Criar Alarme"><span class="material-symbols-outlined">alarm_add</span></a>
                     <a href="${addOpportunityUrl}" class="icon-action-btn" title="Adicionar à Watchlist"><span class="material-symbols-outlined">add</span></a>
@@ -208,7 +208,7 @@ function applyFiltersAndSort() {
     if (filterStoch) {
         processedTickers = processedTickers.filter(ticker => {
             const assetExtraData = allExtraData[ticker.symbol];
-            const stochK = assetExtraData?.stoch_1h;
+            const stochK = assetExtraData?.stoch_4h;
             
             if (stochK === undefined || stochK === null || typeof stochK !== 'number') {
                 return false;
@@ -277,6 +277,18 @@ async function fetchAndDisplayMarketData() {
     }
 }
 
+// NOVO: Função para atualizar o título do Market Scanner
+function updateMarketScanTitle() {
+    const titleElement = document.getElementById('market-scan-title');
+    if (titleElement) {
+        // Encontra o ícone e o texto separadamente para não reescrever o ícone
+        const textNode = [...titleElement.childNodes].find(node => node.nodeType === Node.TEXT_NODE);
+        if (textNode) {
+            textNode.textContent = ` Top ${currentTopN} Pares com Maior Volume (USDC)`;
+        }
+    }
+}
+
 
 document.addEventListener('DOMContentLoaded', () => {
     const tbody = document.getElementById('market-scan-tbody');
@@ -317,6 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentTopN = parseInt(topNSelect.value);
         }
     }
+    updateMarketScanTitle(); // Chama a função para definir o título inicial
 
 
     if (toggleSparklinesCheckbox) {
@@ -331,6 +344,7 @@ document.addEventListener('DOMContentLoaded', () => {
         topNSelect.addEventListener('change', (e) => {
             currentTopN = parseInt(e.target.value);
             localStorage.setItem('marketScannerTopN', currentTopN.toString());
+            updateMarketScanTitle(); // Chama a função para atualizar o título
             fetchAndDisplayMarketData(); 
         });
     }
