@@ -116,20 +116,20 @@ header .main-nav {
 .user-session {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin-left: 1rem; /* Adiciona um espaço à esquerda */
+    gap: 0.75rem; /* Reduz o espaço entre a foto e o botão */
+    margin-left: 1.5rem; /* Aumenta o espaço à esquerda */
 }
 
 .user-photo {
-    width: 40px;
-    height: 40px;
+    width: 36px;  /* Diminui o tamanho da foto */
+    height: 36px;
     border-radius: 50%;
     border: 2px solid #dee2e6;
 }
 
 #logout-btn {
-    padding: 8px 16px;
-    font-size: 0.9em;
+    padding: 6px 12px; /* Diminui o padding do botão */
+    font-size: 0.8em;  /* Diminui o tamanho da fonte */
     background-color: #dc3545; /* Vermelho para logout */
     color: white; /* Garante que o texto é branco */
     border: none;
