@@ -51,51 +51,49 @@
 </head>
 <body>
 
-    
+    <!-- BOTÃO DE TEMA FIXO -->
+    <button id="theme-toggle-btn" class="nav-icon-link" title="Alternar tema">
+        <span class="material-symbols-outlined">dark_mode</span>
+    </button>
 
-<!-- NOVO BOTÃO DE TEMA (fora do header) -->
-<button id="theme-toggle-btn" class="nav-icon-link" title="Alternar tema">
-    <i class="fas fa-moon"></i>
-</button>
-
-<header>
-    <h1><i class="fa-solid fa-bell"></i> Meus Alarmes</h1>
-    <p class="mantra">Acompanhe os seus alarmes ativos e o histórico de disparos.</p>
-    
-    <!-- Primeira Linha: Navegação Global -->
-    <nav class="main-nav">
-        <a href="dashboard.html" class="nav-icon-link" title="Dashboard"><span class="material-symbols-outlined">home</span></a>
-        <a href="market-scan.html" class="nav-icon-link" title="Scanner de Mercado"><span class="material-symbols-outlined">query_stats</span></a>
-        <a href="alarms-create.html" class="nav-icon-link action-create-alarm" title="Criar Alarme"><span class="material-symbols-outlined">alarm_add</span></a>
-        <a href="alarms-manage.html" class="nav-icon-link" title="Meus Alarmes"><span class="material-symbols-outlined">alarm</span></a>
-        <div class="nav-dropdown">
-            <button id="management-toggle" class="nav-icon-link" title="Gerir e Estatísticas"><span class="material-symbols-outlined">settings</span></button>
-            
-            <div class="nav-dropdown-content">
-                <a href="strategies-manager.html" class="nav-link">Gerir Estratégias</a>
-                <a href="manage.html" class="nav-link">Todas as Operações</a>
-                <a href="stats.html" class="nav-link">Ver Estatísticas</a>
+    <header>
+        <h1><span class="material-symbols-outlined">alarm</span> Meus Alarmes</h1>
+        <p class="mantra">Acompanhe os seus alarmes ativos e o histórico de disparos.</p>
+        
+        <!-- Primeira Linha: Navegação Global -->
+        <nav class="main-nav">
+            <a href="dashboard.html" class="nav-icon-link" title="Dashboard"><span class="material-symbols-outlined">home</span></a>
+            <a href="market-scan.html" class="nav-icon-link" title="Scanner de Mercado"><span class="material-symbols-outlined">query_stats</span></a>
+            <a href="alarms-create.html" class="nav-icon-link action-create-alarm" title="Criar Alarme"><span class="material-symbols-outlined">alarm_add</span></a>
+            <a href="alarms-manage.html" class="nav-icon-link" title="Meus Alarmes"><span class="material-symbols-outlined">alarm</span></a>
+            <div class="nav-dropdown">
+                <button id="management-toggle" class="nav-icon-link" title="Gerir e Estatísticas"><span class="material-symbols-outlined">settings</span></button>
+                
+                <div class="nav-dropdown-content">
+                    <a href="strategies-manager.html" class="nav-link">Gerir Estratégias</a>
+                    <a href="manage.html" class="nav-link">Todas as Operações</a>
+                    <a href="stats.html" class="nav-link">Ver Estatísticas</a>
+                </div>
             </div>
-        </div>
 
-        <!-- Secção do Utilizador -->
-        <div id="user-session" class="user-session" style="display: none;">
-            <img id="user-photo" src="" alt="Foto do Utilizador" class="user-photo">
-            <button id="logout-btn" class="btn btn-secondary">Sair</button>
-        </div>
-    </nav>
-    
-    <!-- Segunda Linha: Ações da Página (vazia nesta página) -->
-    <nav class="contextual-nav">
-        <!-- Sem ações contextuais aqui -->
-    </nav>
-</header>
+            <!-- Secção do Utilizador -->
+            <div id="user-session" class="user-session" style="display: none;">
+                <img id="user-photo" src="" alt="Foto do Utilizador" class="user-photo">
+                <button id="logout-btn" class="btn btn-secondary">Sair</button>
+            </div>
+        </nav>
+        
+        <!-- Segunda Linha: Ações da Página (vazia nesta página) -->
+        <nav class="contextual-nav">
+            <!-- Sem ações contextuais aqui -->
+        </nav>
+    </header>
     
 
     <main>
         <!-- Tabela para mostrar os alarmes ativos -->
         <section class="alarms-list-section">
-            <h2><i class="fa-solid fa-clock-rotate-left"></i> Alarmes Ativos</h2>
+            <h2><span class="material-symbols-outlined">schedule</span> Alarmes Ativos</h2>
             <div class="table-wrapper">
                 <table class="alarms-table">
                     <thead>
@@ -115,7 +113,7 @@
 
         <!-- Tabela para o histórico -->
         <section class="alarms-list-section">
-            <h2><i class="fa-solid fa-history"></i> Histórico de Alarmes Disparados</h2>
+            <h2><span class="material-symbols-outlined">history</span> Histórico de Alarmes Disparados</h2>
             <div class="table-wrapper">
                 <table class="alarms-table">
                     <thead>
