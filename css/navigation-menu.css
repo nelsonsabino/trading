@@ -152,22 +152,22 @@ header .main-nav {
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-/* --- BOTÃO DE AÇÃO "CRIAR ALARME" --- */
-.nav-icon-link.action-create-alarm {
-    background-color: #20c997; /* Verde suave para o botão "Criar Alarme" */
+/* --- BOTÃO DE DESTAQUE "SCANNER DE MERCADO" --- */
+a[href="market-scan.html"].nav-icon-link {
+    background-color: #20c997; /* Verde suave */
     color: white;
     font-size: 1.1rem;
 }
 
-.nav-icon-link.action-create-alarm:hover {
+a[href="market-scan.html"].nav-icon-link:hover {
     background-color: #1aab8a;
 }
 
-/* Se quiser garantir que o ícone dentro também tem um bom visual */
-.nav-icon-link.action-add-watchlist i,
-.nav-icon-link.action-create-alarm i {
+a[href="market-scan.html"].nav-icon-link span { /* Para garantir que o Google Icon tem o tamanho certo */
+    font-size: 1.2rem;
     line-height: 1;
 }
+
 
 /* Ajustes para o dark mode */
 .dark-mode .main-nav .nav-icon-link {
@@ -205,16 +205,16 @@ header .main-nav {
     color: #e0e0e0;
 }
 
-/* Dark mode para os botões */
+/* Dark mode para os botões de ação */
 .dark-mode .nav-icon-link.action-add-watchlist {
     background-color: #0b4991;
 }
 .dark-mode .nav-icon-link.action-add-watchlist:hover {
     background-color: #0049b3;
 }
-.dark-mode .nav-icon-link.action-create-alarm {
+.dark-mode a[href="market-scan.html"].nav-icon-link {
     background-color: #1aab8a;
 }
-.dark-mode .nav-icon-link.action-create-alarm:hover {
+.dark-mode a[href="market-scan.html"].nav-icon-link:hover {
     background-color: #158a6e;
 }
