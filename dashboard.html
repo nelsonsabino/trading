@@ -52,10 +52,10 @@
 </head>
 <body>
 
-    <!-- NOVO BOTÃO DE TEMA (fora do header) -->
-<button id="theme-toggle-btn" class="nav-icon-link" title="Alternar tema">
-    <i class="fas fa-moon"></i>
-</button>
+    <!-- BOTÃO DE TEMA FIXO -->
+    <button id="theme-toggle-btn" class="nav-icon-link" title="Alternar tema">
+        <i class="fas fa-moon"></i>
+    </button>
 
     <header>
         <h1>Watchlist de Trading</h1>
@@ -76,22 +76,19 @@
                 </div>
             </div>
 
-            <button id="theme-toggle-btn" class="btn nav-icon-link" title="Alternar tema">
-                <i class="fas fa-moon"></i>
-            </button>
-
             <!-- Secção do Utilizador -->
             <div id="user-session" class="user-session" style="display: none;">
                 <img id="user-photo" src="" alt="Foto do Utilizador" class="user-photo">
                 <button id="logout-btn" class="btn btn-secondary">Sair</button>
             </div>
-            
-            <!-- Botão flutuante para adicionar à Watchlist -->
-            <a href="#" class="nav-icon-link action-add-watchlist" title="Adicionar Ativo à Watchlist">
-                <i class="fa-solid fa-plus"></i>
-            </a>
         </nav>
         
+        <!-- Segunda Linha: Ações da Página -->
+        <nav class="contextual-nav">
+            <button id="add-opportunity-btn" class="btn btn-contextual">
+                <i class="fas fa-plus"></i> Adicionar à Watchlist
+            </button>
+        </nav>
     </header>  
 
     <hr class="section-divider">
