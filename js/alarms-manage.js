@@ -64,7 +64,7 @@ async function fetchAndDisplayAlarms() {
             else { alarmDescription = `Preço ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} USD`; }
             
             const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${alarm.asset_pair}`;
-            const addOpportunityUrl = `dashboard.html?assetPair=${alarm.asset_pair}`; // CORRIGIDO AQUI
+            const addOpportunityUrl = `dashboard.html?assetPair=${alarm.asset_pair}`;
             const assetHtml = `<strong><a href="asset-details.html?symbol=${alarm.asset_pair}" class="asset-link">${alarm.asset_pair}</a></strong>`;
 
             if (alarm.status === 'active') {
