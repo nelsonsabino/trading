@@ -52,17 +52,22 @@
 </head>
 <body>
 
+    <!-- BOTÃO DE TEMA FIXO -->
+    <button id="theme-toggle-btn" class="nav-icon-link" title="Alternar tema">
+        <span class="material-symbols-outlined">dark_mode</span>
+    </button>
+
     <header>
         <h1>Scanner de Mercado</h1>
         <p class="mantra">Encontre os ativos com maior atividade e liquidez.</p>
         <nav class="main-nav">
-         <a href="dashboard.html" class="nav-icon-link" title="Dashboard"><span class="material-symbols-outlined">home</span></a>
-        <a href="market-scan.html" class="nav-icon-link" title="Scanner de Mercado"><span class="material-symbols-outlined">query_stats</span></a>
-        <a href="alarms-create.html" class="nav-icon-link action-create-alarm" title="Criar Alarme"><span class="material-symbols-outlined">alarm_add</span></a>
-        <a href="alarms-manage.html" class="nav-icon-link" title="Meus Alarmes"><span class="material-symbols-outlined">alarm</span></a>
-        <div class="nav-dropdown">
-            <button id="management-toggle" class="nav-icon-link" title="Gerir e Estatísticas"><span class="material-symbols-outlined">settings</span></button>
+            <a href="dashboard.html" class="nav-icon-link" title="Dashboard"><span class="material-symbols-outlined">home</span></a>
+            <a href="market-scan.html" class="nav-icon-link" title="Scanner de Mercado"><span class="material-symbols-outlined">query_stats</span></a>
+            <a href="alarms-create.html" class="nav-icon-link action-create-alarm" title="Criar Alarme"><span class="material-symbols-outlined">alarm_add</span></a>
+            <a href="alarms-manage.html" class="nav-icon-link" title="Meus Alarmes"><span class="material-symbols-outlined">alarm</span></a>
             
+            <div class="nav-dropdown">
+                <button id="management-toggle" class="nav-icon-link" title="Gerir e Estatísticas"><span class="material-symbols-outlined">settings</span></button>
                 <div class="nav-dropdown-content">
                     <a href="strategies-manager.html" class="nav-link">Gerir Estratégias</a>
                     <a href="manage.html" class="nav-link">Todas as Operações</a>
@@ -70,21 +75,22 @@
                 </div>
             </div>
 
-            <button id="theme-toggle-btn" class="btn nav-icon-link" title="Alternar tema">
-                <i class="fas fa-moon"></i>
-            </button>
-
             <!-- Secção do Utilizador -->
             <div id="user-session" class="user-session" style="display: none;">
                 <img id="user-photo" src="" alt="Foto do Utilizador" class="user-photo">
                 <button id="logout-btn" class="btn btn-secondary">Sair</button>
             </div>
         </nav>
+        
+        <!-- Segunda Linha: Ações da Página (vazia nesta página) -->
+        <nav class="contextual-nav">
+            <!-- Sem ações contextuais aqui -->
+        </nav>
     </header>
 
     <main>
         <section class="market-scan-section">
-            <h2><i class="fa-solid fa-fire" style="color: #ffc107;"></i> Top 50 Pares com Maior Volume (USDC)</h2>
+            <h2 id="market-scan-title"><span class="material-symbols-outlined" style="color: #ffc107;">local_fire_department</span> Top 50 Pares com Maior Volume (USDC)</h2>
 
             <div class="market-controls">
                 <div class="control-group">
@@ -101,7 +107,7 @@
                     <input type="checkbox" id="filter-rsi">
                     <label for="filter-rsi">RSI < 45 (1h)</label>
                     <input type="checkbox" id="filter-stoch">
-                    <label for="filter-stoch">STOCH < 20 (1h)</label>
+                    <label for="filter-stoch">STOCH < 20 (4h)</label>
                 </div>
                 <div class="control-group">
                     <label>Exibir:</label>
