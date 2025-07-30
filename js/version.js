@@ -2,6 +2,15 @@
 
 export const changelogData = {
 current: {
+    number: '12.1.1',
+    changes: [
+        "**Correção da Visibilidade dos Ícones em Tabelas:**",
+        "Resolvido o problema onde os ícones Google Fonts não apareciam nos botões de ação das tabelas (Market Scanner, Gestão de Alarmes, etc.).",
+        "A causa foi identificada como uma regra CSS (`buttons.css`) que ocultava indevidamente os `<span>` dos ícones. A regra foi ajustada para ser mais específica e garantir a visibilidade dos ícones em todos os contextos."
+    ]
+},
+ releases: [
+  {
     number: '12.1.0',
     changes: [
         "**Refatoração de Ícones e Estilo de Navegação (UI/UX):**",
@@ -10,8 +19,7 @@ current: {
         "O botão do Scanner de Mercado foi destacado com uma cor verde para melhor visibilidade, conforme solicitado."
     ]
 },
- releases: [
-  {
+     {
     number: '12.0.0',
     changes: [
         "**Criação de Alarme de Preço (UX Melhorada):**",
