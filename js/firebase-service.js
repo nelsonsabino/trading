@@ -50,12 +50,13 @@ export function listenToTrades(callback) {
     });
 }
 
-// NOVA FUNÇÃO para obter todos os trades de um ativo específico
+// Função para obter todos os trades de um ativo específico (APENAS FECHADOS)
 export async function getTradesForAsset(assetSymbol) {
     try {
         const q = query(
             collection(db, 'trades'),
             where("asset", "==", assetSymbol),
+            where("status", "==", "CLOSED"), // NOVO: Filtra apenas por trades fechados
             orderBy('dateAdded', 'desc')
         );
         const querySnapshot = await getDocs(q);
@@ -123,7 +124,6 @@ export function listenToPortfolioSummary(callback) {
 }
 
 export function listenToClosedTrades(callback) {
-    // Adiciona orderBy('dateClosed', 'asc') para garantir a ordem cronológica
     const q = query(collection(db, 'trades'), where('status', '==', 'CLOSED'), orderBy('dateClosed', 'asc'));
     return onSnapshot(q, (snapshot) => {
         const closedTrades = [];
