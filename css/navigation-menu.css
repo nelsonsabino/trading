@@ -139,8 +139,35 @@ header .main-nav {
     background-color: #c82333;
 }
 
-/* --- BOTÃO DE AÇÃO RÁPIDA (ADD TO WATCHLIST - REMOVIDO DAQUI) --- */
+/* --- BOTÃO DE AÇÃO RÁPIDA (ADD TO WATCHLIST) --- */
+.nav-icon-link.action-add-watchlist {
+    background-color: #007bff; /* Cor primária para destaque */
+    color: white;
+    font-size: 1.1rem;
+}
 
+.nav-icon-link.action-add-watchlist:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* --- BOTÃO DE AÇÃO "CRIAR ALARME" --- */
+.nav-icon-link.action-create-alarm {
+    background-color: #20c997; /* Verde suave para o botão "Criar Alarme" */
+    color: white;
+    font-size: 1.1rem;
+}
+
+.nav-icon-link.action-create-alarm:hover {
+    background-color: #1aab8a;
+}
+
+/* Se quiser garantir que o ícone dentro também tem um bom visual */
+.nav-icon-link.action-add-watchlist i,
+.nav-icon-link.action-create-alarm i {
+    line-height: 1;
+}
 
 /* Ajustes para o dark mode */
 .dark-mode .main-nav .nav-icon-link {
@@ -173,8 +200,21 @@ header .main-nav {
 .dark-mode .user-photo {
     border-color: #444;
 }
-/* Dark mode para o botão de navegação ativo */
 .dark-mode .nav-icon-link.nav-active {
-    background-color: #495057; /* Cor escura neutra para dark mode */
+    background-color: #495057;
     color: #e0e0e0;
+}
+
+/* Dark mode para os botões */
+.dark-mode .nav-icon-link.action-add-watchlist {
+    background-color: #0b4991;
+}
+.dark-mode .nav-icon-link.action-add-watchlist:hover {
+    background-color: #0049b3;
+}
+.dark-mode .nav-icon-link.action-create-alarm {
+    background-color: #1aab8a;
+}
+.dark-mode .nav-icon-link.action-create-alarm:hover {
+    background-color: #158a6e;
 }
