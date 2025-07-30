@@ -2,6 +2,17 @@
 
 export const changelogData = {
 current: {
+    number: '12.2.0',
+    changes: [
+        "**Market Scanner - Melhorias de Funcionalidade:**",
+        "Adicionada a opção para exibir um número configurável de ativos (Top 30, 50, 100, 200).",
+        "O título da secção do scanner foi tornado dinâmico para refletir a seleção do 'Mostrar Top'.",
+        "O filtro do Estocástico (STOCH) foi alterado para usar o timeframe de 4 horas, mantendo o RSI em 1 hora. A Edge Function `get-sparklines-data` foi atualizada para buscar dados de ambos os timeframes.",
+        "A preferência do utilizador para 'Mostrar Top N' é agora guardada entre sessões (`localStorage`)."
+    ]
+},
+ releases: [
+  {
     number: '12.1.1',
     changes: [
         "**Correção da Visibilidade dos Ícones em Tabelas:**",
@@ -9,8 +20,7 @@ current: {
         "A causa foi identificada como uma regra CSS (`buttons.css`) que ocultava indevidamente os `<span>` dos ícones. A regra foi ajustada para ser mais específica e garantir a visibilidade dos ícones em todos os contextos."
     ]
 },
- releases: [
-  {
+     {
     number: '12.1.0',
     changes: [
         "**Refatoração de Ícones e Estilo de Navegação (UI/UX):**",
