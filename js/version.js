@@ -2,6 +2,16 @@
 
 export const changelogData = {
 current: {
+    number: '12.1.0',
+    changes: [
+        "**Refatoração de Ícones e Estilo de Navegação (UI/UX):**",
+        "Substituída a biblioteca de ícones Font Awesome pelos Google Fonts Icons em toda a aplicação para um visual mais moderno e consistente.",
+        "O ícone 'Criar Alarme' foi alterado para `alarm_add` e 'Meus Alarmes' para `alarm`.",
+        "O botão do Scanner de Mercado foi destacado com uma cor verde para melhor visibilidade, conforme solicitado."
+    ]
+},
+ releases: [
+  {
     number: '12.0.0',
     changes: [
         "**Criação de Alarme de Preço (UX Melhorada):**",
@@ -9,8 +19,7 @@ current: {
         "Ao fazer duplo clique, o campo é agora preenchido automaticamente com o preço atual do ativo selecionado, facilitando a criação de alarmes para moedas com muitas casas decimais."
     ]
 },
- releases: [
-  {
+     {
     number: '11.13.2',
     changes: [
         "**Página de Detalhes do Ativo - Histórico de Trades (Apenas Fechados):**",
