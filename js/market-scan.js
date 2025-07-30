@@ -162,7 +162,7 @@ function createTableRow(ticker, index, extraData) {
     
     if (assetExtraData && assetExtraData.stoch_4h !== null) {
         const stochK = assetExtraData.stoch_4h;
-        if (typeof stochK === 'number' && stochK < 20) { 
+        if (typeof stochK === 'number' && stochK < 45) { // Alterado para < 45
             stochSignalHtml = `<span class="stoch-signal" data-tooltip="Stoch (4h) K:${stochK.toFixed(1)}">STC</span>`;
         }
     }
@@ -213,7 +213,7 @@ function applyFiltersAndSort() {
             if (stochK === undefined || stochK === null || typeof stochK !== 'number') {
                 return false;
             }
-            return (stochK < 20); 
+            return (stochK < 45); // Alterado para < 45
         });
     }
     processedTickers.sort((a, b) => {
@@ -282,6 +282,7 @@ function updateMarketScanTitle() {
     const titleElement = document.getElementById('market-scan-title');
     if (titleElement) {
         // Encontra o ícone e o texto separadamente para não reescrever o ícone
+        const iconNode = titleElement.querySelector('.material-symbols-outlined');
         const textNode = [...titleElement.childNodes].find(node => node.nodeType === Node.TEXT_NODE);
         if (textNode) {
             textNode.textContent = ` Top ${currentTopN} Pares com Maior Volume (USDC)`;
@@ -329,7 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentTopN = parseInt(topNSelect.value);
         }
     }
-    updateMarketScanTitle(); // Chama a função para definir o título inicial
+    updateMarketScanTitle();
 
 
     if (toggleSparklinesCheckbox) {
@@ -344,7 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
         topNSelect.addEventListener('change', (e) => {
             currentTopN = parseInt(e.target.value);
             localStorage.setItem('marketScannerTopN', currentTopN.toString());
-            updateMarketScanTitle(); // Chama a função para atualizar o título
+            updateMarketScanTitle();
             fetchAndDisplayMarketData(); 
         });
     }
