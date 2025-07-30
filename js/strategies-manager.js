@@ -201,10 +201,10 @@ function createStrategyCard(strategy) {
             <p><strong>Criada em:</strong> ${date}</p>
             <div class="card-actions" style="justify-content: flex-end; gap: 0.5rem;">
                 <button class="icon-action-btn action-edit" data-id="${strategy.id}" title="Editar Estratégia">
-                    <i class="fas fa-pencil"></i> <span>Editar</span>
+                    <span class="material-symbols-outlined">edit</span> <span>Editar</span>
                 </button>
                 <button class="icon-action-btn action-close delete-btn" data-id="${strategy.id}" title="Apagar Estratégia">
-                    <i class="fas fa-trash"></i> <span>Apagar</span>
+                    <span class="material-symbols-outlined">delete</span> <span>Apagar</span>
                 </button>
             </div>
         </div>
