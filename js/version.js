@@ -2,6 +2,15 @@
 
 export const changelogData = {
 current: {
+    number: '11.13.2',
+    changes: [
+        "**Página de Detalhes do Ativo - Histórico de Trades (Apenas Fechados):**",
+        "A tabela 'Histórico de Trades' na página de detalhes do ativo foi corrigida para exibir apenas os trades com o status 'CLOSED'.",
+        "A função `getTradesForAsset` em `firebase-service.js` foi atualizada para incluir um filtro `where(\"status\", \"==\", \"CLOSED\")`, garantindo que apenas o histórico relevante é mostrado."
+    ]
+},
+ releases: [
+  {
     number: '11.13.1',
     changes: [
         "**Correção do Botão de Tema:**",
@@ -9,8 +18,7 @@ current: {
         "A causa foi identificada como um ID duplicado (`theme-toggle-btn`) no HTML, que foi removido para garantir o funcionamento correto do script em todas as páginas."
     ]
 },
- releases: [
-  {
+     {
     number: '11.13.0',
     changes: [
         "**Dashboard (Watchlist) - Opção 'Apagar Trade' no Modal de Edição:**",
