@@ -93,10 +93,10 @@ async function fetchAndDisplayAlarms() {
                         <td data-label="Data Disparo"><span class="cell-value">${triggeredDate}</span></td>
                         <td data-label="Ações">
                             <div class="action-buttons cell-value">
-                                <button class="icon-action-btn delete-btn" data-id="${alarm.id}" title="Apagar Alarme"><i class="fa-solid fa-trash"></i></button>
-                                <a href="#" class="icon-action-btn view-chart-btn" data-symbol="${alarm.asset_pair}" title="Ver Gráfico no Modal"><i class="fa-solid fa-chart-simple"></i></a>
-                                <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn" title="Abrir no TradingView"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-                                <a href="${addOpportunityUrl}" class="icon-action-btn" title="Adicionar à Watchlist"><i class="fa-solid fa-plus"></i></a>
+                                <button class="icon-action-btn delete-btn" data-id="${alarm.id}" title="Apagar Alarme"><span class="material-symbols-outlined">delete</span></button>
+                                <a href="#" class="icon-action-btn view-chart-btn" data-symbol="${alarm.asset_pair}" title="Ver Gráfico no Modal"><span class="material-symbols-outlined">monitoring</span></a>
+                                <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn" title="Abrir no TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
+                                <a href="${addOpportunityUrl}" class="icon-action-btn" title="Adicionar à Watchlist"><span class="material-symbols-outlined">add</span></a>
                             </div>
                         </td>
                     </tr>`);
