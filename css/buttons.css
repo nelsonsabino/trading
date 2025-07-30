@@ -30,6 +30,9 @@
     color: white;
     font-size: 0.9em;
     padding: 8px 16px;
+    display: inline-flex; /* Para alinhar o ícone com o texto */
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .btn-contextual:hover {
@@ -61,8 +64,8 @@
     background-color: #e9ecef; 
 }
 
-.icon-action-btn i {
-    font-size: 1.1em;
+.icon-action-btn .material-symbols-outlined {
+    font-size: 1.2em; /* Tamanho do ícone um pouco maior que o texto */
     line-height: 1; 
 }
 
@@ -88,19 +91,22 @@
     width: 32px;  
     height: 32px; 
     border-radius: 6px; 
-    & span { 
+    /* Esconder apenas spans que contêm TEXTO, não os ícones */
+    & span:not(.material-symbols-outlined) { 
         display: none; 
     }
 }
 
-/* Cores específicas para os ÍCONES (Aplicadas ao <i> elemento) */
-.icon-action-btn.action-summary i, .icon-action-btn.view-chart-btn i { color: #198754; } 
-.icon-action-btn.action-full-chart i { color: #0d6efd; }
-.icon-action-btn.action-bell i { color: #0d6efd; }
-.icon-action-btn.action-plus i { color: #0d6efd; }
-.icon-action-btn.action-arm i { color: #ffc107; }
-.icon-action-btn.action-execute i { color: #20c997; }
-.icon-action-btn.action-close i { color: #dc3545; }
+/* Cores específicas para os ÍCONES (Aplicadas ao <i> ou <span> do ícone) */
+.icon-action-btn.action-summary .material-symbols-outlined, 
+.icon-action-btn.view-chart-btn .material-symbols-outlined { color: #198754; } 
+
+.icon-action-btn.action-full-chart .material-symbols-outlined { color: #0d6efd; }
+.icon-action-btn.action-bell .material-symbols-outlined { color: #0d6efd; }
+.icon-action-btn.action-plus .material-symbols-outlined { color: #0d6efd; }
+.icon-action-btn.action-arm .material-symbols-outlined { color: #ffc107; }
+.icon-action-btn.action-execute .material-symbols-outlined { color: #20c997; }
+.icon-action-btn.action-close .material-symbols-outlined { color: #dc3545; }
 
 
 /* --- LINKS DE NAVEGAÇÃO SECUNDÁRIOS (dentro do dropdown) --- */
