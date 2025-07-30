@@ -2,6 +2,15 @@
 
 export const changelogData = {
 current: {
+    number: '12.0.0',
+    changes: [
+        "**Criação de Alarme de Preço (UX Melhorada):**",
+        "Implementada uma funcionalidade de duplo clique no campo de preço na página de criação de alarmes.",
+        "Ao fazer duplo clique, o campo é agora preenchido automaticamente com o preço atual do ativo selecionado, facilitando a criação de alarmes para moedas com muitas casas decimais."
+    ]
+},
+ releases: [
+  {
     number: '11.13.2',
     changes: [
         "**Página de Detalhes do Ativo - Histórico de Trades (Apenas Fechados):**",
@@ -9,8 +18,7 @@ current: {
         "A função `getTradesForAsset` em `firebase-service.js` foi atualizada para incluir um filtro `where(\"status\", \"==\", \"CLOSED\")`, garantindo que apenas o histórico relevante é mostrado."
     ]
 },
- releases: [
-  {
+     {
     number: '11.13.1',
     changes: [
         "**Correção do Botão de Tema:**",
