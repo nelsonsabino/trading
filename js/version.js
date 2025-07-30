@@ -2,6 +2,15 @@
 
 export const changelogData = {
 current: {
+    number: '11.13.1',
+    changes: [
+        "**Correção do Botão de Tema:**",
+        "Resolvido o problema onde o botão para alternar entre o modo claro/escuro não funcionava na página do Dashboard.",
+        "A causa foi identificada como um ID duplicado (`theme-toggle-btn`) no HTML, que foi removido para garantir o funcionamento correto do script em todas as páginas."
+    ]
+},
+ releases: [
+  {
     number: '11.13.0',
     changes: [
         "**Dashboard (Watchlist) - Opção 'Apagar Trade' no Modal de Edição:**",
@@ -10,8 +19,7 @@ current: {
         "A lógica foi implementada em `js/handlers.js` e `js/modals.js` para gerir a visibilidade do botão e a operação de eliminação."
     ]
 },
- releases: [
-  {
+     {
     number: '11.12.0', 
     changes: [
         "**Gráfico Principal (Página de Detalhes) e Modal (Market Scanner) - EMAs Completas e Zoom:**",
