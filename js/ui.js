@@ -6,6 +6,9 @@ import { openArmModal, openExecModal, openCloseTradeModal, openImageModal, openA
 import { loadAndOpenForEditing } from './handlers.js';
 import { getLastCreatedTradeId, setLastCreatedTradeId } from './state.js';
 
+let tradesForEventListeners = [];
+let allAlarmsForEventListeners = []; // Guarda os alarmes para o listener
+
 function renderSparkline(containerId, dataSeries) {
     const container = document.getElementById(containerId);
     if (!container || !dataSeries || dataSeries.length < 2) return;
@@ -247,9 +250,9 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
     return card;
 }
 
-let tradesForEventListeners = [];
 export function displayTrades(trades, marketData, allAlarms) {
     tradesForEventListeners = trades;
+    allAlarmsForEventListeners = allAlarms || []; // Armazena os alarmes
     if (!potentialTradesContainer) return;
     potentialTradesContainer.innerHTML = '<p class="empty-state-message">Nenhum ativo na watchlist.</p>';
     armedTradesContainer.innerHTML = '<p class="empty-state-message">Nenhum setup armado.</p>';
@@ -298,15 +301,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'execute': openExecModal(trade); break;
                 case 'close': openCloseTradeModal(trade); break;
                 case 'view-alarms':
-                    openAlarmListModal(button.dataset.asset, allAlarms, 'active');
+                    openAlarmListModal(button.dataset.asset, allAlarmsForEventListeners, 'active');
                     break;
                 case 'acknowledge-and-view-alarm':
                     const assetSymbol = button.dataset.asset;
                     if (assetSymbol) {
-                        openAlarmListModal(assetSymbol, allAlarms, 'triggered');
+                        openAlarmListModal(assetSymbol, allAlarmsForEventListeners, 'triggered');
                         acknowledgeAlarm(assetSymbol);
                     }
                     break;
+                case 'add-to-watchlist':
+                   openAddModal();
+                   const modalAssetInput = document.getElementById('asset');
+                   if (modalAssetInput) {
+                       modalAssetInput.value = button.dataset.symbol.replace('BINANCE:', '');
+                   }
+                   break;
             }
         });
     }
