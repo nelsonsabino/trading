@@ -7,7 +7,6 @@ import { loadAndOpenForEditing } from './handlers.js';
 import { getLastCreatedTradeId, setLastCreatedTradeId } from './state.js';
 
 let tradesForEventListeners = [];
-let allAlarmsForEventListeners = []; // Guarda os alarmes para o listener
 
 function renderSparkline(containerId, dataSeries) {
     const container = document.getElementById(containerId);
@@ -106,7 +105,6 @@ export function populateStrategySelect(strategies) {
     }
 }
 
-// Nova função para reconhecer alarmes
 async function acknowledgeAlarm(assetPair) {
     try {
         const { error } = await supabase
@@ -123,7 +121,6 @@ async function acknowledgeAlarm(assetPair) {
     }
 }
 
-// Nova função para abrir e popular o modal de lista de alarmes
 function openAlarmListModal(assetPair, alarms, mode = 'active') {
     const modal = document.getElementById('alarm-list-modal');
     const title = document.getElementById('alarm-list-title');
@@ -136,7 +133,7 @@ function openAlarmListModal(assetPair, alarms, mode = 'active') {
     if (mode === 'active') {
         title.textContent = `Alarmes Ativos para ${assetPair}`;
         filteredAlarms = alarms.filter(a => a.asset_pair === assetPair && a.status === 'active');
-    } else { // 'triggered'
+    } else {
         title.textContent = `Alarmes Disparados para ${assetPair}`;
         filteredAlarms = alarms.filter(a => a.asset_pair === assetPair && a.status === 'triggered' && !a.acknowledged);
     }
@@ -146,7 +143,7 @@ function openAlarmListModal(assetPair, alarms, mode = 'active') {
         container.innerHTML = '<p>Nenhum alarme encontrado.</p>';
     } else {
         filteredAlarms.forEach(alarm => {
-            let alarmDescription = `Preço ${alarm.condition} ${alarm.target_price} USD`; // Simplificado, pode ser expandido
+            let alarmDescription = `Preço ${alarm.condition} ${alarm.target_price} USD`;
             const item = document.createElement('div');
             item.className = 'alarm-list-item';
             item.innerHTML = `
@@ -164,6 +161,17 @@ function openAlarmListModal(assetPair, alarms, mode = 'active') {
     modal.onclick = (e) => { if (e.target.id === 'alarm-list-modal') modal.style.display = 'none'; };
 }
 
+async function loadAndOpenAlarmModal(assetPair, mode) {
+    try {
+        const { data: allAlarms, error } = await supabase.from('alarms').select('*');
+        if (error) throw error;
+        
+        openAlarmListModal(assetPair, allAlarms, mode);
+    } catch (err) {
+        console.error("Erro ao buscar alarmes para o modal:", err);
+        alert("Não foi possível carregar os alarmes.");
+    }
+}
 
 export function createTradeCard(trade, marketData = {}, allAlarms = []) {
     const card = document.createElement('div');
@@ -252,7 +260,6 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
 
 export function displayTrades(trades, marketData, allAlarms) {
     tradesForEventListeners = trades;
-    allAlarmsForEventListeners = allAlarms || []; // Armazena os alarmes
     if (!potentialTradesContainer) return;
     potentialTradesContainer.innerHTML = '<p class="empty-state-message">Nenhum ativo na watchlist.</p>';
     armedTradesContainer.innerHTML = '<p class="empty-state-message">Nenhum setup armado.</p>';
@@ -290,23 +297,29 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!button) return;
             const card = button.closest('.trade-card');
             const tradeId = card ? card.dataset.tradeId : null;
-            if (!tradeId) return;
-            const trade = tradesForEventListeners.find(t => t.id === tradeId);
-            if (!trade) return;
+
             const action = button.dataset.action;
 
             switch (action) {
-                case 'edit': loadAndOpenForEditing(tradeId); break;
-                case 'arm': openArmModal(trade); break;
-                case 'execute': openExecModal(trade); break;
-                case 'close': openCloseTradeModal(trade); break;
+                case 'edit': 
+                    if (tradeId) loadAndOpenForEditing(tradeId); 
+                    break;
+                case 'arm': 
+                    if (tradeId) openArmModal(tradesForEventListeners.find(t => t.id === tradeId)); 
+                    break;
+                case 'execute': 
+                    if (tradeId) openExecModal(tradesForEventListeners.find(t => t.id === tradeId)); 
+                    break;
+                case 'close': 
+                    if (tradeId) openCloseTradeModal(tradesForEventListeners.find(t => t.id === tradeId)); 
+                    break;
                 case 'view-alarms':
-                    openAlarmListModal(button.dataset.asset, allAlarmsForEventListeners, 'active');
+                    loadAndOpenAlarmModal(button.dataset.asset, 'active');
                     break;
                 case 'acknowledge-and-view-alarm':
                     const assetSymbol = button.dataset.asset;
                     if (assetSymbol) {
-                        openAlarmListModal(assetSymbol, allAlarmsForEventListeners, 'triggered');
+                        loadAndOpenAlarmModal(assetSymbol, 'triggered');
                         acknowledgeAlarm(assetSymbol);
                     }
                     break;
