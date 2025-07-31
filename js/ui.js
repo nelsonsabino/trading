@@ -126,8 +126,10 @@ function openAlarmListModal(assetPair, alarms, mode = 'active') {
     const title = document.getElementById('alarm-list-title');
     const container = document.getElementById('alarm-list-container');
     const closeBtn = document.getElementById('close-alarm-list-modal');
+    const footer = document.getElementById('alarm-list-footer');
+    const acknowledgeBtn = document.getElementById('acknowledge-alarms-btn');
 
-    if (!modal || !title || !container || !closeBtn) return;
+    if (!modal || !title || !container || !closeBtn || !footer || !acknowledgeBtn) return;
     
     let filteredAlarms;
     if (mode === 'active') {
@@ -154,6 +156,16 @@ function openAlarmListModal(assetPair, alarms, mode = 'active') {
             `;
             container.appendChild(item);
         });
+    }
+
+    if (mode === 'triggered') {
+        footer.style.display = 'block';
+        acknowledgeBtn.onclick = async () => {
+            await acknowledgeAlarm(assetPair);
+            modal.style.display = 'none';
+        };
+    } else {
+        footer.style.display = 'none';
     }
 
     modal.style.display = 'flex';
@@ -226,7 +238,7 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
     }
     if (hasTriggeredUnacknowledgedAlarm) {
         card.classList.add('alarm-triggered');
-        acknowledgeButtonHtml = `<button class="acknowledge-alarm-btn" data-action="acknowledge-and-view-alarm" data-asset="${assetName}" title="Reconhecer e Ver Alarme Disparado"><span class="material-symbols-outlined">alarm</span> OK</button>`;
+        acknowledgeButtonHtml = `<button class="acknowledge-alarm-btn" data-action="acknowledge-and-view-alarm" data-asset="${assetName}" title="Ver Alarme Disparado"><span class="material-symbols-outlined">alarm</span> OK</button>`;
     }
 
 
@@ -320,7 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const assetSymbol = button.dataset.asset;
                     if (assetSymbol) {
                         loadAndOpenAlarmModal(assetSymbol, 'triggered');
-                        acknowledgeAlarm(assetSymbol);
+                        // acknowledgeAlarm(assetSymbol); // Ação de reconhecer agora está no botão do modal
                     }
                     break;
                 case 'add-to-watchlist':
