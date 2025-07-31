@@ -2,6 +2,16 @@
 
 export const changelogData = {
 current: {
+    number: '12.4.1',
+    changes: [
+        "**Dashboard (Watchlist) - Melhoria no Fluxo de Reconhecimento de Alarmes:**",
+        "O botão 'OK' num card de alarme disparado agora apenas abre o modal com a lista de alarmes, sem fazer o 'reset' automático do estado visual.",
+        "Adicionado um novo botão 'Reconhecer Alarmes' dentro do modal de alarmes disparados, que agora é o único responsável por executar a ação de 'reset' do frame vermelho no card.",
+        "Esta alteração dá ao utilizador mais controlo e intencionalidade sobre quando o aviso de um alarme disparado é removido."
+    ]
+},
+ releases: [
+  {
     number: '12.4.0',
     changes: [
         "**Dashboard (Watchlist) - Gestão de Alarmes Melhorada (Final):**",
@@ -11,8 +21,7 @@ current: {
         "Corrigido o erro que impedia a abertura do modal de alarmes, garantindo que os dados são sempre buscados da base de dados no momento do clique."
     ]
 },
- releases: [
-  {
+     {
     number: '12.3.0',
     changes: [
         "**Dashboard (Watchlist) - Gestão de Alarmes Melhorada:**",
