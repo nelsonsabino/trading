@@ -290,6 +290,31 @@
     background-color: #e0a800;
 }
 
+/* --- MODAL DE LISTA DE ALARMES --- */
+.alarm-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0.5rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.alarm-list-item:last-child {
+    border-bottom: none;
+}
+
+.alarm-list-description {
+    flex-grow: 1;
+    margin-right: 1rem;
+    font-size: 0.95em;
+}
+
+.alarm-list-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+
 .dark-mode .trade-card.alarm-triggered {
     border-color: #dc3545 !important;
     box-shadow: 0 0 15px rgba(220, 53, 69, 0.5);
@@ -302,6 +327,10 @@
 
 .dark-mode .acknowledge-alarm-btn:hover {
     background-color: #8a5e00;
+}
+
+.dark-mode .alarm-list-item {
+    border-bottom-color: #333;
 }
 
 /* Secções de Histórico (para o botão expandir/recolher) */
