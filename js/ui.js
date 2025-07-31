@@ -272,46 +272,17 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
 
 export function displayTrades(trades, marketData, allAlarms) {
     tradesForEventListeners = trades;
-
-    const potentialSection = document.querySelector('.potential-trades');
-    const armedSection = document.querySelector('.armed-trades');
-    const liveSection = document.querySelector('.live-trades');
-
-    if (!potentialTradesContainer || !armedTradesContainer || !liveTradesContainer || !potentialSection || !armedSection || !liveSection) return;
-
-    // Esconder todas as secções primeiro
-    potentialSection.style.display = 'none';
-    armedSection.style.display = 'none';
-    liveSection.style.display = 'none';
-
-    // Limpar os contentores dos cards
-    potentialTradesContainer.innerHTML = '';
-    armedTradesContainer.innerHTML = '';
-    liveTradesContainer.innerHTML = '';
-    
+    if (!potentialTradesContainer) return;
+    potentialTradesContainer.innerHTML = '<p class="empty-state-message">Nenhum ativo na watchlist.</p>';
+    armedTradesContainer.innerHTML = '<p class="empty-state-message">Nenhum setup armado.</p>';
+    liveTradesContainer.innerHTML = '<p class="empty-state-message">Nenhuma operação ativa.</p>';
+    let potentialCount = 0, armedCount = 0, liveCount = 0;
     trades.forEach(trade => {
-        const card = createTradeCard(trade, marketData, allAlarms); 
-        if (trade.data.status === 'POTENTIAL') {
-            potentialTradesContainer.appendChild(card);
-            potentialSection.style.display = 'block';
-        }
-        else if (trade.data.status === 'ARMED') {
-            armedTradesContainer.appendChild(card);
-            armedSection.style.display = 'block';
-        }
-        else if (trade.data.status === 'LIVE') {
-            liveTradesContainer.appendChild(card);
-            liveSection.style.display = 'block';
-        }
+        const card = createTradeCard(trade, marketData, allAlarms);
+        if (trade.data.status === 'POTENTIAL') { if (potentialCount === 0) potentialTradesContainer.innerHTML = ''; potentialTradesContainer.appendChild(card); potentialCount++; }
+        else if (trade.data.status === 'ARMED') { if (armedCount === 0) armedTradesContainer.innerHTML = ''; armedTradesContainer.appendChild(card); armedCount++; }
+        else if (trade.data.status === 'LIVE') { if (liveCount === 0) liveTradesContainer.innerHTML = ''; liveTradesContainer.appendChild(card); liveCount++; }
     });
-
-    // Se após o loop algum contentor estiver vazio, insere a mensagem de estado
-    if (trades.length === 0) {
-        potentialTradesContainer.innerHTML = '<p class="empty-state-message">Nenhum ativo na watchlist.</p>';
-        potentialSection.style.display = 'block';
-        armedSection.style.display = 'none';
-        liveSection.style.display = 'none';
-    }
 
     trades.forEach(trade => {
         const assetMarketData = marketData[trade.data.asset];
@@ -341,29 +312,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const action = button.dataset.action;
 
-            if (action === 'view-alarms' || action === 'acknowledge-and-view-alarm') {
-                const assetSymbol = button.dataset.asset;
-                const mode = action === 'view-alarms' ? 'active' : 'triggered';
-                loadAndOpenAlarmModal(assetSymbol, mode);
-                return;
-            }
-
-            if (!tradeId) return;
-            const trade = tradesForEventListeners.find(t => t.id === tradeId);
-            if (!trade) return;
-
             switch (action) {
                 case 'edit': 
                     if (tradeId) loadAndOpenForEditing(tradeId); 
                     break;
                 case 'arm': 
-                    if (tradeId) openArmModal(trade); 
+                    if (tradeId) openArmModal(tradesForEventListeners.find(t => t.id === tradeId)); 
                     break;
                 case 'execute': 
-                    if (tradeId) openExecModal(trade); 
+                    if (tradeId) openExecModal(tradesForEventListeners.find(t => t.id === tradeId)); 
                     break;
                 case 'close': 
-                    if (tradeId) openCloseTradeModal(trade); 
+                    if (tradeId) openCloseTradeModal(tradesForEventListeners.find(t => t.id === tradeId)); 
+                    break;
+                case 'view-alarms':
+                    loadAndOpenAlarmModal(button.dataset.asset, 'active');
+                    break;
+                case 'acknowledge-and-view-alarm':
+                    const assetSymbol = button.dataset.asset;
+                    if (assetSymbol) {
+                        loadAndOpenAlarmModal(assetSymbol, 'triggered');
+                        // acknowledgeAlarm(assetSymbol); // Ação de reconhecer agora está no botão do modal
+                    }
                     break;
                 case 'add-to-watchlist':
                    openAddModal();
