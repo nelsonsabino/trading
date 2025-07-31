@@ -116,22 +116,22 @@ header .main-nav {
 .user-session {
     display: flex;
     align-items: center;
-    gap: 0.75rem; /* Reduz o espaço entre a foto e o botão */
-    margin-left: 1.5rem; /* Aumenta o espaço à esquerda */
+    gap: 0.75rem;
+    margin-left: 1.5rem;
 }
 
 .user-photo {
-    width: 36px;  /* Diminui o tamanho da foto */
+    width: 36px;
     height: 36px;
     border-radius: 50%;
     border: 2px solid #dee2e6;
 }
 
 #logout-btn {
-    padding: 6px 12px; /* Diminui o padding do botão */
-    font-size: 0.8em;  /* Diminui o tamanho da fonte */
-    background-color: #dc3545; /* Vermelho para logout */
-    color: white; /* Garante que o texto é branco */
+    padding: 6px 12px;
+    font-size: 0.8em;
+    background-color: #dc3545;
+    color: white;
     border: none;
 }
 
@@ -139,22 +139,9 @@ header .main-nav {
     background-color: #c82333;
 }
 
-/* --- BOTÃO DE AÇÃO RÁPIDA (ADD TO WATCHLIST) --- */
-.nav-icon-link.action-add-watchlist {
-    background-color: #007bff; /* Cor primária para destaque */
-    color: white;
-    font-size: 1.1rem;
-}
-
-.nav-icon-link.action-add-watchlist:hover {
-    background-color: #0056b3;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
 /* --- BOTÃO DE DESTAQUE "SCANNER DE MERCADO" --- */
 a[href="market-scan.html"].nav-icon-link {
-    background-color: #20c997; /* Verde suave */
+    background-color: #20c997;
     color: white;
     font-size: 1.1rem;
 }
@@ -163,7 +150,7 @@ a[href="market-scan.html"].nav-icon-link:hover {
     background-color: #1aab8a;
 }
 
-a[href="market-scan.html"].nav-icon-link span { /* Para garantir que o Google Icon tem o tamanho certo */
+a[href="market-scan.html"].nav-icon-link span {
     font-size: 1.2rem;
     line-height: 1;
 }
@@ -206,12 +193,6 @@ a[href="market-scan.html"].nav-icon-link span { /* Para garantir que o Google Ic
 }
 
 /* Dark mode para os botões de ação */
-.dark-mode .nav-icon-link.action-add-watchlist {
-    background-color: #0b4991;
-}
-.dark-mode .nav-icon-link.action-add-watchlist:hover {
-    background-color: #0049b3;
-}
 .dark-mode a[href="market-scan.html"].nav-icon-link {
     background-color: #1aab8a;
 }
