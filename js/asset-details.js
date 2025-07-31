@@ -7,12 +7,6 @@ let currentAssetSymbol = null;
 let currentChartTimeframe = '1h'; 
 let currentChartType = 'line'; 
 
-/**
- * Busca dados de klines e indicadores da Edge Function e renderiza o gráfico principal do ativo.
- * @param {string} symbol - O símbolo do ativo (ex: "BTCUSDC").
- * @param {string} interval - O intervalo de tempo (ex: "1h", "1d").
- * @param {string} chartType - O tipo de gráfico (ex: "line", "candlestick").
- */
 async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line') {
     const chartContainer = document.getElementById('main-asset-chart');
     if (!chartContainer) return;
@@ -23,12 +17,10 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
     currentChartType = chartType; 
 
     try {
-        // Definir o número base de klines para exibir (para 1h = 7 dias)
-        const baseKlinesLimit = 170; // Aproximadamente 7 dias de dados de 1h
+        const baseKlinesLimit = 170;
 
-        // A Edge Function get-asset-details-data já está preparada para receber e usar o 'limit'
         const { data: edgeFunctionResponse, error: edgeFunctionError } = await supabase.functions.invoke('get-asset-details-data', {
-            body: { symbol: symbol, interval: interval, limit: baseKlinesLimit }, // Passa o mesmo número de klines para todos os TFs
+            body: { symbol: symbol, interval: interval, limit: baseKlinesLimit },
         });
 
         if (edgeFunctionError) throw edgeFunctionError;
@@ -52,7 +44,7 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
                 y: [kline[1], kline[2], kline[3], kline[4]] 
             }));
             series.push({ name: 'Preço', type: 'candlestick', data: ohlcSeriesData });
-        } else { // 'line'
+        } else {
             const closePriceSeriesData = klinesData.map(kline => ({
                 x: kline[0],
                 y: kline[4] 
@@ -149,10 +141,6 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
     }
 }
 
-/**
- * Renderiza o widget de Análise Técnica da TradingView.
- * @param {string} symbol - O símbolo do ativo.
- */
 function renderTradingViewTechnicalAnalysisWidget(symbol) {
     const container = document.getElementById('tradingview-tech-analysis-container');
     if (!container) return;
@@ -176,28 +164,47 @@ function renderTradingViewTechnicalAnalysisWidget(symbol) {
     container.appendChild(script); 
 }
 
-// --- Funções de Notícias, Alarmes e Trades ---
 async function displayAlarmsForAsset(symbol) {
-    const tbody = document.getElementById('asset-alarms-tbody');
-    if (!tbody) return;
-    tbody.innerHTML = '<tr><td colspan="3">A carregar alarmes...</td></tr>';
+    const activeTbody = document.getElementById('asset-alarms-tbody');
+    const triggeredTbody = document.getElementById('asset-triggered-alarms-tbody');
+    if (!activeTbody || !triggeredTbody) return;
+    
+    activeTbody.innerHTML = '<tr><td colspan="3">A carregar alarmes...</td></tr>';
+    triggeredTbody.innerHTML = '<tr><td colspan="3">A carregar histórico...</td></tr>';
+
     try {
-        const { data: alarms, error } = await supabase.from('alarms').select('*')
-            .eq('asset_pair', symbol).eq('status', 'active')
+        const { data: allAlarms, error: allAlarmsError } = await supabase.from('alarms').select('*')
+            .eq('asset_pair', symbol)
             .order('created_at', { ascending: false });
-        if (error) throw error;
-        if (alarms.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Nenhum alarme ativo para este ativo.</td></tr>';
-            return;
+        if (allAlarmsError) throw allAlarmsError;
+
+        const activeAlarms = allAlarms.filter(a => a.status === 'active');
+        const triggeredAlarms = allAlarms.filter(a => a.status === 'triggered');
+        
+        if (activeAlarms.length === 0) {
+            activeTbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Nenhum alarme ativo para este ativo.</td></tr>';
+        } else {
+            const activeAlarmsHtml = activeAlarms.map(alarm => {
+                let alarmDescription = `Preço ${alarm.condition} ${alarm.target_price} USD`;
+                return `<tr><td>${alarmDescription}</td><td>${new Date(alarm.created_at).toLocaleString('pt-PT')}</td><td><a href="alarms-manage.html" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.9em;">Gerir</a></td></tr>`;
+            }).join('');
+            activeTbody.innerHTML = activeAlarmsHtml;
         }
-        const alarmsHtml = alarms.map(alarm => {
-            let alarmDescription = `Preço ${alarm.condition} ${alarm.target_price} USD`;
-            return `<tr><td>${alarmDescription}</td><td>${new Date(alarm.created_at).toLocaleString('pt-PT')}</td><td><a href="alarms-manage.html?editAlarmId=${alarm.id}" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.9em;">Gerir</a></td></tr>`;
-        }).join('');
-        tbody.innerHTML = alarmsHtml;
+
+        if (triggeredAlarms.length === 0) {
+            triggeredTbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Nenhum alarme disparado para este ativo.</td></tr>';
+        } else {
+            const triggeredAlarmsHtml = triggeredAlarms.map(alarm => {
+                let alarmDescription = `Preço ${alarm.condition} ${alarm.target_price} USD`;
+                const triggeredDate = alarm.triggered_at ? new Date(alarm.triggered_at).toLocaleString('pt-PT') : 'N/A';
+                return `<tr><td>${alarmDescription}</td><td>${triggeredDate}</td><td><a href="alarms-manage.html" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.9em;">Ver Histórico</a></td></tr>`;
+            }).join('');
+            triggeredTbody.innerHTML = triggeredAlarmsHtml;
+        }
     } catch (err) {
         console.error("Erro ao buscar alarmes para o ativo:", err);
-        tbody.innerHTML = '<tr><td colspan="3" style="color:red;text-align:center;">Erro ao carregar alarmes.</td></tr>';
+        activeTbody.innerHTML = '<tr><td colspan="3" style="color:red;text-align:center;">Erro ao carregar alarmes.</td></tr>';
+        triggeredTbody.innerHTML = '<tr><td colspan="3" style="color:red;text-align:center;">Erro ao carregar histórico.</td></tr>';
     }
 }
 
@@ -207,7 +214,6 @@ async function displayTradesForAsset(symbol) {
     tbody.innerHTML = '<tr><td colspan="5">A carregar trades...</td></tr>';
     try {
         const trades = await getTradesForAsset(symbol);
-        // DEBUG: Log dos trades recebidos
         console.log(`Trades recebidos para ${symbol}:`, trades);
 
         if (trades.length === 0) {
@@ -215,16 +221,14 @@ async function displayTradesForAsset(symbol) {
             return;
         }
         const tradesHtml = trades.map(trade => {
-            // Assegura que as propriedades existem antes de tentar aceder
             const pnl = trade.data.status === 'CLOSED' ? (trade.data.closeDetails?.pnl || 0) : '-';
             const pnlClass = parseFloat(pnl) > 0 ? 'positive-pnl' : (parseFloat(pnl) < 0 ? 'negative-pnl' : '');
             const dateStr = trade.data.dateAdded?.toDate().toLocaleString('pt-PT') || 'N/A';
             const status = trade.data.status || 'UNKNOWN';
 
             const strategyName = trade.data.strategyName || 'N/A';
-            const tradeId = trade.id; // Assume que o ID do documento é o trade.id
+            const tradeId = trade.id;
 
-            // Adicionar data-label para responsividade
             return `<tr data-trade-id="${trade.id}">
                 <td data-label="Estratégia">${strategyName}</td>
                 <td data-label="Status"><span class="status-badge status-${status.toLowerCase()}">${status}</span></td>
@@ -245,7 +249,6 @@ function editTrade(tradeId) {
     window.location.href = 'dashboard.html';
 }
 
-// --- PONTO DE ENTRADA DO SCRIPT ---
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const assetSymbol = urlParams.get('symbol');
