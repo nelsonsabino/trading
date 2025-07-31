@@ -2,6 +2,16 @@
 
 export const changelogData = {
 current: {
+    number: '12.3.0',
+    changes: [
+        "**Dashboard (Watchlist) - Gestão de Alarmes Melhorada:**",
+        "Removida a funcionalidade do gráfico expansível ApexCharts dos cards para uma interface mais limpa.",
+        "O ícone de sino (para alarmes ativos) é agora clicável e abre um modal com uma lista de todos os alarmes ativos para o ativo, com opções para editar.",
+        "O botão 'OK' (para alarmes disparados) agora inclui um ícone de sino e, ao ser clicado, abre um modal com o alarme disparado (com opção de editar) antes de fazer o 'reset' do estado visual do card."
+    ]
+},
+ releases: [
+  {
     number: '12.2.0',
     changes: [
         "**Market Scanner - Melhorias de Funcionalidade:**",
@@ -11,8 +21,7 @@ current: {
         "A preferência do utilizador para 'Mostrar Top N' é agora guardada entre sessões (`localStorage`)."
     ]
 },
- releases: [
-  {
+     {
     number: '12.1.1',
     changes: [
         "**Correção da Visibilidade dos Ícones em Tabelas:**",
