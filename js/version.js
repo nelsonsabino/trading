@@ -2,6 +2,15 @@
 
 export const changelogData = {
 current: {
+    number: '12.6.0',
+    changes: [
+        "**Melhorias na Gestão e Visualização de Alarmes:**",
+        "A lista de alarmes disparados na página 'Meus Alarmes' é agora corretamente ordenada pela data de disparo, com os mais recentes no topo.",
+        "A página de 'Detalhes do Ativo' agora exibe uma nova secção com o histórico de alarmes que já foram disparados para aquele ativo específico."
+    ]
+},
+ releases: [
+  {
     number: '12.5.0',
     changes: [
         "**Gestão de Estratégias - Adicionar Imagens de Referência:**",
@@ -9,8 +18,7 @@ current: {
         "Quando uma estratégia é selecionada no modal de 'Adicionar Ativo à Watchlist', a imagem associada à primeira fase é agora exibida como uma referência visual direta do padrão ou setup."
     ]
 },
- releases: [
-  {
+     {
     number: '12.4.1',
     changes: [
         "**Dashboard (Watchlist) - Melhoria no Fluxo de Reconhecimento de Alarmes:**",
