@@ -37,13 +37,7 @@ header .main-nav {
     display: grid; 
     grid-template-columns: repeat(3, 1fr); 
     gap: 2rem; 
-    grid-template-areas: "potential armed live"; /* Define a ordem visual para desktop */
 }
-
-.potential-trades { grid-area: potential; }
-.armed-trades { grid-area: armed; }
-.live-trades { grid-area: live; }
-
 
 .asset-charts-grid {
     display: grid;
