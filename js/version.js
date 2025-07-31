@@ -2,6 +2,15 @@
 
 export const changelogData = {
 current: {
+    number: '12.7.0',
+    changes: [
+        "**Dashboard (Watchlist) - Melhorias de UI/UX:**",
+        "O botão 'Adicionar à Watchlist' foi revertido para a sua posição na segunda linha de navegação contextual, com texto, para maior clareza e acessibilidade.",
+        "Os ícones de sino (para alarmes ativos e disparados) nos cards da watchlist foram atualizados para terem preenchimento vermelho, aumentando a sua visibilidade."
+    ]
+},
+ releases: [
+  {
     number: '12.6.0',
     changes: [
         "**Melhorias na Gestão e Visualização de Alarmes:**",
@@ -9,8 +18,7 @@ current: {
         "A página de 'Detalhes do Ativo' agora exibe uma nova secção com o histórico de alarmes que já foram disparados para aquele ativo específico."
     ]
 },
- releases: [
-  {
+     {
     number: '12.5.0',
     changes: [
         "**Gestão de Estratégias - Adicionar Imagens de Referência:**",
