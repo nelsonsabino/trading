@@ -17,7 +17,7 @@
 <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
 <!-- FIM DOS FAVICONS GERADOS -->
     
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/layout.css">
@@ -50,52 +50,45 @@
 </head>
 <body>
 
+    <!-- BOTÃO DE TEMA FIXO -->
+    <button id="theme-toggle-btn" class="nav-icon-link" title="Alternar tema">
+        <span class="material-symbols-outlined">dark_mode</span>
+    </button>
 
+    <header>
+        <h1>Gestão de Estratégias</h1>
+        <p class="mantra">Crie e refine os seus sistemas de trading.</p>
 
-<!-- NOVO BOTÃO DE TEMA (fora do header) -->
-<button id="theme-toggle-btn" class="nav-icon-link" title="Alternar tema">
-    <i class="fas fa-moon"></i>
-</button>
-
-
-
-
-<header>
-    <h1>Gestão de Estratégias</h1>
-    <p class="mantra">Crie e refine os seus sistemas de trading.</p>
-
-    <!-- Primeira Linha: Navegação Global com Google Icons -->
-    <nav class="main-nav">
-        <a href="dashboard.html" class="nav-icon-link" title="Dashboard"><span class="material-symbols-outlined">home</span></a>
-        <a href="market-scan.html" class="nav-icon-link" title="Scanner de Mercado"><span class="material-symbols-outlined">query_stats</span></a>
-        <a href="alarms-create.html" class="nav-icon-link action-create-alarm" title="Criar Alarme"><span class="material-symbols-outlined">alarm_add</span></a>
-        <a href="alarms-manage.html" class="nav-icon-link" title="Meus Alarmes"><span class="material-symbols-outlined">alarm</span></a>
-        
-        <div class="nav-dropdown">
-            <button id="management-toggle" class="nav-icon-link" title="Gerir e Estatísticas"><span class="material-symbols-outlined">settings</span></button>
-            <div class="nav-dropdown-content">
-                <a href="strategies-manager.html" class="nav-link">Gerir Estratégias</a>
-                <a href="manage.html" class="nav-link">Todas as Operações</a>
-                <a href="stats.html" class="nav-link">Ver Estatísticas</a>
+        <!-- Primeira Linha: Navegação Global -->
+        <nav class="main-nav">
+            <a href="dashboard.html" class="nav-icon-link" title="Dashboard"><span class="material-symbols-outlined">home</span></a>
+            <a href="market-scan.html" class="nav-icon-link" title="Scanner de Mercado"><span class="material-symbols-outlined">query_stats</span></a>
+            <a href="alarms-create.html" class="nav-icon-link action-create-alarm" title="Criar Alarme"><span class="material-symbols-outlined">alarm_add</span></a>
+            <a href="alarms-manage.html" class="nav-icon-link" title="Meus Alarmes"><span class="material-symbols-outlined">alarm</span></a>
+            
+            <div class="nav-dropdown">
+                <button id="management-toggle" class="nav-icon-link" title="Gerir e Estatísticas"><span class="material-symbols-outlined">settings</span></button>
+                <div class="nav-dropdown-content">
+                    <a href="strategies-manager.html" class="nav-link">Gerir Estratégias</a>
+                    <a href="manage.html" class="nav-link">Todas as Operações</a>
+                    <a href="stats.html" class="nav-link">Ver Estatísticas</a>
+                </div>
             </div>
-        </div>
 
-        <!-- Secção do Utilizador -->
-        <div id="user-session" class="user-session" style="display: none;">
-            <img id="user-photo" src="" alt="Foto do Utilizador" class="user-photo">
-            <button id="logout-btn" class="btn btn-secondary">Sair</button>
-        </div>
-    </nav>
-    
-    <!-- Segunda Linha: Ações da Página -->
-    <nav class="contextual-nav">
-        <button id="create-strategy-btn" class="btn btn-contextual">
-            <span class="material-symbols-outlined" style="font-size: 1.2em; margin-right: 0.5rem;">add</span> Criar Nova Estratégia
-        </button>
-    </nav>
-</header>    
-
-    
+            <!-- Secção do Utilizador -->
+            <div id="user-session" class="user-session" style="display: none;">
+                <img id="user-photo" src="" alt="Foto do Utilizador" class="user-photo">
+                <button id="logout-btn" class="btn btn-secondary">Sair</button>
+            </div>
+        </nav>
+        
+        <!-- Segunda Linha: Ações da Página -->
+        <nav class="contextual-nav">
+            <button id="create-strategy-btn" class="btn btn-contextual">
+                <span class="material-symbols-outlined" style="font-size: 1.2em; margin-right: 0.5rem;">add</span> Criar Nova Estratégia
+            </button>
+        </nav>
+    </header>
 
     <main>
         <section class="strategies-list-section">
@@ -125,7 +118,7 @@
                 </div>
 
                 <button type="button" id="add-phase-btn" class="btn btn-secondary" style="margin-top: 1rem;">
-                    <i class="fas fa-plus"></i> Adicionar Fase
+                    <span class="material-symbols-outlined">add</span> Adicionar Fase
                 </button>
 
                 <hr style="margin: 2rem 0;">
@@ -141,6 +134,7 @@
                         <button type="button" class="btn btn-secondary" data-type="select">Dropdown (Select)</button>
                         <button type="button" class="btn btn-secondary" data-type="text">Campo de Texto</button>
                         <button type="button" class="btn btn-secondary" data-type="number">Campo de Número</button>
+                        <button type="button" class="btn btn-secondary" data-type="image">Imagem</button>
                     </div>
                     <button type="button" id="cancel-add-item" class="btn" style="margin-top: 1rem; background-color: #6c757d; color: white;">Cancelar</button>
                 </div>
@@ -157,5 +151,6 @@
     <script type="module" src="js/version.js"></script>
     <script type="module" src="js/dark-mode.js"></script>
     <script type="module" src="js/auth.js"></script>
+
 </body>
 </html>
