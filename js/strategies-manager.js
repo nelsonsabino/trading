@@ -1,4 +1,4 @@
-// js/strategies-manager.js - VERSÃO COM FASES AUTOMÁTICAS
+// js/strategies-manager.js - VERSÃO COM FASES AUTOMÁTICAS E IMAGENS
 
 import { listenToStrategies, deleteStrategy, addStrategy, updateStrategy, getStrategy } from './firebase-service.js';
 
@@ -36,18 +36,23 @@ function openStrategyModal(strategy = null) {
         if (strategy.data.phases && Array.isArray(strategy.data.phases)) {
             strategy.data.phases.forEach(phase => {
                 const phaseBlock = addPhaseBlock();
-                if (!phaseBlock) return; // Não adiciona mais de 3 fases
+                if (!phaseBlock) return;
 
                 const itemsListContainer = phaseBlock.querySelector('.items-list');
                 if (phase.items && Array.isArray(phase.items)) {
                     phase.items.forEach(item => {
                         const itemBlock = createItemBlock(item.type);
-                        itemBlock.querySelector('.item-id').value = item.id || '';
-                        itemBlock.querySelector('.item-label').value = item.label || '';
-                        itemBlock.querySelector('.item-required').checked = item.required || false;
+                        
+                        if (item.type === 'image') {
+                            itemBlock.querySelector('.item-image-url').value = item.url || '';
+                        } else {
+                            itemBlock.querySelector('.item-id').value = item.id || '';
+                            itemBlock.querySelector('.item-label').value = item.label || '';
+                            itemBlock.querySelector('.item-required').checked = item.required || false;
 
-                        if (item.type === 'select' && item.options) {
-                            itemBlock.querySelector('.item-options').value = item.options.join(', ');
+                            if (item.type === 'select' && item.options) {
+                                itemBlock.querySelector('.item-options').value = item.options.join(', ');
+                            }
                         }
                         itemsListContainer.appendChild(itemBlock);
                     });
@@ -78,23 +83,39 @@ function createItemBlock(type) {
     itemDiv.className = 'phase-block';
     itemDiv.style.backgroundColor = '#fff';
     itemDiv.dataset.type = type;
-    let fieldsHtml = `
-        <div class="phase-block-header">
-            <h5>Item: ${type.charAt(0).toUpperCase() + type.slice(1)}</h5>
-            <button type="button" class="btn delete-btn" style="padding: 4px 8px; font-size: 0.8em;">Remover Item</button>
-        </div>
-        <div class="form-row">
-            <div class="input-item"><label>ID do Item</label><input type="text" class="item-id" required></div>
-            <div class="input-item"><label>Rótulo (Label)</label><input type="text" class="item-label" required></div>
-        </div>
-        <div class="input-item" style="display: flex; align-items: center; gap: 10px;">
-            <input type="checkbox" class="item-required" style="width: auto; margin: 0;">
-            <label style="margin: 0;">Obrigatório?</label>
-        </div>
-    `;
-    if (type === 'select') {
-        fieldsHtml += `<div class="input-item"><label>Opções (separadas por vírgula)</label><input type="text" class="item-options" placeholder="Ex: Opção 1, Opção 2"></div>`;
+    let fieldsHtml = '';
+
+    if (type === 'image') {
+        fieldsHtml = `
+            <div class="phase-block-header">
+                <h5>Item: Imagem</h5>
+                <button type="button" class="btn delete-btn" style="padding: 4px 8px; font-size: 0.8em;">Remover Item</button>
+            </div>
+            <div class="input-item">
+                <label>URL da Imagem</label>
+                <input type="text" class="item-image-url" placeholder="https://exemplo.com/imagem.png" required>
+            </div>
+        `;
+    } else {
+        fieldsHtml = `
+            <div class="phase-block-header">
+                <h5>Item: ${type.charAt(0).toUpperCase() + type.slice(1)}</h5>
+                <button type="button" class="btn delete-btn" style="padding: 4px 8px; font-size: 0.8em;">Remover Item</button>
+            </div>
+            <div class="form-row">
+                <div class="input-item"><label>ID do Item</label><input type="text" class="item-id" required></div>
+                <div class="input-item"><label>Rótulo (Label)</label><input type="text" class="item-label" required></div>
+            </div>
+            <div class="input-item" style="display: flex; align-items: center; gap: 10px;">
+                <input type="checkbox" class="item-required" style="width: auto; margin: 0;">
+                <label style="margin: 0;">Obrigatório?</label>
+            </div>
+        `;
+        if (type === 'select') {
+            fieldsHtml += `<div class="input-item"><label>Opções (separadas por vírgula)</label><input type="text" class="item-options" placeholder="Ex: Opção 1, Opção 2"></div>`;
+        }
     }
+    
     itemDiv.innerHTML = fieldsHtml;
     itemDiv.querySelector('.delete-btn').addEventListener('click', () => itemDiv.remove());
     return itemDiv;
@@ -126,7 +147,7 @@ function addPhaseBlock() {
             <h6>Itens da Checklist</h6>
             <div class="items-list" style="padding-left: 1rem; border-left: 2px solid #e9ecef;"></div>
             <button type="button" class="btn btn-secondary add-item-btn" style="font-size: 0.9em; padding: 6px 10px; margin-top: 1rem;">
-                <i class="fas fa-plus"></i> Adicionar Item
+                <span class="material-symbols-outlined">add</span> Adicionar Item
             </button>
         </div>
     `;
@@ -149,20 +170,24 @@ function buildStrategyDataFromForm() {
     phaseBlocks.forEach((phaseBlock, index) => {
         const phaseObject = {
             id: phaseBlock.dataset.phaseId,
-            title: phaseTitles[index], // Usa o título correspondente à ordem
+            title: phaseTitles[index],
             items: []
         };
         const itemBlocks = phaseBlock.querySelectorAll('.items-list .phase-block');
         itemBlocks.forEach(itemBlock => {
-            const itemObject = {
-                type: itemBlock.dataset.type,
-                id: itemBlock.querySelector('.item-id').value.trim(),
-                label: itemBlock.querySelector('.item-label').value.trim(),
-                required: itemBlock.querySelector('.item-required').checked
-            };
-            if (itemObject.type === 'select') {
-                const optionsInput = itemBlock.querySelector('.item-options');
-                if (optionsInput) itemObject.options = optionsInput.value.split(',').map(opt => opt.trim()).filter(Boolean);
+            const itemType = itemBlock.dataset.type;
+            let itemObject = { type: itemType };
+            
+            if (itemType === 'image') {
+                itemObject.url = itemBlock.querySelector('.item-image-url').value.trim();
+            } else {
+                itemObject.id = itemBlock.querySelector('.item-id').value.trim();
+                itemObject.label = itemBlock.querySelector('.item-label').value.trim();
+                itemObject.required = itemBlock.querySelector('.item-required').checked;
+                if (itemType === 'select') {
+                    const optionsInput = itemBlock.querySelector('.item-options');
+                    if (optionsInput) itemObject.options = optionsInput.value.split(',').map(opt => opt.trim()).filter(Boolean);
+                }
             }
             phaseObject.items.push(itemObject);
         });
@@ -201,10 +226,10 @@ function createStrategyCard(strategy) {
             <p><strong>Criada em:</strong> ${date}</p>
             <div class="card-actions" style="justify-content: flex-end; gap: 0.5rem;">
                 <button class="icon-action-btn action-edit" data-id="${strategy.id}" title="Editar Estratégia">
-                    <span class="material-symbols-outlined">edit</span> <span>Editar</span>
+                    <span class="material-symbols-outlined">edit</span> <span class="button-text">Editar</span>
                 </button>
                 <button class="icon-action-btn action-close delete-btn" data-id="${strategy.id}" title="Apagar Estratégia">
-                    <span class="material-symbols-outlined">delete</span> <span>Apagar</span>
+                    <span class="material-symbols-outlined">delete</span> <span class="button-text">Apagar</span>
                 </button>
             </div>
         </div>
