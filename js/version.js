@@ -2,6 +2,15 @@
 
 export const changelogData = {
 current: {
+    number: '12.5.0',
+    changes: [
+        "**Gestão de Estratégias - Adicionar Imagens de Referência:**",
+        "Implementada a funcionalidade para adicionar um link de imagem como um item numa fase de estratégia no `strategies-manager`.",
+        "Quando uma estratégia é selecionada no modal de 'Adicionar Ativo à Watchlist', a imagem associada à primeira fase é agora exibida como uma referência visual direta do padrão ou setup."
+    ]
+},
+ releases: [
+  {
     number: '12.4.1',
     changes: [
         "**Dashboard (Watchlist) - Melhoria no Fluxo de Reconhecimento de Alarmes:**",
@@ -10,8 +19,7 @@ current: {
         "Esta alteração dá ao utilizador mais controlo e intencionalidade sobre quando o aviso de um alarme disparado é removido."
     ]
 },
- releases: [
-  {
+     {
     number: '12.4.0',
     changes: [
         "**Dashboard (Watchlist) - Gestão de Alarmes Melhorada (Final):**",
