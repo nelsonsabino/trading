@@ -194,13 +194,18 @@
         </div>
     </div>
 
-    <!-- NOVO: Modal para listar alarmes -->
+    <!-- Modal para listar alarmes -->
     <div id="alarm-list-modal" class="modal-overlay">
         <div class="modal-content">
             <span id="close-alarm-list-modal">×</span>
             <h3 id="alarm-list-title">Alarmes para Ativo</h3>
             <div id="alarm-list-container">
-                <!-- A lista de alarmes será inserida aqui pelo JavaScript -->
+                <!-- A lista de alarmes será inserida aqui -->
+            </div>
+            <div id="alarm-list-footer" style="margin-top: 1.5rem; text-align: right; display: none;">
+                <button id="acknowledge-alarms-btn" class="btn btn-secondary btn-contextual">
+                    <span class="material-symbols-outlined">task_alt</span> Reconhecer Alarmes
+                </button>
             </div>
         </div>
     </div>
