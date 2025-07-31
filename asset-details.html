@@ -17,7 +17,7 @@
 <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
 <!-- FIM DOS FAVICONS GERADOS -->
     
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/layout.css">
@@ -51,49 +51,45 @@
 </head>
 <body>
 
+    <!-- BOTÃO DE TEMA FIXO -->
+    <button id="theme-toggle-btn" class="nav-icon-link" title="Alternar tema">
+        <span class="material-symbols-outlined">dark_mode</span>
+    </button>
 
+    <header>
+        <h1 id="asset-title">A carregar...</h1>
+        <p class="mantra">Toda a informação sobre o ativo, num único local.</p>
 
-<!-- NOVO BOTÃO DE TEMA (fora do header) -->
-<button id="theme-toggle-btn" class="nav-icon-link" title="Alternar tema">
-    <i class="fas fa-moon"></i>
-</button>
-
-<header>
-    <h1 id="asset-title">A carregar...</h1>
-    <p class="mantra">Toda a informação sobre o ativo, num único local.</p>
-
-    <!-- Primeira Linha: Navegação Global -->
-    <nav class="main-nav">
-        <a href="dashboard.html" class="nav-icon-link" title="Dashboard"><span class="material-symbols-outlined">home</span></a>
-        <a href="market-scan.html" class="nav-icon-link" title="Scanner de Mercado"><span class="material-symbols-outlined">query_stats</span></a>
-        <a href="alarms-create.html" class="nav-icon-link action-create-alarm" title="Criar Alarme"><span class="material-symbols-outlined">alarm_add</span></a>
-        <a href="alarms-manage.html" class="nav-icon-link" title="Meus Alarmes"><span class="material-symbols-outlined">alarm</span></a>
-        <div class="nav-dropdown">
-            <button id="management-toggle" class="nav-icon-link" title="Gerir e Estatísticas"><span class="material-symbols-outlined">settings</span></button>
+        <!-- Primeira Linha: Navegação Global -->
+        <nav class="main-nav">
+            <a href="dashboard.html" class="nav-icon-link" title="Dashboard"><span class="material-symbols-outlined">home</span></a>
+            <a href="market-scan.html" class="nav-icon-link" title="Scanner de Mercado"><span class="material-symbols-outlined">query_stats</span></a>
+            <a href="alarms-create.html" class="nav-icon-link action-create-alarm" title="Criar Alarme"><span class="material-symbols-outlined">alarm_add</span></a>
+            <a href="alarms-manage.html" class="nav-icon-link" title="Meus Alarmes"><span class="material-symbols-outlined">alarm</span></a>
             
-            <div class="nav-dropdown-content">
-                <a href="strategies-manager.html" class="nav-link">Gerir Estratégias</a>
-                <a href="manage.html" class="nav-link">Todas as Operações</a>
-                <a href="stats.html" class="nav-link">Ver Estatísticas</a>
+            <div class="nav-dropdown">
+                <button id="management-toggle" class="nav-icon-link" title="Gerir e Estatísticas"><span class="material-symbols-outlined">settings</span></button>
+                <div class="nav-dropdown-content">
+                    <a href="strategies-manager.html" class="nav-link">Gerir Estratégias</a>
+                    <a href="manage.html" class="nav-link">Todas as Operações</a>
+                    <a href="stats.html" class="nav-link">Ver Estatísticas</a>
+                </div>
             </div>
-        </div>
 
-        <!-- Secção do Utilizador -->
-        <div id="user-session" class="user-session" style="display: none;">
-            <img id="user-photo" src="" alt="Foto do Utilizador" class="user-photo">
-            <button id="logout-btn" class="btn btn-secondary">Sair</button>
-        </div>
-    </nav>
-    
-    <!-- Segunda Linha: Ações da Página -->
-    <nav class="contextual-nav">
-        <a id="add-to-watchlist-btn" href="#" class="btn btn-contextual"><i class="fas fa-plus"></i> Adicionar à Watchlist</a>
-        <a id="add-alarm-btn" href="#" class="btn btn-contextual"><i class="fas fa-bell"></i> Criar Alarme</a>
-        <a id="open-tv-btn" href="#" class="btn btn-contextual" target="_blank" rel="noopener noreferrer"><i class="fas fa-chart-line"></i> Análise TradingView</a>
-    </nav>
-</header>
-
-    
+            <!-- Secção do Utilizador -->
+            <div id="user-session" class="user-session" style="display: none;">
+                <img id="user-photo" src="" alt="Foto do Utilizador" class="user-photo">
+                <button id="logout-btn" class="btn btn-secondary">Sair</button>
+            </div>
+        </nav>
+        
+        <!-- Segunda Linha: Ações da Página -->
+        <nav class="contextual-nav">
+            <a id="add-to-watchlist-btn" href="#" class="btn btn-contextual"><span class="material-symbols-outlined">add</span> Adicionar à Watchlist</a>
+            <a id="add-alarm-btn" href="#" class="btn btn-contextual"><span class="material-symbols-outlined">alarm_add</span> Criar Alarme</a>
+            <a id="open-tv-btn" href="#" class="btn btn-contextual" target="_blank" rel="noopener noreferrer"><span class="material-symbols-outlined">monitoring</span> Análise TradingView</a>
+        </nav>
+    </header>
 
     <main>
         <section class="main-chart-section">
@@ -128,7 +124,7 @@
         <hr class="section-divider">
 
         <section class="asset-related-data" style="margin-bottom: 2rem;">
-            <h2><i class="fa-solid fa-chart-line"></i> Análise Técnica Detalhada</h2>
+            <h2><span class="material-symbols-outlined">monitoring</span> Análise Técnica Detalhada</h2>
             <div class="stat-card" style="padding: 1rem;">
                 <div id="tradingview-tech-analysis-container" class="tradingview-widget-wrapper"></div> 
             </div>
@@ -137,7 +133,7 @@
         <hr class="section-divider">
 
         <section class="asset-related-data">
-            <h2><i class="fa-solid fa-bell"></i> Alarmes Ativos para este Ativo</h2>
+            <h2><span class="material-symbols-outlined">alarm</span> Alarmes Ativos para este Ativo</h2>
             <div class="table-wrapper">
                 <table class="alarms-table">
                     <thead>
@@ -155,7 +151,25 @@
         <hr class="section-divider">
 
         <section class="asset-related-data">
-            <h2><i class="fa-solid fa-history"></i> Histórico de Trades para este Ativo</h2>
+            <h2><span class="material-symbols-outlined">history</span> Histórico de Alarmes Disparados</h2>
+            <div class="table-wrapper">
+                <table class="alarms-table">
+                    <thead>
+                        <tr>
+                            <th>Condição</th>
+                            <th>Data do Disparo</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="asset-triggered-alarms-tbody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <hr class="section-divider">
+
+        <section class="asset-related-data">
+            <h2><span class="material-symbols-outlined">receipt_long</span> Histórico de Trades para este Ativo</h2>
             <div class="table-wrapper">
                 <table id="trades-table">
                     <thead>
