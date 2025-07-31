@@ -6,6 +6,7 @@
 @media (max-width: 992px) { 
     .dashboard-columns { 
         grid-template-columns: 1fr 1fr; /* 2 colunas para o dashboard */
+        grid-template-areas: "potential armed" "live ."; /* Ajusta as áreas para 2 colunas */
     } 
     .asset-charts-grid { 
         grid-template-columns: 1fr; /* Gráficos da página de detalhes empilhados */
@@ -25,14 +26,9 @@
         padding: 0 1rem 1rem 1rem; 
     }
     .dashboard-columns { 
-        display: flex;
-        flex-direction: column;
+        grid-template-columns: 1fr; /* Volta a ser uma única coluna, seguindo a ordem do HTML */
+        grid-template-areas: unset; /* Remove as áreas de grid para que a ordem do HTML prevaleça */
     }
-    
-    /* Define a nova ordem visual para mobile */
-    .live-trades { order: 1; }
-    .armed-trades { order: 2; }
-    .potential-trades { order: 3; }
     
     h1 { 
         font-size: 1.8rem; 
