@@ -241,10 +241,19 @@
 
 /* --- ALARMES NOS TRADES CARDS (DASHBOARD) --- */
 .alarm-active-bell {
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    width: auto !important;
+    height: auto !important;
     color: #dc3545;
-    font-size: 0.9em;
-    margin-left: 0.25rem;
+    font-size: 1.1em;
+    margin-left: 0.5rem;
     transition: transform 0.2s ease-out;
+}
+
+.alarm-active-bell .material-symbols-outlined {
+    font-variation-settings: 'FILL' 1, 'wght' 700; /* Preenche o ícone */
 }
 
 .alarm-active-bell.ringing {
@@ -284,6 +293,9 @@
     border: none;
     cursor: pointer;
     margin-left: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
 }
 
 .acknowledge-alarm-btn:hover {
