@@ -44,15 +44,25 @@ async function fetchAndDisplayAlarms() {
         activeTbody.innerHTML = '<tr><td colspan="4">A carregar...</td></tr>';
         triggeredTbody.innerHTML = '<tr><td colspan="5">A carregar...</td></tr>';
         
-        const { data, error } = await supabase.from('alarms').select('*').order('created_at', { ascending: false });
-        if (error) throw error;
+        const [activeAlarmsResponse, triggeredAlarmsResponse] = await Promise.all([
+            supabase.from('alarms').select('*').eq('status', 'active').order('created_at', { ascending: false }),
+            supabase.from('alarms').select('*').eq('status', 'triggered').order('triggered_at', { ascending: false })
+        ]);
 
-        setAlarmsData(data);
-        sessionStorage.setItem('allAlarmsData', JSON.stringify(data));
+        if (activeAlarmsResponse.error) throw activeAlarmsResponse.error;
+        if (triggeredAlarmsResponse.error) throw triggeredAlarmsResponse.error;
+
+        const activeAlarms = activeAlarmsResponse.data;
+        const triggeredAlarms = triggeredAlarmsResponse.data;
+        const allAlarms = [...activeAlarms, ...triggeredAlarms];
+
+        setAlarmsData(allAlarms);
+        sessionStorage.setItem('allAlarmsData', JSON.stringify(allAlarms));
 
         const activeAlarmsHtml = [], triggeredAlarmsHtml = [];
 
-        for (const alarm of data) {
+        // Processar alarmes ativos
+        for (const alarm of activeAlarms) {
             const formattedDate = new Date(alarm.created_at).toLocaleString('pt-PT');
             let alarmDescription = '';
             if (alarm.alarm_type === 'stochastic') { alarmDescription = `Estocástico(${alarm.indicator_period}) ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} no ${alarm.indicator_timeframe}`; }
@@ -67,43 +77,58 @@ async function fetchAndDisplayAlarms() {
             const addOpportunityUrl = `dashboard.html?assetPair=${alarm.asset_pair}`;
             const assetHtml = `<strong><a href="asset-details.html?symbol=${alarm.asset_pair}" class="asset-link">${alarm.asset_pair}</a></strong>`;
 
-            if (alarm.status === 'active') {
-                activeAlarmsHtml.push(`
-                    <tr data-alarm-id="${alarm.id}">
-                        <td data-label="Ativo"><span class="cell-value">${assetHtml}</span></td>
-                        <td data-label="Condição"><span class="cell-value description">${alarmDescription}</span></td>
-                        <td data-label="Data Criação"><span class="cell-value">${formattedDate}</span></td>
-                        <td data-label="Ações">
-                            <div class="action-buttons cell-value">
-                                <a href="alarms-create.html?editAlarmId=${alarm.id}" class="icon-action-btn" title="Editar Alarme"><span class="material-symbols-outlined">edit</span></a>
-                                <button class="icon-action-btn delete-btn" data-id="${alarm.id}" title="Apagar Alarme"><span class="material-symbols-outlined">delete</span></button>
-                                <a href="#" class="icon-action-btn view-chart-btn" data-symbol="${alarm.asset_pair}" title="Ver Gráfico no Modal"><span class="material-symbols-outlined">monitoring</span></a>
-                                <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn" title="Abrir no TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
-                                <a href="${addOpportunityUrl}" class="icon-action-btn" title="Adicionar à Watchlist"><span class="material-symbols-outlined">add</span></a>
-                            </div>
-                        </td>
-                    </tr>`);
-            } else {
-                const triggeredDate = alarm.triggered_at ? new Date(alarm.triggered_at).toLocaleString('pt-PT') : new Date(alarm.created_at).toLocaleString('pt-PT');
-                triggeredAlarmsHtml.push(`
-                    <tr data-alarm-id="${alarm.id}">
-                        <td data-label="Ativo"><span class="cell-value">${assetHtml}</span></td>
-                        <td data-label="Condição"><span class="cell-value description">${alarmDescription}</span></td>
-                        <td data-label="Status"><span class="cell-value"><span class="status-badge status-closed">Disparado</span></span></td>
-                        <td data-label="Data Disparo"><span class="cell-value">${triggeredDate}</span></td>
-                        <td data-label="Ações">
-                            <div class="action-buttons cell-value">
-                                <button class="icon-action-btn delete-btn" data-id="${alarm.id}" title="Apagar Alarme"><span class="material-symbols-outlined">delete</span></button>
-                                <a href="#" class="icon-action-btn view-chart-btn" data-symbol="${alarm.asset_pair}" title="Ver Gráfico no Modal"><span class="material-symbols-outlined">monitoring</span></a>
-                                <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn" title="Abrir no TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
-                                <a href="${addOpportunityUrl}" class="icon-action-btn" title="Adicionar à Watchlist"><span class="material-symbols-outlined">add</span></a>
-                            </div>
-                        </td>
-                    </tr>`);
-            }
+            activeAlarmsHtml.push(`
+                <tr data-alarm-id="${alarm.id}">
+                    <td data-label="Ativo"><span class="cell-value">${assetHtml}</span></td>
+                    <td data-label="Condição"><span class="cell-value description">${alarmDescription}</span></td>
+                    <td data-label="Data Criação"><span class="cell-value">${formattedDate}</span></td>
+                    <td data-label="Ações">
+                        <div class="action-buttons cell-value">
+                            <a href="alarms-create.html?editAlarmId=${alarm.id}" class="icon-action-btn" title="Editar Alarme"><span class="material-symbols-outlined">edit</span></a>
+                            <button class="icon-action-btn delete-btn" data-id="${alarm.id}" title="Apagar Alarme"><span class="material-symbols-outlined">delete</span></button>
+                            <a href="#" class="icon-action-btn view-chart-btn" data-symbol="${alarm.asset_pair}" title="Ver Gráfico no Modal"><span class="material-symbols-outlined">monitoring</span></a>
+                            <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn" title="Abrir no TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
+                            <a href="${addOpportunityUrl}" class="icon-action-btn" title="Adicionar à Watchlist"><span class="material-symbols-outlined">add</span></a>
+                        </div>
+                    </td>
+                </tr>`);
         }
-        activeTbody.innerHTML = activeAlarmsHtml.length > 0 ? activeAlarmsHtml.join('') : '<tr><td colspan="4" style="text-align:center;">Nenhum alarme ativo.</td></tr>';
-        triggeredTbody.innerHTML = triggeredAlarmsHtml.length > 0 ? triggeredAlarmsHtml.join('') : '<tr><td colspan="5" style="text-align:center;">Nenhum alarme no histórico.</td></tr>';
+
+        // Processar alarmes disparados
+        for (const alarm of triggeredAlarms) {
+            const triggeredDate = alarm.triggered_at ? new Date(alarm.triggered_at).toLocaleString('pt-PT') : new Date(alarm.created_at).toLocaleString('pt-PT');
+            let alarmDescription = '';
+            if (alarm.alarm_type === 'stochastic') { alarmDescription = `Estocástico(${alarm.indicator_period}) ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} no ${alarm.indicator_timeframe}`; }
+            else if (alarm.alarm_type === 'rsi_level') { alarmDescription = `RSI(${alarm.indicator_period}) ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} no ${alarm.indicator_timeframe}`; }
+            else if (alarm.alarm_type === 'stochastic_crossover') { alarmDescription = `Estocástico %K(${alarm.indicator_period}) cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} de %D(${alarm.combo_period}) no ${alarm.indicator_timeframe}`; } 
+            else if (alarm.alarm_type === 'rsi_crossover') { alarmDescription = `RSI(${alarm.rsi_period}) cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} da MA(${alarm.rsi_ma_period}) no ${alarm.indicator_timeframe}`; } 
+            else if (alarm.alarm_type === 'ema_touch') { alarmDescription = `Preço testa a EMA(${alarm.ema_period}) como ${alarm.condition === 'test_support' ? 'SUPORTE' : 'RESISTÊNCIA'} no ${alarm.indicator_timeframe}`; } 
+            else if (alarm.alarm_type === 'combo') { const primaryTriggerText = alarm.condition === 'test_support' ? `testa a EMA (Suporte)` : `testa a EMA (Resistência)`; const secondaryTriggerText = `Estocástico(${alarm.combo_period}) ${alarm.combo_condition === 'below' ? 'abaixo de' : 'acima de'} ${alarm.combo_target_price}`; alarmDescription = `CONFLUÊNCIA: ${primaryTriggerText} E ${secondaryTriggerText} no ${alarm.indicator_timeframe}`; } 
+            else { alarmDescription = `Preço ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} USD`; }
+
+            const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${alarm.asset_pair}`;
+            const addOpportunityUrl = `dashboard.html?assetPair=${alarm.asset_pair}`;
+            const assetHtml = `<strong><a href="asset-details.html?symbol=${alarm.asset_pair}" class="asset-link">${alarm.asset_pair}</a></strong>`;
+
+            triggeredAlarmsHtml.push(`
+                <tr data-alarm-id="${alarm.id}">
+                    <td data-label="Ativo"><span class="cell-value">${assetHtml}</span></td>
+                    <td data-label="Condição"><span class="cell-value description">${alarmDescription}</span></td>
+                    <td data-label="Status"><span class="cell-value"><span class="status-badge status-closed">Disparado</span></span></td>
+                    <td data-label="Data Disparo"><span class="cell-value">${triggeredDate}</span></td>
+                    <td data-label="Ações">
+                        <div class="action-buttons cell-value">
+                            <button class="icon-action-btn delete-btn" data-id="${alarm.id}" title="Apagar Alarme"><span class="material-symbols-outlined">delete</span></button>
+                            <a href="#" class="icon-action-btn view-chart-btn" data-symbol="${alarm.asset_pair}" title="Ver Gráfico no Modal"><span class="material-symbols-outlined">monitoring</span></a>
+                            <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn" title="Abrir no TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
+                            <a href="${addOpportunityUrl}" class="icon-action-btn" title="Adicionar à Watchlist"><span class="material-symbols-outlined">add</span></a>
+                        </div>
+                    </td>
+                </tr>`);
+        }
+        
+        activeTbody.innerHTML = activeAlarms.length > 0 ? activeAlarmsHtml.join('') : '<tr><td colspan="4" style="text-align:center;">Nenhum alarme ativo.</td></tr>';
+        triggeredTbody.innerHTML = triggeredAlarms.length > 0 ? triggeredAlarmsHtml.join('') : '<tr><td colspan="5" style="text-align:center;">Nenhum alarme no histórico.</td></tr>';
 
         const lastId = getLastCreatedAlarmId();
         if (lastId) {
