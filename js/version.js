@@ -2,6 +2,15 @@
 
 export const changelogData = {
 current: {
+    number: '12.8.0',
+    changes: [
+        "**Dashboard (Watchlist) - Ordem de Prioridade em Mobile:**",
+        "A ordem de exibição das colunas da watchlist em dispositivos móveis foi ajustada para seguir a prioridade: 1º Ativo, 2º Armado, 3º Potencial.",
+        "Implementada uma lógica para esconder automaticamente as colunas que não contêm trades (tanto em mobile como em desktop), resultando numa interface mais limpa."
+    ]
+},
+ releases: [
+  {
     number: '12.7.0',
     changes: [
         "**Dashboard (Watchlist) - Melhorias de UI/UX:**",
@@ -9,8 +18,7 @@ current: {
         "Os ícones de sino (para alarmes ativos e disparados) nos cards da watchlist foram atualizados para terem preenchimento vermelho, aumentando a sua visibilidade."
     ]
 },
- releases: [
-  {
+     {
     number: '12.6.0',
     changes: [
         "**Melhorias na Gestão e Visualização de Alarmes:**",
