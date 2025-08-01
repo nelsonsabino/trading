@@ -1,5 +1,3 @@
-/* css/responsive.css */
-
 /* --- RESPONSIVIDADE --- */
 
 /* Tablet (menor que 992px) */
@@ -25,8 +23,13 @@
         padding: 0 1rem 1rem 1rem; 
     }
     .dashboard-columns { 
-        grid-template-columns: 1fr; 
-        display: grid; /* Garante que é grid, mesmo que já seja herdado */
+        /* 
+         * Passa para flex para usar a propriedade 'order' nos cards.
+         * Se usares grid, 'order' não tem efeito nos filhos.
+         */
+        display: flex !important;
+        flex-direction: column;
+        gap: 1.5rem;
     }
     .potential-trades { order: 3; } /* Potencial será o último */
     .armed-trades { order: 2; }    /* Armado será o do meio */
