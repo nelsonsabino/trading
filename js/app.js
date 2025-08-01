@@ -202,13 +202,16 @@ function hideEmptyDashboardCardsMobile() {
 
     cards.forEach(({ card, container }) => {
         if (card && container) {
-            // Considera vazio se só tem mensagem de estado OU não tem conteúdo visível
-            const messages = container.querySelectorAll('.empty-state-message');
-            // Se só tem mensagem de estado OU não tem conteúdo útil
-            const isReallyEmpty =
-                (container.children.length === 1 && messages.length === 1) ||
-                (!container.textContent.trim() && container.children.length === 0);
-            if (isReallyEmpty) {
+            // Se só tem .empty-state-message e nada mais, ou está totalmente vazio
+            const onlyEmptyState = (
+                container.children.length === 1 &&
+                container.firstElementChild.classList.contains('empty-state-message')
+            );
+            // Se não tem filhos ou está totalmente vazio
+            const isEmpty = container.children.length === 0 || !container.textContent.trim();
+
+            // Só esconde se estiver mesmo vazio OU só tiver mensagem de estado
+            if (isEmpty || onlyEmptyState) {
                 card.classList.add('dashboard-hide-mobile');
             } else {
                 card.classList.remove('dashboard-hide-mobile');
