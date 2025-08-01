@@ -1,4 +1,4 @@
-// js/app.js - VERSÃO COM REGISTO DO SERVICE WORKER E CAMINHO CORRETO
+// js/app.js - VERSÃO PARA ESCONDER CARDS VAZIOS TAMBÉM NO DESKTOP
 
 import { listenToTrades, fetchActiveStrategies } from './firebase-service.js';
 import { supabase, listenToAlarms } from './services.js';
@@ -74,7 +74,7 @@ async function initializeApp() {
         const activeTrades = trades.filter(t => ['POTENTIAL', 'ARMED', 'LIVE'].includes(t.data.status));
         const marketData = await fetchMarketDataForDashboard(activeTrades);
         displayTrades(activeTrades, marketData, currentAlarms);
-        hideEmptyDashboardCardsMobile(); // <- ADICIONADO
+        hideEmptyDashboardCards(); // <- ADICIONADO
     });
 
     listenToAlarms((alarms, error) => {
@@ -88,7 +88,7 @@ async function initializeApp() {
             const activeTrades = trades.filter(t => ['POTENTIAL', 'ARMED', 'LIVE'].includes(t.data.status));
             const marketData = await fetchMarketDataForDashboard(activeTrades);
             displayTrades(activeTrades, marketData, currentAlarms);
-            hideEmptyDashboardCardsMobile(); // <- ADICIONADO
+            hideEmptyDashboardCards(); // <- ADICIONADO
         });
     });
 
@@ -183,16 +183,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-// ----------- ESCONDER CARDS VAZIOS NO TELEMÓVEL -----------
+// ----------- ESCONDER CARDS VAZIOS EM TODAS AS RESOLUÇÕES -----------
 
-function hideEmptyDashboardCardsMobile() {
-    if (window.innerWidth > 768) {
-        document.querySelectorAll('.dashboard-hide-mobile').forEach(card => {
-            card.classList.remove('dashboard-hide-mobile');
-        });
-        return;
-    }
-
+function hideEmptyDashboardCards() {
     const cards = [
         { card: document.querySelector('.live-trades'),   container: document.getElementById('live-trades-container') },
         { card: document.querySelector('.armed-trades'),  container: document.getElementById('armed-trades-container') },
@@ -207,14 +200,14 @@ function hideEmptyDashboardCardsMobile() {
             const noChildren = children.length === 0;
 
             if (allEmptyState || noChildren) {
-                card.classList.add('dashboard-hide-mobile');
+                card.classList.add('dashboard-hide');
             } else {
-                card.classList.remove('dashboard-hide-mobile');
+                card.classList.remove('dashboard-hide');
             }
         }
     });
 }
 
 // Executa ao carregar, ao redimensionar, e depois de atualizar os cards
-window.addEventListener('DOMContentLoaded', hideEmptyDashboardCardsMobile);
-window.addEventListener('resize', hideEmptyDashboardCardsMobile);
+window.addEventListener('DOMContentLoaded', hideEmptyDashboardCards);
+window.addEventListener('resize', hideEmptyDashboardCards);
