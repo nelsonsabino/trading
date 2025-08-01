@@ -5,19 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Watchlist de Trading Cripto</title>
 
-    <!-- FAVICONS GERADOS -->
-    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
-    <link rel="manifest" href="./site.webmanifest">
-    <link rel="mask-icon" href="./safari-pinned-tab.svg" color="#5bbad5">
-    <meta name="msapplication-TileColor" content="#ffffff">
-    <meta name="theme-color" content="#ffffff">
-    <link rel="icon" href="./favicon.ico" type="image/x-icon">
-    <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
-    <!-- FIM DOS FAVICONS GERADOS -->
-
+<!-- FAVICONS GERADOS -->
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="./favicon-16x16.png">
+<link rel="manifest" href="./site.webmanifest">
+<link rel="mask-icon" href="./safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="./favicon.ico" type="image/x-icon">
+<link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
+<!-- FIM DOS FAVICONS GERADOS -->
+    
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/components.css">
@@ -32,7 +33,7 @@
     <link rel="stylesheet" href="css/navigation-menu.css">
 
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-
+    
     <script>
         (function() {
             try {
@@ -50,18 +51,22 @@
     </script>
 </head>
 <body>
+
     <!-- BOTÃO DE TEMA FIXO -->
     <button id="theme-toggle-btn" class="nav-icon-link" title="Alternar tema">
         <span class="material-symbols-outlined">dark_mode</span>
     </button>
+
     <header>
         <h1>Watchlist de Trading</h1>
         <p class="mantra">Tem paciência, usa alarmes, espera que os setups venham.</p>
+       
         <nav class="main-nav">
             <a href="dashboard.html" class="nav-icon-link" title="Dashboard"><span class="material-symbols-outlined">home</span></a>
             <a href="market-scan.html" class="nav-icon-link" title="Scanner de Mercado"><span class="material-symbols-outlined">query_stats</span></a>
             <a href="alarms-create.html" class="nav-icon-link action-create-alarm" title="Criar Alarme"><span class="material-symbols-outlined">alarm_add</span></a>
             <a href="alarms-manage.html" class="nav-icon-link" title="Meus Alarmes"><span class="material-symbols-outlined">alarm</span></a>
+            
             <div class="nav-dropdown">
                 <button id="management-toggle" class="nav-icon-link" title="Gerir e Estatísticas"><span class="material-symbols-outlined">settings</span></button>
                 <div class="nav-dropdown-content">
@@ -70,20 +75,24 @@
                     <a href="stats.html" class="nav-link">Ver Estatísticas</a>
                 </div>
             </div>
+
             <!-- Secção do Utilizador -->
             <div id="user-session" class="user-session" style="display: none;">
                 <img id="user-photo" src="" alt="Foto do Utilizador" class="user-photo">
                 <button id="logout-btn" class="btn btn-secondary">Sair</button>
             </div>
         </nav>
+        
         <!-- Segunda Linha: Ações da Página -->
         <nav class="contextual-nav">
             <button id="add-opportunity-btn" class="btn btn-contextual">
                 <span class="material-symbols-outlined">add</span> Adicionar à Watchlist
             </button>
         </nav>
-    </header>
+    </header>  
+
     <hr class="section-divider">
+    
     <main>
         <div class="dashboard-columns">
             <section class="potential-trades">
@@ -92,18 +101,7 @@
             </section>
             <section class="armed-trades">
                 <h2>Armado</h2>
-                <div id="armed-trades-container">
-                    <!-- Exemplo de item armado -->
-                    <div class="trade-item">
-                        <h3>BTCCUSD <span class="material-symbols-outlined">notifications</span></h3>
-                        <p>Estratégia: Preço em suporte EMA</p>
-                        <div class="trade-actions">
-                            <button class="btn" title="Executar">▶</button>
-                            <button class="btn" title="Reverter">↺</button>
-                        </div>
-                        <p>$114,928.02 <span class="trade-change">-3.04%</span></p>
-                    </div>
-                </div>
+                <div id="armed-trades-container"><p class="empty-state-message">A carregar...</p></div>
             </section>
             <section class="live-trades">
                 <h2>Ativo</h2>
@@ -111,6 +109,7 @@
             </section>
         </div>
     </main>
+
     <div id="add-opportunity-modal" class="modal-overlay">
         <div class="modal-content">
             <span id="close-modal-btn">×</span>
@@ -125,7 +124,7 @@
                     <input type="text" id="asset" name="asset" required placeholder="Comece a escrever para pesquisar..." autocomplete="off">
                     <div id="modal-autocomplete-results" class="autocomplete-results"></div>
                 </div>
-                <div id="dynamic-checklist-container"></div>
+                <div id="dynamic-checklist-container"></div>                
                 <div class="input-item">
                     <label for="image-url">Link da Imagem do Gráfico (TradingView):</label>
                     <input type="text" id="image-url" placeholder="Cole aqui o link da imagem...">
@@ -135,10 +134,12 @@
                     <textarea id="notes" placeholder="Ex: A formar fundo duplo..."></textarea>
                 </div>
                 <p class="form-footnote">* Campos obrigatórios</p>
+
                 <div class="checklist-item">
                     <input type="checkbox" id="redirect-to-alarm-checkbox">
                     <label for="redirect-to-alarm-checkbox"><strong>Criar um alarme para este ativo após guardar?</strong></label>
                 </div>
+                
                 <button type="submit">Guardar na Watchlist</button>
                 <button type="button" id="delete-opportunity-btn" class="btn btn-secondary" style="display: none; margin-top: 1rem; background-color: #dc3545; color: white;">
                     <i class="fas fa-trash"></i> Apagar Trade
@@ -146,6 +147,7 @@
             </form>
         </div>
     </div>
+
     <div id="arm-trade-modal" class="modal-overlay">
         <div class="modal-content">
             <span id="close-arm-trade-modal-btn">×</span>
@@ -157,6 +159,7 @@
             </form>
         </div>
     </div>
+
     <div id="execution-modal" class="modal-overlay">
         <div class="modal-content">
             <span id="close-execution-modal-btn">×</span>
@@ -168,6 +171,7 @@
             </form>
         </div>
     </div>
+
     <div id="close-trade-modal" class="modal-overlay">
         <div class="modal-content">
             <span id="close-close-trade-modal-btn">×</span>
@@ -183,12 +187,15 @@
             </form>
         </div>
     </div>
+     
     <div id="image-modal" class="modal-overlay">
         <div class="modal-content" style="max-width: 90%; max-height: 90%; padding: 0; position: relative;">
             <span id="close-image-modal" style="position: absolute; top: 10px; right: 15px; font-size: 2.5rem; color: #adb5bd; font-weight: 300; cursor: pointer;">×</span>
             <img id="modal-image" src="" alt="Imagem ampliada" style="max-width: 100%; max-height: 90vh; border-radius: 8px; display: block; margin: auto;">
         </div>
     </div>
+
+    <!-- Modal para listar alarmes -->
     <div id="alarm-list-modal" class="modal-overlay">
         <div class="modal-content">
             <span id="close-alarm-list-modal">×</span>
@@ -203,7 +210,9 @@
             </div>
         </div>
     </div>
-    <footer></footer>
+
+    <footer></footer>    
+
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="js/services.js"></script>
@@ -213,33 +222,40 @@
     <script type="module" src="js/version.js"></script>
     <script type="module" src="js/dark-mode.js"></script>
     <script type="module" src="js/auth.js"></script>
-    <script>
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            document.getElementById('installBtn').addEventListener('click', () => {
-                installBanner.classList.add('hidden');
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('O utilizador aceitou instalar');
-                    } else {
-                        console.log('O utilizador recusou instalar');
-                    }
-                    deferredPrompt = null;
-                });
-            });
-        });
-    </script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./service-worker.js')
-                    .then(reg => console.log('Service Worker registado com sucesso:', reg))
-                    .catch(err => console.error('Erro ao registar o Service Worker:', err));
-            });
+
+    
+<script>
+  let deferredPrompt;
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+   
+    document.getElementById('installBtn').addEventListener('click', () => {
+      installBanner.classList.add('hidden');
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('O utilizador aceitou instalar');
+        } else {
+          console.log('O utilizador recusou instalar');
         }
-    </script>
+        deferredPrompt = null;
+      });
+    });
+  });
+</script>
+
+ <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./service-worker.js')
+        .then(reg => console.log('Service Worker registado com sucesso:', reg))
+        .catch(err => console.error('Erro ao registar o Service Worker:', err));
+    });
+  }
+</script>
+
+    
 </body>
 </html>
