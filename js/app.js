@@ -74,6 +74,7 @@ async function initializeApp() {
         const activeTrades = trades.filter(t => ['POTENTIAL', 'ARMED', 'LIVE'].includes(t.data.status));
         const marketData = await fetchMarketDataForDashboard(activeTrades);
         displayTrades(activeTrades, marketData, currentAlarms);
+        hideEmptyDashboardCardsMobile(); // <- ADICIONADO
     });
 
     listenToAlarms((alarms, error) => {
@@ -87,6 +88,7 @@ async function initializeApp() {
             const activeTrades = trades.filter(t => ['POTENTIAL', 'ARMED', 'LIVE'].includes(t.data.status));
             const marketData = await fetchMarketDataForDashboard(activeTrades);
             displayTrades(activeTrades, marketData, currentAlarms);
+            hideEmptyDashboardCardsMobile(); // <- ADICIONADO
         });
     });
 
@@ -181,11 +183,17 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+// ----------- ESCONDER CARDS VAZIOS NO TELEMÓVEL -----------
 
 function hideEmptyDashboardCardsMobile() {
-    if (window.innerWidth > 768) return; // Só em telemóvel
+    if (window.innerWidth > 768) {
+        // Reexibe todos os cards se não for mobile!
+        document.querySelectorAll('.dashboard-hide-mobile').forEach(card => {
+            card.classList.remove('dashboard-hide-mobile');
+        });
+        return;
+    }
 
-    // Seleciona cada card e o seu container de conteúdo
     const cards = [
         { card: document.querySelector('.live-trades'),   container: document.getElementById('live-trades-container') },
         { card: document.querySelector('.armed-trades'),  container: document.getElementById('armed-trades-container') },
@@ -194,11 +202,13 @@ function hideEmptyDashboardCardsMobile() {
 
     cards.forEach(({ card, container }) => {
         if (card && container) {
-            // Se o container está vazio (sem elementos relevantes)
-            const isEmpty = !container.textContent.trim() && container.children.length === 0;
-            // Ou só tem mensagem de estado vazia
-            const onlyEmptyState = container.children.length === 1 && container.querySelector('.empty-state-message');
-            if (isEmpty || onlyEmptyState) {
+            // Considera vazio se só tem mensagem de estado OU não tem conteúdo visível
+            const messages = container.querySelectorAll('.empty-state-message');
+            // Se só tem mensagem de estado OU não tem conteúdo útil
+            const isReallyEmpty =
+                (container.children.length === 1 && messages.length === 1) ||
+                (!container.textContent.trim() && container.children.length === 0);
+            if (isReallyEmpty) {
                 card.classList.add('dashboard-hide-mobile');
             } else {
                 card.classList.remove('dashboard-hide-mobile');
@@ -207,6 +217,6 @@ function hideEmptyDashboardCardsMobile() {
     });
 }
 
-// Executa ao carregar e ao redimensionar
+// Executa ao carregar, ao redimensionar, e depois de atualizar os cards
 window.addEventListener('DOMContentLoaded', hideEmptyDashboardCardsMobile);
 window.addEventListener('resize', hideEmptyDashboardCardsMobile);
