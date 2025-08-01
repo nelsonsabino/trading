@@ -215,7 +215,10 @@ export async function loadAndOpenForEditing(tradeId) {
             // Pode redirecionar para a página de gestão ou stats aqui se quiser
             closeAddModal();
         }
-    }
+    }    
+}
+
+
 
 
 export async function handleRevertStatus(trade) {
@@ -237,8 +240,4 @@ export async function handleRevertStatus(trade) {
         alert('Ocorreu um erro ao reverter o estado.');
         console.error(err);
     }
-}
-
-
-    
 }
