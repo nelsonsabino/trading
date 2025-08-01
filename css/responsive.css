@@ -61,3 +61,10 @@
         justify-content: flex-start;
     }
 }
+
+/* Esconde cards vazios só em telemóvel */
+@media (max-width: 768px) {
+    .dashboard-hide-mobile {
+        display: none !important;
+    }
+}
