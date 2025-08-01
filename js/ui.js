@@ -3,7 +3,7 @@
 import { supabase } from './services.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openImageModal, openAddModal } from './modals.js';
-import { loadAndOpenForEditing } from './handlers.js';
+import { loadAndOpenForEditing, handleRevertStatus } from './handlers.js'; // Importa a nova função
 import { getLastCreatedTradeId, setLastCreatedTradeId } from './state.js';
 
 let tradesForEventListeners = [];
@@ -232,6 +232,7 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
 
     let alarmBellHtml = '';
     let acknowledgeButtonHtml = '';
+    let revertButtonHtml = '';
 
     if (hasActiveAlarm) {
         alarmBellHtml = `<button class="icon-action-btn alarm-active-bell" data-action="view-alarms" data-asset="${assetName}" title="Ver alarmes ativos"><span class="material-symbols-outlined">notifications_active</span></button>`;
@@ -240,8 +241,7 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
         card.classList.add('alarm-triggered');
         acknowledgeButtonHtml = `<button class="acknowledge-alarm-btn" data-action="acknowledge-and-view-alarm" data-asset="${assetName}" title="Ver Alarme Disparado"><span class="material-symbols-outlined">alarm</span> OK</button>`;
     }
-
-    let revertButtonHtml = '';
+    
     if (trade.data.status === 'ARMED' || trade.data.status === 'LIVE') {
         let revertText = trade.data.status === 'ARMED' ? 'Reverter para Potencial' : 'Reverter para Armado';
         let revertAction = trade.data.status === 'ARMED' ? 'revert-to-potential' : 'revert-to-armed';
@@ -340,6 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const assetSymbol = button.dataset.asset;
                     if (assetSymbol) {
                         loadAndOpenAlarmModal(assetSymbol, 'triggered');
+                        // acknowledgeAlarm(assetSymbol); // Ação de reconhecer agora está no botão do modal
                     }
                     break;
                 case 'add-to-watchlist':
