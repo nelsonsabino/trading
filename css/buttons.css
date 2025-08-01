@@ -130,17 +130,15 @@ a.nav-link:hover {
     background-color: #158a6e;
 }
 
-/* --- Otimização para Desktop: Esconder texto dos botões de ação nos cards --- */
-@media (min-width: 769px) {
-    .trade-card .card-main-action-button .icon-action-btn .button-text,
-    .trade-card .revert-btn .button-text {
-        display: none;
-    }
-    
-    .trade-card .card-main-action-button .icon-action-btn,
-    .trade-card .revert-btn {
-        width: 36px;
-        height: 36px;
-        padding: 6px;
-    }
+/* --- Estilo para botões de ação nos cards (sem texto) --- */
+.trade-card .card-main-action-button .icon-action-btn .button-text,
+.trade-card .revert-btn .button-text {
+    display: none;
+}
+
+.trade-card .card-main-action-button .icon-action-btn,
+.trade-card .revert-btn {
+    width: 36px;
+    height: 36px;
+    padding: 6px;
 }
