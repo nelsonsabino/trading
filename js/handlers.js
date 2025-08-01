@@ -216,4 +216,29 @@ export async function loadAndOpenForEditing(tradeId) {
             closeAddModal();
         }
     }
+
+
+export async function handleRevertStatus(trade) {
+    if (!trade) return;
+
+    let newStatus;
+    if (trade.data.status === 'ARMED') newStatus = 'POTENTIAL';
+    else if (trade.data.status === 'LIVE') newStatus = 'ARMED';
+    else return;
+
+    const confirmMsg = `Deseja realmente reverter o estado deste trade para "${newStatus}"?`;
+    if (!confirm(confirmMsg)) return;
+
+    try {
+        await updateTrade(trade.id, { ...trade.data, status: newStatus });
+        alert(`Trade revertido para o estado "${newStatus}" com sucesso!`);
+        // Opcional: refrescar dashboard, ou disparar fetch atualizado, se necessário
+    } catch (err) {
+        alert('Ocorreu um erro ao reverter o estado.');
+        console.error(err);
+    }
+}
+
+
+    
 }
