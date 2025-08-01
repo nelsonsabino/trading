@@ -26,7 +26,12 @@
     }
     .dashboard-columns { 
         grid-template-columns: 1fr; 
+        display: grid; /* Garante que é grid, mesmo que já seja herdado */
     }
+    .potential-trades { order: 3; } /* Potencial será o último */
+    .armed-trades { order: 2; }    /* Armado será o do meio */
+    .live-trades { order: 1; }     /* Ativo será o primeiro */
+
     h1 { 
         font-size: 1.8rem; 
     }
@@ -39,9 +44,7 @@
         font-size: 0.95rem; 
     }
 
-    /* --- CORREÇÃO CRÍTICA: TODAS as regras que transformavam a tabela em blocos foram REMOVIDAS daqui --- */
-    /* Isto garante que as tabelas mantêm o seu layout de colunas e linhas em mobile */
-    /* O scroll horizontal será garantido por .table-wrapper em tables.css */
+    /* O scroll horizontal é garantido por .table-wrapper em tables.css */
 
     /* Controlos do mercado em mobile */
     .market-controls {
