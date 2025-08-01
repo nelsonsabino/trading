@@ -179,3 +179,34 @@ document.addEventListener('DOMContentLoaded', () => {
     
     initializeApp();
 });
+
+
+
+function hideEmptyDashboardCardsMobile() {
+    if (window.innerWidth > 768) return; // Só em telemóvel
+
+    // Seleciona cada card e o seu container de conteúdo
+    const cards = [
+        { card: document.querySelector('.live-trades'),   container: document.getElementById('live-trades-container') },
+        { card: document.querySelector('.armed-trades'),  container: document.getElementById('armed-trades-container') },
+        { card: document.querySelector('.potential-trades'), container: document.getElementById('potential-trades-container') }
+    ];
+
+    cards.forEach(({ card, container }) => {
+        if (card && container) {
+            // Se o container está vazio (sem elementos relevantes)
+            const isEmpty = !container.textContent.trim() && container.children.length === 0;
+            // Ou só tem mensagem de estado vazia
+            const onlyEmptyState = container.children.length === 1 && container.querySelector('.empty-state-message');
+            if (isEmpty || onlyEmptyState) {
+                card.classList.add('dashboard-hide-mobile');
+            } else {
+                card.classList.remove('dashboard-hide-mobile');
+            }
+        }
+    });
+}
+
+// Executa ao carregar e ao redimensionar
+window.addEventListener('DOMContentLoaded', hideEmptyDashboardCardsMobile);
+window.addEventListener('resize', hideEmptyDashboardCardsMobile);
