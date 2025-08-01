@@ -62,9 +62,7 @@
     }
 }
 
-/* Esconde cards vazios só em telemóvel */
-@media (max-width: 768px) {
-    .dashboard-hide-mobile {
-        display: none !important;
-    }
+/* Esconde cards vazios em todas as resoluções (desktop e mobile) */
+.dashboard-hide {
+    display: none !important;
 }
