@@ -68,6 +68,7 @@ function createInputItem(item, data) {
     return element;
 }
 
+// ---- EXPORT CORRIGIDO ----
 export function generateDynamicChecklist(container, phases, data = {}) {
     container.innerHTML = '';
     if (!phases || phases.length === 0) return;
@@ -89,6 +90,7 @@ export function generateDynamicChecklist(container, phases, data = {}) {
         container.appendChild(phaseDiv);
     });
 }
+// ---- FIM EXPORT ----
 
 export function populateStrategySelect(strategies) {
     if (!addModal.strategySelect) return;
