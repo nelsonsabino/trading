@@ -187,7 +187,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function hideEmptyDashboardCardsMobile() {
     if (window.innerWidth > 768) {
-        // Reexibe todos os cards se não for mobile!
         document.querySelectorAll('.dashboard-hide-mobile').forEach(card => {
             card.classList.remove('dashboard-hide-mobile');
         });
@@ -203,10 +202,10 @@ function hideEmptyDashboardCardsMobile() {
     cards.forEach(({ card, container }) => {
         if (card && container) {
             const children = Array.from(container.children);
+            // Só esconde se todos os filhos forem .empty-state-message OU se não houver filhos
             const allEmptyState = children.length > 0 && children.every(child => child.classList.contains('empty-state-message'));
             const noChildren = children.length === 0;
 
-            // Só esconde se não houver trades (nenhum filho útil)
             if (allEmptyState || noChildren) {
                 card.classList.add('dashboard-hide-mobile');
             } else {
