@@ -1,68 +1,82 @@
 /* --- RESPONSIVIDADE --- */
 
 /* Tablet (menor que 992px) */
-@media (max-width: 992px) { 
-    .dashboard-columns { 
+@media (max-width: 992px) {
+    .dashboard-columns {
         grid-template-columns: 1fr 1fr; /* 2 colunas para o dashboard */
-    } 
-    .asset-charts-grid { 
+    }
+
+    .asset-charts-grid {
         grid-template-columns: 1fr; /* Gráficos da página de detalhes empilhados */
     }
 }
 
 /* Telemóvel (menor que 768px) */
 @media (max-width: 768px) {
-    html { 
-        font-size: 14px; 
+    html {
+        font-size: 14px;
     }
-    header { 
-        padding: 1.5rem 1rem; 
-        margin-bottom: 1rem; 
+
+    header {
+        padding: 1.5rem 1rem;
+        margin-bottom: 1rem;
     }
-    main { 
-        padding: 0 1rem 1rem 1rem; 
+
+    main {
+        padding: 0 1rem 1rem 1rem;
     }
-    .dashboard-columns { 
-        /* 
-         * Passa para flex para usar a propriedade 'order' nos cards.
-         * Se usares grid, 'order' não tem efeito nos filhos.
-         */
+
+    .dashboard-columns {
+        /* Passa para flex para usar a propriedade 'order' nos cards. */
         display: flex !important;
         flex-direction: column;
         gap: 1.5rem;
     }
-    .potential-trades { order: 3; } /* Potencial será o último */
-    .armed-trades { order: 2; }    /* Armado será o do meio */
-    .live-trades { order: 1; }     /* Ativo será o primeiro */
 
-    h1 { 
-        font-size: 1.8rem; 
+    .potential-trades { order: 3; } /* Potencial será o último */
+    .armed-trades { order: 2; } /* Armado será o do meio */
+    .live-trades { order: 1; } /* Ativo será o primeiro */
+
+    h1 {
+        font-size: 1.8rem;
     }
-    h2 { 
-        font-size: 1.4rem; 
-        margin-bottom: 1rem; 
+
+    h2 {
+        font-size: 1.4rem;
+        margin-bottom: 1rem;
     }
-    .btn, .nav-link { 
-        padding: 8px 16px; 
-        font-size: 0.95rem; 
+
+    .btn, .nav-link {
+        padding: 8px 16px;
+        font-size: 0.95rem;
     }
 
     /* O scroll horizontal é garantido por .table-wrapper em tables.css */
 
     /* Controlos do mercado em mobile */
     .market-controls {
-        flex-direction: column; 
-        align-items: flex-start; 
-        gap: 1rem; 
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
         padding: 0.75rem;
     }
+
     .market-controls .control-group {
-        width: 100%; 
+        width: 100%;
         justify-content: flex-start;
+    }
+
+    /* Esconde cards vazios apenas em dispositivos móveis */
+    .dashboard-hide {
+        display: none !important;
     }
 }
 
-/* Esconde cards vazios em todas as resoluções (desktop e mobile) */
-.dashboard-hide {
-    display: none !important;
+/* Garante que as colunas sejam visíveis no desktop, mesmo vazias */
+@media (min-width: 769px) {
+    .potential-trades,
+    .armed-trades,
+    .live-trades {
+        display: block !important;
+    }
 }
