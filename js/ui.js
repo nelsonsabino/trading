@@ -1,9 +1,7 @@
-// js/ui.js
-
 import { supabase } from './services.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openImageModal, openAddModal } from './modals.js';
-import { loadAndOpenForEditing, handleRevertStatus } from './handlers.js'; // ADICIONADO handler
+import { loadAndOpenForEditing, handleRevertStatus } from './handlers.js';
 import { getLastCreatedTradeId, setLastCreatedTradeId } from './state.js';
 
 let tradesForEventListeners = [];
@@ -24,7 +22,166 @@ function renderSparkline(containerId, dataSeries) {
     chart.render();
 }
 
-// ... funções getIconForLabel, createChecklistItem, createInputItem, generateDynamicChecklist, populateStrategySelect, acknowledgeAlarm, openAlarmListModal, loadAndOpenAlarmModal ...
+function getIconForLabel(labelText) {
+    const text = labelText.toLowerCase();
+    if (text.includes('tendência')) return 'trending_up';
+    if (text.includes('rsi')) return 'show_chart';
+    if (text.includes('stochastic') || text.includes('estocástico')) return 'moving';
+    if (text.includes('suporte')) return 'south';
+    if (text.includes('resistência')) return 'north';
+    if (text.includes('fibo')) return 'straighten';
+    if (text.includes('volume')) return 'database';
+    if (text.includes('ema')) return 'timeline';
+    if (text.includes('alarme')) return 'alarm';
+    if (text.includes('preço')) return 'attach_money';
+    if (text.includes('candle')) return 'candlestick_chart';
+    if (text.includes('timeframe')) return 'schedule';
+    if (text.includes('val ')) return 'magnetism';
+    if (text.includes('alvo')) return 'my_location';
+    return 'check';
+}
+
+function createChecklistItem(item, data) {
+    const isRequired = item.required ? 'required' : '';
+    const labelText = item.required ? `${item.label} <span class="required-asterisk">*</span>` : item.label;
+    const isChecked = data && data[item.id] ? 'checked' : '';
+    const element = document.createElement('div');
+    element.className = 'checklist-item';
+    element.innerHTML = `<span class="material-symbols-outlined">${getIconForLabel(item.label)}</span><input type="checkbox" id="${item.id}" ${isChecked} ${isRequired}><label for="${item.id}">${labelText}</label>`;
+    return element;
+}
+
+function createInputItem(item, data) {
+    const element = document.createElement('div');
+    element.className = 'input-item-styled'; 
+    const isRequired = item.required ? 'required' : '';
+    const labelText = item.required ? `${item.label} <span class="required-asterisk">*</span>` : item.label;
+    const value = data && data[item.id] ? data[item.id] : '';
+    let fieldHtml = '';
+    if (item.type === 'select') {
+        const optionsHtml = item.options.map(opt => `<option value="${opt}" ${value === opt ? 'selected' : ''}>${opt}</option>`).join('');
+        fieldHtml = `<select id="${item.id}" ${isRequired} class="input-item-field"><option value="">-- Selecione --</option>${optionsHtml}</select>`;
+    } else {
+        fieldHtml = `<input type="${item.type}" id="${item.id}" value="${value}" step="any" ${isRequired} class="input-item-field" placeholder="${item.placeholder || ''}">`;
+    }
+    element.innerHTML = `<span class="material-symbols-outlined">${getIconForLabel(item.label)}</span><div style="flex-grow: 1;"><label for="${item.id}">${labelText}</label>${fieldHtml}</div>`;
+    return element;
+}
+
+export function generateDynamicChecklist(container, phases, data = {}) {
+    container.innerHTML = '';
+    if (!phases || phases.length === 0) return;
+    phases.forEach(phase => {
+        if (!phase || !Array.isArray(phase.items)) return; 
+        const phaseDiv = document.createElement('div');
+        const titleEl = document.createElement('h4');
+        titleEl.textContent = phase.title;
+        phaseDiv.appendChild(titleEl);
+        phase.items.forEach(item => {
+            let element;
+            switch (item.type) {
+                case 'checkbox': element = createChecklistItem(item, data); break;
+                case 'select': case 'text': case 'number': element = createInputItem(item, data); break;
+                default: console.warn(`Tipo de item desconhecido: ${item.type}`);
+            }
+            if (element) phaseDiv.appendChild(element);
+        });
+        container.appendChild(phaseDiv);
+    });
+}
+
+export function populateStrategySelect(strategies) {
+    if (!addModal.strategySelect) return;
+    addModal.strategySelect.innerHTML = '<option value="">-- Selecione uma Estratégia --</option>';
+    if (strategies && Array.isArray(strategies)) {
+        strategies.forEach(strategy => {
+            const option = document.createElement('option');
+            option.value = strategy.id;
+            option.textContent = strategy.data.name;
+            addModal.strategySelect.appendChild(option);
+        });
+    }
+}
+
+async function acknowledgeAlarm(assetPair) {
+    try {
+        const { error } = await supabase
+            .from('alarms')
+            .update({ acknowledged: true })
+            .eq('asset_pair', assetPair)
+            .eq('status', 'triggered');
+
+        if (error) throw error;
+        console.log(`Alarmes disparados para ${assetPair} reconhecidos com sucesso.`);
+    } catch (error) {
+        console.error("Erro ao reconhecer alarme:", error);
+        alert("Ocorreu um erro ao reconhecer o alarme. Tente novamente.");
+    }
+}
+
+function openAlarmListModal(assetPair, alarms, mode = 'active') {
+    const modal = document.getElementById('alarm-list-modal');
+    const title = document.getElementById('alarm-list-title');
+    const container = document.getElementById('alarm-list-container');
+    const closeBtn = document.getElementById('close-alarm-list-modal');
+    const footer = document.getElementById('alarm-list-footer');
+    const acknowledgeBtn = document.getElementById('acknowledge-alarms-btn');
+
+    if (!modal || !title || !container || !closeBtn || !footer || !acknowledgeBtn) return;
+    
+    let filteredAlarms;
+    if (mode === 'active') {
+        title.textContent = `Alarmes Ativos para ${assetPair}`;
+        filteredAlarms = alarms.filter(a => a.asset_pair === assetPair && a.status === 'active');
+    } else {
+        title.textContent = `Alarmes Disparados para ${assetPair}`;
+        filteredAlarms = alarms.filter(a => a.asset_pair === assetPair && a.status === 'triggered' && !a.acknowledged);
+    }
+    
+    container.innerHTML = '';
+    if (filteredAlarms.length === 0) {
+        container.innerHTML = '<p>Nenhum alarme encontrado.</p>';
+    } else {
+        filteredAlarms.forEach(alarm => {
+            let alarmDescription = `Preço ${alarm.condition} ${alarm.target_price} USD`;
+            const item = document.createElement('div');
+            item.className = 'alarm-list-item';
+            item.innerHTML = `
+                <span class="alarm-list-description">${alarmDescription}</span>
+                <div class="alarm-list-actions">
+                    <a href="alarms-create.html?editAlarmId=${alarm.id}" class="icon-action-btn" title="Editar"><span class="material-symbols-outlined">edit</span></a>
+                </div>
+            `;
+            container.appendChild(item);
+        });
+    }
+
+    if (mode === 'triggered') {
+        footer.style.display = 'block';
+        acknowledgeBtn.onclick = async () => {
+            await acknowledgeAlarm(assetPair);
+            modal.style.display = 'none';
+        };
+    } else {
+        footer.style.display = 'none';
+    }
+
+    modal.style.display = 'flex';
+    closeBtn.onclick = () => modal.style.display = 'none';
+    modal.onclick = (e) => { if (e.target.id === 'alarm-list-modal') modal.style.display = 'none'; };
+}
+
+async function loadAndOpenAlarmModal(assetPair, mode) {
+    try {
+        const { data: allAlarms, error } = await supabase.from('alarms').select('*');
+        if (error) throw error;
+        
+        openAlarmListModal(assetPair, allAlarms, mode);
+    } catch (err) {
+        console.error("Erro ao buscar alarmes para o modal:", err);
+        alert("Não foi possível carregar os alarmes.");
+    }
+}
 
 export function createTradeCard(trade, marketData = {}, allAlarms = []) {
     const card = document.createElement('div');
@@ -195,7 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
                        modalAssetInput.value = button.dataset.symbol.replace('BINANCE:', '');
                    }
                    break;
-                case 'revert-status': // <-- NOVO CASE PARA REVERSÃO
+                case 'revert-status':
                     if (tradeId) handleRevertStatus(tradesForEventListeners.find(t => t.id === tradeId));
                     break;
             }
