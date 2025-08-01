@@ -72,65 +72,11 @@
     }
 }
 
-/* Desktop: Ajuste dos botões para mostrar apenas ícones com tooltip */
+/* Garante que as colunas sejam visíveis no desktop, mesmo vazias */
 @media (min-width: 769px) {
-    .btn {
-        padding: 8px;
-        width: 40px; /* Tamanho fixo para os botões */
-        text-indent: -9999px; /* Esconde o texto */
-        overflow: hidden;
-        white-space: nowrap;
-        position: relative;
-    }
-
-    .btn::after {
-        content: attr(data-tooltip);
-        position: absolute;
-        left: 50%;
-        top: -100%;
-        transform: translateX(-50%);
-        padding: 4px 8px;
-        background-color: #333;
-        color: #fff;
-        border-radius: 4px;
-        white-space: nowrap;
-        opacity: 0;
-        transition: opacity 0.2s;
-        pointer-events: none;
-        z-index: 10;
-    }
-
-    .btn:hover::after {
-        opacity: 1;
-        top: -30px; /* Ajusta a posição do tooltip */
-    }
-
-    /* Botões específicos */
-    .btn[title="Executar"] {
-        background-color: #28a745; /* Verde */
-    }
-
-    .btn[title="Executar"]::before {
-        content: "▶";
-        text-indent: 0;
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        color: #fff;
-    }
-
-    .btn[title="Reverter"] {
-        background-color: #6c757d; /* Cinza */
-    }
-
-    .btn[title="Reverter"]::before {
-        content: "↺";
-        text-indent: 0;
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        color: #fff;
+    .potential-trades,
+    .armed-trades,
+    .live-trades {
+        display: block !important;
     }
 }
