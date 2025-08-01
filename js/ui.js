@@ -1,7 +1,9 @@
+// js/ui.js
+
 import { supabase } from './services.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openImageModal, openAddModal } from './modals.js';
-import { loadAndOpenForEditing, handleRevertStatus } from './handlers.js';
+import { loadAndOpenForEditing } from './handlers.js';
 import { getLastCreatedTradeId, setLastCreatedTradeId } from './state.js';
 
 let tradesForEventListeners = [];
@@ -68,7 +70,6 @@ function createInputItem(item, data) {
     return element;
 }
 
-// ---- EXPORT CORRIGIDO ----
 export function generateDynamicChecklist(container, phases, data = {}) {
     container.innerHTML = '';
     if (!phases || phases.length === 0) return;
@@ -90,7 +91,6 @@ export function generateDynamicChecklist(container, phases, data = {}) {
         container.appendChild(phaseDiv);
     });
 }
-// ---- FIM EXPORT ----
 
 export function populateStrategySelect(strategies) {
     if (!addModal.strategySelect) return;
@@ -216,17 +216,7 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
     if (mainActionButtonText) {
         mainActionButtonHtml = `<button class="icon-action-btn ${mainActionButtonClass}" data-action="${dataAction}" title="${mainActionButtonText}"><span class="material-symbols-outlined">${mainActionButtonIcon}</span> <span class="button-text">${mainActionButtonText}</span></button>`;
     }
-
-    // ---- BOTÃO REVERSÃO DE STATUS ----
-    let revertButtonHtml = '';
-    if (trade.data.status === 'ARMED') {
-        revertButtonHtml = `<button class="icon-action-btn action-revert" data-action="revert-status" title="Reverter para Potencial"><span class="material-symbols-outlined">undo</span> <span class="button-text">Reverter</span></button>`;
-    }
-    if (trade.data.status === 'LIVE') {
-        revertButtonHtml = `<button class="icon-action-btn action-revert" data-action="revert-status" title="Reverter para Armado"><span class="material-symbols-outlined">undo</span> <span class="button-text">Reverter</span></button>`;
-    }
-    // ---- FIM BOTÃO REVERSÃO ----
-
+    
     let formattedPrice;
     if (assetMarketData.price >= 1.0) {
         formattedPrice = assetMarketData.price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -251,6 +241,14 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
         acknowledgeButtonHtml = `<button class="acknowledge-alarm-btn" data-action="acknowledge-and-view-alarm" data-asset="${assetName}" title="Ver Alarme Disparado"><span class="material-symbols-outlined">alarm</span> OK</button>`;
     }
 
+    let revertButtonHtml = '';
+    if (trade.data.status === 'ARMED' || trade.data.status === 'LIVE') {
+        let revertText = trade.data.status === 'ARMED' ? 'Reverter para Potencial' : 'Reverter para Armado';
+        let revertAction = trade.data.status === 'ARMED' ? 'revert-to-potential' : 'revert-to-armed';
+        revertButtonHtml = `<button class="btn btn-secondary revert-btn" data-action="${revertAction}" title="${revertText}"><span class="material-symbols-outlined">undo</span> <span class="button-text">${revertText}</span></button>`;
+    }
+
+
     card.innerHTML = `
         <div class="card-header-row">
             <h3 class="asset-title-card">
@@ -258,10 +256,7 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
                 ${alarmBellHtml}
                 <button class="icon-action-btn card-edit-btn" data-action="edit" title="Editar"><span class="material-symbols-outlined">edit</span></button>
             </h3>
-            <div class="card-main-action-button">
-                ${mainActionButtonHtml}
-                ${revertButtonHtml}
-            </div>
+            <div class="card-main-action-button">${mainActionButtonHtml}</div>
         </div>
         <p class="strategy-name">Estratégia: ${trade.data.strategyName || 'N/A'}</p>
         
@@ -269,6 +264,7 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
 
         <div class="card-bottom-row">
             <div class="card-secondary-actions">
+                ${revertButtonHtml}
                 <a href="https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}" target="_blank" rel="noopener noreferrer" class="icon-action-btn action-full-chart" title="Abrir no TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
                 ${acknowledgeButtonHtml}
             </div>
@@ -344,7 +340,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     const assetSymbol = button.dataset.asset;
                     if (assetSymbol) {
                         loadAndOpenAlarmModal(assetSymbol, 'triggered');
-                        // acknowledgeAlarm(assetSymbol); // Ação de reconhecer agora está no botão do modal
                     }
                     break;
                 case 'add-to-watchlist':
@@ -354,8 +349,14 @@ document.addEventListener('DOMContentLoaded', () => {
                        modalAssetInput.value = button.dataset.symbol.replace('BINANCE:', '');
                    }
                    break;
-                case 'revert-status':
-                    if (tradeId) handleRevertStatus(tradesForEventListeners.find(t => t.id === tradeId));
+                case 'revert-to-potential':
+                case 'revert-to-armed':
+                    if (tradeId) {
+                        const trade = tradesForEventListeners.find(t => t.id === tradeId);
+                        if (trade) {
+                            handleRevertStatus(trade, action);
+                        }
+                    }
                     break;
             }
         });
