@@ -2,6 +2,15 @@
 
 export const changelogData = {
 current: {
+    number: '12.9.0',
+    changes: [
+        "**Dashboard (Watchlist) - Reverter Status do Trade:**",
+        "Implementada a funcionalidade para reverter o status de um trade de 'Armado' ou 'Ativo' para um estado anterior.",
+        "Nos modais de edição, foram adicionados botões que permitem ao utilizador regredir o status de um trade, por exemplo, de 'Armado' de volta para 'Potencial', oferecendo mais flexibilidade na gestão da watchlist."
+    ]
+},
+ releases: [
+  {
     number: '12.8.0',
     changes: [
         "**Dashboard (Watchlist) - Ordem de Prioridade em Mobile:**",
@@ -9,8 +18,7 @@ current: {
         "Implementada uma lógica para esconder automaticamente as colunas que não contêm trades (tanto em mobile como em desktop), resultando numa interface mais limpa."
     ]
 },
- releases: [
-  {
+     {
     number: '12.7.0',
     changes: [
         "**Dashboard (Watchlist) - Melhorias de UI/UX:**",
