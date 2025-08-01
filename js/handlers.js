@@ -1,5 +1,3 @@
-// js/handlers.js - VERSÃO COM CAPTURA DE ID PARA DESTAQUE
-
 import { addModal } from './dom-elements.js';
 import { GESTAO_PADRAO } from './config.js';
 import { getTrade, addTrade, updateTrade, closeTradeAndUpdateBalance, deleteTrade } from './firebase-service.js'; // Importa deleteTrade
@@ -215,12 +213,10 @@ export async function loadAndOpenForEditing(tradeId) {
             // Pode redirecionar para a página de gestão ou stats aqui se quiser
             closeAddModal();
         }
-    }    
+    }
 }
 
-
-
-
+// Função de reversão de status, ao nível do módulo (fora de qualquer outra função!)
 export async function handleRevertStatus(trade) {
     if (!trade) return;
 
