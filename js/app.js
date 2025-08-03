@@ -184,6 +184,23 @@ document.addEventListener('DOMContentLoaded', () => {
         closeModalObj.form.addEventListener('submit', handleCloseSubmit);
     }
 
+    // --- INÍCIO DA ALTERAÇÃO ---
+    // Adicionar listeners para o modal de imagem
+    const imageModal = document.getElementById('image-modal');
+    const closeImageModalBtn = document.getElementById('close-image-modal');
+    if (imageModal && closeImageModalBtn) {
+        closeImageModalBtn.addEventListener('click', () => {
+            imageModal.style.display = 'none';
+        });
+        imageModal.addEventListener('click', (e) => {
+            // Fecha o modal se o clique for no overlay (o fundo)
+            if (e.target.id === 'image-modal') {
+                imageModal.style.display = 'none';
+            }
+        });
+    }
+    // --- FIM DA ALTERAÇÃO ---
+
     const modalAssetInput = document.getElementById('asset');
     if (modalAssetInput) {
         const modalResultsDiv = document.getElementById('modal-autocomplete-results');
