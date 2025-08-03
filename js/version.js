@@ -2,6 +2,24 @@
 
 export const changelogData = {
 current: {
+    number: '12.9.2',
+    changes: [
+        "**Correção dos Gráficos (EMAs):**",
+        "Resolvido o problema crítico que impedia a exibição das EMAs nos gráficos da aplicação (ex: página de Detalhes do Ativo).",
+        "A causa foi identificada como uma incompatibilidade na função do Supabase (`get-asset-details-data`) com a forma como a biblioteca `technicalindicators` devolve os dados.",
+        "A função foi refatorada para lidar de forma robusta com os diferentes formatos de dados, garantindo que as EMAs são sempre calculadas e exibidas corretamente quando há dados históricos suficientes."
+    ]
+},
+ releases: [
+  {
+        number: '12.9.1',
+        changes: [
+            "**Correção das Notificações de Alarme:**",
+            "Resolvido o problema onde as notificações de alarmes de indicadores (ex: Estocástico, RSI) mostravam uma mensagem incorreta de 'Alarme de Preço'.",
+            "A função do Supabase (`check-price-alarms`) foi corrigida para gerar a mensagem de notificação específica e correta para cada tipo de alarme, garantindo que o alerta recebido corresponde exatamente à condição que o disparou."
+        ]
+    },
+     {
     number: '12.9.0',
     changes: [
         "**Dashboard (Watchlist) - Reverter Status do Trade:**",
@@ -9,8 +27,7 @@ current: {
         "Nos modais de edição, foram adicionados botões que permitem ao utilizador regredir o status de um trade, por exemplo, de 'Armado' de volta para 'Potencial', oferecendo mais flexibilidade na gestão da watchlist."
     ]
 },
- releases: [
-  {
+     {
     number: '12.8.0',
     changes: [
         "**Dashboard (Watchlist) - Ordem de Prioridade em Mobile:**",
