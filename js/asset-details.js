@@ -1,5 +1,5 @@
 // js/asset-details.js
-// VERSÃO DEFINITIVA: Corrige a exibição das EMAs no gráfico e as descrições de todos os alarmes.
+// VERSÃO DE DIAGNÓSTICO: Adiciona console.log para inspecionar os dados do gráfico.
 
 import { supabase } from './services.js';
 import { getTradesForAsset } from './firebase-service.js';
@@ -24,6 +24,11 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
             body: { symbol: symbol, interval: interval, limit: baseKlinesLimit },
         });
 
+        // --- INÍCIO DO DIAGNÓSTICO ---
+        console.log("--- INÍCIO DOS DADOS DE DIAGNÓSTICO ---");
+        console.log("Resposta completa da Edge Function:", edgeFunctionResponse);
+        // --- FIM DO DIAGNÓSTICO ---
+
         if (edgeFunctionError) throw edgeFunctionError;
         if (!edgeFunctionResponse || !edgeFunctionResponse.ohlc || !edgeFunctionResponse.indicators) {
             throw new Error('Dados de gráfico ou indicadores não encontrados na Edge Function.');
@@ -31,6 +36,19 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
 
         const klinesData = edgeFunctionResponse.ohlc;
         const indicatorsData = edgeFunctionResponse.indicators;
+
+        // --- INÍCIO DO DIAGNÓSTICO ---
+        console.log("Dados de velas (klinesData):", klinesData);
+        console.log(`Número de velas recebidas: ${klinesData.length}`);
+        console.log("Dados de indicadores (indicatorsData):", indicatorsData);
+        if (indicatorsData.ema50_data) {
+            console.log(`Número de pontos de EMA 50: ${indicatorsData.ema50_data.length}`);
+        }
+        if (indicatorsData.ema200_data) {
+            console.log(`Número de pontos de EMA 200: ${indicatorsData.ema200_data.length}`);
+        }
+        console.log("--- FIM DOS DADOS DE DIAGNÓSTICO ---");
+        // --- FIM DO DIAGNÓSTICO ---
 
         if (klinesData.length === 0) {
             chartContainer.innerHTML = '<p style="color:red;">Não há dados de preço para este timeframe.</p>';
@@ -53,7 +71,6 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
             series.push({ name: 'Preço (USD)', type: 'line', data: closePriceSeriesData });
         }
         
-        // --- CÓDIGO DAS EMAs RESTAURADO ---
         if (indicatorsData.ema50_data && indicatorsData.ema50_data.length === klinesData.length) {
             const ema50SeriesData = indicatorsData.ema50_data.map((emaVal, index) => ({
                 x: klinesData[index][0], 
@@ -68,7 +85,6 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
             }));
             series.push({ name: 'EMA 200', type: 'line', data: ema200SeriesData });
         }
-        // --- FIM DO CÓDIGO RESTAURADO ---
         
         const currentPriceVal = klinesData[klinesData.length - 1][4];
         const firstPriceVal = klinesData[0][4];
@@ -144,6 +160,8 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
     }
 }
 
+// ... (o resto do ficheiro permanece exatamente igual)
+
 function renderTradingViewTechnicalAnalysisWidget(symbol) {
     const container = document.getElementById('tradingview-tech-analysis-container');
     if (!container) return;
@@ -206,7 +224,6 @@ async function displayAlarmsForAsset(symbol) {
             triggeredTbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Nenhum alarme disparado para este ativo.</td></tr>';
         } else {
             const triggeredAlarmsHtml = triggeredAlarms.map(alarm => {
-                // --- LÓGICA DE DESCRIÇÃO CORRIGIDA PARA ALARMES DISPARADOS ---
                 let alarmDescription = '';
                 if (alarm.alarm_type === 'stochastic') { alarmDescription = `Estocástico(${alarm.indicator_period}) ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} no ${alarm.indicator_timeframe}`; }
                 else if (alarm.alarm_type === 'rsi_level') { alarmDescription = `RSI(${alarm.indicator_period}) ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} no ${alarm.indicator_timeframe}`; }
@@ -215,7 +232,6 @@ async function displayAlarmsForAsset(symbol) {
                 else if (alarm.alarm_type === 'ema_touch') { alarmDescription = `Preço testa a EMA(${alarm.ema_period}) como ${alarm.condition === 'test_support' ? 'SUPORTE' : 'RESISTÊNCIA'} no ${alarm.indicator_timeframe}`; } 
                 else if (alarm.alarm_type === 'combo') { const primaryTriggerText = alarm.condition === 'test_support' ? `testa a EMA (Suporte)` : `testa a EMA (Resistência)`; const secondaryTriggerText = `Estocástico(${alarm.combo_period}) ${alarm.combo_condition === 'below' ? 'abaixo de' : 'acima de'} ${alarm.combo_target_price}`; alarmDescription = `CONFLUÊNCIA: ${primaryTriggerText} E ${secondaryTriggerText} no ${alarm.indicator_timeframe}`; } 
                 else { alarmDescription = `Preço ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} USD`; }
-                // --- FIM DA LÓGICA DE DESCRIÇÃO CORRIGIDA ---
                 
                 const triggeredDate = alarm.triggered_at ? new Date(alarm.triggered_at).toLocaleString('pt-PT') : 'N/A';
                 return `<tr><td>${alarmDescription}</td><td>${triggeredDate}</td><td><a href="alarms-manage.html" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.9em;">Ver Histórico</a></td></tr>`;
