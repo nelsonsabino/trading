@@ -185,7 +185,7 @@ async function displayAlarmsForAsset(symbol) {
             activeTbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Nenhum alarme ativo para este ativo.</td></tr>';
         } else {
             const activeAlarmsHtml = activeAlarms.map(alarm => {
-                let alarmDescription = getAlarmDescription(alarm); // Usa a função
+                let alarmDescription = getAlarmDescription(alarm);
                 return `<tr><td>${alarmDescription}</td><td>${new Date(alarm.created_at).toLocaleString('pt-PT')}</td><td><a href="alarms-manage.html" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.9em;">Gerir</a></td></tr>`;
             }).join('');
             activeTbody.innerHTML = activeAlarmsHtml;
@@ -195,7 +195,7 @@ async function displayAlarmsForAsset(symbol) {
             triggeredTbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Nenhum alarme disparado para este ativo.</td></tr>';
         } else {
             const triggeredAlarmsHtml = triggeredAlarms.map(alarm => {
-                let alarmDescription = getAlarmDescription(alarm); // Usa a função
+                let alarmDescription = getAlarmDescription(alarm);
                 const triggeredDate = alarm.triggered_at ? new Date(alarm.triggered_at).toLocaleString('pt-PT') : 'N/A';
                 return `<tr><td>${alarmDescription}</td><td>${triggeredDate}</td><td><a href="alarms-manage.html" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.9em;">Ver Histórico</a></td></tr>`;
             }).join('');
@@ -336,6 +336,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     renderTradingViewTechnicalAnalysisWidget(assetSymbol);
-});```
-
---- END OF FILE asset-details.js ---
+});
