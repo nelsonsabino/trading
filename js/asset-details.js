@@ -1,5 +1,5 @@
 // js/asset-details.js
-// VERSÃO DE DIAGNÓSTICO: Adiciona console.log para inspecionar os dados do gráfico.
+// VERSÃO FINAL: Lógica de cores dinâmica para garantir a renderização do gráfico.
 
 import { supabase } from './services.js';
 import { getTradesForAsset } from './firebase-service.js';
@@ -24,11 +24,6 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
             body: { symbol: symbol, interval: interval, limit: baseKlinesLimit },
         });
 
-        // --- INÍCIO DO DIAGNÓSTICO ---
-        console.log("--- INÍCIO DOS DADOS DE DIAGNÓSTICO ---");
-        console.log("Resposta completa da Edge Function:", edgeFunctionResponse);
-        // --- FIM DO DIAGNÓSTICO ---
-
         if (edgeFunctionError) throw edgeFunctionError;
         if (!edgeFunctionResponse || !edgeFunctionResponse.ohlc || !edgeFunctionResponse.indicators) {
             throw new Error('Dados de gráfico ou indicadores não encontrados na Edge Function.');
@@ -37,61 +32,58 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
         const klinesData = edgeFunctionResponse.ohlc;
         const indicatorsData = edgeFunctionResponse.indicators;
 
-        // --- INÍCIO DO DIAGNÓSTICO ---
-        console.log("Dados de velas (klinesData):", klinesData);
-        console.log(`Número de velas recebidas: ${klinesData.length}`);
-        console.log("Dados de indicadores (indicatorsData):", indicatorsData);
-        if (indicatorsData.ema50_data) {
-            console.log(`Número de pontos de EMA 50: ${indicatorsData.ema50_data.length}`);
-        }
-        if (indicatorsData.ema200_data) {
-            console.log(`Número de pontos de EMA 200: ${indicatorsData.ema200_data.length}`);
-        }
-        console.log("--- FIM DOS DADOS DE DIAGNÓSTICO ---");
-        // --- FIM DO DIAGNÓSTICO ---
-
         if (klinesData.length === 0) {
             chartContainer.innerHTML = '<p style="color:red;">Não há dados de preço para este timeframe.</p>';
             return;
         }
 
+        // --- INÍCIO DA LÓGICA CORRIGIDA ---
         let series = [];
-        
+        let colors = [];
+
+        const currentPriceVal = klinesData[klinesData.length - 1][4];
+        const firstPriceVal = klinesData[0][4];
+        const priceChartColor = currentPriceVal >= firstPriceVal ? '#28a745' : '#dc3545';
+        const ema50Color = '#ffc107'; 
+        const ema200Color = '#0d6efd';
+
+        // Adiciona a série de preços e a sua cor
         if (chartType === 'candlestick') {
             const ohlcSeriesData = klinesData.map(kline => ({
                 x: kline[0], 
                 y: [kline[1], kline[2], kline[3], kline[4]] 
             }));
             series.push({ name: 'Preço', type: 'candlestick', data: ohlcSeriesData });
+            // A cor de candlestick é definida em plotOptions, não aqui.
         } else {
             const closePriceSeriesData = klinesData.map(kline => ({
                 x: kline[0],
                 y: kline[4] 
             }));
             series.push({ name: 'Preço (USD)', type: 'line', data: closePriceSeriesData });
+            colors.push(priceChartColor);
         }
         
+        // Adiciona a série EMA 50 e a sua cor, se os dados existirem e forem válidos
         if (indicatorsData.ema50_data && indicatorsData.ema50_data.length === klinesData.length) {
             const ema50SeriesData = indicatorsData.ema50_data.map((emaVal, index) => ({
                 x: klinesData[index][0], 
                 y: emaVal 
             }));
             series.push({ name: 'EMA 50', type: 'line', data: ema50SeriesData });
+            colors.push(ema50Color);
         }
+
+        // Adiciona a série EMA 200 e a sua cor, se os dados existirem e forem válidos
         if (indicatorsData.ema200_data && indicatorsData.ema200_data.length === klinesData.length) {
             const ema200SeriesData = indicatorsData.ema200_data.map((emaVal, index) => ({
                 x: klinesData[index][0],
                 y: emaVal
             }));
             series.push({ name: 'EMA 200', type: 'line', data: ema200SeriesData });
+            colors.push(ema200Color);
         }
-        
-        const currentPriceVal = klinesData[klinesData.length - 1][4];
-        const firstPriceVal = klinesData[0][4];
-        const priceChartColor = currentPriceVal >= firstPriceVal ? '#28a745' : '#dc3545';
-        const ema50Color = '#ffc107'; 
-        const ema200Color = '#0d6efd'; 
-        const colors = [priceChartColor, ema50Color, ema200Color];
+        // --- FIM DA LÓGICA CORRIGIDA ---
 
         let options = {
             series: series,
@@ -105,7 +97,7 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
                 zoom: { enabled: true }
             },
             dataLabels: { enabled: false },
-            colors: colors, 
+            colors: colors, // Usa o array de cores dinâmico
             stroke: { 
                 curve: 'smooth',
                 width: 2
@@ -159,8 +151,6 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
         chartContainer.innerHTML = '<p style="color:red;">Não foi possível carregar o gráfico. ' + err.message + '</p>';
     }
 }
-
-// ... (o resto do ficheiro permanece exatamente igual)
 
 function renderTradingViewTechnicalAnalysisWidget(symbol) {
     const container = document.getElementById('tradingview-tech-analysis-container');
