@@ -1,4 +1,4 @@
-// js/app.js - VERSÃO PARA ESCONDER CARDS VAZIOS TAMBÉM NO DESKTOP
+// js/app.js - VERSÃO REATORIZADA E OTIMIZADA
 
 import { listenToTrades, fetchActiveStrategies } from './firebase-service.js';
 import { supabase, listenToAlarms } from './services.js';
@@ -9,7 +9,29 @@ import { handleAddSubmit, handleArmSubmit, handleExecSubmit, handleCloseSubmit, 
 import { setupAutocomplete } from './utils.js';
 import { setCurrentStrategies, getStrategies } from './state.js';
 
+// --- Variáveis de Estado da Dashboard ---
+let allTrades = [];
 let currentAlarms = [];
+
+// --- Função Central de Atualização da UI ---
+/**
+ * Pega nos dados mais recentes de trades e alarmes, busca os dados de mercado,
+ * e atualiza a interface da dashboard.
+ */
+async function refreshDashboardView() {
+    console.log("A atualizar a vista da dashboard...");
+    const activeTrades = allTrades.filter(t => ['POTENTIAL', 'ARMED', 'LIVE'].includes(t.data.status));
+    
+    // Busca dados de mercado apenas para os trades ativos
+    const marketData = await fetchMarketDataForDashboard(activeTrades);
+    
+    // Exibe os trades com os dados de mercado e alarmes mais recentes
+    displayTrades(activeTrades, marketData, currentAlarms);
+    
+    // Garante que os cards vazios são escondidos
+    hideEmptyDashboardCards();
+}
+
 
 async function fetchMarketDataForDashboard(trades) {
     if (trades.length === 0) return {};
@@ -66,32 +88,30 @@ async function initializeApp() {
     const potentialTradesContainer = document.getElementById('potential-trades-container');
     if (!potentialTradesContainer) return;
 
+    // 1. Busca dados estáticos essenciais
     const strategies = await fetchActiveStrategies();
     setCurrentStrategies(strategies);
     populateStrategySelect(strategies);
     
-    listenToTrades(async (trades) => {
-        const activeTrades = trades.filter(t => ['POTENTIAL', 'ARMED', 'LIVE'].includes(t.data.status));
-        const marketData = await fetchMarketDataForDashboard(activeTrades);
-        displayTrades(activeTrades, marketData, currentAlarms);
-        hideEmptyDashboardCards(); // <- ADICIONADO
+    // 2. Inicia os "ouvintes" (listeners) de forma independente
+    listenToTrades((trades) => {
+        console.log("Dados de trades recebidos/atualizados.");
+        allTrades = trades;
+        refreshDashboardView(); // Chama a função central de atualização
     });
 
     listenToAlarms((alarms, error) => {
+        console.log("Dados de alarmes recebidos/atualizados.");
         if (error) {
             console.error("Erro ao escutar alarmes:", error);
             currentAlarms = [];
         } else {
             currentAlarms = alarms;
         }
-        listenToTrades(async (trades) => {
-            const activeTrades = trades.filter(t => ['POTENTIAL', 'ARMED', 'LIVE'].includes(t.data.status));
-            const marketData = await fetchMarketDataForDashboard(activeTrades);
-            displayTrades(activeTrades, marketData, currentAlarms);
-            hideEmptyDashboardCards(); // <- ADICIONADO
-        });
+        refreshDashboardView(); // Chama a função central de atualização
     });
 
+    // 3. Verifica se um trade foi marcado para edição
     const tradeIdToEdit = localStorage.getItem('tradeToEdit');
     if (tradeIdToEdit) {
         localStorage.removeItem('tradeToEdit');
@@ -103,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            const serviceWorkerPath = '/trading/service-worker.js'; 
+            const serviceWorkerPath = './service-worker.js'; // Caminho corrigido para a raiz
             navigator.serviceWorker.register(serviceWorkerPath)
                 .then(registration => {
                     console.log('Service Worker registado com sucesso:', registration.scope);
@@ -126,13 +146,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const selectedStrategyId = addModal.strategySelect.value;
             const selectedStrategy = strategies.find(s => s.id === selectedStrategyId);
             
-            addModal.checklistContainer.innerHTML = ''; // Limpa sempre o container primeiro
+            addModal.checklistContainer.innerHTML = '';
 
             if (selectedStrategy && selectedStrategy.data.phases && selectedStrategy.data.phases.length > 0) {
                 const potentialPhase = selectedStrategy.data.phases[0];
                 if (potentialPhase) {
-                    
-                    // Procura por um item do tipo 'image' na fase
                     const imageItem = potentialPhase.items.find(item => item.type === 'image');
                     if (imageItem && imageItem.url) {
                         const imgElement = document.createElement('img');
@@ -142,7 +160,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         imgElement.style.marginBottom = '1.5rem';
                         addModal.checklistContainer.appendChild(imgElement);
                     }
-
                     generateDynamicChecklist(addModal.checklistContainer, [potentialPhase]);
                 }
             }
@@ -194,20 +211,17 @@ function hideEmptyDashboardCards() {
 
     cards.forEach(({ card, container }) => {
         if (card && container) {
-            const children = Array.from(container.children);
-            // Só esconde se todos os filhos forem .empty-state-message OU se não houver filhos
-            const allEmptyState = children.length > 0 && children.every(child => child.classList.contains('empty-state-message'));
-            const noChildren = children.length === 0;
-
-            if (allEmptyState || noChildren) {
-                card.classList.add('dashboard-hide');
-            } else {
+            // Verifica se o container está vazio ou só contém a mensagem de "estado vazio"
+            const hasContent = container.querySelector('.trade-card');
+            if (hasContent) {
                 card.classList.remove('dashboard-hide');
+            } else {
+                card.classList.add('dashboard-hide');
             }
         }
     });
 }
 
-// Executa ao carregar, ao redimensionar, e depois de atualizar os cards
+// Executa ao carregar e ao redimensionar
 window.addEventListener('DOMContentLoaded', hideEmptyDashboardCards);
 window.addEventListener('resize', hideEmptyDashboardCards);
