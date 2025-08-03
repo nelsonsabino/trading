@@ -1,5 +1,5 @@
 // js/asset-details.js
-// VERSÃO FINAL: Lógica de cores dinâmica para garantir a renderização do gráfico.
+// VERSÃO CORRIGIDA: Gráficos originais mantidos, descrições de alarme corrigidas.
 
 import { supabase } from './services.js';
 import { getTradesForAsset } from './firebase-service.js';
@@ -37,53 +37,43 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
             return;
         }
 
-        // --- INÍCIO DA LÓGICA CORRIGIDA ---
         let series = [];
-        let colors = [];
-
-        const currentPriceVal = klinesData[klinesData.length - 1][4];
-        const firstPriceVal = klinesData[0][4];
-        const priceChartColor = currentPriceVal >= firstPriceVal ? '#28a745' : '#dc3545';
-        const ema50Color = '#ffc107'; 
-        const ema200Color = '#0d6efd';
-
-        // Adiciona a série de preços e a sua cor
+        
         if (chartType === 'candlestick') {
             const ohlcSeriesData = klinesData.map(kline => ({
                 x: kline[0], 
                 y: [kline[1], kline[2], kline[3], kline[4]] 
             }));
             series.push({ name: 'Preço', type: 'candlestick', data: ohlcSeriesData });
-            // A cor de candlestick é definida em plotOptions, não aqui.
         } else {
             const closePriceSeriesData = klinesData.map(kline => ({
                 x: kline[0],
                 y: kline[4] 
             }));
             series.push({ name: 'Preço (USD)', type: 'line', data: closePriceSeriesData });
-            colors.push(priceChartColor);
         }
         
-        // Adiciona a série EMA 50 e a sua cor, se os dados existirem e forem válidos
         if (indicatorsData.ema50_data && indicatorsData.ema50_data.length === klinesData.length) {
             const ema50SeriesData = indicatorsData.ema50_data.map((emaVal, index) => ({
                 x: klinesData[index][0], 
                 y: emaVal 
             }));
             series.push({ name: 'EMA 50', type: 'line', data: ema50SeriesData });
-            colors.push(ema50Color);
         }
-
-        // Adiciona a série EMA 200 e a sua cor, se os dados existirem e forem válidos
         if (indicatorsData.ema200_data && indicatorsData.ema200_data.length === klinesData.length) {
             const ema200SeriesData = indicatorsData.ema200_data.map((emaVal, index) => ({
                 x: klinesData[index][0],
                 y: emaVal
             }));
             series.push({ name: 'EMA 200', type: 'line', data: ema200SeriesData });
-            colors.push(ema200Color);
         }
-        // --- FIM DA LÓGICA CORRIGIDA ---
+        
+        const currentPriceVal = klinesData[klinesData.length - 1][4];
+        const firstPriceVal = klinesData[0][4];
+        const priceChartColor = currentPriceVal >= firstPriceVal ? '#28a745' : '#dc3545';
+        const ema50Color = '#ffc107'; 
+        const ema200Color = '#0d6efd'; 
+        const colors = [priceChartColor, ema50Color, ema200Color];
 
         let options = {
             series: series,
@@ -97,7 +87,7 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
                 zoom: { enabled: true }
             },
             dataLabels: { enabled: false },
-            colors: colors, // Usa o array de cores dinâmico
+            colors: colors, 
             stroke: { 
                 curve: 'smooth',
                 width: 2
@@ -196,6 +186,7 @@ async function displayAlarmsForAsset(symbol) {
             activeTbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Nenhum alarme ativo para este ativo.</td></tr>';
         } else {
             const activeAlarmsHtml = activeAlarms.map(alarm => {
+                // --- INÍCIO DA LÓGICA DE DESCRIÇÃO CORRIGIDA ---
                 let alarmDescription = '';
                 if (alarm.alarm_type === 'stochastic') { alarmDescription = `Estocástico(${alarm.indicator_period}) ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} no ${alarm.indicator_timeframe}`; }
                 else if (alarm.alarm_type === 'rsi_level') { alarmDescription = `RSI(${alarm.indicator_period}) ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} no ${alarm.indicator_timeframe}`; }
@@ -204,7 +195,8 @@ async function displayAlarmsForAsset(symbol) {
                 else if (alarm.alarm_type === 'ema_touch') { alarmDescription = `Preço testa a EMA(${alarm.ema_period}) como ${alarm.condition === 'test_support' ? 'SUPORTE' : 'RESISTÊNCIA'} no ${alarm.indicator_timeframe}`; } 
                 else if (alarm.alarm_type === 'combo') { const primaryTriggerText = alarm.condition === 'test_support' ? `testa a EMA (Suporte)` : `testa a EMA (Resistência)`; const secondaryTriggerText = `Estocástico(${alarm.combo_period}) ${alarm.combo_condition === 'below' ? 'abaixo de' : 'acima de'} ${alarm.combo_target_price}`; alarmDescription = `CONFLUÊNCIA: ${primaryTriggerText} E ${secondaryTriggerText} no ${alarm.indicator_timeframe}`; } 
                 else { alarmDescription = `Preço ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} USD`; }
-                
+                // --- FIM DA LÓGICA DE DESCRIÇÃO CORRIGIDA ---
+
                 return `<tr><td>${alarmDescription}</td><td>${new Date(alarm.created_at).toLocaleString('pt-PT')}</td><td><a href="alarms-manage.html" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.9em;">Gerir</a></td></tr>`;
             }).join('');
             activeTbody.innerHTML = activeAlarmsHtml;
@@ -214,6 +206,7 @@ async function displayAlarmsForAsset(symbol) {
             triggeredTbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Nenhum alarme disparado para este ativo.</td></tr>';
         } else {
             const triggeredAlarmsHtml = triggeredAlarms.map(alarm => {
+                // --- INÍCIO DA LÓGICA DE DESCRIÇÃO CORRIGIDA ---
                 let alarmDescription = '';
                 if (alarm.alarm_type === 'stochastic') { alarmDescription = `Estocástico(${alarm.indicator_period}) ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} no ${alarm.indicator_timeframe}`; }
                 else if (alarm.alarm_type === 'rsi_level') { alarmDescription = `RSI(${alarm.indicator_period}) ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} no ${alarm.indicator_timeframe}`; }
@@ -222,6 +215,7 @@ async function displayAlarmsForAsset(symbol) {
                 else if (alarm.alarm_type === 'ema_touch') { alarmDescription = `Preço testa a EMA(${alarm.ema_period}) como ${alarm.condition === 'test_support' ? 'SUPORTE' : 'RESISTÊNCIA'} no ${alarm.indicator_timeframe}`; } 
                 else if (alarm.alarm_type === 'combo') { const primaryTriggerText = alarm.condition === 'test_support' ? `testa a EMA (Suporte)` : `testa a EMA (Resistência)`; const secondaryTriggerText = `Estocástico(${alarm.combo_period}) ${alarm.combo_condition === 'below' ? 'abaixo de' : 'acima de'} ${alarm.combo_target_price}`; alarmDescription = `CONFLUÊNCIA: ${primaryTriggerText} E ${secondaryTriggerText} no ${alarm.indicator_timeframe}`; } 
                 else { alarmDescription = `Preço ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} USD`; }
+                // --- FIM DA LÓGICA DE DESCRIÇÃO CORRIGIDA ---
                 
                 const triggeredDate = alarm.triggered_at ? new Date(alarm.triggered_at).toLocaleString('pt-PT') : 'N/A';
                 return `<tr><td>${alarmDescription}</td><td>${triggeredDate}</td><td><a href="alarms-manage.html" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.9em;">Ver Histórico</a></td></tr>`;
