@@ -185,7 +185,7 @@ async function displayAlarmsForAsset(symbol) {
             activeTbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Nenhum alarme ativo para este ativo.</td></tr>';
         } else {
             const activeAlarmsHtml = activeAlarms.map(alarm => {
-                let alarmDescription = `Preço ${alarm.condition} ${alarm.target_price} USD`;
+                let alarmDescription = getAlarmDescription(alarm); // Usa a função
                 return `<tr><td>${alarmDescription}</td><td>${new Date(alarm.created_at).toLocaleString('pt-PT')}</td><td><a href="alarms-manage.html" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.9em;">Gerir</a></td></tr>`;
             }).join('');
             activeTbody.innerHTML = activeAlarmsHtml;
@@ -195,7 +195,7 @@ async function displayAlarmsForAsset(symbol) {
             triggeredTbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Nenhum alarme disparado para este ativo.</td></tr>';
         } else {
             const triggeredAlarmsHtml = triggeredAlarms.map(alarm => {
-                let alarmDescription = `Preço ${alarm.condition} ${alarm.target_price} USD`;
+                let alarmDescription = getAlarmDescription(alarm); // Usa a função
                 const triggeredDate = alarm.triggered_at ? new Date(alarm.triggered_at).toLocaleString('pt-PT') : 'N/A';
                 return `<tr><td>${alarmDescription}</td><td>${triggeredDate}</td><td><a href="alarms-manage.html" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.9em;">Ver Histórico</a></td></tr>`;
             }).join('');
@@ -247,6 +247,35 @@ async function displayTradesForAsset(symbol) {
 function editTrade(tradeId) {
     localStorage.setItem('tradeToEdit', tradeId);
     window.location.href = 'dashboard.html';
+}
+
+function getAlarmDescription(alarm) {
+    let description = '';
+    switch (alarm.alarm_type) {
+        case 'stochastic':
+            description = `Estocástico(${alarm.indicator_period}) ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} no ${alarm.indicator_timeframe}`;
+            break;
+        case 'rsi_level':
+            description = `RSI(${alarm.indicator_period}) ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} no ${alarm.indicator_timeframe}`;
+            break;
+        case 'stochastic_crossover':
+            description = `Estocástico %K(${alarm.indicator_period}) cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} de %D(${alarm.combo_period}) no ${alarm.indicator_timeframe}`;
+            break;
+        case 'rsi_crossover':
+            description = `RSI(${alarm.rsi_period}) cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} da MA(${alarm.rsi_ma_period}) no ${alarm.indicator_timeframe}`;
+            break;
+        case 'ema_touch':
+            description = `Preço testa a EMA(${alarm.ema_period}) como ${alarm.condition === 'test_support' ? 'SUPORTE' : 'RESISTÊNCIA'} no ${alarm.indicator_timeframe}`;
+            break;
+        case 'combo':
+            const primaryTriggerText = alarm.condition === 'test_support' ? `testa a EMA (Suporte)` : `testa a EMA (Resistência)`;
+            const secondaryTriggerText = `Estocástico(${alarm.combo_period}) ${alarm.combo_condition === 'below' ? 'abaixo de' : 'acima de'} ${alarm.combo_target_price}`;
+            description = `CONFLUÊNCIA: ${primaryTriggerText} E ${secondaryTriggerText} no ${alarm.indicator_timeframe}`;
+            break;
+        default: // price
+            description = `Preço ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} USD`;
+    }
+    return description;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -307,4 +336,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     renderTradingViewTechnicalAnalysisWidget(assetSymbol);
-});
+});```
+
+--- END OF FILE asset-details.js ---
