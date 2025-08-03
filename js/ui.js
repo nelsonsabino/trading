@@ -55,7 +55,7 @@ function createChecklistItem(item, data) {
 
 function createInputItem(item, data) {
     const element = document.createElement('div');
-    element.className = 'input-item-styled'; 
+    element.className = 'input-item-styled';
     const isRequired = item.required ? 'required' : '';
     const labelText = item.required ? `${item.label} <span class="required-asterisk">*</span>` : item.label;
     const value = data && data[item.id] ? data[item.id] : '';
@@ -74,7 +74,7 @@ export function generateDynamicChecklist(container, phases, data = {}) {
     container.innerHTML = '';
     if (!phases || phases.length === 0) return;
     phases.forEach(phase => {
-        if (!phase || !Array.isArray(phase.items)) return; 
+        if (!phase || !Array.isArray(phase.items)) return;
         const phaseDiv = document.createElement('div');
         const titleEl = document.createElement('h4');
         titleEl.textContent = phase.title;
@@ -207,7 +207,7 @@ async function loadAndOpenAlarmModal(assetPair, mode) {
         const { data: allAlarms, error } = await supabase.from('alarms').select('*');
         if (error) throw error;
         
-        openAlarmListModal(assetPair, allAlarms, mode);
+        openAlarmListModal(allAlarms, mode);
     } catch (err) {
         console.error("Erro ao buscar alarmes para o modal:", err);
         alert("Não foi possível carregar os alarmes.");
@@ -262,6 +262,13 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
     let alarmBellHtml = '';
     let acknowledgeButtonHtml = '';
     let revertButtonHtml = '';
+    // --- INÍCIO DA ALTERAÇÃO ---
+    let viewImageButtonHtml = '';
+
+    if (trade.data.imageUrl) {
+        viewImageButtonHtml = `<button class="icon-action-btn" data-action="view-image" data-image-url="${trade.data.imageUrl}" title="Ver Imagem do Gráfico"><span class="material-symbols-outlined">image</span></button>`;
+    }
+    // --- FIM DA ALTERAÇÃO ---
 
     if (hasActiveAlarm) {
         alarmBellHtml = `<button class="icon-action-btn alarm-active-bell" data-action="view-alarms" data-asset="${assetName}" title="Ver alarmes ativos"><span class="material-symbols-outlined">notifications_active</span></button>`;
@@ -295,6 +302,7 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
             <div class="card-secondary-actions">
                 ${revertButtonHtml}
                 <a href="https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}" target="_blank" rel="noopener noreferrer" class="icon-action-btn action-full-chart" title="Abrir no TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
+                ${viewImageButtonHtml} <!-- ALTERAÇÃO AQUI -->
                 ${acknowledgeButtonHtml}
             </div>
             <div class="card-sparkline" id="sparkline-card-${trade.id}"></div>
@@ -362,6 +370,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'close': 
                     if (tradeId) openCloseTradeModal(tradesForEventListeners.find(t => t.id === tradeId)); 
                     break;
+                // --- INÍCIO DA ALTERAÇÃO ---
+                case 'view-image':
+                    const imageUrl = button.dataset.imageUrl;
+                    if (imageUrl) openImageModal(imageUrl);
+                    break;
+                // --- FIM DA ALTERAÇÃO ---
                 case 'view-alarms':
                     loadAndOpenAlarmModal(button.dataset.asset, 'active');
                     break;
@@ -369,7 +383,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     const assetSymbol = button.dataset.asset;
                     if (assetSymbol) {
                         loadAndOpenAlarmModal(assetSymbol, 'triggered');
-                        // acknowledgeAlarm(assetSymbol); // Ação de reconhecer agora está no botão do modal
                     }
                     break;
                 case 'add-to-watchlist':
