@@ -3,7 +3,7 @@
 import { supabase } from './services.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openImageModal, openAddModal } from './modals.js';
-import { loadAndOpenForEditing, handleRevertStatus } from './handlers.js'; // Importa a nova função
+import { loadAndOpenForEditing, handleRevertStatus } from './handlers.js';
 import { getLastCreatedTradeId, setLastCreatedTradeId } from './state.js';
 
 let tradesForEventListeners = [];
@@ -121,6 +121,35 @@ async function acknowledgeAlarm(assetPair) {
     }
 }
 
+function getAlarmDescription(alarm) {
+    let description = '';
+    switch (alarm.alarm_type) {
+        case 'stochastic':
+            description = `Estocástico(${alarm.indicator_period}) ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} no ${alarm.indicator_timeframe}`;
+            break;
+        case 'rsi_level':
+            description = `RSI(${alarm.indicator_period}) ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} no ${alarm.indicator_timeframe}`;
+            break;
+        case 'stochastic_crossover':
+            description = `Estocástico %K(${alarm.indicator_period}) cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} de %D(${alarm.combo_period}) no ${alarm.indicator_timeframe}`;
+            break;
+        case 'rsi_crossover':
+            description = `RSI(${alarm.rsi_period}) cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} da MA(${alarm.rsi_ma_period}) no ${alarm.indicator_timeframe}`;
+            break;
+        case 'ema_touch':
+            description = `Preço testa a EMA(${alarm.ema_period}) como ${alarm.condition === 'test_support' ? 'SUPORTE' : 'RESISTÊNCIA'} no ${alarm.indicator_timeframe}`;
+            break;
+        case 'combo':
+            const primaryTriggerText = alarm.condition === 'test_support' ? `testa a EMA (Suporte)` : `testa a EMA (Resistência)`;
+            const secondaryTriggerText = `Estocástico(${alarm.combo_period}) ${alarm.combo_condition === 'below' ? 'abaixo de' : 'acima de'} ${alarm.combo_target_price}`;
+            description = `CONFLUÊNCIA: ${primaryTriggerText} E ${secondaryTriggerText} no ${alarm.indicator_timeframe}`;
+            break;
+        default: // price
+            description = `Preço ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} USD`;
+    }
+    return description;
+}
+
 function openAlarmListModal(assetPair, alarms, mode = 'active') {
     const modal = document.getElementById('alarm-list-modal');
     const title = document.getElementById('alarm-list-title');
@@ -145,7 +174,7 @@ function openAlarmListModal(assetPair, alarms, mode = 'active') {
         container.innerHTML = '<p>Nenhum alarme encontrado.</p>';
     } else {
         filteredAlarms.forEach(alarm => {
-            let alarmDescription = `Preço ${alarm.condition} ${alarm.target_price} USD`;
+            const alarmDescription = getAlarmDescription(alarm);
             const item = document.createElement('div');
             item.className = 'alarm-list-item';
             item.innerHTML = `
