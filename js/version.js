@@ -2,6 +2,16 @@
 
 export const changelogData = {
 current: {
+    number: '12.9.3',
+    changes: [
+        "**Otimização da Dashboard (Performance e Fiabilidade):**",
+        "Refatorada a lógica de atualização de dados em `app.js` para separar completamente os 'ouvintes' (listeners) de trades e de alarmes.",
+        "Corrigido o problema onde um novo 'ouvinte' de trades era criado a cada atualização de alarmes, o que causava atualizações duplicadas e consumo excessivo de recursos.",
+        "Esta alteração garante que a dashboard é atualizada de forma muito mais eficiente e consistente, melhorando a performance geral e a robustez da aplicação."
+    ]
+},
+ releases: [
+  {
     number: '12.9.2',
     changes: [
         "**Correção dos Gráficos (EMAs):**",
@@ -10,8 +20,7 @@ current: {
         "A função foi refatorada para lidar de forma robusta com os diferentes formatos de dados, garantindo que as EMAs são sempre calculadas e exibidas corretamente quando há dados históricos suficientes."
     ]
 },
- releases: [
-  {
+     {
         number: '12.9.1',
         changes: [
             "**Correção das Notificações de Alarme:**",
