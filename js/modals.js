@@ -12,11 +12,10 @@ export function closeAddModal() {
         addModal.form.reset(); 
         addModal.checklistContainer.innerHTML = ''; 
         setCurrentTrade({}); 
-        // NOVO: Esconder o botão de apagar ao fechar o modal
         const deleteBtn = document.getElementById('delete-opportunity-btn');
         if (deleteBtn) {
             deleteBtn.style.display = 'none';
-            deleteBtn.onclick = null; // Limpa o listener para evitar múltiplos bindings
+            deleteBtn.onclick = null;
         }
     } 
 }
@@ -29,13 +28,11 @@ export function openArmModal(trade) {
     setCurrentTrade({ id: trade.id, data: trade.data });
     armModal.assetNameSpan.textContent = trade.data.asset;
     armModal.strategyNameSpan.textContent = trade.data.strategyName;
-    armModal.checklistContainer.innerHTML = ''; // Limpa sempre o container
+    armModal.checklistContainer.innerHTML = ''; // Limpa o container primeiro
 
-    // Pega a segunda fase (armed) pela ordem
     const armedPhase = (selectedStrategy.data.phases && selectedStrategy.data.phases.length > 1) ? selectedStrategy.data.phases[1] : null;
     
     if (armedPhase) {
-        // --- INÍCIO DA ALTERAÇÃO ---
         // Procura e exibe a imagem de referência para a fase "Armada"
         const imageItem = armedPhase.items.find(item => item.type === 'image');
         if (imageItem && imageItem.url) {
@@ -46,10 +43,14 @@ export function openArmModal(trade) {
             imgElement.style.marginBottom = '1.5rem';
             armModal.checklistContainer.appendChild(imgElement);
         }
-        // --- FIM DA ALTERAÇÃO ---
         generateDynamicChecklist(armModal.checklistContainer, [armedPhase], trade.data.armedSetup);
     }
     
+    const imageUrlInput = document.getElementById('image-url-arm');
+    if (imageUrlInput) {
+        imageUrlInput.value = trade.data.imageUrl || '';
+    }
+
     if (armModal.container) armModal.container.style.display = 'flex';
 }
 export function closeArmModal() { if (armModal.container) { armModal.container.style.display = 'none'; armModal.form.reset(); setCurrentTrade({}); } }
@@ -62,14 +63,12 @@ export function openExecModal(trade) {
     setCurrentTrade({ id: trade.id, data: trade.data });
     execModal.assetNameSpan.textContent = trade.data.asset;
     execModal.strategyNameSpan.textContent = trade.data.strategyName;
-    execModal.checklistContainer.innerHTML = ''; // Limpa sempre o container
-
-    // Pega a terceira fase (execution) pela ordem
+    execModal.checklistContainer.innerHTML = ''; // Limpa o container primeiro
+    
     const executionPhase = (selectedStrategy.data.phases && selectedStrategy.data.phases.length > 2) ? selectedStrategy.data.phases[2] : null;
     const phasesForChecklist = [];
     
     if (executionPhase) {
-        // --- INÍCIO DA ALTERAÇÃO ---
         // Procura e exibe a imagem de referência para a fase "Execução"
         const imageItem = executionPhase.items.find(item => item.type === 'image');
         if (imageItem && imageItem.url) {
@@ -80,7 +79,6 @@ export function openExecModal(trade) {
             imgElement.style.marginBottom = '1.5rem';
             execModal.checklistContainer.appendChild(imgElement);
         }
-        // --- FIM DA ALTERAÇÃO ---
         phasesForChecklist.push(executionPhase);
     }
     
@@ -92,6 +90,11 @@ export function openExecModal(trade) {
     
     generateDynamicChecklist(execModal.checklistContainer, phasesForChecklist, trade.data.executionDetails);
     
+    const imageUrlInput = document.getElementById('image-url-exec');
+    if (imageUrlInput) {
+        imageUrlInput.value = trade.data.imageUrl || '';
+    }
+
     if (execModal.container) execModal.container.style.display = 'flex';
 }
 export function closeExecModal() { if (execModal.container) { execModal.container.style.display = 'none'; execModal.form.reset(); setCurrentTrade({}); } }
