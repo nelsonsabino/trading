@@ -34,6 +34,14 @@ export function openArmModal(trade) {
     const armedPhase = (selectedStrategy.data.phases && selectedStrategy.data.phases.length > 1) ? selectedStrategy.data.phases[1] : null;
     generateDynamicChecklist(armModal.checklistContainer, [armedPhase], trade.data.armedSetup);
     
+    // --- INÍCIO DA ALTERAÇÃO ---
+    // Preenche o campo de imagem no modal de "Armar"
+    const imageUrlInput = document.getElementById('image-url-arm');
+    if (imageUrlInput) {
+        imageUrlInput.value = trade.data.imageUrl || '';
+    }
+    // --- FIM DA ALTERAÇÃO ---
+
     if (armModal.container) armModal.container.style.display = 'flex';
 }
 export function closeArmModal() { if (armModal.container) { armModal.container.style.display = 'none'; armModal.form.reset(); setCurrentTrade({}); } }
@@ -62,6 +70,14 @@ export function openExecModal(trade) {
     phasesForChecklist.push(gestaoPhase);
     
     generateDynamicChecklist(execModal.checklistContainer, phasesForChecklist, trade.data.executionDetails);
+
+    // --- INÍCIO DA ALTERAÇÃO ---
+    // Preenche o campo de imagem no modal de "Executar"
+    const imageUrlInput = document.getElementById('image-url-exec');
+    if (imageUrlInput) {
+        imageUrlInput.value = trade.data.imageUrl || '';
+    }
+    // --- FIM DA ALTERAÇÃO ---
     
     if (execModal.container) execModal.container.style.display = 'flex';
 }
@@ -70,5 +86,6 @@ export function closeExecModal() { if (execModal.container) { execModal.containe
 export function openCloseTradeModal(trade) { setCurrentTrade({ id: trade.id, data: trade.data }); closeModalObj.assetNameSpan.textContent = trade.data.asset; if (closeModalObj.container) closeModalObj.container.style.display = 'flex'; }
 export function closeCloseTradeModal() { if (closeModalObj.container) { closeModalObj.container.style.display = 'none'; closeModalObj.form.reset(); setCurrentTrade({}); } }
 
+// ESTAS FUNÇÕES JÁ NÃO SÃO USADAS PELA NOVA ABORDAGEM, MAS MANTEMOS PARA REFERÊNCIA CASO SEJA NECESSÁRIO
 export function openImageModal(imageUrl) { if (imageModal && modalImg) { modalImg.src = imageUrl; imageModal.classList.add('visible'); } }
 export function closeImageModal() { if (imageModal && modalImg) { imageModal.classList.remove('visible'); modalImg.src = ''; } }
