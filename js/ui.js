@@ -2,11 +2,32 @@
 
 import { supabase } from './services.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
-import { openArmModal, openExecModal, openCloseTradeModal, openImageModal, openAddModal } from './modals.js';
+import { openArmModal, openExecModal, openCloseTradeModal, openAddModal } from './modals.js';
 import { loadAndOpenForEditing, handleRevertStatus } from './handlers.js';
 import { getLastCreatedTradeId, setLastCreatedTradeId } from './state.js';
 
 let tradesForEventListeners = [];
+
+// --- INÍCIO DA ALTERAÇÃO ---
+// Funções de ajuda para gerir o estado das imagens no localStorage
+const getVisibleImageIds = () => {
+    try {
+        const ids = localStorage.getItem('visibleImageTradeIds');
+        return ids ? JSON.parse(ids) : [];
+    } catch (e) {
+        console.error("Erro ao ler IDs de imagem do localStorage", e);
+        return [];
+    }
+};
+
+const setVisibleImageIds = (ids) => {
+    try {
+        localStorage.setItem('visibleImageTradeIds', JSON.stringify(ids));
+    } catch (e) {
+        console.error("Erro ao guardar IDs de imagem no localStorage", e);
+    }
+};
+// --- FIM DA ALTERAÇÃO ---
 
 function renderSparkline(containerId, dataSeries) {
     const container = document.getElementById(containerId);
@@ -263,20 +284,25 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
     let acknowledgeButtonHtml = '';
     let revertButtonHtml = '';
     
-    // --- INÍCIO DA ALTERAÇÃO ---
     let viewImageButtonHtml = '';
     let imageContainerHtml = '';
     if (trade.data.imageUrl) {
         viewImageButtonHtml = `<button class="icon-action-btn" data-action="toggle-image" title="Mostrar/Esconder Imagem"><span class="material-symbols-outlined">image</span></button>`;
+        
+        // --- INÍCIO DA ALTERAÇÃO ---
+        // Verifica se a imagem deve estar visível no carregamento
+        const visibleImageIds = getVisibleImageIds();
+        const isVisibleClass = visibleImageIds.includes(trade.id) ? 'visible' : '';
+        
         imageContainerHtml = `
-            <div class="card-image-container">
+            <div class="card-image-container ${isVisibleClass}">
                 <a href="${trade.data.imageUrl}" target="_blank" rel="noopener noreferrer" title="Abrir imagem numa nova janela">
                     <img src="${trade.data.imageUrl}" alt="Gráfico de Análise para ${assetName}" loading="lazy">
                 </a>
             </div>
         `;
+        // --- FIM DA ALTERAÇÃO ---
     }
-    // --- FIM DA ALTERAÇÃO ---
 
     if (hasActiveAlarm) {
         alarmBellHtml = `<button class="icon-action-btn alarm-active-bell" data-action="view-alarms" data-asset="${assetName}" title="Ver alarmes ativos"><span class="material-symbols-outlined">notifications_active</span></button>`;
@@ -379,14 +405,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'close': 
                     if (tradeId) openCloseTradeModal(tradesForEventListeners.find(t => t.id === tradeId)); 
                     break;
+                
                 // --- INÍCIO DA ALTERAÇÃO ---
                 case 'toggle-image':
                     const imageContainer = card.querySelector('.card-image-container');
                     if (imageContainer) {
                         imageContainer.classList.toggle('visible');
+                        
+                        // Atualiza o localStorage
+                        let visibleIds = getVisibleImageIds();
+                        const isVisible = imageContainer.classList.contains('visible');
+                        
+                        if (isVisible) {
+                            // Adiciona o ID se não estiver na lista
+                            if (!visibleIds.includes(tradeId)) {
+                                visibleIds.push(tradeId);
+                            }
+                        } else {
+                            // Remove o ID da lista
+                            visibleIds = visibleIds.filter(id => id !== tradeId);
+                        }
+                        setVisibleImageIds(visibleIds);
                     }
                     break;
                 // --- FIM DA ALTERAÇÃO ---
+
                 case 'view-alarms':
                     loadAndOpenAlarmModal(button.dataset.asset, 'active');
                     break;
