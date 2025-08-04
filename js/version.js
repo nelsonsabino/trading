@@ -2,6 +2,23 @@
 
 export const changelogData = {
 current: {
+    number: '12.11.1',
+    changes: [
+        "**Correção na Ordenação do Histórico de Alarmes:**",
+        "Corrigido o problema na página de 'Detalhes do Ativo' onde o histórico de alarmes disparados não era exibido em ordem cronológica.",
+        "A lista de alarmes disparados é agora corretamente ordenada pela data de disparo (`triggered_at`), com os mais recentes a aparecer no topo."
+    ]
+},
+ releases: [
+  {
+        number: '12.11.0',
+        changes: [
+            "**Melhorias de Usabilidade e Gestão de Dados (Watchlist):**",
+            "A aplicação agora guarda o estado (aberto/fechado) da imagem de análise nos cards da watchlist, mantendo a visualização entre sessões (`localStorage`).",
+            "O campo para editar o link da imagem do gráfico foi adicionado a todos os modais de edição de trade (Potencial, Armado, Executar), permitindo que a imagem seja atualizada em qualquer fase do processo."
+        ]
+    },
+     {
     number: '12.10.0',
     changes: [
         "**Dashboard (Watchlist) - Visualização de Imagem Integrada no Card:**",
@@ -10,8 +27,7 @@ current: {
         "Clicar na própria imagem abre-a numa nova janela do navegador para visualização em tamanho real, melhorando o fluxo de análise."
     ]
 },
- releases: [
-  {
+     {
         number: '12.9.4',
         changes: [
             "**Dashboard (Watchlist) - Acesso Rápido à Imagem do Gráfico:**",
