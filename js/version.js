@@ -2,6 +2,24 @@
 
 export const changelogData = {
 current: {
+    number: '12.10.0',
+    changes: [
+        "**Dashboard (Watchlist) - Visualização de Imagem Integrada no Card:**",
+        "Substituída a funcionalidade de modal de imagem por uma experiência integrada diretamente no card da watchlist.",
+        "O botão 'imagem', visível quando um link de análise é guardado, agora expande e recolhe o card com uma animação suave para mostrar ou ocultar a imagem.",
+        "Clicar na própria imagem abre-a numa nova janela do navegador para visualização em tamanho real, melhorando o fluxo de análise."
+    ]
+},
+ releases: [
+  {
+        number: '12.9.4',
+        changes: [
+            "**Dashboard (Watchlist) - Acesso Rápido à Imagem do Gráfico:**",
+            "Adicionado um botão de 'imagem' nos cards da watchlist, que só aparece se um link de imagem de análise foi guardado para o trade.",
+            "Ao clicar neste novo botão, a imagem do gráfico é exibida num modal sobreposto, permitindo uma consulta rápida da análise sem sair da dashboard."
+        ]
+    },
+     {
     number: '12.9.3',
     changes: [
         "**Otimização da Dashboard (Performance e Fiabilidade):**",
@@ -10,8 +28,7 @@ current: {
         "Esta alteração garante que a dashboard é atualizada de forma muito mais eficiente e consistente, melhorando a performance geral e a robustez da aplicação."
     ]
 },
- releases: [
-  {
+     {
     number: '12.9.2',
     changes: [
         "**Correção dos Gráficos (EMAs):**",
