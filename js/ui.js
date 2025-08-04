@@ -55,7 +55,7 @@ function createChecklistItem(item, data) {
 
 function createInputItem(item, data) {
     const element = document.createElement('div');
-    element.className = 'input-item-styled';
+    element.className = 'input-item-styled'; 
     const isRequired = item.required ? 'required' : '';
     const labelText = item.required ? `${item.label} <span class="required-asterisk">*</span>` : item.label;
     const value = data && data[item.id] ? data[item.id] : '';
@@ -74,7 +74,7 @@ export function generateDynamicChecklist(container, phases, data = {}) {
     container.innerHTML = '';
     if (!phases || phases.length === 0) return;
     phases.forEach(phase => {
-        if (!phase || !Array.isArray(phase.items)) return;
+        if (!phase || !Array.isArray(phase.items)) return; 
         const phaseDiv = document.createElement('div');
         const titleEl = document.createElement('h4');
         titleEl.textContent = phase.title;
@@ -207,7 +207,7 @@ async function loadAndOpenAlarmModal(assetPair, mode) {
         const { data: allAlarms, error } = await supabase.from('alarms').select('*');
         if (error) throw error;
         
-        openAlarmListModal(allAlarms, mode);
+        openAlarmListModal(assetPair, allAlarms, mode);
     } catch (err) {
         console.error("Erro ao buscar alarmes para o modal:", err);
         alert("Não foi possível carregar os alarmes.");
@@ -262,11 +262,19 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
     let alarmBellHtml = '';
     let acknowledgeButtonHtml = '';
     let revertButtonHtml = '';
+    
     // --- INÍCIO DA ALTERAÇÃO ---
     let viewImageButtonHtml = '';
-
+    let imageContainerHtml = '';
     if (trade.data.imageUrl) {
-        viewImageButtonHtml = `<button class="icon-action-btn" data-action="view-image" data-image-url="${trade.data.imageUrl}" title="Ver Imagem do Gráfico"><span class="material-symbols-outlined">image</span></button>`;
+        viewImageButtonHtml = `<button class="icon-action-btn" data-action="toggle-image" title="Mostrar/Esconder Imagem"><span class="material-symbols-outlined">image</span></button>`;
+        imageContainerHtml = `
+            <div class="card-image-container">
+                <a href="${trade.data.imageUrl}" target="_blank" rel="noopener noreferrer" title="Abrir imagem numa nova janela">
+                    <img src="${trade.data.imageUrl}" alt="Gráfico de Análise para ${assetName}" loading="lazy">
+                </a>
+            </div>
+        `;
     }
     // --- FIM DA ALTERAÇÃO ---
 
@@ -284,7 +292,6 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
         revertButtonHtml = `<button class="btn btn-secondary revert-btn" data-action="${revertAction}" title="${revertText}"><span class="material-symbols-outlined">undo</span> <span class="button-text">${revertText}</span></button>`;
     }
 
-
     card.innerHTML = `
         <div class="card-header-row">
             <h3 class="asset-title-card">
@@ -298,11 +305,13 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
         
         ${notesHtml}
 
+        ${imageContainerHtml}
+
         <div class="card-bottom-row">
             <div class="card-secondary-actions">
                 ${revertButtonHtml}
                 <a href="https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}" target="_blank" rel="noopener noreferrer" class="icon-action-btn action-full-chart" title="Abrir no TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
-                ${viewImageButtonHtml} <!-- ALTERAÇÃO AQUI -->
+                ${viewImageButtonHtml}
                 ${acknowledgeButtonHtml}
             </div>
             <div class="card-sparkline" id="sparkline-card-${trade.id}"></div>
@@ -371,9 +380,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (tradeId) openCloseTradeModal(tradesForEventListeners.find(t => t.id === tradeId)); 
                     break;
                 // --- INÍCIO DA ALTERAÇÃO ---
-                case 'view-image':
-                    const imageUrl = button.dataset.imageUrl;
-                    if (imageUrl) openImageModal(imageUrl);
+                case 'toggle-image':
+                    const imageContainer = card.querySelector('.card-image-container');
+                    if (imageContainer) {
+                        imageContainer.classList.toggle('visible');
+                    }
                     break;
                 // --- FIM DA ALTERAÇÃO ---
                 case 'view-alarms':
