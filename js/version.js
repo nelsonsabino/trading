@@ -2,6 +2,15 @@
 
 export const changelogData = {
 current: {
+    number: '12.12.0',
+    changes: [
+        "**Melhorias no Construtor de Estratégias (Funcionalidade e UX):**",
+        "Implementada a capacidade de reordenar os itens da checklist (checkbox, texto, etc.) através de arrastar e soltar (drag-and-drop) no gestor de estratégias, oferecendo total flexibilidade na construção dos setups.",
+        "As imagens de referência definidas para cada fase da estratégia são agora exibidas corretamente no topo dos modais do Dashboard (Adicionar, Armar, Executar), fornecendo um guia visual claro durante a gestão do trade."
+    ]
+},
+ releases: [
+  {
     number: '12.11.1',
     changes: [
         "**Correção na Ordenação do Histórico de Alarmes:**",
@@ -9,8 +18,7 @@ current: {
         "A lista de alarmes disparados é agora corretamente ordenada pela data de disparo (`triggered_at`), com os mais recentes a aparecer no topo."
     ]
 },
- releases: [
-  {
+     {
         number: '12.11.0',
         changes: [
             "**Melhorias de Usabilidade e Gestão de Dados (Watchlist):**",
