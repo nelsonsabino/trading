@@ -2,6 +2,23 @@
 
 export const changelogData = {
 current: {
+    number: '12.12.2',
+    changes: [
+        "**Correção Final da Exibição de Imagens da Estratégia (Modais):**",
+        "Resolvido o bug onde a imagem de referência da estratégia era adicionada ao modal e imediatamente apagada pela função que desenha a checklist.",
+        "A lógica foi corrigida para garantir que a imagem é inserida e mantida corretamente em todos os modais (Adicionar, Armar, Executar), finalizando a implementação da funcionalidade."
+    ]
+},
+ releases: [
+  {
+        number: '12.12.1',
+        changes: [
+            "**Correção da Exibição de Imagens da Estratégia:**",
+            "Resolvido o problema crítico que impedia a exibição das imagens de referência da estratégia nos modais de Adicionar e Editar trade.",
+            "A lógica foi refatorada para garantir que a imagem correta de cada fase (Potencial, Armada, Execução) é carregada e exibida de forma fiável, corrigindo também o erro de `SyntaxError` que impedia o dashboard de carregar."
+        ]
+    },
+     {
     number: '12.12.0',
     changes: [
         "**Melhorias no Construtor de Estratégias (Funcionalidade e UX):**",
@@ -9,8 +26,7 @@ current: {
         "As imagens de referência definidas para cada fase da estratégia são agora exibidas corretamente no topo dos modais do Dashboard (Adicionar, Armar, Executar), fornecendo um guia visual claro durante a gestão do trade."
     ]
 },
- releases: [
-  {
+     {
     number: '12.11.1',
     changes: [
         "**Correção na Ordenação do Histórico de Alarmes:**",
