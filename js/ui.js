@@ -2,31 +2,15 @@
 
 import { supabase } from './services.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
-import { openArmModal, openExecModal, openCloseTradeModal, openImageModal, openAddModal } from './modals.js';
+import { openArmModal, openExecModal, openCloseTradeModal, openAddModal } from './modals.js';
 import { loadAndOpenForEditing, handleRevertStatus } from './handlers.js';
-import { getLastCreatedTradeId, setLastCreatedTradeId, getVisibleImageIds, setVisibleImageIds } from './state.js'; // Assumindo que a lógica de localStorage foi movida para state.js
+// --- INÍCIO DA ALTERAÇÃO ---
+// Importa as funções de gestão de estado, incluindo as novas para as imagens
+import { getLastCreatedTradeId, setLastCreatedTradeId, getVisibleImageIds, setVisibleImageIds } from './state.js';
+// --- FIM DA ALTERAÇÃO ---
+
 
 let tradesForEventListeners = [];
-
-// Funções de ajuda para gerir o estado das imagens no localStorage
-const getVisibleImageIdsInternal = () => {
-    try {
-        const ids = localStorage.getItem('visibleImageTradeIds');
-        return ids ? JSON.parse(ids) : [];
-    } catch (e) {
-        console.error("Erro ao ler IDs de imagem do localStorage", e);
-        return [];
-    }
-};
-
-const setVisibleImageIdsInternal = (ids) => {
-    try {
-        localStorage.setItem('visibleImageTradeIds', JSON.stringify(ids));
-    } catch (e) {
-        console.error("Erro ao guardar IDs de imagem no localStorage", e);
-    }
-};
-
 
 function renderSparkline(containerId, dataSeries) {
     const container = document.getElementById(containerId);
@@ -97,8 +81,6 @@ export function generateDynamicChecklist(container, phases, data = {}) {
     phases.forEach(phase => {
         if (!phase || !Array.isArray(phase.items)) return;
 
-        // --- INÍCIO DA ALTERAÇÃO ---
-        // Procura por um item de imagem na fase e exibe-o no topo.
         const imageItem = phase.items.find(item => item.type === 'image');
         if (imageItem && imageItem.url) {
             const imgElement = document.createElement('img');
@@ -109,8 +91,7 @@ export function generateDynamicChecklist(container, phases, data = {}) {
             imgElement.style.border = "1px solid #dee2e6";
             container.appendChild(imgElement);
         }
-        // --- FIM DA ALTERAÇÃO ---
-
+        
         const phaseDiv = document.createElement('div');
         const titleEl = document.createElement('h4');
         titleEl.textContent = phase.title;
@@ -121,7 +102,6 @@ export function generateDynamicChecklist(container, phases, data = {}) {
             switch (item.type) {
                 case 'checkbox': element = createChecklistItem(item, data); break;
                 case 'select': case 'text': case 'number': element = createInputItem(item, data); break;
-                // O tipo 'image' é ignorado aqui porque já foi tratado acima.
                 case 'image': break; 
                 default: console.warn(`Tipo de item desconhecido: ${item.type}`);
             }
@@ -307,8 +287,11 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
     if (trade.data.imageUrl) {
         viewImageButtonHtml = `<button class="icon-action-btn" data-action="toggle-image" title="Mostrar/Esconder Imagem"><span class="material-symbols-outlined">image</span></button>`;
         
-        const visibleImageIds = getVisibleImageIdsInternal();
+        // --- INÍCIO DA ALTERAÇÃO ---
+        // Usa a função importada do state.js
+        const visibleImageIds = getVisibleImageIds();
         const isVisibleClass = visibleImageIds.includes(trade.id) ? 'visible' : '';
+        // --- FIM DA ALTERAÇÃO ---
         
         imageContainerHtml = `
             <div class="card-image-container ${isVisibleClass}">
@@ -427,7 +410,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (imageContainer) {
                         imageContainer.classList.toggle('visible');
                         
-                        let visibleIds = getVisibleImageIdsInternal();
+                        // --- INÍCIO DA ALTERAÇÃO ---
+                        // Usa as funções importadas do state.js
+                        let visibleIds = getVisibleImageIds();
                         const isVisible = imageContainer.classList.contains('visible');
                         
                         if (isVisible) {
@@ -437,7 +422,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         } else {
                             visibleIds = visibleIds.filter(id => id !== tradeId);
                         }
-                        setVisibleImageIdsInternal(visibleIds);
+                        setVisibleImageIds(visibleIds);
+                        // --- FIM DA ALTERAÇÃO ---
                     }
                     break;
                 
