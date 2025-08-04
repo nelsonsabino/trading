@@ -4,13 +4,28 @@ import { supabase } from './services.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openAddModal } from './modals.js';
 import { loadAndOpenForEditing, handleRevertStatus } from './handlers.js';
-// --- INÍCIO DA ALTERAÇÃO ---
-// Importa as funções de gestão de estado, incluindo as novas para as imagens
 import { getLastCreatedTradeId, setLastCreatedTradeId, getVisibleImageIds, setVisibleImageIds } from './state.js';
-// --- FIM DA ALTERAÇÃO ---
-
 
 let tradesForEventListeners = [];
+
+// Funções de ajuda para gerir o estado das imagens no localStorage
+const getVisibleImageIdsInternal = () => {
+    try {
+        const ids = localStorage.getItem('visibleImageTradeIds');
+        return ids ? JSON.parse(ids) : [];
+    } catch (e) {
+        console.error("Erro ao ler IDs de imagem do localStorage", e);
+        return [];
+    }
+};
+
+const setVisibleImageIdsInternal = (ids) => {
+    try {
+        localStorage.setItem('visibleImageTradeIds', JSON.stringify(ids));
+    } catch (e) {
+        console.error("Erro ao guardar IDs de imagem no localStorage", e);
+    }
+};
 
 function renderSparkline(containerId, dataSeries) {
     const container = document.getElementById(containerId);
@@ -75,34 +90,27 @@ function createInputItem(item, data) {
 }
 
 export function generateDynamicChecklist(container, phases, data = {}) {
+    // A função é limpa para ter apenas uma responsabilidade: gerar os itens do formulário.
+    // A lógica de exibição da imagem de referência será tratada no app.js e modals.js.
     container.innerHTML = '';
     if (!phases || phases.length === 0) return;
 
     phases.forEach(phase => {
-        if (!phase || !Array.isArray(phase.items)) return;
-
-        const imageItem = phase.items.find(item => item.type === 'image');
-        if (imageItem && imageItem.url) {
-            const imgElement = document.createElement('img');
-            imgElement.src = imageItem.url;
-            imgElement.style.maxWidth = '100%';
-            imgElement.style.borderRadius = '8px';
-            imgElement.style.marginBottom = '1.5rem';
-            imgElement.style.border = "1px solid #dee2e6";
-            container.appendChild(imgElement);
-        }
+        if (!phase || !Array.isArray(phase.items)) return; 
         
         const phaseDiv = document.createElement('div');
         const titleEl = document.createElement('h4');
         titleEl.textContent = phase.title;
         phaseDiv.appendChild(titleEl);
 
-        phase.items.forEach(item => {
+        // Filtra os itens para excluir os do tipo 'image' da renderização da checklist
+        const formItems = phase.items.filter(item => item.type !== 'image');
+
+        formItems.forEach(item => {
             let element;
             switch (item.type) {
                 case 'checkbox': element = createChecklistItem(item, data); break;
                 case 'select': case 'text': case 'number': element = createInputItem(item, data); break;
-                case 'image': break; 
                 default: console.warn(`Tipo de item desconhecido: ${item.type}`);
             }
             if (element) phaseDiv.appendChild(element);
@@ -287,11 +295,8 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
     if (trade.data.imageUrl) {
         viewImageButtonHtml = `<button class="icon-action-btn" data-action="toggle-image" title="Mostrar/Esconder Imagem"><span class="material-symbols-outlined">image</span></button>`;
         
-        // --- INÍCIO DA ALTERAÇÃO ---
-        // Usa a função importada do state.js
-        const visibleImageIds = getVisibleImageIds();
+        const visibleImageIds = getVisibleImageIdsInternal();
         const isVisibleClass = visibleImageIds.includes(trade.id) ? 'visible' : '';
-        // --- FIM DA ALTERAÇÃO ---
         
         imageContainerHtml = `
             <div class="card-image-container ${isVisibleClass}">
@@ -410,9 +415,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (imageContainer) {
                         imageContainer.classList.toggle('visible');
                         
-                        // --- INÍCIO DA ALTERAÇÃO ---
-                        // Usa as funções importadas do state.js
-                        let visibleIds = getVisibleImageIds();
+                        let visibleIds = getVisibleImageIdsInternal();
                         const isVisible = imageContainer.classList.contains('visible');
                         
                         if (isVisible) {
@@ -422,8 +425,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         } else {
                             visibleIds = visibleIds.filter(id => id !== tradeId);
                         }
-                        setVisibleImageIds(visibleIds);
-                        // --- FIM DA ALTERAÇÃO ---
+                        setVisibleImageIdsInternal(visibleIds);
                     }
                     break;
                 
