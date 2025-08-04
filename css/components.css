@@ -361,3 +361,27 @@
 .dark-mode .closed-trades-history-section {
     background-color: #1e1e1e;
 }
+
+/* --- INÍCIO DA ALTERAÇÃO --- */
+/* Estilos para o container da imagem no card */
+.card-image-container {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-out;
+    margin-top: 0;
+}
+
+.card-image-container.visible {
+    max-height: 500px; /* Altura suficiente para a maioria das imagens */
+    margin-top: 0.75rem; /* Espaço entre as notas e a imagem */
+    transition: max-height 0.5s ease-in;
+}
+
+.card-image-container img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    display: block;
+    cursor: pointer;
+}
+/* --- FIM DA ALTERAÇÃO --- */
