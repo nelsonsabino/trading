@@ -50,3 +50,24 @@ export function getAlarmsData() {
 export function setAlarmsData(data) {
     alarmsData = data;
 }
+
+// --- INÍCIO DA ALTERAÇÃO ---
+// Funções para gerir o estado das imagens visíveis no localStorage
+export function getVisibleImageIds() {
+    try {
+        const ids = localStorage.getItem('visibleImageTradeIds');
+        return ids ? JSON.parse(ids) : [];
+    } catch (e) {
+        console.error("Erro ao ler IDs de imagem do localStorage", e);
+        return [];
+    }
+}
+
+export function setVisibleImageIds(ids) {
+    try {
+        localStorage.setItem('visibleImageTradeIds', JSON.stringify(ids));
+    } catch (e) {
+        console.error("Erro ao guardar IDs de imagem no localStorage", e);
+    }
+}
+// --- FIM DA ALTERAÇÃO ---
