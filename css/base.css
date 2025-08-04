@@ -1,11 +1,48 @@
 /* css/base.css */
 
+/* --- INÍCIO DA ALTERAÇÃO - PALETA DE CORES CENTRALIZADA --- */
+:root {
+  /* Tema Claro (Padrão) */
+  --bg-primary: #f8f9fa;       /* Fundo principal da página */
+  --surface-primary: #ffffff;   /* Fundo de cards, cabeçalho, modais */
+  --border-primary: #dee2e6;    /* Bordas e separadores */
+  --border-secondary: #e9ecef;  /* Bordas mais suaves */
+
+  --text-primary: #212529;      /* Texto principal, preto forte */
+  --text-secondary: #6c757d;    /* Texto secundário, cinza */
+  --text-headings: #495057;     /* Títulos */
+
+  --accent-blue: #007bff;        /* Links, botões primários */
+  --accent-yellow: #ffc107;      /* Cor para "Armado" */
+  --accent-green: #28a745;       /* Cor para "Ativo" */
+  --accent-red: #dc3545;         /* Cor para alarmes, negativo */
+}
+
+.dark-mode {
+  /* Tema Escuro (Sobrescreve as variáveis) */
+  --bg-primary: #121212;         /* Preto muito escuro, mas não puro */
+  --surface-primary: #1e1e1e;   /* Cinza escuro para superfícies */
+  --border-primary: #343a40;    /* Bordas mais escuras */
+  --border-secondary: #2c3136;  /* Bordas mais suaves no escuro */
+
+  --text-primary: #e0e0e0;      /* Branco suave, não puro */
+  --text-secondary: #adb5bd;    /* Cinza mais claro para texto secundário */
+  --text-headings: #f8f9fa;     /* Títulos quase brancos */
+
+  --accent-blue: #58a6ff;        /* Azul mais suave para o modo escuro */
+  --accent-yellow: #d29922;      /* Amarelo/mostarda escuro */
+  --accent-green: #3fb950;       /* Verde menos vibrante */
+  --accent-red: #f85149;         /* Vermelho menos vibrante */
+}
+/* --- FIM DA ALTERAÇÃO --- */
+
+
 /* --- GERAL & TIPOGRAFIA --- */
 body { 
     font-family: -apple-system, BlinkMacMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
     line-height: 1.6; 
-    background-color: #f8f9fa; 
-    color: #343a40; 
+    background-color: var(--bg-primary); 
+    color: var(--text-primary); 
     margin: 0; 
 }
 
@@ -20,15 +57,15 @@ h1, h2, h3 {
 }
 
 h2 { 
-    color: #495057; 
-    border-bottom: 2px solid #e9ecef; 
+    color: var(--text-headings); 
+    border-bottom: 2px solid var(--border-secondary); 
     padding-bottom: 0.5rem; 
     margin-bottom: 1.5rem; 
 }
 
 .section-divider { 
     border: none; 
-    border-top: 1px solid #dee2e6; 
+    border-top: 1px solid var(--border-primary); 
     margin: 3rem 0; 
 }
 
@@ -39,7 +76,7 @@ h2 {
     transition: color 0.2s ease; 
 }
 .asset-link:hover { 
-    color: #007bff; 
+    color: var(--accent-blue); 
     text-decoration: underline; 
 }
 
