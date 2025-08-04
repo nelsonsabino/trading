@@ -90,9 +90,10 @@ function createInputItem(item, data) {
 }
 
 export function generateDynamicChecklist(container, phases, data = {}) {
-    // A função é limpa para ter apenas uma responsabilidade: gerar os itens do formulário.
-    // A lógica de exibição da imagem de referência será tratada no app.js e modals.js.
-    container.innerHTML = '';
+    // --- INÍCIO DA CORREÇÃO ---
+    // A linha `container.innerHTML = '';` foi REMOVIDA daqui.
+    // A responsabilidade de limpar o container passa a ser de quem chama a função.
+    // --- FIM DA CORREÇÃO ---
     if (!phases || phases.length === 0) return;
 
     phases.forEach(phase => {
@@ -103,7 +104,6 @@ export function generateDynamicChecklist(container, phases, data = {}) {
         titleEl.textContent = phase.title;
         phaseDiv.appendChild(titleEl);
 
-        // Filtra os itens para excluir os do tipo 'image' da renderização da checklist
         const formItems = phase.items.filter(item => item.type !== 'image');
 
         formItems.forEach(item => {
