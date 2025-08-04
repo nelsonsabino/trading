@@ -2,59 +2,61 @@
 
 /* --- COMPONENTES GERAIS --- */
 .stat-card {
-    background-color: #fff;
+    background-color: var(--surface-primary);
     padding: 1.5rem;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.08);
     text-align: center;
+    border: 1px solid var(--border-primary);
 }
 .stat-card h4 {
     margin-top: 0;
     margin-bottom: 0.5rem;
-    color: #6c757d;
+    color: var(--text-secondary);
     font-size: 1em;
 }
 .stat-card p {
     margin: 0;
     font-size: 2em;
     font-weight: bold;
-    color: #343a40;
+    color: var(--text-primary);
 }
 
 /* --- CARDS DO DASHBOARD (POTENCIAL, ARMADO, ATIVO) --- */
 .potential-trades, .armed-trades, .live-trades {
-    background-color: #fff;
+    background-color: var(--surface-primary);
     padding: 1.5rem;
     border-radius: 8px;
-    border-top: 4px solid #6c757d;
+    border: 1px solid var(--border-primary);
+    border-top: 4px solid var(--text-secondary);
 }
 .armed-trades {
-    border-top-color: #ffc107;
+    border-top-color: var(--accent-yellow);
 }
 .live-trades {
-    border-top-color: #28a745;
+    border-top-color: var(--accent-green);
 }
 
 /* Base do trade-card */
 .trade-card {
-    background: #fdfdfd;
-    border: 1px solid #e9ecef;
+    background: var(--surface-primary);
+    border: 1px solid var(--border-secondary);
     padding: 0.8rem 1rem;
     border-radius: 6px;
     margin-bottom: 1rem;
-    transition: box-shadow 0.2s ease-in-out;
-    border-left: 5px solid #6c757d;
+    transition: box-shadow 0.2s ease-in-out, background-color 0.2s;
+    border-left: 5px solid var(--text-secondary);
     display: flex;
     flex-direction: column;
 }
 .trade-card:hover {
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.12);
 }
 .trade-card.armed {
-    border-left-color: #ffc107;
+    border-left-color: var(--accent-yellow);
 }
 .trade-card.live {
-    border-left-color: #28a745;
+    border-left-color: var(--accent-green);
 }
 
 /* --- LINHA SUPERIOR DO CARD --- */
@@ -75,7 +77,7 @@
 .card-edit-btn {
     background: none;
     border: none;
-    color: #6c757d;
+    color: var(--text-secondary);
     cursor: pointer;
     opacity: 0;
     transition: opacity 0.2s;
@@ -92,16 +94,16 @@
 .strategy-name {
     margin: 0;
     font-size: 0.85em;
-    color: #007bff;
+    color: var(--accent-blue);
     font-weight: 500;
     text-align: left;
 }
 .trade-notes {
     font-size: 0.8em;
-    color: #6c757d;
+    color: var(--text-secondary);
     margin-top: 0.5rem;
     padding-top: 0.5rem;
-    border-top: 1px dashed #e9ecef;
+    border-top: 1px dashed var(--border-secondary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -115,7 +117,7 @@
     align-items: center;
     margin-top: 0.5rem;
     padding-top: 0.5rem;
-    border-top: 1px solid #e9ecef;
+    border-top: 1px solid var(--border-secondary);
     gap: 0.5rem;
 }
 .card-chart-price-group {
@@ -150,7 +152,7 @@
 /* Ações secundárias */
 .card-secondary-actions {
     display: flex;
-    gap: 0.5rem; /* Aumenta o espaço entre os botões */
+    gap: 0.5rem;
     flex-shrink: 0;
 }
 .card-secondary-actions .icon-action-btn {
@@ -163,62 +165,29 @@
     font-size: 0.9em;
 }
 
-
-/* --- SECÇÃO DE PORTFÓLIO E NOTÍCIAS (sem alterações) --- */
-.portfolio-section, .news-article {
-    /* Estilos existentes */
-}
-
 /* --- PÁGINA DE LOGIN --- */
 .login-container {
     max-width: 450px;
     margin: 5rem auto;
     padding: 2.5rem;
     text-align: center;
-    background-color: #fff;
+    background-color: var(--surface-primary);
     border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.1);
 }
-
-.login-container h1 {
-    margin-bottom: 1rem;
-}
-
 .login-container p {
-    margin-bottom: 2rem;
-    color: #6c757d;
+    color: var(--text-secondary);
 }
 
-#login-google-btn {
-    background-color: #4285F4;
-    color: white;
-    width: 100%;
-    font-size: 1.1rem;
-    padding: 14px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-}
-
-#login-google-btn:hover {
-    background-color: #357ae8;
-}
-
-/* --- COMPONENTE: SECÇÃO DE PORTFÓLIO (PÁGINA STATS) - VERSÃO CORRIGIDA --- */
+/* --- COMPONENTE: SECÇÃO DE PORTFÓLIO (PÁGINA STATS) --- */
 .portfolio-section h4 {
     text-align: center;
     font-size: 1.5em;
-    color: #495057;
-    border-bottom: 1px solid #e9ecef;
+    color: var(--text-headings);
+    border-bottom: 1px solid var(--border-secondary);
     padding-bottom: 1rem;
     margin-bottom: 1.5rem;
 }
-
 .portfolio-balance {
     display: flex;
     justify-content: center;
@@ -226,17 +195,15 @@
     gap: 0.75rem;
     margin-bottom: 1.5rem;
 }
-
 .balance-label {
     font-size: 1.5rem;
-    color: #6c757d;
+    color: var(--text-secondary);
     font-weight: 500;
 }
-
 .balance-value {
     font-size: 2.5rem;
     font-weight: 700;
-    color: #28a745;
+    color: var(--accent-green);
 }
 
 /* --- ALARMES NOS TRADES CARDS (DASHBOARD) --- */
@@ -246,47 +213,22 @@
     padding: 0 !important;
     width: auto !important;
     height: auto !important;
-    color: #dc3545;
+    color: var(--accent-red);
     font-size: 1.1em;
     margin-left: 0.5rem;
     transition: transform 0.2s ease-out;
 }
-
 .alarm-active-bell .material-symbols-outlined {
     font-variation-settings: 'FILL' 1, 'wght' 700;
 }
-
-.alarm-active-bell.ringing {
-    animation: bell-ring 1s ease-in-out infinite;
-}
-
-@keyframes bell-ring {
-    0% { transform: rotate(0deg); }
-    15% { transform: rotate(15deg); }
-    30% { transform: rotate(-15deg); }
-    45% { transform: rotate(10deg); }
-    60% { transform: rotate(-10deg); }
-    75% { transform: rotate(5deg); }
-    100% { transform: rotate(0deg); }
-}
-
 .trade-card.alarm-triggered {
-    border: 2px solid #dc3545;
-    box-shadow: 0 0 15px rgba(220, 53, 69, 0.5);
+    border: 2px solid var(--accent-red);
+    box-shadow: 0 0 15px rgba(220, 53, 69, 0.4);
 }
-
-.trade-card.alarm-triggered .card-main-action-button button {
-    background-color: #dc3545;
-}
-
-.trade-card.alarm-triggered .card-main-action-button button:hover {
-    background-color: #c82333;
-}
-
-/* Estilo para o botão de reconhecer alarme */
 .acknowledge-alarm-btn {
-    background-color: #ffc107;
-    color: #212529;
+    background-color: var(--accent-yellow);
+    color: var(--text-primary);
+    font-weight: 600;
     font-size: 0.8em;
     padding: 4px 8px;
     border-radius: 4px;
@@ -297,9 +239,8 @@
     align-items: center;
     gap: 0.3rem;
 }
-
 .acknowledge-alarm-btn:hover {
-    background-color: #e0a800;
+    filter: brightness(0.9);
 }
 
 /* --- MODAL DE LISTA DE ALARMES --- */
@@ -308,61 +249,25 @@
     justify-content: space-between;
     align-items: center;
     padding: 0.75rem 0.5rem;
-    border-bottom: 1px solid #e9ecef;
+    border-bottom: 1px solid var(--border-secondary);
 }
-
 .alarm-list-item:last-child {
     border-bottom: none;
 }
 
-.alarm-list-description {
-    flex-grow: 1;
-    margin-right: 1rem;
-    font-size: 0.95em;
-}
-
-.alarm-list-actions {
-    display: flex;
-    gap: 0.5rem;
-}
-
-
-.dark-mode .trade-card.alarm-triggered {
-    border-color: #dc3545 !important;
-    box-shadow: 0 0 15px rgba(220, 53, 69, 0.5);
-}
-
-.dark-mode .acknowledge-alarm-btn {
-    background-color: #a06e00;
-    color: #eee;
-}
-
-.dark-mode .acknowledge-alarm-btn:hover {
-    background-color: #8a5e00;
-}
-
-.dark-mode .alarm-list-item {
-    border-bottom-color: #333;
-}
-
-/* Secções de Histórico (para o botão expandir/recolher) */
+/* Secções de Histórico */
 .closed-trades-history-section {
-    background-color: #fff;
+    background-color: var(--surface-primary);
     padding: 1.5rem;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    border: 1px solid var(--border-primary);
 }
 .closed-trades-history-section h2 {
-    margin-top: 0;
-    margin-bottom: 1rem;
     border-bottom: none;
     padding-bottom: 0;
 }
-.dark-mode .closed-trades-history-section {
-    background-color: #1e1e1e;
-}
 
-/* --- INÍCIO DA ALTERAÇÃO --- */
 /* Estilos para o container da imagem no card */
 .card-image-container {
     max-height: 0;
@@ -370,13 +275,11 @@
     transition: max-height 0.5s ease-out;
     margin-top: 0;
 }
-
 .card-image-container.visible {
-    max-height: 500px; /* Altura suficiente para a maioria das imagens */
-    margin-top: 0.75rem; /* Espaço entre as notas e a imagem */
+    max-height: 500px;
+    margin-top: 0.75rem;
     transition: max-height 0.5s ease-in;
 }
-
 .card-image-container img {
     max-width: 100%;
     height: auto;
@@ -384,4 +287,3 @@
     display: block;
     cursor: pointer;
 }
-/* --- FIM DA ALTERAÇÃO --- */
