@@ -4,13 +4,13 @@
 header { 
     text-align: center; 
     padding: 2rem 1rem; 
-    background-color: #fff; 
-    border-bottom: 1px solid #dee2e6; 
+    background-color: var(--surface-primary); 
+    border-bottom: 1px solid var(--border-primary); 
     margin-bottom: 2rem; 
 }
 .mantra { 
     font-style: italic; 
-    color: #6c757d; 
+    color: var(--text-secondary); 
 }
 header .main-nav { 
     margin-top: 1.5rem; 
@@ -29,7 +29,7 @@ header .main-nav {
     gap: 0.8rem;
     margin-top: 1.5rem; /* Espaço abaixo da navegação principal */
     padding-top: 1rem;
-    border-top: 1px solid #e9ecef;
+    border-top: 1px solid var(--border-secondary);
 }
 
 /* --- GRIDS DE LAYOUT PRINCIPAL --- */
@@ -60,7 +60,8 @@ header .main-nav {
     align-items: center;
     gap: 1.5rem;
     padding: 1rem;
-    background-color: #f1f3f5;
+    background-color: var(--surface-primary); /* Alterado para usar variável */
+    border: 1px solid var(--border-primary);   /* Adicionada borda para contraste no modo escuro */
     border-radius: 8px;
     margin-bottom: 1.5rem;
     flex-wrap: wrap; 
@@ -71,7 +72,5 @@ header .main-nav {
     gap: 0.5rem;
 }
 
-/* --- DARK MODE PARA LAYOUT --- */
-.dark-mode .contextual-nav {
-    border-top-color: #333;
-}
+/* --- DARK MODE PARA LAYOUT (REMOVIDO) --- */
+/* A regra .dark-mode .contextual-nav foi removida pois agora é gerida pelas variáveis */
