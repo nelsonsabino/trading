@@ -29,19 +29,27 @@ export function openArmModal(trade) {
     setCurrentTrade({ id: trade.id, data: trade.data });
     armModal.assetNameSpan.textContent = trade.data.asset;
     armModal.strategyNameSpan.textContent = trade.data.strategyName;
-    
+    armModal.checklistContainer.innerHTML = ''; // Limpa sempre o container
+
     // Pega a segunda fase (armed) pela ordem
     const armedPhase = (selectedStrategy.data.phases && selectedStrategy.data.phases.length > 1) ? selectedStrategy.data.phases[1] : null;
-    generateDynamicChecklist(armModal.checklistContainer, [armedPhase], trade.data.armedSetup);
     
-    // --- INÍCIO DA ALTERAÇÃO ---
-    // Preenche o campo de imagem no modal de "Armar"
-    const imageUrlInput = document.getElementById('image-url-arm');
-    if (imageUrlInput) {
-        imageUrlInput.value = trade.data.imageUrl || '';
+    if (armedPhase) {
+        // --- INÍCIO DA ALTERAÇÃO ---
+        // Procura e exibe a imagem de referência para a fase "Armada"
+        const imageItem = armedPhase.items.find(item => item.type === 'image');
+        if (imageItem && imageItem.url) {
+            const imgElement = document.createElement('img');
+            imgElement.src = imageItem.url;
+            imgElement.style.maxWidth = '100%';
+            imgElement.style.borderRadius = '8px';
+            imgElement.style.marginBottom = '1.5rem';
+            armModal.checklistContainer.appendChild(imgElement);
+        }
+        // --- FIM DA ALTERAÇÃO ---
+        generateDynamicChecklist(armModal.checklistContainer, [armedPhase], trade.data.armedSetup);
     }
-    // --- FIM DA ALTERAÇÃO ---
-
+    
     if (armModal.container) armModal.container.style.display = 'flex';
 }
 export function closeArmModal() { if (armModal.container) { armModal.container.style.display = 'none'; armModal.form.reset(); setCurrentTrade({}); } }
@@ -54,12 +62,25 @@ export function openExecModal(trade) {
     setCurrentTrade({ id: trade.id, data: trade.data });
     execModal.assetNameSpan.textContent = trade.data.asset;
     execModal.strategyNameSpan.textContent = trade.data.strategyName;
-    
+    execModal.checklistContainer.innerHTML = ''; // Limpa sempre o container
+
     // Pega a terceira fase (execution) pela ordem
     const executionPhase = (selectedStrategy.data.phases && selectedStrategy.data.phases.length > 2) ? selectedStrategy.data.phases[2] : null;
     const phasesForChecklist = [];
     
     if (executionPhase) {
+        // --- INÍCIO DA ALTERAÇÃO ---
+        // Procura e exibe a imagem de referência para a fase "Execução"
+        const imageItem = executionPhase.items.find(item => item.type === 'image');
+        if (imageItem && imageItem.url) {
+            const imgElement = document.createElement('img');
+            imgElement.src = imageItem.url;
+            imgElement.style.maxWidth = '100%';
+            imgElement.style.borderRadius = '8px';
+            imgElement.style.marginBottom = '1.5rem';
+            execModal.checklistContainer.appendChild(imgElement);
+        }
+        // --- FIM DA ALTERAÇÃO ---
         phasesForChecklist.push(executionPhase);
     }
     
@@ -70,14 +91,6 @@ export function openExecModal(trade) {
     phasesForChecklist.push(gestaoPhase);
     
     generateDynamicChecklist(execModal.checklistContainer, phasesForChecklist, trade.data.executionDetails);
-
-    // --- INÍCIO DA ALTERAÇÃO ---
-    // Preenche o campo de imagem no modal de "Executar"
-    const imageUrlInput = document.getElementById('image-url-exec');
-    if (imageUrlInput) {
-        imageUrlInput.value = trade.data.imageUrl || '';
-    }
-    // --- FIM DA ALTERAÇÃO ---
     
     if (execModal.container) execModal.container.style.display = 'flex';
 }
@@ -86,6 +99,5 @@ export function closeExecModal() { if (execModal.container) { execModal.containe
 export function openCloseTradeModal(trade) { setCurrentTrade({ id: trade.id, data: trade.data }); closeModalObj.assetNameSpan.textContent = trade.data.asset; if (closeModalObj.container) closeModalObj.container.style.display = 'flex'; }
 export function closeCloseTradeModal() { if (closeModalObj.container) { closeModalObj.container.style.display = 'none'; closeModalObj.form.reset(); setCurrentTrade({}); } }
 
-// ESTAS FUNÇÕES JÁ NÃO SÃO USADAS PELA NOVA ABORDAGEM, MAS MANTEMOS PARA REFERÊNCIA CASO SEJA NECESSÁRIO
 export function openImageModal(imageUrl) { if (imageModal && modalImg) { modalImg.src = imageUrl; imageModal.classList.add('visible'); } }
 export function closeImageModal() { if (imageModal && modalImg) { imageModal.classList.remove('visible'); modalImg.src = ''; } }
