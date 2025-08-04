@@ -141,29 +141,26 @@ document.addEventListener('DOMContentLoaded', () => {
         addModal.closeBtn.addEventListener('click', closeAddModal);
         addModal.container.addEventListener('click', e => { if (e.target.id === 'add-opportunity-modal') closeAddModal(); });
         addModal.form.addEventListener('submit', handleAddSubmit);
+        
+        // --- INÍCIO DA ALTERAÇÃO ---
+        // Lógica simplificada para usar a nova generateDynamicChecklist
         addModal.strategySelect.addEventListener('change', () => {
             const strategies = getStrategies(); 
             const selectedStrategyId = addModal.strategySelect.value;
             const selectedStrategy = strategies.find(s => s.id === selectedStrategyId);
             
-            addModal.checklistContainer.innerHTML = '';
+            // Limpa o container e deixa a generateDynamicChecklist fazer o resto
+            addModal.checklistContainer.innerHTML = ''; 
 
             if (selectedStrategy && selectedStrategy.data.phases && selectedStrategy.data.phases.length > 0) {
                 const potentialPhase = selectedStrategy.data.phases[0];
                 if (potentialPhase) {
-                    const imageItem = potentialPhase.items.find(item => item.type === 'image');
-                    if (imageItem && imageItem.url) {
-                        const imgElement = document.createElement('img');
-                        imgElement.src = imageItem.url;
-                        imgElement.style.maxWidth = '100%';
-                        imgElement.style.borderRadius = '8px';
-                        imgElement.style.marginBottom = '1.5rem';
-                        addModal.checklistContainer.appendChild(imgElement);
-                    }
+                    // A função agora trata de exibir a imagem e os itens da checklist
                     generateDynamicChecklist(addModal.checklistContainer, [potentialPhase]);
                 }
             }
         });
+        // --- FIM DA ALTERAÇÃO ---
     }
 
     if (armModal.container) {
@@ -211,7 +208,6 @@ function hideEmptyDashboardCards() {
 
     cards.forEach(({ card, container }) => {
         if (card && container) {
-            // Verifica se o container está vazio ou só contém a mensagem de "estado vazio"
             const hasContent = container.querySelector('.trade-card');
             if (hasContent) {
                 card.classList.remove('dashboard-hide');
