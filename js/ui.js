@@ -2,15 +2,14 @@
 
 import { supabase } from './services.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
-import { openArmModal, openExecModal, openCloseTradeModal, openAddModal } from './modals.js';
+import { openArmModal, openExecModal, openCloseTradeModal, openImageModal, openAddModal } from './modals.js';
 import { loadAndOpenForEditing, handleRevertStatus } from './handlers.js';
-import { getLastCreatedTradeId, setLastCreatedTradeId } from './state.js';
+import { getLastCreatedTradeId, setLastCreatedTradeId, getVisibleImageIds, setVisibleImageIds } from './state.js'; // Assumindo que a lógica de localStorage foi movida para state.js
 
 let tradesForEventListeners = [];
 
-// --- INÍCIO DA ALTERAÇÃO ---
 // Funções de ajuda para gerir o estado das imagens no localStorage
-const getVisibleImageIds = () => {
+const getVisibleImageIdsInternal = () => {
     try {
         const ids = localStorage.getItem('visibleImageTradeIds');
         return ids ? JSON.parse(ids) : [];
@@ -20,14 +19,14 @@ const getVisibleImageIds = () => {
     }
 };
 
-const setVisibleImageIds = (ids) => {
+const setVisibleImageIdsInternal = (ids) => {
     try {
         localStorage.setItem('visibleImageTradeIds', JSON.stringify(ids));
     } catch (e) {
         console.error("Erro ao guardar IDs de imagem no localStorage", e);
     }
 };
-// --- FIM DA ALTERAÇÃO ---
+
 
 function renderSparkline(containerId, dataSeries) {
     const container = document.getElementById(containerId);
@@ -94,17 +93,36 @@ function createInputItem(item, data) {
 export function generateDynamicChecklist(container, phases, data = {}) {
     container.innerHTML = '';
     if (!phases || phases.length === 0) return;
+
     phases.forEach(phase => {
-        if (!phase || !Array.isArray(phase.items)) return; 
+        if (!phase || !Array.isArray(phase.items)) return;
+
+        // --- INÍCIO DA ALTERAÇÃO ---
+        // Procura por um item de imagem na fase e exibe-o no topo.
+        const imageItem = phase.items.find(item => item.type === 'image');
+        if (imageItem && imageItem.url) {
+            const imgElement = document.createElement('img');
+            imgElement.src = imageItem.url;
+            imgElement.style.maxWidth = '100%';
+            imgElement.style.borderRadius = '8px';
+            imgElement.style.marginBottom = '1.5rem';
+            imgElement.style.border = "1px solid #dee2e6";
+            container.appendChild(imgElement);
+        }
+        // --- FIM DA ALTERAÇÃO ---
+
         const phaseDiv = document.createElement('div');
         const titleEl = document.createElement('h4');
         titleEl.textContent = phase.title;
         phaseDiv.appendChild(titleEl);
+
         phase.items.forEach(item => {
             let element;
             switch (item.type) {
                 case 'checkbox': element = createChecklistItem(item, data); break;
                 case 'select': case 'text': case 'number': element = createInputItem(item, data); break;
+                // O tipo 'image' é ignorado aqui porque já foi tratado acima.
+                case 'image': break; 
                 default: console.warn(`Tipo de item desconhecido: ${item.type}`);
             }
             if (element) phaseDiv.appendChild(element);
@@ -289,9 +307,7 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
     if (trade.data.imageUrl) {
         viewImageButtonHtml = `<button class="icon-action-btn" data-action="toggle-image" title="Mostrar/Esconder Imagem"><span class="material-symbols-outlined">image</span></button>`;
         
-        // --- INÍCIO DA ALTERAÇÃO ---
-        // Verifica se a imagem deve estar visível no carregamento
-        const visibleImageIds = getVisibleImageIds();
+        const visibleImageIds = getVisibleImageIdsInternal();
         const isVisibleClass = visibleImageIds.includes(trade.id) ? 'visible' : '';
         
         imageContainerHtml = `
@@ -301,7 +317,6 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
                 </a>
             </div>
         `;
-        // --- FIM DA ALTERAÇÃO ---
     }
 
     if (hasActiveAlarm) {
@@ -381,6 +396,7 @@ export function displayTrades(trades, marketData, allAlarms) {
         setLastCreatedTradeId(null);
     }
 }
+
 document.addEventListener('DOMContentLoaded', () => {
     const dashboard = document.querySelector('.dashboard-columns');
     if (dashboard) {
@@ -406,30 +422,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (tradeId) openCloseTradeModal(tradesForEventListeners.find(t => t.id === tradeId)); 
                     break;
                 
-                // --- INÍCIO DA ALTERAÇÃO ---
                 case 'toggle-image':
                     const imageContainer = card.querySelector('.card-image-container');
                     if (imageContainer) {
                         imageContainer.classList.toggle('visible');
                         
-                        // Atualiza o localStorage
-                        let visibleIds = getVisibleImageIds();
+                        let visibleIds = getVisibleImageIdsInternal();
                         const isVisible = imageContainer.classList.contains('visible');
                         
                         if (isVisible) {
-                            // Adiciona o ID se não estiver na lista
                             if (!visibleIds.includes(tradeId)) {
                                 visibleIds.push(tradeId);
                             }
                         } else {
-                            // Remove o ID da lista
                             visibleIds = visibleIds.filter(id => id !== tradeId);
                         }
-                        setVisibleImageIds(visibleIds);
+                        setVisibleImageIdsInternal(visibleIds);
                     }
                     break;
-                // --- FIM DA ALTERAÇÃO ---
-
+                
                 case 'view-alarms':
                     loadAndOpenAlarmModal(button.dataset.asset, 'active');
                     break;
