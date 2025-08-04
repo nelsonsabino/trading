@@ -42,6 +42,31 @@
     margin-top: 1rem;
 }
 
+/* --- INÍCIO DA ALTERAÇÃO - DRAG & DROP --- */
+.item-drag-handle {
+    cursor: grab;
+    color: #6c757d;
+    padding-right: 0.5rem;
+    user-select: none; /* Impede a seleção de texto ao arrastar */
+}
+
+/* Estilo do item enquanto está a ser arrastado */
+.phase-block.dragging {
+    opacity: 0.6;
+    background-color: #e9ecef;
+}
+
+/* Placeholder para indicar a zona de drop */
+.drop-zone-placeholder {
+    height: 3rem;
+    background-color: rgba(13, 110, 253, 0.1);
+    border: 2px dashed #0d6efd;
+    border-radius: 4px;
+    margin: 0.5rem 0;
+}
+/* --- FIM DA ALTERAÇÃO --- */
+
+
 /* Separador visual para o alarme combo no formulário de alarmes */
 .combo-separator {
     text-align: center;
