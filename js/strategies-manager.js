@@ -1,4 +1,4 @@
-// js/strategies-manager.js - VERSÃO COM FASES AUTOMÁTICAS E IMAGENS
+// js/strategies-manager.js - VERSÃO COM FASES AUTOMÁTICAS, IMAGENS E REORDENAÇÃO
 
 import { listenToStrategies, deleteStrategy, addStrategy, updateStrategy, getStrategy } from './firebase-service.js';
 
@@ -21,6 +21,7 @@ const addItemModal = {
 };
 let currentPhaseItemsContainer = null;
 let editingStrategyId = null;
+let draggedItem = null;
 
 
 // --- FUNÇÕES DE GESTÃO DO MODAL ---
@@ -83,13 +84,19 @@ function createItemBlock(type) {
     itemDiv.className = 'phase-block';
     itemDiv.style.backgroundColor = '#fff';
     itemDiv.dataset.type = type;
+    itemDiv.setAttribute('draggable', true); // --- ALTERAÇÃO: Torna o item arrastável
     let fieldsHtml = '';
+
+    const headerContent = `
+        <span class="material-symbols-outlined item-drag-handle">drag_indicator</span>
+        <h5>Item: ${type.charAt(0).toUpperCase() + type.slice(1)}</h5>
+    `;
 
     if (type === 'image') {
         fieldsHtml = `
             <div class="phase-block-header">
-                <h5>Item: Imagem</h5>
-                <button type="button" class="btn delete-btn" style="padding: 4px 8px; font-size: 0.8em;">Remover Item</button>
+                ${headerContent}
+                <button type="button" class="btn delete-btn" style="padding: 4px 8px; font-size: 0.8em;">Remover</button>
             </div>
             <div class="input-item">
                 <label>URL da Imagem</label>
@@ -99,8 +106,8 @@ function createItemBlock(type) {
     } else {
         fieldsHtml = `
             <div class="phase-block-header">
-                <h5>Item: ${type.charAt(0).toUpperCase() + type.slice(1)}</h5>
-                <button type="button" class="btn delete-btn" style="padding: 4px 8px; font-size: 0.8em;">Remover Item</button>
+                ${headerContent}
+                <button type="button" class="btn delete-btn" style="padding: 4px 8px; font-size: 0.8em;">Remover</button>
             </div>
             <div class="form-row">
                 <div class="input-item"><label>ID do Item</label><input type="text" class="item-id" required></div>
@@ -112,13 +119,48 @@ function createItemBlock(type) {
             </div>
         `;
         if (type === 'select') {
-            fieldsHtml += `<div class="input-item"><label>Opções (separadas por vírgula)</label><input type="text" class="item-options" placeholder="Ex: Opção 1, Opção 2"></div>`;
+            fieldsHtml += `<div class="input-item"><label>Opções (vírgula)</label><input type="text" class="item-options" placeholder="Opção 1, Opção 2"></div>`;
         }
     }
     
     itemDiv.innerHTML = fieldsHtml;
     itemDiv.querySelector('.delete-btn').addEventListener('click', () => itemDiv.remove());
+
+    itemDiv.addEventListener('dragstart', (e) => {
+        draggedItem = e.target;
+        setTimeout(() => e.target.classList.add('dragging'), 0);
+    });
+    itemDiv.addEventListener('dragend', (e) => {
+        e.target.classList.remove('dragging');
+        draggedItem = null;
+    });
+
     return itemDiv;
+}
+
+function getDragAfterElement(container, y) {
+    const draggableElements = [...container.querySelectorAll('.phase-block:not(.dragging)')];
+    return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        if (offset < 0 && offset > closest.offset) {
+            return { offset: offset, element: child };
+        } else {
+            return closest;
+        }
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+function initializeDragAndDrop(container) {
+    container.addEventListener('dragover', e => {
+        e.preventDefault();
+        const afterElement = getDragAfterElement(container, e.clientY);
+        if (afterElement == null) {
+            container.appendChild(draggedItem);
+        } else {
+            container.insertBefore(draggedItem, afterElement);
+        }
+    });
 }
 
 function addPhaseBlock() {
@@ -145,18 +187,19 @@ function addPhaseBlock() {
         </div>
         <div class="phase-items-container">
             <h6>Itens da Checklist</h6>
-            <div class="items-list" style="padding-left: 1rem; border-left: 2px solid #e9ecef;"></div>
-            <button type="button" class="btn btn-secondary add-item-btn" style="font-size: 0.9em; padding: 6px 10px; margin-top: 1rem;">
+            <div class="items-list"></div>
+            <button type="button" class="btn btn-secondary add-item-btn">
                 <span class="material-symbols-outlined">add</span> Adicionar Item
             </button>
         </div>
     `;
 
     phaseDiv.querySelector('.delete-btn').addEventListener('click', () => phaseDiv.remove());
-    phaseDiv.querySelector('.add-item-btn').addEventListener('click', (e) => {
-        const itemsContainer = e.target.closest('.phase-items-container').querySelector('.items-list');
-        openAddItemModal(itemsContainer);
-    });
+    
+    const itemsListContainer = phaseDiv.querySelector('.items-list');
+    phaseDiv.querySelector('.add-item-btn').addEventListener('click', () => openAddItemModal(itemsListContainer));
+    
+    initializeDragAndDrop(itemsListContainer); // --- ALTERAÇÃO: Ativa o Drag and Drop
 
     strategyModal.phasesContainer.appendChild(phaseDiv);
     return phaseDiv;
