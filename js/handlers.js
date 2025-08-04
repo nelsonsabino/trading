@@ -91,7 +91,17 @@ export async function handleArmSubmit(e) {
         });
     }
 
-    await updateTrade(currentTrade.id, { status: "ARMED", armedSetup: checklistData, dateArmed: new Date() });
+    // --- INÍCIO DA ALTERAÇÃO ---
+    const imageUrl = document.getElementById('image-url-arm').value;
+    const updateData = {
+        status: "ARMED",
+        armedSetup: checklistData,
+        dateArmed: new Date(),
+        imageUrl: imageUrl
+    };
+    await updateTrade(currentTrade.id, updateData);
+    // --- FIM DA ALTERAÇÃO ---
+
     closeArmModal();
 }
 
@@ -127,7 +137,17 @@ export async function handleExecSubmit(e) {
         });
     }
 
-    await updateTrade(currentTrade.id, { status: "LIVE", executionDetails: executionData, dateExecuted: new Date() });
+    // --- INÍCIO DA ALTERAÇÃO ---
+    const imageUrl = document.getElementById('image-url-exec').value;
+    const updateData = {
+        status: "LIVE",
+        executionDetails: executionData,
+        dateExecuted: new Date(),
+        imageUrl: imageUrl
+    };
+    await updateTrade(currentTrade.id, updateData);
+    // --- FIM DA ALTERAÇÃO ---
+
     closeExecModal();
 }
 
