@@ -235,10 +235,14 @@
                                 <option value="below">RSI cruza para BAIXO da MA</option>
                             </select>
                         </div>
-                        <!-- INÍCIO DA ALTERAÇÃO -->
                         <div class="input-item">
                             <label for="rsi-crossover-interval">Intervalo de Velas</label>
                             <input type="number" id="rsi-crossover-interval" value="1" min="1" title="Define o número de velas para confirmar o cruzamento. 1 = imediato.">
+                        </div>
+                        <!-- INÍCIO DA ALTERAÇÃO -->
+                        <div class="input-item">
+                            <label for="rsi-crossover-threshold">Buffer (pontos de RSI)</label>
+                            <input type="number" id="rsi-crossover-threshold" value="1.0" min="0" step="0.1" title="Margem de segurança. O RSI deve manter-se acima/abaixo da MA por este valor.">
                         </div>
                         <!-- FIM DA ALTERAÇÃO -->
                         <div class="input-item">
