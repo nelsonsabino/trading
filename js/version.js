@@ -2,6 +2,32 @@
 
 export const changelogData = {
 current: {
+    number: '12.14.1',
+    changes: [
+        "**Correção Crítica na Funcionalidade de Alarmes:**",
+        "Resolvido o erro que impedia a criação de novos alarmes de 'Cruzamento RSI/MA' devido a uma coluna em falta na base de dados (`crossover_interval`). A coluna foi adicionada com sucesso.",
+        "Corrigido um erro de JavaScript (`TypeError`) que ocorria na página 'Meus Alarmes', causado pela execução indevida do script da página de criação de alarmes."
+    ]
+},
+ releases: [
+    {
+        number: '12.14.0',
+        changes: [
+            "**Alarmes de Cruzamento (RSI/MA) com Intervalo de Confirmação:**",
+            "Adicionada a funcionalidade avançada para definir um 'Intervalo de Velas' nos alarmes de cruzamento RSI/MA.",
+            "Isto permite criar alarmes que disparam não apenas no cruzamento imediato (intervalo de 1 vela), mas que confirmam a mudança de momentum ao longo de várias velas (ex: 3 velas), tornando o sinal mais robusto e adaptável a diferentes estratégias."
+        ]
+    },
+     {
+        number: '12.13.0',
+        changes: [
+            "**Refatoração Visual e Melhoria do Tema Escuro:**",
+            "Implementada uma paleta de cores centralizada com variáveis CSS para garantir consistência visual em toda a aplicação.",
+            "O tema escuro foi completamente redesenhado para usar tons de cinzento-escuro em vez de preto puro e texto em branco-suave, reduzindo o contraste e o cansaço visual.",
+            "As cores de destaque (verde, amarelo, azul) agora têm tons mais sóbrios e dessaturados no modo escuro, criando uma experiência mais harmoniosa."
+        ]
+    },
+     {
     number: '12.12.2',
     changes: [
         "**Correção Final da Exibição de Imagens da Estratégia (Modais):**",
@@ -9,8 +35,7 @@ current: {
         "A lógica foi corrigida para garantir que a imagem é inserida e mantida corretamente em todos os modais (Adicionar, Armar, Executar), finalizando a implementação da funcionalidade."
     ]
 },
- releases: [
-  {
+     {
         number: '12.12.1',
         changes: [
             "**Correção da Exibição de Imagens da Estratégia:**",
