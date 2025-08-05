@@ -149,17 +149,6 @@
     font-size: 0.8em;
 }
 
-/* --- INÍCIO DA ALTERAÇÃO --- */
-/* Cores para o P&L nos cards, agora usando as variáveis de feedback */
-.positive-pnl {
-    color: var(--feedback-positive);
-}
-.negative-pnl {
-    color: var(--feedback-negative);
-}
-/* --- FIM DA ALTERAÇÃO --- */
-
-
 /* Ações secundárias */
 .card-secondary-actions {
     display: flex;
@@ -232,15 +221,10 @@
 .alarm-active-bell .material-symbols-outlined {
     font-variation-settings: 'FILL' 1, 'wght' 700;
 }
-
 .trade-card.alarm-triggered {
-    border: 2px solid #ff0c00;
-    box-shadow: 0 0 15px rgb(241 0 23 / 91%);
-}
-/*.trade-card.alarm-triggered {
     border: 2px solid var(--accent-red);
     box-shadow: 0 0 15px rgba(220, 53, 69, 0.4);
-}*/
+}
 .acknowledge-alarm-btn {
     background-color: var(--accent-yellow);
     color: var(--text-primary);
@@ -303,3 +287,31 @@
     display: block;
     cursor: pointer;
 }
+
+/* --- INÍCIO DA ALTERAÇÃO - ESTILOS PARA A PÁGINA DE CHANGELOG --- */
+.changelog-card {
+    background-color: var(--surface-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: 8px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.changelog-card h4 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.changelog-card ul {
+    padding-left: 20px;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.changelog-card li {
+    margin-bottom: 0.5rem;
+}
+/* --- FIM DA ALTERAÇÃO --- */
