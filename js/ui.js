@@ -31,9 +31,18 @@ function renderSparkline(containerId, dataSeries) {
     const container = document.getElementById(containerId);
     if (!container || !dataSeries || dataSeries.length < 2) return;
     container.innerHTML = '';
+
+    // --- INÍCIO DA ALTERAÇÃO ---
+    // Lê as cores de feedback diretamente das variáveis CSS para garantir consistência
+    const computedStyle = getComputedStyle(document.documentElement);
+    const positiveColor = computedStyle.getPropertyValue('--feedback-positive').trim();
+    const negativeColor = computedStyle.getPropertyValue('--feedback-negative').trim();
+
     const firstPrice = dataSeries[0];
     const lastPrice = dataSeries[dataSeries.length - 1];
-    const chartColor = lastPrice >= firstPrice ? '#28a745' : '#dc3545';
+    const chartColor = lastPrice >= firstPrice ? positiveColor : negativeColor;
+    // --- FIM DA ALTERAÇÃO ---
+
     const options = {
         series: [{ data: dataSeries }], chart: { type: 'line', height: 40, width: 100, sparkline: { enabled: true }},
         stroke: { curve: 'smooth', width: 2 }, colors: [chartColor],
@@ -90,10 +99,6 @@ function createInputItem(item, data) {
 }
 
 export function generateDynamicChecklist(container, phases, data = {}) {
-    // --- INÍCIO DA CORREÇÃO ---
-    // A linha `container.innerHTML = '';` foi REMOVIDA daqui.
-    // A responsabilidade de limpar o container passa a ser de quem chama a função.
-    // --- FIM DA CORREÇÃO ---
     if (!phases || phases.length === 0) return;
 
     phases.forEach(phase => {
