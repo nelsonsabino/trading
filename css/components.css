@@ -149,6 +149,17 @@
     font-size: 0.8em;
 }
 
+/* --- INÍCIO DA ALTERAÇÃO --- */
+/* Cores para o P&L nos cards, agora usando as variáveis de feedback */
+.positive-pnl {
+    color: var(--feedback-positive);
+}
+.negative-pnl {
+    color: var(--feedback-negative);
+}
+/* --- FIM DA ALTERAÇÃO --- */
+
+
 /* Ações secundárias */
 .card-secondary-actions {
     display: flex;
