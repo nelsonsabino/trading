@@ -16,6 +16,10 @@
   --accent-yellow: #ffc107;      /* Cor para "Armado" */
   --accent-green: #28a745;       /* Cor para "Ativo" */
   --accent-red: #dc3545;         /* Cor para alarmes, negativo */
+
+  /* Novas variáveis para feedback que precisam ser sempre vibrantes */
+  --feedback-positive: #28a745;
+  --feedback-negative: #dc3545;
 }
 
 .dark-mode {
@@ -33,6 +37,10 @@
   --accent-yellow: #d29922;      /* Amarelo/mostarda escuro */
   --accent-green: #3fb950;       /* Verde menos vibrante */
   --accent-red: #f85149;         /* Vermelho menos vibrante */
+  
+  /* Cores vibrantes para feedback, mesmo no modo escuro */
+  --feedback-positive: #32d244;
+  --feedback-negative: #ff4d4d;
 }
 /* --- FIM DA ALTERAÇÃO --- */
 
