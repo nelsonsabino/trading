@@ -42,6 +42,7 @@ function enterEditMode(alarm) {
     document.getElementById('alarm-type-select').value = alarmType;
     document.getElementById('alarm-type-select').dispatchEvent(new Event('change'));
 
+    // Preenche os campos do formulário com base no tipo de alarme
     if (alarmType === 'stochastic') { 
         document.getElementById('stoch-condition').value = alarm.condition; 
         document.getElementById('stoch-value').value = alarm.target_price; 
@@ -60,7 +61,10 @@ function enterEditMode(alarm) {
     } else if (alarmType === 'rsi_crossover') { 
         document.getElementById('rsi-condition').value = alarm.condition; 
         document.getElementById('rsi-timeframe').value = alarm.indicator_timeframe; 
-        document.getElementById('rsi-crossover-interval').value = alarm.crossover_interval || 1; 
+        document.getElementById('rsi-crossover-interval').value = alarm.crossover_interval || 1;
+        // --- INÍCIO DA ALTERAÇÃO ---
+        document.getElementById('rsi-crossover-threshold').value = alarm.crossover_threshold || 1.0;
+        // --- FIM DA ALTERAÇÃO ---
         if(document.getElementById('rsi-period')) document.getElementById('rsi-period').value = alarm.rsi_period || 14;
         if(document.getElementById('rsi-ma-period')) document.getElementById('rsi-ma-period').value = alarm.rsi_ma_period || 14;
     } else if (alarmType === 'ema_touch') { 
@@ -98,13 +102,10 @@ export { enterEditMode };
 
 // --- PONTO DE ENTRADA DO SCRIPT ---
 document.addEventListener('DOMContentLoaded', () => {
-    // --- INÍCIO DA CORREÇÃO ---
-    // Executa o código de inicialização apenas se o formulário existir na página
     const alarmForm = document.getElementById('alarm-form');
     if (!alarmForm) {
-        return; // Sai da função se não estiver na página de criação/edição de alarmes
+        return;
     }
-    // --- FIM DA CORREÇÃO ---
 
     const feedbackDiv = document.getElementById('alarm-feedback');
     const assetInput = document.getElementById('alarm-asset');
@@ -242,6 +243,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 alarmData.condition = document.getElementById('rsi-condition').value; 
                 alarmData.indicator_timeframe = document.getElementById('rsi-timeframe').value; 
                 alarmData.crossover_interval = parseInt(document.getElementById('rsi-crossover-interval').value) || 1;
+                // --- INÍCIO DA ALTERAÇÃO ---
+                alarmData.crossover_threshold = parseFloat(document.getElementById('rsi-crossover-threshold').value) || 1.0;
+                // --- FIM DA ALTERAÇÃO ---
                 alarmData.rsi_period = 14; 
                 alarmData.rsi_ma_period = 14; 
             } else if (alarmType === 'ema_touch') { 
