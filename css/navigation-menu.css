@@ -194,7 +194,7 @@ a[href="market-scan.html"].nav-icon-link span {
 
 /* Dark mode para os botões de ação */
 .dark-mode a[href="market-scan.html"].nav-icon-link {
-    background-color: #1aab8a;
+    background-color: #335f55;
 }
 .dark-mode a[href="market-scan.html"].nav-icon-link:hover {
     background-color: #158a6e;
