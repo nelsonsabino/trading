@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 1. Gera a secção para a versão ATUAL
     html += `
-        <div class="stat-card" style="text-align: left; margin-bottom: 2rem; border-left: 5px solid #28a745;">
+        <div class="changelog-card" style="text-align: left; margin-bottom: 2rem; border-left: 5px solid var(--accent-green);">
             <h3>Versão ${changelogData.current.number} (Atual)</h3>
             <ul style="padding-left: 20px; margin-top: 1rem;">
     `;
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Itera sobre as versões antigas e gera uma secção para cada uma
     changelogData.releases.forEach(release => {
         html += `
-            <div class="stat-card" style="text-align: left; margin-bottom: 1.5rem; background-color: #f8f9fa;">
+            <div class="changelog-card" style="text-align: left; margin-bottom: 1.5rem;">
                 <h4>Versão ${release.number}</h4>
                 <ul style="padding-left: 20px; font-size: 0.95em; margin-top: 0.5rem;">
         `;
