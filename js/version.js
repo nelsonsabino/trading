@@ -2,6 +2,31 @@
 
 export const changelogData = {
 current: {
+    number: '12.15.1',
+    changes: [
+        "**Correção Crítica do Alarme RSI/MA Avançado:**",
+        "Resolvido o erro que impedia a criação e edição de alarmes de cruzamento RSI/MA devido à falta da coluna `crossover_threshold` na base de dados.",
+        "A coluna foi adicionada com sucesso, estabilizando a nova funcionalidade de 'Confirmação Sustentada'."
+    ]
+},
+ releases: [
+     {
+        number: '12.15.0',
+        changes: [
+            "**Lógica de Alarme RSI/MA Avançada (Confirmação Sustentada):**",
+            "A lógica do alarme de cruzamento RSI/MA foi completamente reescrita para verificar se o RSI *permanece* acima/abaixo da sua MA durante todo o 'Intervalo de Velas' definido.",
+            "Adicionado um novo campo 'Buffer de Confirmação' que permite definir uma margem de segurança (em pontos de RSI), garantindo que o alarme só dispara quando o cruzamento é decisivo e não apenas um toque."
+        ]
+    },
+    {
+        number: '12.14.2',
+        changes: [
+            "**Melhoria Visual nos Sinais de P&L:**",
+            "Refinada a paleta de cores para introduzir cores de 'feedback' mais vibrantes para lucro (verde) e prejuízo (vermelho), que se mantêm com alto contraste em ambos os temas, claro e escuro.",
+            "O texto de variação percentual e o gráfico sparkline nos cards da watchlist agora usam estas novas cores, garantindo que os sinais de mercado sejam imediatamente percetíveis e visualmente consistentes."
+        ]
+    },
+     {
     number: '12.14.1',
     changes: [
         "**Correção Crítica na Funcionalidade de Alarmes:**",
@@ -9,8 +34,7 @@ current: {
         "Corrigido um erro de JavaScript (`TypeError`) que ocorria na página 'Meus Alarmes', causado pela execução indevida do script da página de criação de alarmes."
     ]
 },
- releases: [
-    {
+     {
         number: '12.14.0',
         changes: [
             "**Alarmes de Cruzamento (RSI/MA) com Intervalo de Confirmação:**",
