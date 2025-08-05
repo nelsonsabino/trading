@@ -232,10 +232,15 @@
 .alarm-active-bell .material-symbols-outlined {
     font-variation-settings: 'FILL' 1, 'wght' 700;
 }
+
 .trade-card.alarm-triggered {
+    border: 2px solid #ff0c00;
+    box-shadow: 0 0 15px rgb(241 0 23 / 91%);
+}
+/*.trade-card.alarm-triggered {
     border: 2px solid var(--accent-red);
     box-shadow: 0 0 15px rgba(220, 53, 69, 0.4);
-}
+}*/
 .acknowledge-alarm-btn {
     background-color: var(--accent-yellow);
     color: var(--text-primary);
