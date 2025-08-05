@@ -61,6 +61,9 @@ function enterEditMode(alarm) {
     } else if (alarmType === 'rsi_crossover') { 
         document.getElementById('rsi-condition').value = alarm.condition; 
         document.getElementById('rsi-timeframe').value = alarm.indicator_timeframe; 
+        // --- INÍCIO DA ALTERAÇÃO ---
+        document.getElementById('rsi-crossover-interval').value = alarm.crossover_interval || 1; 
+        // --- FIM DA ALTERAÇÃO ---
         if(document.getElementById('rsi-period')) document.getElementById('rsi-period').value = alarm.rsi_period || 14;
         if(document.getElementById('rsi-ma-period')) document.getElementById('rsi-ma-period').value = alarm.rsi_ma_period || 14;
     } else if (alarmType === 'ema_touch') { 
@@ -106,12 +109,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const alarmTypeSelect = document.getElementById('alarm-type-select');
     const priceInput = document.getElementById('alarm-price-standalone');
     
-    // NOVO: Listener de duplo clique para preencher o preço
     if (priceInput) {
         priceInput.addEventListener('dblclick', () => {
             if (currentAssetPrice !== null && !isNaN(currentAssetPrice)) {
                 priceInput.value = currentAssetPrice.toString();
-                // Feedback visual opcional
                 priceInput.style.transition = 'background-color 0.3s';
                 priceInput.style.backgroundColor = '#d4edda';
                 setTimeout(() => {
@@ -236,6 +237,9 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (alarmType === 'rsi_crossover') { 
                 alarmData.condition = document.getElementById('rsi-condition').value; 
                 alarmData.indicator_timeframe = document.getElementById('rsi-timeframe').value; 
+                // --- INÍCIO DA ALTERAÇÃO ---
+                alarmData.crossover_interval = parseInt(document.getElementById('rsi-crossover-interval').value) || 1;
+                // --- FIM DA ALTERAÇÃO ---
                 alarmData.rsi_period = 14; 
                 alarmData.rsi_ma_period = 14; 
             } else if (alarmType === 'ema_touch') { 
