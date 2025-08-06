@@ -34,6 +34,32 @@ async function fetchPriceForPair(pair) {
     }
 }
 
+// --- INÍCIO DA ALTERAÇÃO 1: Nova função para apagar o alarme ---
+async function deleteAlarm() {
+    if (!editingAlarmId) return;
+
+    const confirmed = confirm("Tem a certeza que quer apagar permanentemente este alarme?");
+    if (confirmed) {
+        const feedbackDiv = document.getElementById('alarm-feedback');
+        feedbackDiv.textContent = 'A apagar alarme...';
+        try {
+            const { error } = await supabase
+                .from('alarms')
+                .delete()
+                .eq('id', editingAlarmId);
+
+            if (error) throw error;
+
+            alert('Alarme apagado com sucesso!');
+            window.location.href = 'alarms-manage.html';
+        } catch (error) {
+            console.error("Erro ao apagar alarme:", error);
+            feedbackDiv.textContent = `Erro ao apagar alarme: ${error.message}`;
+        }
+    }
+}
+// --- FIM DA ALTERAÇÃO 1 ---
+
 function enterEditMode(alarm) {
     editingAlarmId = alarm.id;
     document.getElementById('alarm-asset').value = alarm.asset_pair;
@@ -84,6 +110,9 @@ function enterEditMode(alarm) {
     }
     document.querySelector('#alarm-form button[type="submit"]').textContent = 'Atualizar Alarme';
     document.getElementById('cancel-edit-btn').style.display = 'inline-block';
+    // --- INÍCIO DA ALTERAÇÃO 2: Mostra o botão de apagar ---
+    document.getElementById('delete-alarm-btn').style.display = 'inline-block';
+    // --- FIM DA ALTERAÇÃO 2 ---
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -93,6 +122,9 @@ function exitEditMode() {
     document.getElementById('alarm-type-select').dispatchEvent(new Event('change'));
     document.querySelector('#alarm-form button[type="submit"]').textContent = 'Definir Alarme';
     document.getElementById('cancel-edit-btn').style.display = 'none';
+    // --- INÍCIO DA ALTERAÇÃO 3: Esconde o botão de apagar ---
+    document.getElementById('delete-alarm-btn').style.display = 'none';
+    // --- FIM DA ALTERAÇÃO 3 ---
     document.getElementById('asset-current-price').textContent = '';
     window.history.replaceState({}, document.title, window.location.pathname);
 }
@@ -114,6 +146,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const alarmTypeSelect = document.getElementById('alarm-type-select');
     const priceInput = document.getElementById('alarm-price-standalone');
     
+    // --- INÍCIO DA ALTERAÇÃO 4: Adiciona listener para o novo botão ---
+    const deleteBtn = document.getElementById('delete-alarm-btn');
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', deleteAlarm);
+    }
+    // --- FIM DA ALTERAÇÃO 4 ---
+
     if (priceInput) {
         priceInput.addEventListener('dblclick', () => {
             if (currentAssetPrice !== null && !isNaN(currentAssetPrice)) {
