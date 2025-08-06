@@ -5,11 +5,14 @@ import { setAlarmsData, getLastCreatedAlarmId, setLastCreatedAlarmId } from './s
 import { enterEditMode } from './alarms-create.js';
 
 // --- LÓGICA DO MODAL DO GRÁFICO ---
-const chartModal = document.getElementById('chart-modal');
-const closeChartModalBtn = document.getElementById('close-chart-modal');
-const chartContainer = document.getElementById('chart-modal-container');
+
+// 1. Declara as variáveis no escopo do módulo para serem acessíveis por todas as funções.
+let chartModal = null;
+let closeChartModalBtn = null;
+let chartContainer = null;
 
 export function openChartModal(symbol) {
+    // A inicialização das variáveis já terá acontecido no DOMContentLoaded.
     if (!chartModal || !chartContainer) return;
     chartContainer.innerHTML = '';
     const currentTheme = document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light';
@@ -26,12 +29,6 @@ function closeChartModal() {
     if (!chartModal || !chartContainer) return;
     chartContainer.innerHTML = '';
     chartModal.style.display = 'none';
-}
-
-// Add listeners only if the modal elements exist on the current page.
-if (chartModal && closeChartModalBtn) {
-    closeChartModalBtn.addEventListener('click', closeChartModal);
-    chartModal.addEventListener('click', (e) => { if (e.target.id === 'chart-modal') closeChartModal(); });
 }
 
 
@@ -63,7 +60,6 @@ async function fetchAndDisplayAlarms() {
 
         const activeAlarmsHtml = [], triggeredAlarmsHtml = [];
 
-        // Processar alarmes ativos
         for (const alarm of activeAlarms) {
             const formattedDate = new Date(alarm.created_at).toLocaleString('pt-PT');
             let alarmDescription = '';
@@ -96,7 +92,6 @@ async function fetchAndDisplayAlarms() {
                 </tr>`);
         }
 
-        // Processar alarmes disparados
         for (const alarm of triggeredAlarms) {
             const triggeredDate = alarm.triggered_at ? new Date(alarm.triggered_at).toLocaleString('pt-PT') : new Date(alarm.created_at).toLocaleString('pt-PT');
             let alarmDescription = '';
@@ -161,14 +156,25 @@ async function deleteAlarm(alarmId) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Add a guard clause to ensure this script only runs its initialization logic
-    // on the alarms-manage.html page.
+    // 2. Inicializa as variáveis e adiciona os listeners do modal DEPOIS de o DOM estar pronto.
+    // Este código corre em AMBAS as páginas (create e manage), mas só encontra os elementos se eles existirem.
+    chartModal = document.getElementById('chart-modal');
+    closeChartModalBtn = document.getElementById('close-chart-modal');
+    chartContainer = document.getElementById('chart-modal-container');
+
+    if (chartModal && closeChartModalBtn) {
+        closeChartModalBtn.addEventListener('click', closeChartModal);
+        chartModal.addEventListener('click', (e) => { if (e.target.id === 'chart-modal') closeChartModal(); });
+    }
+
+    // 3. Adiciona uma verificação para o código que SÓ deve correr na página de gestão de alarmes.
     const mainContainer = document.querySelector('main');
     const activeAlarmsTable = document.getElementById('active-alarms-tbody');
     if (!mainContainer || !activeAlarmsTable) {
-        return; // Exit if we are not on the correct page
+        return; // Sai da função se não estiver na página 'alarms-manage'
     }
 
+    // O código abaixo só será executado se as condições acima forem falsas, ou seja, se estivermos na página correta.
     mainContainer.addEventListener('click', (e) => {
         const deleteBtn = e.target.closest('.delete-btn');
         if (deleteBtn) {
