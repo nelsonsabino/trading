@@ -2,14 +2,22 @@
 
 export const changelogData = {
 current: {
+    number: '13.3.0',
+    changes: [
+        "**Melhoria de UX (Reconhecimento de Alarmes):**",
+        "Ao clicar no botão 'Reconhecer Alarmes' no modal de um alarme disparado, a página da dashboard agora é recarregada automaticamente.",
+        "Esta alteração garante um feedback visual imediato, removendo a sinalização vermelha do card do ativo sem a necessidade de uma atualização manual da página."
+    ]
+},
+ releases: [
+      {
     number: '13.2.1',
     changes: [
         "**Refinação da Análise de Padrões RSI:**",
         "O histórico de análise para a deteção de linhas de tendência foi reduzido para as últimas 100 velas, focando a ferramenta em padrões mais recentes e relevantes, conforme solicitado."
     ]
 },
- releases: [
-      {
+     {
         number: '13.2.0',
         changes: [
             "**Melhoria da Análise de Padrões (Ritmo da Tendência):**",
