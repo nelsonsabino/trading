@@ -17,7 +17,6 @@ let currentTopN = 50;
 // Novos estados para a análise avançada
 let rsiPatternFilter = 'none';
 let rsiAnalysisTimeframe = '1h';
-let requireStochConfirmation = false;
 
 
 const chartModal = document.getElementById('chart-modal');
@@ -247,7 +246,9 @@ function applyFiltersAndSort() {
             
             const typeMatch = trend.type === type;
             const touchesMatch = trend.touches >= parseInt(touches);
-            const confirmationMatch = requireStochConfirmation ? trend.isConfirmed === true : true;
+            
+            // O filtro agora só precisa de verificar se o padrão foi confirmado pelo backend
+            const confirmationMatch = trend.isConfirmed;
 
             return typeMatch && touchesMatch && confirmationMatch;
         });
@@ -318,12 +319,10 @@ async function handleRsiPatternAnalysis() {
     const analyzeBtn = document.getElementById('analyze-rsi-patterns-btn');
     const statusIndicator = document.getElementById('rsi-analysis-status');
     const filterSelect = document.getElementById('filter-rsi-trend');
-    const stochConfirmCheckbox = document.getElementById('filter-stoch-confirmation');
 
     analyzeBtn.disabled = true;
     statusIndicator.textContent = 'A analisar...';
     filterSelect.disabled = true;
-    stochConfirmCheckbox.disabled = true;
 
     try {
         const symbolsToAnalyze = allTickersData.slice(0, currentTopN).map(t => t.symbol);
@@ -332,7 +331,7 @@ async function handleRsiPatternAnalysis() {
             body: { 
                 symbols: symbolsToAnalyze, 
                 analyzeRsiPatterns: true,
-                timeframe: rsiAnalysisTimeframe // Passa o timeframe selecionado
+                timeframe: rsiAnalysisTimeframe
             },
         });
 
@@ -345,7 +344,6 @@ async function handleRsiPatternAnalysis() {
 
         statusIndicator.textContent = 'Análise concluída!';
         filterSelect.disabled = false;
-        stochConfirmCheckbox.disabled = false;
         applyFiltersAndSort(); 
     
     } catch (err) {
@@ -375,12 +373,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleSparklinesCheckbox = document.getElementById('toggle-sparklines');
     const topNSelect = document.getElementById('top-n-select');
     
-    // Novos elementos
     const analyzeRsiPatternsBtn = document.getElementById('analyze-rsi-patterns-btn');
     const rsiAnalysisTimeframeSelect = document.getElementById('rsi-analysis-timeframe');
     const rsiTrendFilterSelect = document.getElementById('filter-rsi-trend');
-    const stochConfirmCheckbox = document.getElementById('filter-stoch-confirmation');
-
 
     const savedSparklinesState = localStorage.getItem('showSparklines');
     if (savedSparklinesState !== null) {
@@ -451,13 +446,6 @@ document.addEventListener('DOMContentLoaded', () => {
             applyFiltersAndSort();
         });
     }
-    if (stochConfirmCheckbox) {
-        stochConfirmCheckbox.addEventListener('change', (e) => {
-            requireStochConfirmation = e.target.checked;
-            applyFiltersAndSort();
-        });
-    }
-
 
     if (tbody) {
         tbody.addEventListener('click', function(e) {
