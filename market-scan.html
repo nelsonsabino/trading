@@ -61,7 +61,25 @@
         <h1>Scanner de Mercado</h1>
         <p class="mantra">Encontre os ativos com maior atividade e liquidez.</p>
         <nav class="main-nav">
-            <!-- ... links de navegação existentes ... -->
+            <a href="dashboard.html" class="nav-icon-link" title="Dashboard"><span class="material-symbols-outlined">home</span></a>
+            <a href="market-scan.html" class="nav-icon-link" title="Scanner de Mercado"><span class="material-symbols-outlined">query_stats</span></a>
+            <a href="alarms-create.html" class="nav-icon-link action-create-alarm" title="Criar Alarme"><span class="material-symbols-outlined">alarm_add</span></a>
+            <a href="alarms-manage.html" class="nav-icon-link" title="Meus Alarmes"><span class="material-symbols-outlined">alarm</span></a>
+            
+            <div class="nav-dropdown">
+                <button id="management-toggle" class="nav-icon-link" title="Gerir e Estatísticas"><span class="material-symbols-outlined">settings</span></button>
+                <div class="nav-dropdown-content">
+                    <a href="strategies-manager.html" class="nav-link">Gerir Estratégias</a>
+                    <a href="manage.html" class="nav-link">Todas as Operações</a>
+                    <a href="stats.html" class="nav-link">Ver Estatísticas</a>
+                </div>
+            </div>
+
+            <!-- Secção do Utilizador -->
+            <div id="user-session" class="user-session" style="display: none;">
+                <img id="user-photo" src="" alt="Foto do Utilizador" class="user-photo">
+                <button id="logout-btn" class="btn btn-secondary">Sair</button>
+            </div>
         </nav>
         
         <nav class="contextual-nav">
@@ -106,7 +124,6 @@
                 </div>
             </div>
 
-            <!-- INÍCIO DA ALTERAÇÃO: Nova secção para análise avançada -->
             <div class="market-controls advanced-controls">
                 <div class="control-group">
                     <button id="analyze-rsi-patterns-btn" class="btn btn-secondary">
@@ -125,7 +142,6 @@
                     </select>
                 </div>
             </div>
-            <!-- FIM DA ALTERAÇÃO -->
 
             <div class="table-wrapper">
                 <table class="market-table">
@@ -150,11 +166,17 @@
         </section>
 
         <div id="chart-modal" class="modal-overlay">
-            <!-- ... conteúdo do modal ... -->
+            <div class="modal-content" style="max-width: 90%; height: 90%; padding: 1rem;">
+                <span id="close-chart-modal" style="position: absolute; top: 15px; right: 25px; font-size: 2.5rem; color: #adb5bd; font-weight: 300; cursor: pointer; z-index: 10;">×</span>
+                <div id="chart-modal-container" style="height: 100%; width: 100%;"></div>
+            </div>
         </div>
 
         <div id="tech-analysis-modal" class="modal-overlay">
-           <!-- ... conteúdo do modal ... -->
+            <div class="modal-content" style="max-width: 450px; height: 600px; padding: 1rem;">
+                <span id="close-tech-analysis-modal" style="position: absolute; top: 15px; right: 25px; font-size: 2.5rem; color: #adb5bd; font-weight: 300; cursor: pointer; z-index: 10;">×</span>
+                <div id="tech-analysis-container" style="height: 100%; width: 100%;"></div>
+            </div>
         </div>
         
     </main>
