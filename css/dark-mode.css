@@ -8,7 +8,6 @@
 
 /* Fundos e bordas de elementos que mudam no modo escuro */
 .dark-mode header, 
-.dark-mode .trade-card, 
 .dark-mode .modal-content, 
 .dark-mode .potential-trades, 
 .dark-mode .armed-trades, 
@@ -133,9 +132,15 @@
 .dark-mode .section-divider {
     border-top-color: #333;
 }
+
+/* --- INÍCIO DA ALTERAÇÃO --- */
+/* Cor de fundo específica para os cards para destacá-los do fundo da coluna */
 .dark-mode .trade-card {
-    border-color: #2c2c2c !important; /* Garante que as bordas laterais também mudam */
+    background-color: #252525; /* Um cinza ligeiramente mais claro que #1e1e1e */
+    border-color: #333 !important; /* Garante que as bordas laterais também mudam */
 }
+/* --- FIM DA ALTERAÇÃO --- */
+
 .dark-mode .trade-card .card-screenshot {
     border-color: #444;
 }
