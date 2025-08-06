@@ -218,13 +218,11 @@ function openAlarmListModal(assetPair, alarms, mode = 'active') {
 
     if (mode === 'triggered') {
         footer.style.display = 'block';
-        // --- INÍCIO DA ALTERAÇÃO ---
         acknowledgeBtn.onclick = async () => {
             await acknowledgeAlarm(assetPair);
             modal.style.display = 'none';
-            location.reload(); // Recarrega a página para atualizar o estado visual
+            location.reload(); 
         };
-        // --- FIM DA ALTERAÇÃO ---
     } else {
         footer.style.display = 'none';
     }
@@ -292,7 +290,7 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
     const hasTriggeredUnacknowledgedAlarm = relatedAlarms.some(alarm => alarm.status === 'triggered' && alarm.acknowledged === false);
 
     let alarmBellHtml = '';
-    let acknowledgeButtonHtml = '';
+    let triggeredActionRowHtml = ''; // --- ALTERAÇÃO: Nova variável para a linha de ação
     let revertButtonHtml = '';
     
     let viewImageButtonHtml = '';
@@ -315,10 +313,18 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
     if (hasActiveAlarm) {
         alarmBellHtml = `<button class="icon-action-btn alarm-active-bell" data-action="view-alarms" data-asset="${assetName}" title="Ver alarmes ativos"><span class="material-symbols-outlined">notifications_active</span></button>`;
     }
+
+    // --- INÍCIO DA ALTERAÇÃO: Lógica para criar a linha de ação do alarme disparado ---
     if (hasTriggeredUnacknowledgedAlarm) {
         card.classList.add('alarm-triggered');
-        acknowledgeButtonHtml = `<button class="acknowledge-alarm-btn" data-action="acknowledge-and-view-alarm" data-asset="${assetName}" title="Ver Alarme Disparado"><span class="material-symbols-outlined">alarm</span> OK</button>`;
+        const acknowledgeButtonHtml = `<button class="acknowledge-alarm-btn" data-action="acknowledge-and-view-alarm" data-asset="${assetName}" title="Ver Alarme Disparado"><span class="material-symbols-outlined">alarm</span> OK</button>`;
+        triggeredActionRowHtml = `
+            <div class="card-triggered-action-row">
+                ${acknowledgeButtonHtml}
+            </div>
+        `;
     }
+    // --- FIM DA ALTERAÇÃO ---
     
     if (trade.data.status === 'ARMED' || trade.data.status === 'LIVE') {
         let revertText = trade.data.status === 'ARMED' ? 'Reverter para Potencial' : 'Reverter para Armado';
@@ -326,6 +332,7 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
         revertButtonHtml = `<button class="btn btn-secondary revert-btn" data-action="${revertAction}" title="${revertText}"><span class="material-symbols-outlined">undo</span> <span class="button-text">${revertText}</span></button>`;
     }
 
+    // --- INÍCIO DA ALTERAÇÃO: Estrutura HTML do card atualizada ---
     card.innerHTML = `
         <div class="card-header-row">
             <h3 class="asset-title-card">
@@ -341,12 +348,13 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
 
         ${imageContainerHtml}
 
+        ${triggeredActionRowHtml}
+
         <div class="card-bottom-row">
             <div class="card-secondary-actions">
                 ${revertButtonHtml}
                 <a href="https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}" target="_blank" rel="noopener noreferrer" class="icon-action-btn action-full-chart" title="Abrir no TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
                 ${viewImageButtonHtml}
-                ${acknowledgeButtonHtml}
             </div>
             <div class="card-sparkline" id="sparkline-card-${trade.id}"></div>
             <div class="card-price-data">
@@ -355,6 +363,7 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
             </div>
         </div>
     `;
+    // --- FIM DA ALTERAÇÃO ---
     return card;
 }
 
