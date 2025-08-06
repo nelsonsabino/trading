@@ -32,8 +32,6 @@ function renderSparkline(containerId, dataSeries) {
     if (!container || !dataSeries || dataSeries.length < 2) return;
     container.innerHTML = '';
 
-    // --- INÍCIO DA ALTERAÇÃO ---
-    // Lê as cores de feedback diretamente das variáveis CSS para garantir consistência
     const computedStyle = getComputedStyle(document.documentElement);
     const positiveColor = computedStyle.getPropertyValue('--feedback-positive').trim();
     const negativeColor = computedStyle.getPropertyValue('--feedback-negative').trim();
@@ -41,7 +39,6 @@ function renderSparkline(containerId, dataSeries) {
     const firstPrice = dataSeries[0];
     const lastPrice = dataSeries[dataSeries.length - 1];
     const chartColor = lastPrice >= firstPrice ? positiveColor : negativeColor;
-    // --- FIM DA ALTERAÇÃO ---
 
     const options = {
         series: [{ data: dataSeries }], chart: { type: 'line', height: 40, width: 100, sparkline: { enabled: true }},
@@ -221,10 +218,13 @@ function openAlarmListModal(assetPair, alarms, mode = 'active') {
 
     if (mode === 'triggered') {
         footer.style.display = 'block';
+        // --- INÍCIO DA ALTERAÇÃO ---
         acknowledgeBtn.onclick = async () => {
             await acknowledgeAlarm(assetPair);
             modal.style.display = 'none';
+            location.reload(); // Recarrega a página para atualizar o estado visual
         };
+        // --- FIM DA ALTERAÇÃO ---
     } else {
         footer.style.display = 'none';
     }
