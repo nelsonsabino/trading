@@ -236,7 +236,6 @@
     border-radius: 4px;
     border: none;
     cursor: pointer;
-    margin-left: 0.5rem;
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
@@ -244,6 +243,18 @@
 .acknowledge-alarm-btn:hover {
     filter: brightness(0.9);
 }
+
+/* --- INÍCIO DA ALTERAÇÃO --- */
+/* Nova linha de ação para o alarme disparado */
+.card-triggered-action-row {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-secondary);
+    display: flex;
+    justify-content: flex-end; /* Alinha o botão "OK" à direita */
+}
+/* --- FIM DA ALTERAÇÃO --- */
+
 
 /* --- MODAL DE LISTA DE ALARMES --- */
 .alarm-list-item {
@@ -317,7 +328,7 @@
     margin-bottom: 0.5rem;
 }
 
-/* --- INÍCIO DA ALTERAÇÃO: Estilos para o novo badge de tendência RSI --- */
+/* Badge de tendência RSI */
 .rsi-trend-signal {
     display: inline-block;
     padding: 2px 6px;
@@ -350,4 +361,3 @@
 .dark-mode .rsi-trend-signal.rsi-trend-resistance.confirmed {
     color: var(--surface-primary);
 }
-/* --- FIM DA ALTERAÇÃO --- */
