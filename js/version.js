@@ -2,6 +2,16 @@
 
 export const changelogData = {
 current: {
+   number: '13.0.1',
+    changes: [
+        "**Correção Crítica no Sistema de Alarmes:**",
+        "Resolvido o erro que impedia a verificação de todos os alarmes de indicador (RSI, Stoch, EMA, etc.), fazendo com que não fossem disparados.",
+        "A causa era a falta da importação da biblioteca `technicalindicators` (com o parâmetro `?target=deno` correto para o ambiente Supabase) na Edge Function `check-price-alarms`.",
+        "Com a importação alinhada à que já funcionava noutras partes do sistema, todos os tipos de alarme voltam a ser 100% funcionais."
+    ]
+},
+ releases: [
+      {
     number: '13.0.0',
     changes: [
         "**Versão 13: Implementado o Módulo de Análise de Padrões de RSI (LTA/LTB):**",
@@ -11,8 +21,7 @@ current: {
         "**Novos Sinais Visuais:** A tabela do scanner agora exibe 'badges' para os padrões detetados (ex: LTA-3) e um ícone de estrela (★) para os padrões que têm a confirmação do Estocástico."
     ]
 },
- releases: [
-      {
+     {
         number: '12.15.2',
         changes: [
             "**Melhoria Visual no Alerta de Alarme Disparado:**",
