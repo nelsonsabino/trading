@@ -2,6 +2,15 @@
 
 export const changelogData = {
 current: {
+    number: '13.0.2',
+    changes: [
+        "**Correção de UI (Alarmes):**",
+        "Resolvido o bug visual na página 'Meus Alarmes' onde os novos alarmes de 'Linha de Tendência RSI' exibiam uma descrição incorreta de 'Preço abaixo de null'.",
+        "A lógica da interface foi atualizada para reconhecer e formatar corretamente a descrição para este tipo de alarme, tanto na lista de alarmes ativos como no histórico de alarmes disparados."
+    ]
+},
+ releases: [
+    {
    number: '13.0.1',
     changes: [
         "**Correção Crítica no Sistema de Alarmes:**",
@@ -9,9 +18,8 @@ current: {
         "A causa era a falta da importação da biblioteca `technicalindicators` (com o parâmetro `?target=deno` correto para o ambiente Supabase) na Edge Function `check-price-alarms`.",
         "Com a importação alinhada à que já funcionava noutras partes do sistema, todos os tipos de alarme voltam a ser 100% funcionais."
     ]
-},
- releases: [
-      {
+},  
+    {
     number: '13.0.0',
     changes: [
         "**Versão 13: Implementado o Módulo de Análise de Padrões de RSI (LTA/LTB):**",
