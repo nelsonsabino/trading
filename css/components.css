@@ -222,12 +222,14 @@
     font-variation-settings: 'FILL' 1, 'wght' 700;
 }
 
-/* --- INÍCIO DA ALTERAÇÃO --- */
 .trade-card.alarm-triggered {
-    border: 2px solid var(--feedback-negative);
-    box-shadow: 0 0 12px -2px var(--feedback-negative);
+    /* --- INÍCIO DA CORREÇÃO --- */
+    /* Usa a nova variável dedicada para um alerta mais forte */
+    border: 2px solid var(--feedback-alert-glow);
+    /* Aumenta a intensidade e a expansão do brilho */
+    box-shadow: 0 0 15px -1px var(--feedback-alert-glow);
+    /* --- FIM DA CORREÇÃO --- */
 }
-/* --- FIM DA ALTERAÇÃO --- */
 
 .acknowledge-alarm-btn {
     background-color: var(--accent-yellow);
