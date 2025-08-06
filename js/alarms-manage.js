@@ -28,10 +28,12 @@ function closeChartModal() {
     chartModal.style.display = 'none';
 }
 
-if (chartModal) {
+// Add listeners only if the modal elements exist on the current page.
+if (chartModal && closeChartModalBtn) {
     closeChartModalBtn.addEventListener('click', closeChartModal);
     chartModal.addEventListener('click', (e) => { if (e.target.id === 'chart-modal') closeChartModal(); });
 }
+
 
 // --- FUNÇÕES DE GESTÃO DE ALARMES ---
 
@@ -159,23 +161,28 @@ async function deleteAlarm(alarmId) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Add a guard clause to ensure this script only runs its initialization logic
+    // on the alarms-manage.html page.
     const mainContainer = document.querySelector('main');
-    if (mainContainer) {
-        mainContainer.addEventListener('click', (e) => {
-            const deleteBtn = e.target.closest('.delete-btn');
-            if (deleteBtn) {
-                deleteAlarm(deleteBtn.getAttribute('data-id'));
-                return;
-            }
-            const chartBtn = e.target.closest('.view-chart-btn');
-            if (chartBtn) {
-                e.preventDefault();
-                const symbol = chartBtn.dataset.symbol;
-                if (symbol) openChartModal(symbol);
-                return;
-            }
-        });
+    const activeAlarmsTable = document.getElementById('active-alarms-tbody');
+    if (!mainContainer || !activeAlarmsTable) {
+        return; // Exit if we are not on the correct page
     }
+
+    mainContainer.addEventListener('click', (e) => {
+        const deleteBtn = e.target.closest('.delete-btn');
+        if (deleteBtn) {
+            deleteAlarm(deleteBtn.getAttribute('data-id'));
+            return;
+        }
+        const chartBtn = e.target.closest('.view-chart-btn');
+        if (chartBtn) {
+            e.preventDefault();
+            const symbol = chartBtn.dataset.symbol;
+            if (symbol) openChartModal(symbol);
+            return;
+        }
+    });
 
     fetchAndDisplayAlarms();
 });
