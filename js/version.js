@@ -2,6 +2,15 @@
 
 export const changelogData = {
 current: {
+    number: '12.15.2',
+    changes: [
+        "**Melhoria Visual no Alerta de Alarme Disparado:**",
+        "A cor da borda e do brilho ('glow') nos cards de alarme disparado foi tornada significativamente mais vibrante para aumentar a visibilidade e a urgência do alerta, especialmente no tema escuro.",
+        "Criada uma variável de cor dedicada (`--feedback-alert-glow`) para este efeito, garantindo que a alteração não afeta a legibilidade de outros elementos vermelhos na interface."
+    ]
+},
+ releases: [
+     {
     number: '12.15.1',
     changes: [
         "**Correção Crítica do Alarme RSI/MA Avançado:**",
@@ -9,7 +18,6 @@ current: {
         "A coluna foi adicionada com sucesso, estabilizando a nova funcionalidade de 'Confirmação Sustentada'."
     ]
 },
- releases: [
      {
         number: '12.15.0',
         changes: [
