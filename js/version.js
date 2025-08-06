@@ -2,6 +2,16 @@
 
 export const changelogData = {
 current: {
+    number: '13.1.0',
+    changes: [
+        "**Refatoração da Análise de Padrões RSI (Scanner de Mercado):**",
+        "A confirmação com o Estocástico é agora obrigatória e automática na análise de padrões de LTA/LTB do RSI, garantindo que apenas os setups de maior probabilidade são sinalizados.",
+        "A lógica foi movida inteiramente para o backend (Edge Function), que agora devolve um resultado claro de 'confirmado' ou 'não confirmado' para cada padrão.",
+        "Simplificada a interface do Scanner de Mercado, removendo o checkbox redundante de 'Exigir Confirmação', tornando a experiência do utilizador mais limpa e direta."
+    ]
+},
+ releases: [
+    {
     number: '13.0.2',
     changes: [
         "**Correção de UI (Alarmes):**",
@@ -9,8 +19,7 @@ current: {
         "A lógica da interface foi atualizada para reconhecer e formatar corretamente a descrição para este tipo de alarme, tanto na lista de alarmes ativos como no histórico de alarmes disparados."
     ]
 },
- releases: [
-    {
+     {
    number: '13.0.1',
     changes: [
         "**Correção Crítica no Sistema de Alarmes:**",
