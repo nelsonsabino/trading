@@ -2,14 +2,24 @@
 
 export const changelogData = {
 current: {
-    number: '12.15.2',
+    number: '13.0.0',
     changes: [
-        "**Melhoria Visual no Alerta de Alarme Disparado:**",
-        "A cor da borda e do brilho ('glow') nos cards de alarme disparado foi tornada significativamente mais vibrante para aumentar a visibilidade e a urgência do alerta, especialmente no tema escuro.",
-        "Criada uma variável de cor dedicada (`--feedback-alert-glow`) para este efeito, garantindo que a alteração não afeta a legibilidade de outros elementos vermelhos na interface."
+        "**Versão 13: Implementado o Módulo de Análise de Padrões de RSI (LTA/LTB):**",
+        "**Novo Alarme Avançado:** Adicionado um novo tipo de alarme para detetar automaticamente o 'Nº Toque' numa Linha de Tendência de Alta (fundos ascendentes) ou de Baixa (picos descendentes) no RSI.",
+        "**Scanner de Mercado Inteligente:** Integrada a mesma lógica no Market Scanner, com um botão opcional para 'Analisar Padrões RSI' num timeframe selecionável (1h, 4h, 1d).",
+        "**Confirmação de Momentum:** Adicionada a opção de 'Exigir Confirmação do Estocástico' no scanner, que filtra apenas os padrões de RSI em que cada toque na linha de tendência foi confirmado por um cruzamento do Estocástico, identificando setups de altíssima probabilidade.",
+        "**Novos Sinais Visuais:** A tabela do scanner agora exibe 'badges' para os padrões detetados (ex: LTA-3) e um ícone de estrela (★) para os padrões que têm a confirmação do Estocástico."
     ]
 },
  releases: [
+      {
+        number: '12.15.2',
+        changes: [
+            "**Melhoria Visual no Alerta de Alarme Disparado:**",
+            "A cor da borda e do brilho ('glow') nos cards de alarme disparado foi tornada significativamente mais vibrante para aumentar a visibilidade e a urgência do alerta, especialmente no tema escuro.",
+            "Criada uma variável de cor dedicada (`--feedback-alert-glow`) para este efeito, garantindo que a alteração não afeta a legibilidade de outros elementos vermelhos na interface."
+        ]
+    },
      {
     number: '12.15.1',
     changes: [
