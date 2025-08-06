@@ -2,14 +2,22 @@
 
 export const changelogData = {
 current: {
-    number: '13.3.0',
+    number: '13.4.0',
     changes: [
-        "**Melhoria de UX (Reconhecimento de Alarmes):**",
-        "Ao clicar no botão 'Reconhecer Alarmes' no modal de um alarme disparado, a página da dashboard agora é recarregada automaticamente.",
-        "Esta alteração garante um feedback visual imediato, removendo a sinalização vermelha do card do ativo sem a necessidade de uma atualização manual da página."
+        "**Melhoria de UX (Gestão de Alarmes):**",
+        "Adicionada a funcionalidade para apagar um alarme diretamente da página de edição ('Criar ou Editar Alarme').",
+        "Um botão 'Apagar Alarme' agora fica visível no modo de edição, permitindo uma gestão mais rápida e eficiente sem a necessidade de retornar à lista principal de alarmes."
     ]
 },
- releases: [
+releases: [
+    {
+        number: '13.3.0',
+        changes: [
+            "**Melhoria de UX (Reconhecimento de Alarmes):**",
+            "Ao clicar no botão 'Reconhecer Alarmes' no modal de um alarme disparado, a página da dashboard agora é recarregada automaticamente.",
+            "Esta alteração garante um feedback visual imediato, removendo a sinalização vermelha do card do ativo sem a necessidade de uma atualização manual da página."
+        ]
+    },
       {
     number: '13.2.1',
     changes: [
