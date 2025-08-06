@@ -1,0 +1,320 @@
+/* css/components.css */
+
+/* --- COMPONENTES GERAIS --- */
+.stat-card {
+    background-color: var(--surface-primary);
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    text-align: center;
+    border: 1px solid var(--border-primary);
+}
+.stat-card h4 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 1em;
+}
+.stat-card p {
+    margin: 0;
+    font-size: 2em;
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+/* --- CARDS DO DASHBOARD (POTENCIAL, ARMADO, ATIVO) --- */
+.potential-trades, .armed-trades, .live-trades {
+    background-color: var(--surface-primary);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-primary);
+    border-top: 4px solid var(--text-secondary);
+}
+.armed-trades {
+    border-top-color: var(--accent-yellow);
+}
+.live-trades {
+    border-top-color: var(--accent-green);
+}
+
+/* Base do trade-card */
+.trade-card {
+    background: var(--surface-primary);
+    border: 1px solid var(--border-secondary);
+    padding: 0.8rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    transition: box-shadow 0.2s ease-in-out, background-color 0.2s;
+    border-left: 5px solid var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+}
+.trade-card:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.12);
+}
+.trade-card.armed {
+    border-left-color: var(--accent-yellow);
+}
+.trade-card.live {
+    border-left-color: var(--accent-green);
+}
+
+/* --- LINHA SUPERIOR DO CARD --- */
+.card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+}
+.asset-title-card {
+    margin: 0;
+    font-size: 1.2em;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.card-edit-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+    padding: 0;
+    width: auto;
+    height: auto;
+    font-size: 0.9em;
+}
+.trade-card:hover .card-edit-btn {
+    opacity: 1;
+}
+
+/* --- SEÇÃO DO MEIO (ESTRATÉGIA E NOTAS) --- */
+.strategy-name {
+    margin: 0;
+    font-size: 0.85em;
+    color: var(--accent-blue);
+    font-weight: 500;
+    text-align: left;
+}
+.trade-notes {
+    font-size: 0.8em;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed var(--border-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+}
+
+/* --- LINHA INFERIOR DO CARD --- */
+.card-bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border-secondary);
+    gap: 0.5rem;
+}
+.card-chart-price-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-grow: 1;
+    min-width: 0;
+}
+.card-sparkline {
+    width: 60px;
+    height: 25px;
+    flex-shrink: 0;
+}
+.card-price-data {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 0.4rem;
+    flex-shrink: 0;
+    min-width: 100px;
+    justify-content: flex-end;
+}
+.card-price {
+    font-weight: 600;
+    font-size: 0.9em;
+}
+.price-change-percent {
+    font-size: 0.8em;
+}
+
+/* Ações secundárias */
+.card-secondary-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+.card-secondary-actions .icon-action-btn {
+    width: 28px;
+    height: 28px;
+    padding: 4px;
+    box-sizing: border-box;
+}
+.card-secondary-actions .icon-action-btn i {
+    font-size: 0.9em;
+}
+
+/* --- PÁGINA DE LOGIN --- */
+.login-container {
+    max-width: 450px;
+    margin: 5rem auto;
+    padding: 2.5rem;
+    text-align: center;
+    background-color: var(--surface-primary);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+.login-container p {
+    color: var(--text-secondary);
+}
+
+/* --- COMPONENTE: SECÇÃO DE PORTFÓLIO (PÁGINA STATS) --- */
+.portfolio-section h4 {
+    text-align: center;
+    font-size: 1.5em;
+    color: var(--text-headings);
+    border-bottom: 1px solid var(--border-secondary);
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+.portfolio-balance {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+.balance-label {
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+.balance-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--accent-green);
+}
+
+/* --- ALARMES NOS TRADES CARDS (DASHBOARD) --- */
+.alarm-active-bell {
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    color: var(--accent-red);
+    font-size: 1.1em;
+    margin-left: 0.5rem;
+    transition: transform 0.2s ease-out;
+}
+.alarm-active-bell .material-symbols-outlined {
+    font-variation-settings: 'FILL' 1, 'wght' 700;
+}
+
+/* --- INÍCIO DA ALTERAÇÃO --- */
+.trade-card.alarm-triggered {
+    border: 2px solid var(--feedback-negative);
+    box-shadow: 0 0 12px -2px var(--feedback-negative);
+}
+/* --- FIM DA ALTERAÇÃO --- */
+
+.acknowledge-alarm-btn {
+    background-color: var(--accent-yellow);
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.8em;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    margin-left: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+.acknowledge-alarm-btn:hover {
+    filter: brightness(0.9);
+}
+
+/* --- MODAL DE LISTA DE ALARMES --- */
+.alarm-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0.5rem;
+    border-bottom: 1px solid var(--border-secondary);
+}
+.alarm-list-item:last-child {
+    border-bottom: none;
+}
+
+/* Secções de Histórico */
+.closed-trades-history-section {
+    background-color: var(--surface-primary);
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    border: 1px solid var(--border-primary);
+}
+.closed-trades-history-section h2 {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+/* Estilos para o container da imagem no card */
+.card-image-container {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-out;
+    margin-top: 0;
+}
+.card-image-container.visible {
+    max-height: 500px;
+    margin-top: 0.75rem;
+    transition: max-height 0.5s ease-in;
+}
+.card-image-container img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    display: block;
+    cursor: pointer;
+}
+
+/* --- ESTILOS PARA A PÁGINA DE CHANGELOG --- */
+.changelog-card {
+    background-color: var(--surface-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: 8px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.changelog-card h4 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.changelog-card ul {
+    padding-left: 20px;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.changelog-card li {
+    margin-bottom: 0.5rem;
+}
