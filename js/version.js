@@ -7,7 +7,7 @@ current: {
         "**Refinação da Análise de Padrões RSI:**",
         "O histórico de análise para a deteção de linhas de tendência foi reduzido para as últimas 100 velas, focando a ferramenta em padrões mais recentes e relevantes, conforme solicitado."
     ]
-},
+}
  releases: [
     {
     number: '13.2.0',
