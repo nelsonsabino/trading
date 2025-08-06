@@ -126,8 +126,14 @@
 
             <div class="market-controls advanced-controls">
                 <div class="control-group">
+                    <label for="rsi-analysis-timeframe">Analisar Padrões RSI em:</label>
+                    <select id="rsi-analysis-timeframe">
+                        <option value="1h" selected>1 Hora</option>
+                        <option value="4h">4 Horas</option>
+                        <option value="1d">Diário</option>
+                    </select>
                     <button id="analyze-rsi-patterns-btn" class="btn btn-secondary">
-                        <span class="material-symbols-outlined">auto_graph</span> Analisar Padrões de RSI
+                        <span class="material-symbols-outlined">auto_graph</span> Analisar
                     </button>
                     <span id="rsi-analysis-status" class="status-indicator"></span>
                 </div>
@@ -140,6 +146,8 @@
                         <option value="resistance_2">2+ Picos Descendentes (LTB)</option>
                         <option value="resistance_3">3+ Picos Descendentes (LTB)</option>
                     </select>
+                    <input type="checkbox" id="filter-stoch-confirmation" disabled>
+                    <label for="filter-stoch-confirmation">Exigir Confirmação Stoch</label>
                 </div>
             </div>
 
