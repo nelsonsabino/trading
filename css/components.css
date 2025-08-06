@@ -223,12 +223,8 @@
 }
 
 .trade-card.alarm-triggered {
-    /* --- INÍCIO DA CORREÇÃO --- */
-    /* Usa a nova variável dedicada para um alerta mais forte */
     border: 2px solid var(--feedback-alert-glow);
-    /* Aumenta a intensidade e a expansão do brilho */
     box-shadow: 0 0 15px -1px var(--feedback-alert-glow);
-    /* --- FIM DA CORREÇÃO --- */
 }
 
 .acknowledge-alarm-btn {
@@ -320,3 +316,38 @@
 .changelog-card li {
     margin-bottom: 0.5rem;
 }
+
+/* --- INÍCIO DA ALTERAÇÃO: Estilos para o novo badge de tendência RSI --- */
+.rsi-trend-signal {
+    display: inline-block;
+    padding: 2px 6px;
+    font-size: 0.7em;
+    font-weight: bold;
+    border-radius: 4px;
+    margin-left: 5px;
+    cursor: help;
+    border: 1px solid var(--border-primary);
+    background-color: var(--surface-primary);
+    color: var(--text-secondary);
+}
+
+.rsi-trend-signal.rsi-trend-support.confirmed {
+    background-color: var(--accent-green);
+    color: #fff;
+    border-color: var(--accent-green);
+}
+
+.dark-mode .rsi-trend-signal.rsi-trend-support.confirmed {
+    color: var(--surface-primary);
+}
+
+.rsi-trend-signal.rsi-trend-resistance.confirmed {
+    background-color: var(--accent-red);
+    color: #fff;
+    border-color: var(--accent-red);
+}
+
+.dark-mode .rsi-trend-signal.rsi-trend-resistance.confirmed {
+    color: var(--surface-primary);
+}
+/* --- FIM DA ALTERAÇÃO --- */
