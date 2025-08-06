@@ -173,6 +173,12 @@ function getAlarmDescription(alarm) {
             const secondaryTriggerText = `Estocástico(${alarm.combo_period}) ${alarm.combo_condition === 'below' ? 'abaixo de' : 'acima de'} ${alarm.combo_target_price}`;
             description = `CONFLUÊNCIA: ${primaryTriggerText} E ${secondaryTriggerText} no ${alarm.indicator_timeframe}`;
             break;
+        // --- INÍCIO DA ALTERAÇÃO ---
+        case 'rsi_trendline':
+            const trendTypeText = alarm.trendline_type === 'support' ? 'Suporte' : 'Resistência';
+            description = `${alarm.touch_count}º toque em L.T. de ${trendTypeText} no ${alarm.indicator_timeframe}`;
+            break;
+        // --- FIM DA ALTERAÇÃO ---
         default: // price
             description = `Preço ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} USD`;
     }
@@ -290,7 +296,7 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
     const hasTriggeredUnacknowledgedAlarm = relatedAlarms.some(alarm => alarm.status === 'triggered' && alarm.acknowledged === false);
 
     let alarmBellHtml = '';
-    let triggeredActionRowHtml = ''; // --- ALTERAÇÃO: Nova variável para a linha de ação
+    let triggeredActionRowHtml = '';
     let revertButtonHtml = '';
     
     let viewImageButtonHtml = '';
@@ -314,7 +320,6 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
         alarmBellHtml = `<button class="icon-action-btn alarm-active-bell" data-action="view-alarms" data-asset="${assetName}" title="Ver alarmes ativos"><span class="material-symbols-outlined">notifications_active</span></button>`;
     }
 
-    // --- INÍCIO DA ALTERAÇÃO: Lógica para criar a linha de ação do alarme disparado ---
     if (hasTriggeredUnacknowledgedAlarm) {
         card.classList.add('alarm-triggered');
         const acknowledgeButtonHtml = `<button class="acknowledge-alarm-btn" data-action="acknowledge-and-view-alarm" data-asset="${assetName}" title="Ver Alarme Disparado"><span class="material-symbols-outlined">alarm</span> OK</button>`;
@@ -324,7 +329,6 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
             </div>
         `;
     }
-    // --- FIM DA ALTERAÇÃO ---
     
     if (trade.data.status === 'ARMED' || trade.data.status === 'LIVE') {
         let revertText = trade.data.status === 'ARMED' ? 'Reverter para Potencial' : 'Reverter para Armado';
@@ -332,7 +336,6 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
         revertButtonHtml = `<button class="btn btn-secondary revert-btn" data-action="${revertAction}" title="${revertText}"><span class="material-symbols-outlined">undo</span> <span class="button-text">${revertText}</span></button>`;
     }
 
-    // --- INÍCIO DA ALTERAÇÃO: Estrutura HTML do card atualizada ---
     card.innerHTML = `
         <div class="card-header-row">
             <h3 class="asset-title-card">
@@ -363,7 +366,6 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
             </div>
         </div>
     `;
-    // --- FIM DA ALTERAÇÃO ---
     return card;
 }
 
