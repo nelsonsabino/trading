@@ -2,6 +2,16 @@
 
 export const changelogData = {
 current: {
+    number: '13.2.0',
+    changes: [
+        "**Melhoria da Análise de Padrões (Ritmo da Tendência):**",
+        "A lógica de deteção de linhas de tendência no RSI foi tornada mais inteligente. Para padrões de 3 toques, a função agora analisa o 'ritmo' da tendência, garantindo que a distância entre os toques seja proporcional e evitando falsos positivos causados por pivôs muito distantes no tempo.",
+        "O histórico de análise foi ajustado para um período mais focado (300 velas), melhorando a relevância dos padrões encontrados.",
+        "Esta nova camada de validação aumenta significativamente a fiabilidade dos sinais de LTA/LTB gerados pelo scanner."
+    ]
+}
+ releases: [
+    {
     number: '13.1.0',
     changes: [
         "**Refatoração da Análise de Padrões RSI (Scanner de Mercado):**",
@@ -10,8 +20,7 @@ current: {
         "Simplificada a interface do Scanner de Mercado, removendo o checkbox redundante de 'Exigir Confirmação', tornando a experiência do utilizador mais limpa e direta."
     ]
 },
- releases: [
-    {
+     {
     number: '13.0.2',
     changes: [
         "**Correção de UI (Alarmes):**",
