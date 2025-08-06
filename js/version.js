@@ -9,52 +9,52 @@ current: {
     ]
 },
  releases: [
-    {
-    number: '13.2.0',
-    changes: [
-        "**Melhoria da Análise de Padrões (Ritmo da Tendência):**",
-        "A lógica de deteção de linhas de tendência no RSI foi tornada mais inteligente. Para padrões de 3 toques, a função agora analisa o 'ritmo' da tendência, garantindo que a distância entre os toques seja proporcional e evitando falsos positivos causados por pivôs muito distantes no tempo.",
-        "O histórico de análise foi ajustado para um período mais focado (300 velas), melhorando a relevância dos padrões encontrados.",
-        "Esta nova camada de validação aumenta significativamente a fiabilidade dos sinais de LTA/LTB gerados pelo scanner."
-    ]
-},
-    {
-    number: '13.1.0',
-    changes: [
-        "**Refatoração da Análise de Padrões RSI (Scanner de Mercado):**",
-        "A confirmação com o Estocástico é agora obrigatória e automática na análise de padrões de LTA/LTB do RSI, garantindo que apenas os setups de maior probabilidade são sinalizados.",
-        "A lógica foi movida inteiramente para o backend (Edge Function), que agora devolve um resultado claro de 'confirmado' ou 'não confirmado' para cada padrão.",
-        "Simplificada a interface do Scanner de Mercado, removendo o checkbox redundante de 'Exigir Confirmação', tornando a experiência do utilizador mais limpa e direta."
-    ]
-},
-     {
-    number: '13.0.2',
-    changes: [
-        "**Correção de UI (Alarmes):**",
-        "Resolvido o bug visual na página 'Meus Alarmes' onde os novos alarmes de 'Linha de Tendência RSI' exibiam uma descrição incorreta de 'Preço abaixo de null'.",
-        "A lógica da interface foi atualizada para reconhecer e formatar corretamente a descrição para este tipo de alarme, tanto na lista de alarmes ativos como no histórico de alarmes disparados."
-    ]
-},
-     {
-   number: '13.0.1',
-    changes: [
-        "**Correção Crítica no Sistema de Alarmes:**",
-        "Resolvido o erro que impedia a verificação de todos os alarmes de indicador (RSI, Stoch, EMA, etc.), fazendo com que não fossem disparados.",
-        "A causa era a falta da importação da biblioteca `technicalindicators` (com o parâmetro `?target=deno` correto para o ambiente Supabase) na Edge Function `check-price-alarms`.",
-        "Com a importação alinhada à que já funcionava noutras partes do sistema, todos os tipos de alarme voltam a ser 100% funcionais."
-    ]
-},  
-    {
-    number: '13.0.0',
-    changes: [
-        "**Versão 13: Implementado o Módulo de Análise de Padrões de RSI (LTA/LTB):**",
-        "**Novo Alarme Avançado:** Adicionado um novo tipo de alarme para detetar automaticamente o 'Nº Toque' numa Linha de Tendência de Alta (fundos ascendentes) ou de Baixa (picos descendentes) no RSI.",
-        "**Scanner de Mercado Inteligente:** Integrada a mesma lógica no Market Scanner, com um botão opcional para 'Analisar Padrões RSI' num timeframe selecionável (1h, 4h, 1d).",
-        "**Confirmação de Momentum:** Adicionada a opção de 'Exigir Confirmação do Estocástico' no scanner, que filtra apenas os padrões de RSI em que cada toque na linha de tendência foi confirmado por um cruzamento do Estocástico, identificando setups de altíssima probabilidade.",
-        "**Novos Sinais Visuais:** A tabela do scanner agora exibe 'badges' para os padrões detetados (ex: LTA-3) e um ícone de estrela (★) para os padrões que têm a confirmação do Estocástico."
-    ]
-},
-     {
+      {
+        number: '13.2.0',
+        changes: [
+            "**Melhoria da Análise de Padrões (Ritmo da Tendência):**",
+            "A lógica de deteção de linhas de tendência no RSI foi tornada mais inteligente. Para padrões de 3 toques, a função agora analisa o 'ritmo' da tendência, garantindo que a distância entre os toques seja proporcional e evitando falsos positivos causados por pivôs muito distantes no tempo.",
+            "O histórico de análise foi ajustado para um período mais focado (300 velas), melhorando a relevância dos padrões encontrados.",
+            "Esta nova camada de validação aumenta significativamente a fiabilidade dos sinais de LTA/LTB gerados pelo scanner."
+        ]
+      },
+      {
+        number: '13.1.0',
+        changes: [
+            "**Refatoração da Análise de Padrões RSI (Scanner de Mercado):**",
+            "A confirmação com o Estocástico é agora obrigatória e automática na análise de padrões de LTA/LTB do RSI, garantindo que apenas os setups de maior probabilidade são sinalizados.",
+            "A lógica foi movida inteiramente para o backend (Edge Function), que agora devolve um resultado claro de 'confirmado' ou 'não confirmado' para cada padrão.",
+            "Simplificada a interface do Scanner de Mercado, removendo o checkbox redundante de 'Exigir Confirmação', tornando a experiência do utilizador mais limpa e direta."
+        ]
+      },
+      {
+        number: '13.0.2',
+        changes: [
+            "**Correção de UI (Alarmes):**",
+            "Resolvido o bug visual na página 'Meus Alarmes' onde os novos alarmes de 'Linha de Tendência RSI' exibiam uma descrição incorreta de 'Preço abaixo de null'.",
+            "A lógica da interface foi atualizada para reconhecer e formatar corretamente a descrição para este tipo de alarme, tanto na lista de alarmes ativos como no histórico de alarmes disparados."
+        ]
+      },
+      {
+        number: '13.0.1',
+        changes: [
+            "**Correção Crítica no Sistema de Alarmes:**",
+            "Resolvido o erro que impedia a verificação de todos os alarmes de indicador (RSI, Stoch, EMA, etc.), fazendo com que não fossem disparados.",
+            "A causa era a falta da importação da biblioteca `technicalindicators` (com o parâmetro `?target=deno` correto para o ambiente Supabase) na Edge Function `check-price-alarms`.",
+            "Com a importação alinhada à que já funcionava noutras partes do sistema, todos os tipos de alarme voltam a ser 100% funcionais."
+        ]
+      },
+      {
+        number: '13.0.0',
+        changes: [
+            "**Versão 13: Implementado o Módulo de Análise de Padrões de RSI (LTA/LTB):**",
+            "**Novo Alarme Avançado:** Adicionado um novo tipo de alarme para detetar automaticamente o 'Nº Toque' numa Linha de Tendência de Alta (fundos ascendentes) ou de Baixa (picos descendentes) no RSI.",
+            "**Scanner de Mercado Inteligente:** Integrada a mesma lógica no Market Scanner, com um botão opcional para 'Analisar Padrões RSI' num timeframe selecionável (1h, 4h, 1d).",
+            "**Confirmação de Momentum:** Adicionada a opção de 'Exigir Confirmação do Estocástico' no scanner, que filtra apenas os padrões de RSI em que cada toque na linha de tendência foi confirmado por um cruzamento do Estocástico, identificando setups de altíssima probabilidade.",
+            "**Novos Sinais Visuais:** A tabela do scanner agora exibe 'badges' para os padrões detetados (ex: LTA-3) e um ícone de estrela (★) para os padrões que têm a confirmação do Estocástico."
+        ]
+      },
+      {
         number: '12.15.2',
         changes: [
             "**Melhoria Visual no Alerta de Alarme Disparado:**",
@@ -187,13 +187,13 @@ current: {
     ]
 },
      {
-        number: '12.9.1',
-        changes: [
-            "**Correção das Notificações de Alarme:**",
-            "Resolvido o problema onde as notificações de alarmes de indicadores (ex: Estocástico, RSI) mostravam uma mensagem incorreta de 'Alarme de Preço'.",
-            "A função do Supabase (`check-price-alarms`) foi corrigida para gerar a mensagem de notificação específica e correta para cada tipo de alarme, garantindo que o alerta recebido corresponde exatamente à condição que o disparou."
-        ]
-    },
+    number: '12.9.1',
+    changes: [
+        "**Correção das Notificações de Alarme:**",
+        "Resolvido o problema onde as notificações de alarmes de indicadores (ex: Estocástico, RSI) mostravam uma mensagem incorreta de 'Alarme de Preço'.",
+        "A função do Supabase (`check-price-alarms`) foi corrigida para gerar a mensagem de notificação específica e correta para cada tipo de alarme, garantindo que o alerta recebido corresponde exatamente à condição que o disparou."
+    ]
+},
      {
     number: '12.9.0',
     changes: [
