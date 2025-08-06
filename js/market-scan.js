@@ -13,7 +13,12 @@ let filterRsi = false;
 let filterStoch = false;
 let showSparklines = true;
 let currentTopN = 50;
-let rsiPatternFilter = 'none'; // Novo estado para o filtro de padrão
+
+// Novos estados para a análise avançada
+let rsiPatternFilter = 'none';
+let rsiAnalysisTimeframe = '1h';
+let requireStochConfirmation = false;
+
 
 const chartModal = document.getElementById('chart-modal');
 const closeChartModalBtn = document.getElementById('close-chart-modal');
@@ -172,9 +177,15 @@ function createTableRow(ticker, index, extraData) {
     if (assetExtraData && assetExtraData.rsiTrend) {
         const trend = assetExtraData.rsiTrend;
         const trendText = trend.type === 'support' ? `LTA-${trend.touches}` : `LTB-${trend.touches}`;
-        const trendTooltip = trend.type === 'support' ? `${trend.touches}+ Fundos Ascendentes (1h)` : `${trend.touches}+ Picos Descendentes (1h)`;
-        const trendClass = trend.type === 'support' ? 'rsi-trend-support' : 'rsi-trend-resistance';
-        rsiTrendSignalHtml = `<span class="rsi-trend-signal ${trendClass}" data-tooltip="${trendTooltip}">${trendText}</span>`;
+        const trendTooltip = trend.type === 'support' ? `${trend.touches}+ Fundos Ascendentes (${rsiAnalysisTimeframe})` : `${trend.touches}+ Picos Descendentes (${rsiAnalysisTimeframe})`;
+        let trendClass = trend.type === 'support' ? 'rsi-trend-support' : 'rsi-trend-resistance';
+        let confirmedHtml = '';
+        if (trend.isConfirmed) {
+            trendClass += ' confirmed';
+            confirmedHtml = ' ★';
+        }
+        
+        rsiTrendSignalHtml = `<span class="rsi-trend-signal ${trendClass}" data-tooltip="${trendTooltip}">${trendText}${confirmedHtml}</span>`;
     }
 
     let formattedPrice;
@@ -233,7 +244,12 @@ function applyFiltersAndSort() {
             if (!trend) return false;
 
             const [type, touches] = rsiPatternFilter.split('_');
-            return trend.type === type && trend.touches >= parseInt(touches);
+            
+            const typeMatch = trend.type === type;
+            const touchesMatch = trend.touches >= parseInt(touches);
+            const confirmationMatch = requireStochConfirmation ? trend.isConfirmed === true : true;
+
+            return typeMatch && touchesMatch && confirmationMatch;
         });
     }
 
@@ -302,15 +318,22 @@ async function handleRsiPatternAnalysis() {
     const analyzeBtn = document.getElementById('analyze-rsi-patterns-btn');
     const statusIndicator = document.getElementById('rsi-analysis-status');
     const filterSelect = document.getElementById('filter-rsi-trend');
+    const stochConfirmCheckbox = document.getElementById('filter-stoch-confirmation');
 
     analyzeBtn.disabled = true;
     statusIndicator.textContent = 'A analisar...';
+    filterSelect.disabled = true;
+    stochConfirmCheckbox.disabled = true;
 
     try {
         const symbolsToAnalyze = allTickersData.slice(0, currentTopN).map(t => t.symbol);
         
         const { data: analysisData, error } = await supabase.functions.invoke('get-sparklines-data', {
-            body: { symbols: symbolsToAnalyze, analyzeRsiPatterns: true },
+            body: { 
+                symbols: symbolsToAnalyze, 
+                analyzeRsiPatterns: true,
+                timeframe: rsiAnalysisTimeframe // Passa o timeframe selecionado
+            },
         });
 
         if (error) throw error;
@@ -322,6 +345,7 @@ async function handleRsiPatternAnalysis() {
 
         statusIndicator.textContent = 'Análise concluída!';
         filterSelect.disabled = false;
+        stochConfirmCheckbox.disabled = false;
         applyFiltersAndSort(); 
     
     } catch (err) {
@@ -350,26 +374,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterStochCheckbox = document.getElementById('filter-stoch');
     const toggleSparklinesCheckbox = document.getElementById('toggle-sparklines');
     const topNSelect = document.getElementById('top-n-select');
+    
+    // Novos elementos
     const analyzeRsiPatternsBtn = document.getElementById('analyze-rsi-patterns-btn');
+    const rsiAnalysisTimeframeSelect = document.getElementById('rsi-analysis-timeframe');
     const rsiTrendFilterSelect = document.getElementById('filter-rsi-trend');
+    const stochConfirmCheckbox = document.getElementById('filter-stoch-confirmation');
+
 
     const savedSparklinesState = localStorage.getItem('showSparklines');
     if (savedSparklinesState !== null) {
         showSparklines = JSON.parse(savedSparklinesState);
         if (toggleSparklinesCheckbox) {
             toggleSparklinesCheckbox.checked = showSparklines;
-        }
-    } else {
-        if (toggleSparklinesCheckbox) {
-            showSparklines = toggleSparklinesCheckbox.checked;
-        }
-    }
-    const marketTable = tbody ? tbody.closest('.market-table') : null;
-    if (marketTable) {
-        if (!showSparklines) {
-            marketTable.classList.add('hide-sparkline-column');
-        } else {
-            marketTable.classList.remove('hide-sparkline-column');
         }
     }
 
@@ -378,10 +395,6 @@ document.addEventListener('DOMContentLoaded', () => {
         currentTopN = parseInt(savedTopNState);
         if (topNSelect) {
             topNSelect.value = currentTopN.toString();
-        }
-    } else {
-        if (topNSelect) {
-            currentTopN = parseInt(topNSelect.value);
         }
     }
     updateMarketScanTitle();
@@ -406,21 +419,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     if (sortBySelect) {
-        currentSortBy = sortBySelect.value;
         sortBySelect.addEventListener('change', (e) => {
             currentSortBy = e.target.value;
             applyFiltersAndSort();
         });
     }
     if (filterRsiCheckbox) {
-        filterRsi = filterRsiCheckbox.checked;
         filterRsiCheckbox.addEventListener('change', (e) => {
             filterRsi = e.target.checked;
             applyFiltersAndSort();
         });
     }
     if (filterStochCheckbox) {
-        filterStoch = filterStochCheckbox.checked;
         filterStochCheckbox.addEventListener('change', (e) => {
             filterStoch = e.target.checked;
             applyFiltersAndSort();
@@ -430,9 +440,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (analyzeRsiPatternsBtn) {
         analyzeRsiPatternsBtn.addEventListener('click', handleRsiPatternAnalysis);
     }
+    if (rsiAnalysisTimeframeSelect) {
+        rsiAnalysisTimeframeSelect.addEventListener('change', (e) => {
+            rsiAnalysisTimeframe = e.target.value;
+        });
+    }
     if (rsiTrendFilterSelect) {
         rsiTrendFilterSelect.addEventListener('change', (e) => {
             rsiPatternFilter = e.target.value;
+            applyFiltersAndSort();
+        });
+    }
+    if (stochConfirmCheckbox) {
+        stochConfirmCheckbox.addEventListener('change', (e) => {
+            requireStochConfirmation = e.target.checked;
             applyFiltersAndSort();
         });
     }
