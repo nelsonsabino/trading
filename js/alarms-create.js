@@ -73,13 +73,11 @@ function enterEditMode(alarm) {
         document.getElementById('combo-stoch-condition').value = alarm.combo_condition; 
         document.getElementById('combo-stoch-value').value = alarm.combo_target_price; 
         document.getElementById('combo-timeframe').value = alarm.indicator_timeframe; 
-    // --- INÍCIO DA ALTERAÇÃO ---
     } else if (alarmType === 'rsi_trendline') {
         document.getElementById('rsi-trendline-type').value = alarm.trendline_type || 'support';
         document.getElementById('rsi-trendline-touches').value = alarm.touch_count || 3;
         document.getElementById('rsi-trendline-period').value = alarm.indicator_period || 14;
         document.getElementById('rsi-trendline-timeframe').value = alarm.indicator_timeframe || '1h';
-    // --- FIM DA ALTERAÇÃO ---
     } else { // price
         document.getElementById('alarm-condition-standalone').value = alarm.condition; 
         document.getElementById('alarm-price-standalone').value = alarm.target_price; 
@@ -139,9 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
         rsi_crossover: document.getElementById('rsi-fields'), 
         ema_touch: document.getElementById('ema-fields'), 
         combo: document.getElementById('combo-fields'),
-        // --- INÍCIO DA ALTERAÇÃO ---
         rsi_trendline: document.getElementById('rsi-trendline-fields')
-        // --- FIM DA ALTERAÇÃO ---
     };
     
     alarmTypeSelect.addEventListener('change', () => {
@@ -155,7 +151,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (selectedType === 'stochastic') { document.getElementById('stoch-condition').dispatchEvent(new Event('change')); }
     });
 
-    // ... (restante dos listeners de change que já existem) ...
+    const rsiLevelConditionSelect = document.getElementById('rsi-level-condition');
+    if(rsiLevelConditionSelect) { rsiLevelConditionSelect.addEventListener('change', (e) => { const rsiValueInput = document.getElementById('rsi-level-value'); if(e.target.value === 'below') { rsiValueInput.value = 35; } else { rsiValueInput.value = 70; } }); }
+
+    const stochConditionSelect = document.getElementById('stoch-condition');
+    if (stochConditionSelect) {
+        stochConditionSelect.addEventListener('change', (e) => {
+            const stochValueInput = document.getElementById('stoch-value');
+            if (e.target.value === 'below') { stochValueInput.value = 30; } else { stochValueInput.value = 70; }
+        });
+    }
 
     const urlParams = new URLSearchParams(window.location.search);
     const assetPairFromUrl = urlParams.get('assetPair');
@@ -168,10 +173,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (alarmIdToEdit) {
-        // ... (código existente para carregar alarme para edição) ...
+        const fetchAndEditAlarm = async (id) => {
+            feedbackDiv.textContent = 'A carregar dados do alarme para edição...';
+            try {
+                const { data: alarmToEdit, error } = await supabase
+                    .from('alarms')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+
+                if (error) throw error;
+
+                if (alarmToEdit) {
+                    feedbackDiv.textContent = '';
+                    enterEditMode(alarmToEdit);
+                } else {
+                    console.warn(`Alarme com ID ${id} não encontrado na base de dados.`);
+                    feedbackDiv.textContent = 'Erro: Alarme a editar não encontrado.';
+                }
+            } catch (err) {
+                console.error("Erro ao buscar alarme para edição:", err);
+                feedbackDiv.textContent = 'Erro ao carregar os dados do alarme para edição.';
+            }
+        };
+        fetchAndEditAlarm(alarmIdToEdit);
     }
 
-    // ... (restante do código de inicialização) ...
+    mainContainer.addEventListener('click', (e) => {
+        const chartBtn = e.target.closest('.view-chart-btn');
+        if (chartBtn) {
+            const symbol = chartBtn.dataset.symbol;
+            if (symbol) openChartModal(symbol);
+        }
+    });
     
     document.getElementById('cancel-edit-btn').addEventListener('click', exitEditMode);
 
@@ -189,13 +223,23 @@ document.addEventListener('DOMContentLoaded', () => {
             let alarmData = { asset_pair: assetPair, alarm_type: alarmType };
             
             if (alarmType === 'price') { 
-                // ...
+                alarmData.condition = document.getElementById('alarm-condition-standalone').value; 
+                alarmData.target_price = parseFloat(document.getElementById('alarm-price-standalone').value); 
             } else if (alarmType === 'rsi_level') { 
-                // ...
+                alarmData.condition = document.getElementById('rsi-level-condition').value; 
+                alarmData.target_price = parseFloat(document.getElementById('rsi-level-value').value); 
+                alarmData.indicator_period = parseInt(document.getElementById('rsi-level-period').value); 
+                alarmData.indicator_timeframe = document.getElementById('rsi-level-timeframe').value; 
             } else if (alarmType === 'stochastic') { 
-                // ...
+                alarmData.condition = document.getElementById('stoch-condition').value; 
+                alarmData.target_price = parseFloat(document.getElementById('stoch-value').value); 
+                alarmData.indicator_period = parseInt(document.getElementById('stoch-period').value); 
+                alarmData.indicator_timeframe = document.getElementById('stoch-timeframe').value; 
             } else if (alarmType === 'stochastic_crossover') { 
-                // ...
+                alarmData.condition = document.getElementById('stoch-cross-condition').value; 
+                alarmData.indicator_period = parseInt(document.getElementById('stoch-cross-k-period').value); 
+                alarmData.combo_period = parseInt(document.getElementById('stoch-cross-d-period').value); 
+                alarmData.indicator_timeframe = document.getElementById('stoch-cross-timeframe').value; 
             } else if (alarmType === 'rsi_crossover') { 
                 alarmData.condition = document.getElementById('rsi-condition').value; 
                 alarmData.indicator_timeframe = document.getElementById('rsi-timeframe').value; 
@@ -203,17 +247,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 alarmData.crossover_threshold = parseFloat(document.getElementById('rsi-crossover-threshold').value) || 1.0;
                 alarmData.rsi_period = 14; 
                 alarmData.rsi_ma_period = 14; 
-            // --- INÍCIO DA ALTERAÇÃO ---
             } else if (alarmType === 'rsi_trendline') {
                 alarmData.trendline_type = document.getElementById('rsi-trendline-type').value;
                 alarmData.touch_count = parseInt(document.getElementById('rsi-trendline-touches').value) || 3;
                 alarmData.indicator_period = parseInt(document.getElementById('rsi-trendline-period').value) || 14;
                 alarmData.indicator_timeframe = document.getElementById('rsi-trendline-timeframe').value;
-            // --- FIM DA ALTERAÇÃO ---
             } else if (alarmType === 'ema_touch') { 
-                // ...
+                alarmData.condition = document.getElementById('ema-condition').value; 
+                alarmData.indicator_timeframe = document.getElementById('ema-timeframe').value; 
+                alarmData.ema_period = parseInt(document.getElementById('ema-period').value); 
             } else if (alarmType === 'combo') { 
-                // ...
+                alarmData.condition = document.getElementById('combo-primary-trigger').value; 
+                alarmData.indicator_timeframe = document.getElementById('combo-timeframe').value; 
+                alarmData.ema_period = parseInt(document.getElementById('combo-ema-period').value); 
+                alarmData.combo_indicator = 'stochastic'; 
+                alarmData.combo_condition = document.getElementById('combo-stoch-condition').value; 
+                alarmData.combo_target_price = parseInt(document.getElementById('combo-stoch-value').value); 
+                alarmData.combo_period = 14; 
             }
 
             if (editingAlarmId) {
