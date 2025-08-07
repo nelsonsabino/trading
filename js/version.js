@@ -2,6 +2,23 @@
 
 export const changelogData = {
 current: {
+    number: '13.4.2',
+    changes: [
+        "**Correção Final de UI (Alarmes):**",
+        "Resolvido o bug visual onde a descrição de alarmes de 'Linha de Tendência RSI' aparecia incorretamente no modal de 'Alarmes Disparados' do Dashboard.",
+        "A função de formatação de descrição de alarmes em `ui.js` foi atualizada, garantindo consistência visual em toda a aplicação."
+    ]
+},
+releases: [
+    {
+        number: '13.4.1',
+        changes: [
+            "**Melhoria Visual (Tema Escuro):**",
+            "Aumentado o contraste visual dos cards de trade no Dashboard em modo escuro.",
+            "O fundo dos cards é agora ligeiramente mais claro que o fundo da coluna, criando uma melhor separação e profundidade na interface."
+        ]
+    },
+    {
     number: '13.4.0',
     changes: [
         "**Melhoria de UX (Gestão de Alarmes):**",
@@ -9,7 +26,6 @@ current: {
         "Um botão 'Apagar Alarme' agora fica visível no modo de edição, permitindo uma gestão mais rápida e eficiente sem a necessidade de retornar à lista principal de alarmes."
     ]
 },
-releases: [
     {
         number: '13.3.0',
         changes: [
