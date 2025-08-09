@@ -2,6 +2,25 @@
 
 export const changelogData = {
 current: {
+    number: '13.6.0',
+    changes: [
+        "**Novo Sinal Avançado (Divergência Bullish Clássica):**",
+        "Implementado um novo sinal 'Div B' no Market Scanner para detetar divergências bullish clássicas, um dos indicadores de reversão mais fortes.",
+        "O sinal é ativado quando são encontrados dois fundos no Estocástico (abaixo de 25), onde o RSI marca um fundo mais alto e o preço marca um fundo igual ou mais baixo.",
+        "A lógica é calculada para os timeframes de 1h e 4h, e foi adicionado um filtro 'Apenas Divergência Bullish' para uma análise focada."
+    ]
+},
+releases: [
+    {
+        number: '13.5.0',
+        changes: [
+            "**Novo Sinal de Análise (Momentum Bullish):**",
+            "Adicionado um novo sinal 'Mom B' ao Market Scanner para detetar potenciais divergências de momentum em sobrevenda.",
+            "O sinal é calculado para os timeframes de 1h e 4h e é ativado quando o Estocástico está abaixo de 30 e o valor do RSI é superior ao da vela anterior.",
+            "Incluído um novo filtro 'Apenas Momentum Bullish' para isolar rapidamente os ativos que apresentam esta condição de alta probabilidade."
+        ]
+    },
+    {
     number: '13.4.2',
     changes: [
         "**Correção Final de UI (Alarmes):**",
@@ -9,7 +28,14 @@ current: {
         "A função de formatação de descrição de alarmes em `ui.js` foi atualizada, garantindo consistência visual em toda a aplicação."
     ]
 },
-releases: [
+    {
+    number: '13.4.2',
+    changes: [
+        "**Correção Final de UI (Alarmes):**",
+        "Resolvido o bug visual onde a descrição de alarmes de 'Linha de Tendência RSI' aparecia incorretamente no modal de 'Alarmes Disparados' do Dashboard.",
+        "A função de formatação de descrição de alarmes em `ui.js` foi atualizada, garantindo consistência visual em toda a aplicação."
+    ]
+},
     {
         number: '13.4.1',
         changes: [
