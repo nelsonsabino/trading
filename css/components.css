@@ -244,16 +244,13 @@
     filter: brightness(0.9);
 }
 
-/* --- INÍCIO DA ALTERAÇÃO --- */
-/* Nova linha de ação para o alarme disparado */
 .card-triggered-action-row {
     margin-top: 0.75rem;
     padding-top: 0.75rem;
     border-top: 1px solid var(--border-secondary);
     display: flex;
-    justify-content: flex-end; /* Alinha o botão "OK" à direita */
+    justify-content: flex-end; 
 }
-/* --- FIM DA ALTERAÇÃO --- */
 
 
 /* --- MODAL DE LISTA DE ALARMES --- */
@@ -361,3 +358,22 @@
 .dark-mode .rsi-trend-signal.rsi-trend-resistance.confirmed {
     color: var(--surface-primary);
 }
+
+/* --- INÍCIO DA ALTERAÇÃO --- */
+/* Novo badge para Momentum Bullish */
+.momentum-bullish-signal {
+    display: inline-block;
+    padding: 2px 6px;
+    font-size: 0.7em;
+    font-weight: bold;
+    border-radius: 4px;
+    margin-left: 5px;
+    cursor: help;
+    background-color: #6f42c1; /* Roxo */
+    color: #fff;
+    border: 1px solid #6f42c1;
+}
+.dark-mode .momentum-bullish-signal {
+    color: #fff;
+}
+/* --- FIM DA ALTERAÇÃO --- */
