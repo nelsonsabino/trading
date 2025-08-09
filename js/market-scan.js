@@ -11,7 +11,7 @@ let allExtraData = {};
 let currentSortBy = 'volume';
 let filterRsi = false;
 let filterStoch = false;
-let filterMomentum = false; // --- ALTERAÇÃO: Nova variável de estado para o filtro
+let filterDivergence = false; // --- ALTERAÇÃO: Variável renomeada
 let showSparklines = true;
 let currentTopN = 50;
 
@@ -158,7 +158,7 @@ function createTableRow(ticker, index, extraData) {
     let rsiSignalHtml = '';
     let stochSignalHtml = '';
     let rsiTrendSignalHtml = '';
-    let momentumSignalHtml = ''; // --- ALTERAÇÃO: Nova variável para o badge de momentum
+    let divergenceSignalHtml = ''; // --- ALTERAÇÃO: Variável renomeada
 
     const assetExtraData = extraData[ticker.symbol];
     
@@ -188,12 +188,12 @@ function createTableRow(ticker, index, extraData) {
             rsiTrendSignalHtml = `<span class="rsi-trend-signal ${trendClass}" data-tooltip="${trendTooltip}">${trendText}${confirmedHtml}</span>`;
         }
 
-        // --- INÍCIO DA ALTERAÇÃO: Lógica para renderizar o novo badge de momentum ---
-        if (assetExtraData.bullishMomentum_1h) {
-            momentumSignalHtml += `<span class="momentum-bullish-signal" data-tooltip="Momentum Bullish (1h)">Mom B 1h</span>`;
+        // --- INÍCIO DA ALTERAÇÃO: Renderiza os novos badges de Divergência Bullish ---
+        if (assetExtraData.bullishDivergence_1h) {
+            divergenceSignalHtml += `<span class="divergence-bullish-signal" data-tooltip="Divergência Bullish Clássica (1h)">Div B 1h</span>`;
         }
-        if (assetExtraData.bullishMomentum_4h) {
-            momentumSignalHtml += `<span class="momentum-bullish-signal" data-tooltip="Momentum Bullish (4h)">Mom B 4h</span>`;
+        if (assetExtraData.bullishDivergence_4h) {
+            divergenceSignalHtml += `<span class="divergence-bullish-signal" data-tooltip="Divergência Bullish Clássica (4h)">Div B 4h</span>`;
         }
         // --- FIM DA ALTERAÇÃO ---
     }
@@ -212,7 +212,7 @@ function createTableRow(ticker, index, extraData) {
     return `
         <tr>
             <td data-label="#">${index + 1}</td>
-            <td data-label="Ativo"><div class="asset-name"><strong><a href="asset-details.html?symbol=${ticker.symbol}" class="asset-link">${baseAsset}</a></strong> ${rsiSignalHtml} ${stochSignalHtml} ${rsiTrendSignalHtml} ${momentumSignalHtml}</div></td>
+            <td data-label="Ativo"><div class="asset-name"><strong><a href="asset-details.html?symbol=${ticker.symbol}" class="asset-link">${baseAsset}</a></strong> ${rsiSignalHtml} ${stochSignalHtml} ${rsiTrendSignalHtml} ${divergenceSignalHtml}</div></td>
             <td data-label="Último Preço">${formattedPrice}</td>
             ${sparklineCellHtml}
             <td data-label="Volume (24h)">${formatVolume(volume)}</td>
@@ -248,11 +248,11 @@ function applyFiltersAndSort() {
         });
     }
 
-    // --- INÍCIO DA ALTERAÇÃO: Adiciona lógica para o novo filtro de momentum ---
-    if (filterMomentum) {
+    // --- INÍCIO DA ALTERAÇÃO: Lógica para o filtro de divergência ---
+    if (filterDivergence) {
         processedTickers = processedTickers.filter(ticker => {
             const assetExtraData = allExtraData[ticker.symbol];
-            return assetExtraData && (assetExtraData.bullishMomentum_1h || assetExtraData.bullishMomentum_4h);
+            return assetExtraData && (assetExtraData.bullishDivergence_1h || assetExtraData.bullishDivergence_4h);
         });
     }
     // --- FIM DA ALTERAÇÃO ---
@@ -388,7 +388,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sortBySelect = document.getElementById('sort-by');
     const filterRsiCheckbox = document.getElementById('filter-rsi');
     const filterStochCheckbox = document.getElementById('filter-stoch');
-    const filterMomentumCheckbox = document.getElementById('filter-momentum'); // --- ALTERAÇÃO: Novo elemento checkbox
+    const filterDivergenceCheckbox = document.getElementById('filter-divergence'); // --- ALTERAÇÃO: Novo elemento checkbox
     const toggleSparklinesCheckbox = document.getElementById('toggle-sparklines');
     const topNSelect = document.getElementById('top-n-select');
     
@@ -451,10 +451,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- INÍCIO DA ALTERAÇÃO: Adiciona listener para o novo checkbox de momentum ---
-    if (filterMomentumCheckbox) {
-        filterMomentumCheckbox.addEventListener('change', (e) => {
-            filterMomentum = e.target.checked;
+    // --- INÍCIO DA ALTERAÇÃO: Listener para o filtro de divergência ---
+    if (filterDivergenceCheckbox) {
+        filterDivergenceCheckbox.addEventListener('change', (e) => {
+            filterDivergence = e.target.checked;
             applyFiltersAndSort();
         });
     }
