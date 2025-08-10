@@ -190,8 +190,8 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
     card.className = 'trade-card';
     card.dataset.tradeId = trade.id;
     const assetName = trade.data.asset;
-    // --- INÍCIO DA CORREÇÃO: Linha reintroduzida ---
-    const tradingViewSymbol = `BINANCE:${assetName}`;
+    // --- INÍCIO DA CORREÇÃO ---
+    const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${assetName}`;
     // --- FIM DA CORREÇÃO ---
     const assetMarketData = marketData[assetName] || { price: 0, change: 0, sparkline: [] };
     const priceChangeClass = assetMarketData.change >= 0 ? 'positive-pnl' : 'negative-pnl';
