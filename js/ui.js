@@ -190,9 +190,7 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
     card.className = 'trade-card';
     card.dataset.tradeId = trade.id;
     const assetName = trade.data.asset;
-    // --- INÍCIO DA CORREÇÃO ---
     const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${assetName}`;
-    // --- FIM DA CORREÇÃO ---
     const assetMarketData = marketData[assetName] || { price: 0, change: 0, sparkline: [] };
     const priceChangeClass = assetMarketData.change >= 0 ? 'positive-pnl' : 'negative-pnl';
     if (trade.data.status === 'ARMED') card.classList.add('armed');
@@ -262,7 +260,14 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
     const tbody = document.getElementById('watchlist-alarms-tbody');
     if (!tbody) return;
 
-    const assetsInKanban = new Set(allTrades.map(t => t.data.asset));
+    // --- INÍCIO DA CORREÇÃO ---
+    const assetsInKanban = new Set(
+        allTrades
+            .filter(t => ['POTENTIAL', 'ARMED', 'LIVE'].includes(t.data.status))
+            .map(t => t.data.asset)
+    );
+    // --- FIM DA CORREÇÃO ---
+    
     const activeAlarms = allAlarms.filter(a => a.status === 'active');
     
     const assetsOnWatchlist = activeAlarms.reduce((acc, alarm) => {
