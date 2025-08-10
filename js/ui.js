@@ -260,13 +260,11 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
     const tbody = document.getElementById('watchlist-alarms-tbody');
     if (!tbody) return;
 
-    // --- INÍCIO DA CORREÇÃO ---
     const assetsInKanban = new Set(
         allTrades
             .filter(t => ['POTENTIAL', 'ARMED', 'LIVE'].includes(t.data.status))
             .map(t => t.data.asset)
     );
-    // --- FIM DA CORREÇÃO ---
     
     const activeAlarms = allAlarms.filter(a => a.status === 'active');
     
@@ -290,14 +288,23 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
         const assetMarketData = marketData[assetName] || { price: 0, sparkline: [] };
         let formattedPrice = assetMarketData.price >= 1.0 ? assetMarketData.price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$' + assetMarketData.price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
 
+        // --- INÍCIO DA ALTERAÇÃO ---
+        const hasTriggeredUnacknowledgedAlarm = allAlarms.some(a => a.asset_pair === assetName && a.status === 'triggered' && !a.acknowledged);
+        const triggeredClass = hasTriggeredUnacknowledgedAlarm ? 'class="alarm-triggered"' : '';
+        const acknowledgeButtonHtml = hasTriggeredUnacknowledgedAlarm 
+            ? `<button class="acknowledge-alarm-btn" data-action="acknowledge-and-view-alarm" data-asset="${assetName}" title="Ver Alarme Disparado"><span class="material-symbols-outlined">alarm</span> OK</button>`
+            : '';
+        // --- FIM DA ALTERAÇÃO ---
+
         return `
-            <tr>
+            <tr ${triggeredClass}>
                 <td data-label="Ativo"><strong><a href="asset-details.html?symbol=${assetName}" class="asset-link">${assetName}</a></strong></td>
                 <td data-label="Condição do Alarme Principal">${getAlarmDescription(alarm, true)}</td>
                 <td data-label="Último Preço">${formattedPrice}</td>
                 <td data-label="Sparkline (24h)"><div class="sparkline-container" id="sparkline-watchlist-${assetName}"></div></td>
                 <td data-label="Ações">
                     <div class="action-buttons">
+                        ${acknowledgeButtonHtml}
                         <a href="asset-details.html?symbol=${assetName}" class="icon-action-btn" title="Ver Gráfico e Detalhes"><span class="material-symbols-outlined">monitoring</span></a>
                         <a href="https://www.tradingview.com/chart/?symbol=BINANCE:${assetName}" target="_blank" class="icon-action-btn" title="TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
                         <a href="alarms-create.html?assetPair=${assetName}" class="icon-action-btn" title="Criar Novo Alarme"><span class="material-symbols-outlined">alarm_add</span></a>
@@ -354,13 +361,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const watchlistTable = document.getElementById('watchlist-alarms-tbody');
     if (watchlistTable) {
         watchlistTable.addEventListener('click', (e) => {
-            const button = e.target.closest('button[data-action="add-to-potential"]');
-            if (button) {
-                e.preventDefault();
-                const symbol = button.dataset.symbol;
+            const button = e.target.closest('button[data-action]');
+            if (!button) return;
+            e.preventDefault();
+            const action = button.dataset.action;
+            const symbol = button.dataset.symbol;
+
+            if (action === 'add-to-potential' && symbol) {
                 openAddModal();
                 const modalAssetInput = document.getElementById('asset');
                 if (modalAssetInput) modalAssetInput.value = symbol;
+            } else if (action === 'acknowledge-and-view-alarm' && button.dataset.asset) {
+                loadAndOpenAlarmModal(button.dataset.asset, 'triggered');
             }
         });
     }
