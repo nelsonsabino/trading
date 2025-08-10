@@ -4,9 +4,7 @@ import { listenToTrades, fetchActiveStrategies } from './firebase-service.js';
 import { supabase, listenToAlarms } from './services.js';
 import { addModal, armModal, execModal, closeModalObj } from './dom-elements.js';
 import { openAddModal, closeAddModal, closeArmModal, closeExecModal, closeCloseTradeModal } from './modals.js';
-// --- INÍCIO DA ALTERAÇÃO ---
 import { displayTrades, populateStrategySelect, generateDynamicChecklist, displayWatchlistTable } from './ui.js';
-// --- FIM DA ALTERAÇÃO ---
 import { handleAddSubmit, handleArmSubmit, handleExecSubmit, handleCloseSubmit, loadAndOpenForEditing } from './handlers.js';
 import { setupAutocomplete } from './utils.js';
 import { setCurrentStrategies, getStrategies } from './state.js';
@@ -20,23 +18,18 @@ async function refreshDashboardView() {
     console.log("A atualizar a vista da dashboard...");
     const activeTrades = allTrades.filter(t => ['POTENTIAL', 'ARMED', 'LIVE'].includes(t.data.status));
     
-    // --- INÍCIO DA ALTERAÇÃO: Passa os trades e alarmes para a função de busca de dados ---
     const marketData = await fetchMarketDataForDashboard(activeTrades, currentAlarms);
     
-    // Exibe os trades e a nova tabela da watchlist
     displayTrades(activeTrades, marketData, currentAlarms);
     displayWatchlistTable(allTrades, currentAlarms, marketData);
-    // --- FIM DA ALTERAÇÃO ---
     
     hideEmptyDashboardCards();
 }
 
-// --- INÍCIO DA ALTERAÇÃO: A função agora aceita alarmes para incluir os seus ativos na busca ---
 async function fetchMarketDataForDashboard(trades, alarms) {
     const tradeSymbols = trades.map(trade => trade.data.asset);
     const alarmSymbols = alarms.filter(a => a.status === 'active').map(a => a.asset_pair);
     
-    // Combina e remove duplicados para ter uma lista única de todos os ativos a serem monitorizados
     const symbols = [...new Set([...tradeSymbols, ...alarmSymbols])];
     if (symbols.length === 0) return {};
 
@@ -86,11 +79,14 @@ async function fetchMarketDataForDashboard(trades, alarms) {
         return {};
     }
 }
-// --- FIM DA ALTERAÇÃO ---
 
+// --- INÍCIO DA ALTERAÇÃO: Lógica de sincronização ---
 async function initializeApp() {
     const potentialTradesContainer = document.getElementById('potential-trades-container');
     if (!potentialTradesContainer) return;
+
+    let tradesReady = false;
+    let alarmsReady = false;
 
     const strategies = await fetchActiveStrategies();
     setCurrentStrategies(strategies);
@@ -99,7 +95,10 @@ async function initializeApp() {
     listenToTrades((trades) => {
         console.log("Dados de trades recebidos/atualizados.");
         allTrades = trades;
-        refreshDashboardView();
+        tradesReady = true;
+        if (alarmsReady) {
+            refreshDashboardView();
+        }
     });
 
     listenToAlarms((alarms, error) => {
@@ -110,7 +109,10 @@ async function initializeApp() {
         } else {
             currentAlarms = alarms;
         }
-        refreshDashboardView();
+        alarmsReady = true;
+        if (tradesReady) {
+            refreshDashboardView();
+        }
     });
 
     const tradeIdToEdit = localStorage.getItem('tradeToEdit');
@@ -119,6 +121,7 @@ async function initializeApp() {
         loadAndOpenForEditing(tradeIdToEdit);
     }
 }
+// --- FIM DA ALTERAÇÃO ---
 
 document.addEventListener('DOMContentLoaded', () => {
     
