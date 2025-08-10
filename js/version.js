@@ -2,15 +2,24 @@
 
 export const changelogData = {
 current: {
-    number: '13.8.0',
+    number: '14.0.0',
     changes: [
-        "**Refatoração e Simplificação do Scanner de Mercado:**",
-        "Removida a funcionalidade de 'Análise Profunda' (botão 'Analisar' e filtro de padrão), tornando a deteção de padrões de Linha de Tendência (LTA/LTB) totalmente automática e mais limpa.",
-        "O scanner agora foca-se exclusivamente no sinal de '3º Toque Recente', que alerta quando uma L.T. de 3 pontos é confirmada com Estocástico e expira após 6 velas, priorizando apenas setups recentes e acionáveis.",
-        "Removida a lógica anterior de 'Divergência Bullish' para focar a ferramenta na nova funcionalidade principal."
+        "**Versão 14: Implementação da Watchlist de Alarmes e Refatoração do Fluxo de Trabalho:**",
+        "**Nova Tabela no Dashboard:** Adicionada uma 'Watchlist de Alarmes' automática ao Dashboard. Qualquer ativo com um alarme ativo, que não esteja no funil de trades (Potencial, Armado, Ativo), aparece agora nesta lista para monitorização.",
+        "**Ação Rápida 'Monitorizar':** Adicionado um novo botão 'Monitorizar' (ícone de olho) no Market Scanner e na página de Detalhes do Ativo. Esta ação cria instantaneamente um alarme padrão (cruzamento bullish do Estocástico em 15m) para adicionar o ativo à nova watchlist.",
+        "**Novo Fluxo de Reversão:** Trades na coluna 'Potencial' agora têm a opção de 'Reverter para Watchlist', que remove o trade do funil mas mantém os seus alarmes, movendo o ativo de volta para a lista de monitorização."
     ]
 },
 releases: [
+    {
+        number: '13.8.0',
+        changes: [
+            "**Refatoração e Simplificação do Scanner de Mercado:**",
+            "Removida a funcionalidade de 'Análise Profunda' (botão 'Analisar' e filtro de padrão), tornando a deteção de padrões de Linha de Tendência (LTA/LTB) totalmente automática e mais limpa.",
+            "O scanner agora foca-se exclusivamente no sinal de '3º Toque Recente', que alerta quando uma L.T. de 3 pontos é confirmada com Estocástico e expira após 6 velas, priorizando apenas setups recentes e acionáveis.",
+            "Removida a lógica anterior de 'Divergência Bullish' para focar a ferramenta na nova funcionalidade principal."
+        ]
+    },
     {
         number: '13.7.0',
         changes: [
