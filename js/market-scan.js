@@ -117,6 +117,43 @@ function formatVolume(volume) {
     return volume.toFixed(2);
 }
 
+// --- INÍCIO DA ALTERAÇÃO 1: Nova função para o clique no botão "Monitorizar" ---
+async function handleMonitorAssetClick(symbol) {
+    const button = document.querySelector(`button[data-action="monitor"][data-symbol="${symbol}"]`);
+    if (button) button.disabled = true;
+
+    try {
+        const alarmData = {
+            asset_pair: symbol,
+            alarm_type: 'stochastic_crossover',
+            condition: 'above', // Cruzamento Bullish
+            indicator_timeframe: '15m',
+            indicator_period: 14, // Período K padrão
+            combo_period: 3,      // Período D padrão
+            status: 'active'
+        };
+
+        const { error } = await supabase.from('alarms').insert([alarmData]);
+        if (error) throw error;
+        
+        // Feedback visual temporário
+        if (button) {
+            const originalIcon = button.innerHTML;
+            button.innerHTML = `<span class="material-symbols-outlined">check</span>`;
+            setTimeout(() => {
+                button.innerHTML = originalIcon;
+                button.disabled = false;
+            }, 2000);
+        }
+        
+    } catch (error) {
+        console.error(`Erro ao criar alarme para ${symbol}:`, error);
+        alert(`Não foi possível criar o alarme para ${symbol}. Verifique se já existe um alarme similar.`);
+        if (button) button.disabled = false;
+    }
+}
+// --- FIM DA ALTERAÇÃO 1 ---
+
 function createTableRow(ticker, index, extraData) {
     const baseAsset = ticker.symbol.replace('USDC', '');
     const price = parseFloat(ticker.lastPrice);
@@ -128,12 +165,10 @@ function createTableRow(ticker, index, extraData) {
     const addOpportunityUrl = `dashboard.html?assetPair=${ticker.symbol}`;
 
     let rsiSignalHtml = '', stochSignalHtml = '', thirdTouchSignalHtml = '';
-
     const assetExtraData = extraData[ticker.symbol];
     if (assetExtraData) {
         if (assetExtraData.rsi_1h !== null && assetExtraData.rsi_1h < 45) rsiSignalHtml = `<span class="rsi-signal" data-tooltip="RSI (1h) está em ${assetExtraData.rsi_1h.toFixed(1)}">RSI</span>`;
         if (assetExtraData.stoch_4h !== null && typeof assetExtraData.stoch_4h === 'number' && assetExtraData.stoch_4h < 35) stochSignalHtml = `<span class="stoch-signal" data-tooltip="Stoch (4h) K:${assetExtraData.stoch_4h.toFixed(1)}">STC</span>`;
-        
         if (assetExtraData.thirdTouchSignal_1h) {
             const { type } = assetExtraData.thirdTouchSignal_1h;
             thirdTouchSignalHtml += `<span class="third-touch-signal ${type === 'LTA' ? 'support' : 'resistance'}" data-tooltip="3º Toque em ${type} (1h)">${type}-3 1h</span>`;
@@ -147,6 +182,7 @@ function createTableRow(ticker, index, extraData) {
     let formattedPrice = price >= 1.0 ? price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$' + price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
     const sparklineCellHtml = showSparklines ? `<td data-label="Sparkline (24h)" class="sparkline-cell"><div class="sparkline-container" id="sparkline-${ticker.symbol}"></div></td>` : `<td></td>`;
     
+    // --- INÍCIO DA ALTERAÇÃO 2: Adiciona o novo botão "Monitorizar" ---
     return `
         <tr>
             <td data-label="#">${index + 1}</td>
@@ -155,15 +191,23 @@ function createTableRow(ticker, index, extraData) {
             ${sparklineCellHtml}
             <td data-label="Volume (24h)">${formatVolume(volume)}</td>
             <td data-label="Variação (24h)" class="${priceChangeClass}">${priceChangePercent.toFixed(2)}%</td>
-            <td data-label="Ações"><div class="action-buttons"><a href="#" class="icon-action-btn view-chart-btn" data-symbol="${ticker.symbol}" title="Ver Gráfico"><span class="material-symbols-outlined">monitoring</span></a><a href="${tradingViewUrl}" target="_blank" class="icon-action-btn" title="TradingView"><span class="material-symbols-outlined">open_in_new</span></a><a href="${createAlarmUrl}" class="icon-action-btn" title="Criar Alarme"><span class="material-symbols-outlined">alarm_add</span></a><a href="${addOpportunityUrl}" class="icon-action-btn" title="Adicionar à Watchlist"><span class="material-symbols-outlined">add</span></a></div></td>
+            <td data-label="Ações">
+                <div class="action-buttons">
+                    <button class="icon-action-btn" data-action="monitor" data-symbol="${ticker.symbol}" title="Monitorizar Ativo (Cria Alarme Stoch 15m)"><span class="material-symbols-outlined">visibility</span></button>
+                    <a href="#" class="icon-action-btn view-chart-btn" data-symbol="${ticker.symbol}" title="Ver Gráfico"><span class="material-symbols-outlined">monitoring</span></a>
+                    <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn" title="TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
+                    <a href="${createAlarmUrl}" class="icon-action-btn" title="Criar Alarme Detalhado"><span class="material-symbols-outlined">alarm_add</span></a>
+                    <a href="${addOpportunityUrl}" class="icon-action-btn" title="Adicionar a Trade Potencial"><span class="material-symbols-outlined">add_shopping_cart</span></a>
+                </div>
+            </td>
         </tr>`;
+    // --- FIM DA ALTERAÇÃO 2 ---
 }
 
 function applyFiltersAndSort() {
     let processedTickers = [...allTickersData];
     if (filterRsi) processedTickers = processedTickers.filter(t => allExtraData[t.symbol]?.rsi_1h < 45);
     if (filterStoch) processedTickers = processedTickers.filter(t => allExtraData[t.symbol]?.stoch_4h < 35);
-    
     if (filterThirdTouch) {
         processedTickers = processedTickers.filter(t => {
             const extra = allExtraData[t.symbol];
@@ -252,10 +296,25 @@ document.addEventListener('DOMContentLoaded', () => {
     if (filterStochCheckbox) filterStochCheckbox.addEventListener('change', (e) => { filterStoch = e.target.checked; applyFiltersAndSort(); });
     if (filterThirdTouchCheckbox) filterThirdTouchCheckbox.addEventListener('change', (e) => { filterThirdTouch = e.target.checked; applyFiltersAndSort(); });
     
-    if (tbody) tbody.addEventListener('click', (e) => {
-        const button = e.target.closest('.view-chart-btn');
-        if (button) { e.preventDefault(); const symbol = button.dataset.symbol; if (symbol) openChartModal(symbol); }
-    });
+    // --- INÍCIO DA ALTERAÇÃO 3: Adiciona o listener para os cliques na tabela ---
+    if (tbody) {
+        tbody.addEventListener('click', (e) => {
+            const button = e.target.closest('button, a'); // Captura cliques em botões ou links
+            if (!button) return;
+
+            const action = button.dataset.action;
+            const symbol = button.dataset.symbol;
+
+            if (action === 'monitor' && symbol) {
+                e.preventDefault();
+                handleMonitorAssetClick(symbol);
+            } else if (button.classList.contains('view-chart-btn') && symbol) {
+                e.preventDefault();
+                openChartModal(symbol);
+            }
+        });
+    }
+    // --- FIM DA ALTERAÇÃO 3 ---
     
     fetchAndDisplayMarketData();
 });
