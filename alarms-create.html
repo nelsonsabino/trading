@@ -83,10 +83,7 @@
             </div>
         </nav>
         
-        <!-- Segunda Linha: Ações da Página (vazia nesta página) -->
-        <nav class="contextual-nav">
-            <!-- Sem ações contextuais aqui -->
-        </nav>
+        <nav class="contextual-nav"></nav>
     </header>
 
     <main>
@@ -98,7 +95,8 @@
                     <select id="alarm-type-select">
                         <option value="price">Preço</option>
                         <option value="rsi_level">RSI (Nível)</option> 
-                        <option value="rsi_trendline">RSI - Linha de Tendência</option>
+                        <option value="rsi_trendline">RSI - Padrão de Toques</option>
+                        <option value="rsi_trendline_break">RSI - Quebra de L.T.</option>
                         <option value="ema_touch">Toque na EMA</option>
                         <option value="stochastic">Estocástico (Nível)</option>
                         <option value="stochastic_crossover">Estocástico (Cruzamento)</option>
@@ -116,7 +114,6 @@
                     </div>
                 </div>
 
-                <!-- Campos para Alarme de Preço -->
                 <div id="price-fields">
                     <div class="form-row">
                         <div class="input-item">
@@ -133,7 +130,6 @@
                     </div>
                 </div>
 
-                <!-- Campos para Alarme de Estocástico -->
                 <div id="stochastic-fields" style="display: none;">
                     <div class="form-row">
                         <div class="input-item">
@@ -164,7 +160,6 @@
                     </div>
                 </div>
 
-                <!-- Campos para o alarme de Cruzamento do Estocástico -->
                 <div id="stoch-crossover-fields" style="display: none;">
                     <div class="form-row">
                         <div class="input-item">
@@ -195,7 +190,6 @@
                     </div>
                 </div>
 
-                <!-- Campos para Alarme de Nível de RSI -->
                 <div id="rsi-level-fields" style="display: none;">
                     <div class="form-row">
                         <div class="input-item">
@@ -226,7 +220,6 @@
                     </div>
                 </div>
                                 
-                <!-- Campos para Alarme de RSI-MA Crossover -->
                 <div id="rsi-fields" style="display: none;">
                     <div class="form-row">
                         <div class="input-item">
@@ -257,7 +250,6 @@
                     </div>
                 </div>
 
-                <!-- Campos para Alarme de Linha de Tendência RSI -->
                 <div id="rsi-trendline-fields" style="display: none;">
                     <div class="form-row">
                         <div class="input-item">
@@ -286,8 +278,32 @@
                         </div>
                     </div>
                 </div>
+                
+                <div id="rsi-trendline-break-fields" style="display: none;">
+                    <div class="form-row">
+                        <div class="input-item">
+                            <label for="rsi-trendline-break-type">Monitorizar Quebra de:</label>
+                            <select id="rsi-trendline-break-type">
+                                <option value="support">Suporte (LTA)</option>
+                                <option value="resistance">Resistência (LTB)</option>
+                            </select>
+                        </div>
+                        <div class="input-item">
+                            <label for="rsi-trendline-break-period">Período RSI</label>
+                            <input type="number" id="rsi-trendline-break-period" value="14">
+                        </div>
+                        <div class="input-item">
+                            <label for="rsi-trendline-break-timeframe">Timeframe</label>
+                            <select id="rsi-trendline-break-timeframe">
+                                <option value="15m">15 Minutos</option>
+                                <option value="1h" selected>1 Hora</option>
+                                <option value="4h">4 Horas</option>
+                                <option value="1d">Diário</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
 
-                <!-- Campos para Alarme de Toque na EMA -->
                 <div id="ema-fields" style="display: none;">
                     <div class="form-row">
                         <div class="input-item">
@@ -314,46 +330,43 @@
                     </div>
                 </div>
 
-                <!-- Campos para o Alarme Combo -->
                 <div id="combo-fields" style="display: none;">
-                    <p class="combo-separator">CONDIÇÃO PRINCIPAL (Evento de Gatilho)</p>
+                    <p class="combo-separator">CONDIÇÃO PRINCIPAL</p>
                     <div class="form-row">
                         <div class="input-item">
-                            <label for="combo-primary-trigger">Gatilho Primário</label>
+                            <label for="combo-primary-trigger">Gatilho</label>
                             <select id="combo-primary-trigger">
-                                <option value="touch_from_above">Preço toca na EMA (Suporte)</option>
-                                <option value="touch_from_below">Preço toca na EMA (Resistência)</option>
+                                <option value="touch_from_above">Preço toca EMA (Suporte)</option>
+                                <option value="touch_from_below">Preço toca EMA (Resistência)</option>
                             </select>
                         </div>
                         <div class="input-item">
-                            <label for="combo-ema-period">Período da EMA</label>
+                            <label for="combo-ema-period">Período EMA</label>
                             <input type="number" id="combo-ema-period" value="50">
                         </div>
                     </div>
-
                     <p class="combo-separator">E (CONDIÇÃO SECUNDÁRIA)</p>
                     <div class="form-row">
                         <div class="input-item">
-                            <label>Indicador de Confirmação</label>
+                            <label>Indicador</label>
                             <input type="text" value="Estocástico" readonly>
                         </div>
                         <div class="input-item">
-                            <label for="combo-stoch-condition">Condição do Estocástico</label>
+                            <label for="combo-stoch-condition">Condição</label>
                             <select id="combo-stoch-condition">
-                                <option value="below">Abaixo de (Sobrevenda)</option>
-                                <option value="above">Acima de (Sobrecompra)</option>
+                                <option value="below">Abaixo de</option>
+                                <option value="above">Acima de</option>
                             </select>
                         </div>
                         <div class="input-item">
-                            <label for="combo-stoch-value">Valor Alvo</label>
+                            <label for="combo-stoch-value">Valor</label>
                             <input type="number" id="combo-stoch-value" value="20">
                         </div>
                     </div>
-                    
                     <p class="combo-separator">NO TIMEFRAME</p>
                     <div class="form-row">
                         <div class="input-item" style="flex-grow: 2;">
-                            <label for="combo-timeframe">Timeframe (para ambos os indicadores)</label>
+                            <label for="combo-timeframe">Timeframe (Ambos)</label>
                             <select id="combo-timeframe">
                                 <option value="5m">5 Minutos</option>
                                 <option value="15m">15 Minutos</option>
@@ -365,21 +378,19 @@
                     </div>
                 </div>
 
-                <!-- --- INÍCIO DA ALTERAÇÃO --- -->
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">Definir Alarme</button>
                     <button type="button" id="cancel-edit-btn" class="btn btn-secondary" style="display: none;">Cancelar Edição</button>
                     <button type="button" id="delete-alarm-btn" class="btn btn-danger" style="display: none;">Apagar Alarme</button>
                 </div>
-                <!-- --- FIM DA ALTERAÇÃO --- -->
             </form>
             <div id="alarm-feedback" class="alarm-feedback"></div>
         </section>
         
         <div id="chart-modal" class="modal-overlay">
             <div class="modal-content" style="max-width: 90%; height: 90%; padding: 1rem;">
-                <span id="close-chart-modal" style="position: absolute; top: 15px; right: 25px; font-size: 2.5rem; color: #adb5bd; font-weight: 300; cursor: pointer; z-index: 10;">×</span>
-                <div id="chart-modal-container" style="height: 100%; width: 100%;"></div>
+                <span id="close-chart-modal">×</span>
+                <div id="chart-modal-container"></div>
             </div>
         </div>
     </main>
