@@ -2,15 +2,23 @@
 
 export const changelogData = {
 current: {
-    number: '14.0.0',
+    number: '14.1.0',
     changes: [
-        "**Versão 14: Implementação da Watchlist de Alarmes e Refatoração do Fluxo de Trabalho:**",
-        "**Nova Tabela no Dashboard:** Adicionada uma 'Watchlist de Alarmes' automática ao Dashboard. Qualquer ativo com um alarme ativo, que não esteja no funil de trades (Potencial, Armado, Ativo), aparece agora nesta lista para monitorização.",
-        "**Ação Rápida 'Monitorizar':** Adicionado um novo botão 'Monitorizar' (ícone de olho) no Market Scanner e na página de Detalhes do Ativo. Esta ação cria instantaneamente um alarme padrão (cruzamento bullish do Estocástico em 15m) para adicionar o ativo à nova watchlist.",
-        "**Novo Fluxo de Reversão:** Trades na coluna 'Potencial' agora têm a opção de 'Reverter para Watchlist', que remove o trade do funil mas mantém os seus alarmes, movendo o ativo de volta para a lista de monitorização."
+        "**Consistência Visual (Alarmes Disparados):**",
+        "A nova 'Watchlist de Alarmes' no Dashboard agora reage a alarmes disparados, tal como os cards de trade.",
+        "As linhas da tabela ficam destacadas com um brilho vermelho e um botão 'OK' aparece, permitindo o reconhecimento do alarme diretamente da lista e unificando a experiência do utilizador."
     ]
 },
 releases: [
+    {
+        number: '14.0.0',
+        changes: [
+            "**Versão 14: Implementação da Watchlist de Alarmes e Refatoração do Fluxo de Trabalho:**",
+            "**Nova Tabela no Dashboard:** Adicionada uma 'Watchlist de Alarmes' automática ao Dashboard. Qualquer ativo com um alarme ativo, que não esteja no funil de trades (Potencial, Armado, Ativo), aparece agora nesta lista para monitorização.",
+            "**Ação Rápida 'Monitorizar':** Adicionado um novo botão 'Monitorizar' (ícone de olho) no Market Scanner e na página de Detalhes do Ativo. Esta ação cria instantaneamente um alarme padrão (cruzamento bullish do Estocástico em 15m) para adicionar o ativo à nova watchlist.",
+            "**Novo Fluxo de Reversão:** Trades na coluna 'Potencial' agora têm a opção de 'Reverter para Watchlist', que remove o trade do funil mas mantém os seus alarmes, movendo o ativo de volta para a lista de monitorização."
+        ]
+    },
     {
         number: '13.8.0',
         changes: [
