@@ -18,13 +18,13 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
     overflow: hidden;
     font-size: 0.95em; 
-    border: 1px solid var(--border-primary); /* Adiciona uma borda para melhor definição no modo escuro */
+    border: 1px solid var(--border-primary);
 }
 
 /* Aplicar o estilo de cabeçalho a TODAS as tabelas */
 .market-table thead tr, .alarms-table thead tr, #trades-table thead tr,
 #strategy-stats thead tr, #reason-stats thead tr, .trades-history-table thead tr { 
-    background-color: var(--bg-primary); /* Um tom ligeiramente diferente para o cabeçalho */
+    background-color: var(--bg-primary); 
     border-bottom: 2px solid var(--border-primary); 
 }
 
@@ -148,4 +148,10 @@
     filter: brightness(0.9);
 }
 
-/* O bloco de dark-mode no final foi removido pois já não é necessário */
+/* --- INÍCIO DA ALTERAÇÃO --- */
+/* Estilo para a linha da tabela de watchlist quando um alarme dispara */
+.alarms-table tr.alarm-triggered {
+    /* Usamos box-shadow para criar um "glow" sem afetar o layout */
+    box-shadow: inset 0 0 0 2px var(--feedback-alert-glow);
+}
+/* --- FIM DA ALTERAÇÃO --- */
