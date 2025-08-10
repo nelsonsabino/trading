@@ -4,7 +4,9 @@ import { listenToTrades, fetchActiveStrategies } from './firebase-service.js';
 import { supabase, listenToAlarms } from './services.js';
 import { addModal, armModal, execModal, closeModalObj } from './dom-elements.js';
 import { openAddModal, closeAddModal, closeArmModal, closeExecModal, closeCloseTradeModal } from './modals.js';
-import { displayTrades, populateStrategySelect, generateDynamicChecklist } from './ui.js';
+// --- INÍCIO DA ALTERAÇÃO ---
+import { displayTrades, populateStrategySelect, generateDynamicChecklist, displayWatchlistTable } from './ui.js';
+// --- FIM DA ALTERAÇÃO ---
 import { handleAddSubmit, handleArmSubmit, handleExecSubmit, handleCloseSubmit, loadAndOpenForEditing } from './handlers.js';
 import { setupAutocomplete } from './utils.js';
 import { setCurrentStrategies, getStrategies } from './state.js';
@@ -14,28 +16,29 @@ let allTrades = [];
 let currentAlarms = [];
 
 // --- Função Central de Atualização da UI ---
-/**
- * Pega nos dados mais recentes de trades e alarmes, busca os dados de mercado,
- * e atualiza a interface da dashboard.
- */
 async function refreshDashboardView() {
     console.log("A atualizar a vista da dashboard...");
     const activeTrades = allTrades.filter(t => ['POTENTIAL', 'ARMED', 'LIVE'].includes(t.data.status));
     
-    // Busca dados de mercado apenas para os trades ativos
-    const marketData = await fetchMarketDataForDashboard(activeTrades);
+    // --- INÍCIO DA ALTERAÇÃO: Passa os trades e alarmes para a função de busca de dados ---
+    const marketData = await fetchMarketDataForDashboard(activeTrades, currentAlarms);
     
-    // Exibe os trades com os dados de mercado e alarmes mais recentes
+    // Exibe os trades e a nova tabela da watchlist
     displayTrades(activeTrades, marketData, currentAlarms);
+    displayWatchlistTable(allTrades, currentAlarms, marketData);
+    // --- FIM DA ALTERAÇÃO ---
     
-    // Garante que os cards vazios são escondidos
     hideEmptyDashboardCards();
 }
 
-
-async function fetchMarketDataForDashboard(trades) {
-    if (trades.length === 0) return {};
-    const symbols = [...new Set(trades.map(trade => trade.data.asset))];
+// --- INÍCIO DA ALTERAÇÃO: A função agora aceita alarmes para incluir os seus ativos na busca ---
+async function fetchMarketDataForDashboard(trades, alarms) {
+    const tradeSymbols = trades.map(trade => trade.data.asset);
+    const alarmSymbols = alarms.filter(a => a.status === 'active').map(a => a.asset_pair);
+    
+    // Combina e remove duplicados para ter uma lista única de todos os ativos a serem monitorizados
+    const symbols = [...new Set([...tradeSymbols, ...alarmSymbols])];
+    if (symbols.length === 0) return {};
 
     try {
         const results = await Promise.allSettled([
@@ -83,21 +86,20 @@ async function fetchMarketDataForDashboard(trades) {
         return {};
     }
 }
+// --- FIM DA ALTERAÇÃO ---
 
 async function initializeApp() {
     const potentialTradesContainer = document.getElementById('potential-trades-container');
     if (!potentialTradesContainer) return;
 
-    // 1. Busca dados estáticos essenciais
     const strategies = await fetchActiveStrategies();
     setCurrentStrategies(strategies);
     populateStrategySelect(strategies);
     
-    // 2. Inicia os "ouvintes" (listeners) de forma independente
     listenToTrades((trades) => {
         console.log("Dados de trades recebidos/atualizados.");
         allTrades = trades;
-        refreshDashboardView(); // Chama a função central de atualização
+        refreshDashboardView();
     });
 
     listenToAlarms((alarms, error) => {
@@ -108,10 +110,9 @@ async function initializeApp() {
         } else {
             currentAlarms = alarms;
         }
-        refreshDashboardView(); // Chama a função central de atualização
+        refreshDashboardView();
     });
 
-    // 3. Verifica se um trade foi marcado para edição
     const tradeIdToEdit = localStorage.getItem('tradeToEdit');
     if (tradeIdToEdit) {
         localStorage.removeItem('tradeToEdit');
@@ -123,14 +124,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            const serviceWorkerPath = './service-worker.js'; // Caminho corrigido para a raiz
+            const serviceWorkerPath = './service-worker.js';
             navigator.serviceWorker.register(serviceWorkerPath)
-                .then(registration => {
-                    console.log('Service Worker registado com sucesso:', registration.scope);
-                })
-                .catch(error => {
-                    console.error('Falha no registo do Service Worker:', error);
-                });
+                .then(registration => console.log('Service Worker registado com sucesso:', registration.scope))
+                .catch(error => console.error('Falha no registo do Service Worker:', error));
         });
     }
 
@@ -142,19 +139,16 @@ document.addEventListener('DOMContentLoaded', () => {
         addModal.container.addEventListener('click', e => { if (e.target.id === 'add-opportunity-modal') closeAddModal(); });
         addModal.form.addEventListener('submit', handleAddSubmit);
         
-        // --- INÍCIO DA ALTERAÇÃO (Lógica de exibição da imagem restaurada) ---
         addModal.strategySelect.addEventListener('change', () => {
             const strategies = getStrategies(); 
             const selectedStrategyId = addModal.strategySelect.value;
             const selectedStrategy = strategies.find(s => s.id === selectedStrategyId);
             
-            addModal.checklistContainer.innerHTML = ''; // Limpa sempre o container primeiro
+            addModal.checklistContainer.innerHTML = '';
 
             if (selectedStrategy && selectedStrategy.data.phases && selectedStrategy.data.phases.length > 0) {
                 const potentialPhase = selectedStrategy.data.phases[0];
                 if (potentialPhase) {
-                    
-                    // Procura por um item do tipo 'image' na fase e exibe-o
                     const imageItem = potentialPhase.items.find(item => item.type === 'image');
                     if (imageItem && imageItem.url) {
                         const imgElement = document.createElement('img');
@@ -162,16 +156,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         imgElement.style.maxWidth = '100%';
                         imgElement.style.borderRadius = '8px';
                         imgElement.style.marginBottom = '1.5rem';
-                        // Adiciona a imagem ANTES de gerar a checklist
                         addModal.checklistContainer.appendChild(imgElement);
                     }
-
-                    // Agora gera a checklist (que irá ignorar o item da imagem)
                     generateDynamicChecklist(addModal.checklistContainer, [potentialPhase]);
                 }
             }
         });
-        // --- FIM DA ALTERAÇÃO ---
     }
 
     if (armModal.container) {
@@ -207,9 +197,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeApp();
 });
 
-
-// ----------- ESCONDER CARDS VAZIOS EM TODAS AS RESOLUÇÕES -----------
-
 function hideEmptyDashboardCards() {
     const cards = [
         { card: document.querySelector('.live-trades'),   container: document.getElementById('live-trades-container') },
@@ -220,15 +207,10 @@ function hideEmptyDashboardCards() {
     cards.forEach(({ card, container }) => {
         if (card && container) {
             const hasContent = container.querySelector('.trade-card');
-            if (hasContent) {
-                card.classList.remove('dashboard-hide');
-            } else {
-                card.classList.add('dashboard-hide');
-            }
+            card.classList.toggle('dashboard-hide', !hasContent);
         }
     });
 }
 
-// Executa ao carregar e ao redimensionar
 window.addEventListener('DOMContentLoaded', hideEmptyDashboardCards);
 window.addEventListener('resize', hideEmptyDashboardCards);
