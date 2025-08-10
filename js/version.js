@@ -2,15 +2,24 @@
 
 export const changelogData = {
 current: {
-    number: '13.7.0',
+    number: '13.8.0',
     changes: [
-        "**Novo Alarme Avançado (Quebra de Linha de Tendência RSI):**",
-        "Implementado um novo tipo de alarme para detetar automaticamente a quebra de uma linha de tendência de RSI estabelecida.",
-        "A lógica valida primeiro a existência de uma linha de tendência robusta (3 toques com ritmo proporcional) antes de monitorizar ativamente a sua quebra.",
-        "Esta funcionalidade é processada por uma nova Edge Function dedicada (`check-trendline-alarms`) para garantir a performance e o isolamento do sistema principal de alarmes."
+        "**Refatoração e Simplificação do Scanner de Mercado:**",
+        "Removida a funcionalidade de 'Análise Profunda' (botão 'Analisar' e filtro de padrão), tornando a deteção de padrões de Linha de Tendência (LTA/LTB) totalmente automática e mais limpa.",
+        "O scanner agora foca-se exclusivamente no sinal de '3º Toque Recente', que alerta quando uma L.T. de 3 pontos é confirmada com Estocástico e expira após 6 velas, priorizando apenas setups recentes e acionáveis.",
+        "Removida a lógica anterior de 'Divergência Bullish' para focar a ferramenta na nova funcionalidade principal."
     ]
 },
 releases: [
+    {
+        number: '13.7.0',
+        changes: [
+            "**Novo Alarme Avançado (Quebra de Linha de Tendência RSI):**",
+            "Implementado um novo tipo de alarme para detetar automaticamente a quebra de uma linha de tendência de RSI estabelecida.",
+            "A lógica valida primeiro a existência de uma linha de tendência robusta (3 toques com ritmo proporcional) antes de monitorizar ativamente a sua quebra.",
+            "Esta funcionalidade é processada por uma nova Edge Function dedicada (`check-trendline-alarms`) para garantir a performance e o isolamento do sistema principal de alarmes."
+        ]
+ },
     {
     number: '13.6.0',
     changes: [
