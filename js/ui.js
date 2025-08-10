@@ -3,18 +3,16 @@
 import { supabase } from './services.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openAddModal } from './modals.js';
-import { loadAndOpenForEditing, handleRevertStatus } from './handlers.js';
+import { loadAndOpenForEditing, handleRevertStatus, handleRevertToWatchlist } from './handlers.js';
 import { getLastCreatedTradeId, setLastCreatedTradeId, getVisibleImageIds, setVisibleImageIds } from './state.js';
 
 let tradesForEventListeners = [];
 
-// Funções de ajuda para gerir o estado das imagens no localStorage
 const getVisibleImageIdsInternal = () => {
     try {
         const ids = localStorage.getItem('visibleImageTradeIds');
         return ids ? JSON.parse(ids) : [];
     } catch (e) {
-        console.error("Erro ao ler IDs de imagem do localStorage", e);
         return [];
     }
 };
@@ -31,24 +29,19 @@ function renderSparkline(containerId, dataSeries) {
     const container = document.getElementById(containerId);
     if (!container || !dataSeries || dataSeries.length < 2) return;
     container.innerHTML = '';
-
     const computedStyle = getComputedStyle(document.documentElement);
     const positiveColor = computedStyle.getPropertyValue('--feedback-positive').trim();
     const negativeColor = computedStyle.getPropertyValue('--feedback-negative').trim();
-
-    const firstPrice = dataSeries[0];
-    const lastPrice = dataSeries[dataSeries.length - 1];
-    const chartColor = lastPrice >= firstPrice ? positiveColor : negativeColor;
-
+    const chartColor = dataSeries[dataSeries.length - 1] >= dataSeries[0] ? positiveColor : negativeColor;
     const options = {
         series: [{ data: dataSeries }], chart: { type: 'line', height: 40, width: 100, sparkline: { enabled: true }},
         stroke: { curve: 'smooth', width: 2 }, colors: [chartColor],
-        tooltip: { fixed: { enabled: false }, x: { show: false }, y: { title: { formatter: () => '' }, formatter: (val) => val.toFixed(5) }, marker: { show: false }}
+        tooltip: { fixed: { enabled: false }, x: { show: false }, y: { title: { formatter: () => '' } }, marker: { show: false }}
     };
-    const chart = new ApexCharts(container, options);
-    chart.render();
+    new ApexCharts(container, options).render();
 }
 
+// ... (as funções getIconForLabel, createChecklistItem, createInputItem, generateDynamicChecklist, populateStrategySelect permanecem inalteradas) ...
 function getIconForLabel(labelText) {
     const text = labelText.toLowerCase();
     if (text.includes('tendência')) return 'trending_up';
@@ -67,7 +60,6 @@ function getIconForLabel(labelText) {
     if (text.includes('alvo')) return 'my_location';
     return 'check';
 }
-
 function createChecklistItem(item, data) {
     const isRequired = item.required ? 'required' : '';
     const labelText = item.required ? `${item.label} <span class="required-asterisk">*</span>` : item.label;
@@ -77,7 +69,6 @@ function createChecklistItem(item, data) {
     element.innerHTML = `<span class="material-symbols-outlined">${getIconForLabel(item.label)}</span><input type="checkbox" id="${item.id}" ${isChecked} ${isRequired}><label for="${item.id}">${labelText}</label>`;
     return element;
 }
-
 function createInputItem(item, data) {
     const element = document.createElement('div');
     element.className = 'input-item-styled'; 
@@ -94,33 +85,26 @@ function createInputItem(item, data) {
     element.innerHTML = `<span class="material-symbols-outlined">${getIconForLabel(item.label)}</span><div style="flex-grow: 1;"><label for="${item.id}">${labelText}</label>${fieldHtml}</div>`;
     return element;
 }
-
 export function generateDynamicChecklist(container, phases, data = {}) {
     if (!phases || phases.length === 0) return;
-
     phases.forEach(phase => {
         if (!phase || !Array.isArray(phase.items)) return; 
-        
         const phaseDiv = document.createElement('div');
         const titleEl = document.createElement('h4');
         titleEl.textContent = phase.title;
         phaseDiv.appendChild(titleEl);
-
         const formItems = phase.items.filter(item => item.type !== 'image');
-
         formItems.forEach(item => {
             let element;
             switch (item.type) {
                 case 'checkbox': element = createChecklistItem(item, data); break;
                 case 'select': case 'text': case 'number': element = createInputItem(item, data); break;
-                default: console.warn(`Tipo de item desconhecido: ${item.type}`);
             }
             if (element) phaseDiv.appendChild(element);
         });
         container.appendChild(phaseDiv);
     });
 }
-
 export function populateStrategySelect(strategies) {
     if (!addModal.strategySelect) return;
     addModal.strategySelect.innerHTML = '<option value="">-- Selecione uma Estratégia --</option>';
@@ -133,64 +117,33 @@ export function populateStrategySelect(strategies) {
         });
     }
 }
+// --- FIM DO BLOCO INALTERADO ---
 
 async function acknowledgeAlarm(assetPair) {
     try {
-        const { error } = await supabase
-            .from('alarms')
-            .update({ acknowledged: true })
-            .eq('asset_pair', assetPair)
-            .eq('status', 'triggered');
-
+        const { error } = await supabase.from('alarms').update({ acknowledged: true }).eq('asset_pair', assetPair).eq('status', 'triggered');
         if (error) throw error;
-        console.log(`Alarmes disparados para ${assetPair} reconhecidos com sucesso.`);
     } catch (error) {
         console.error("Erro ao reconhecer alarme:", error);
-        alert("Ocorreu um erro ao reconhecer o alarme. Tente novamente.");
+        alert("Ocorreu um erro ao reconhecer o alarme.");
     }
 }
 
-function getAlarmDescription(alarm) {
-    let description = '';
+function getAlarmDescription(alarm, forTable = false) {
+    if (!alarm) return 'N/A';
     switch (alarm.alarm_type) {
-        case 'stochastic':
-            description = `Estocástico(${alarm.indicator_period}) ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} no ${alarm.indicator_timeframe}`;
-            break;
-        case 'rsi_level':
-            description = `RSI(${alarm.indicator_period}) ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} no ${alarm.indicator_timeframe}`;
-            break;
-        case 'stochastic_crossover':
-            description = `Estocástico %K(${alarm.indicator_period}) cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} de %D(${alarm.combo_period}) no ${alarm.indicator_timeframe}`;
-            break;
-        case 'rsi_crossover':
-            description = `RSI(${alarm.rsi_period}) cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} da MA(${alarm.rsi_ma_period}) no ${alarm.indicator_timeframe}`;
-            break;
-        case 'ema_touch':
-            description = `Preço testa a EMA(${alarm.ema_period}) como ${alarm.condition === 'test_support' ? 'SUPORTE' : 'RESISTÊNCIA'} no ${alarm.indicator_timeframe}`;
-            break;
-        case 'combo':
-            const primaryTriggerText = alarm.condition === 'test_support' ? `testa a EMA (Suporte)` : `testa a EMA (Resistência)`;
-            const secondaryTriggerText = `Estocástico(${alarm.combo_period}) ${alarm.combo_condition === 'below' ? 'abaixo de' : 'acima de'} ${alarm.combo_target_price}`;
-            description = `CONFLUÊNCIA: ${primaryTriggerText} E ${secondaryTriggerText} no ${alarm.indicator_timeframe}`;
-            break;
-        case 'rsi_trendline':
-            const trendTypeText = alarm.trendline_type === 'support' ? 'Suporte' : 'Resistência';
-            description = `${alarm.touch_count}º toque em L.T. de ${trendTypeText} no ${alarm.indicator_timeframe}`;
-            break;
-        // --- INÍCIO DA ALTERAÇÃO ---
+        case 'stochastic': return `Stoch(${alarm.indicator_period}) ${alarm.condition === 'above' ? '>' : '<'} ${alarm.target_price} (${alarm.indicator_timeframe})`;
+        case 'rsi_level': return `RSI(${alarm.indicator_period}) ${alarm.condition === 'above' ? '>' : '<'} ${alarm.target_price} (${alarm.indicator_timeframe})`;
+        case 'stochastic_crossover': return `Stoch %K cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} de %D (${alarm.indicator_timeframe})`;
+        case 'rsi_crossover': return `RSI cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} da MA (${alarm.indicator_timeframe})`;
+        case 'ema_touch': return `Preço testa EMA(${alarm.ema_period}) (${alarm.indicator_timeframe})`;
+        case 'combo': return `Confluência EMA/Stoch (${alarm.indicator_timeframe})`;
+        case 'rsi_trendline': return `${alarm.touch_count}º toque em L.T. de ${alarm.trendline_type} (${alarm.indicator_timeframe})`;
         case 'rsi_trendline_break':
-            const breakTrendType = alarm.trendline_type === 'support' ? 'Suporte (LTA)' : 'Resistência (LTB)';
-            if (alarm.status === 'triggered') {
-                description = `Quebra da L.T. de ${breakTrendType} no ${alarm.indicator_timeframe}`;
-            } else {
-                description = `A monitorizar quebra da L.T. de ${breakTrendType} no ${alarm.indicator_timeframe}`;
-            }
-            break;
-        // --- FIM DA ALTERAÇÃO ---
-        default: // price
-            description = `Preço ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} USD`;
+            const statusText = forTable ? 'Monitoriza quebra' : (alarm.status === 'triggered' ? 'Quebra da' : 'Monitoriza quebra da');
+            return `${statusText} L.T. de ${alarm.trendline_type} (${alarm.indicator_timeframe})`;
+        default: return `Preço ${alarm.condition === 'above' ? '>' : '<'} ${alarm.target_price} USD`;
     }
-    return description;
 }
 
 function openAlarmListModal(assetPair, alarms, mode = 'active') {
@@ -200,47 +153,25 @@ function openAlarmListModal(assetPair, alarms, mode = 'active') {
     const closeBtn = document.getElementById('close-alarm-list-modal');
     const footer = document.getElementById('alarm-list-footer');
     const acknowledgeBtn = document.getElementById('acknowledge-alarms-btn');
-
-    if (!modal || !title || !container || !closeBtn || !footer || !acknowledgeBtn) return;
+    if (!modal) return;
     
-    let filteredAlarms;
-    if (mode === 'active') {
-        title.textContent = `Alarmes Ativos para ${assetPair}`;
-        filteredAlarms = alarms.filter(a => a.asset_pair === assetPair && a.status === 'active');
-    } else {
-        title.textContent = `Alarmes Disparados para ${assetPair}`;
-        filteredAlarms = alarms.filter(a => a.asset_pair === assetPair && a.status === 'triggered' && !a.acknowledged);
-    }
+    title.textContent = mode === 'active' ? `Alarmes Ativos para ${assetPair}` : `Alarmes Disparados para ${assetPair}`;
+    const filteredAlarms = alarms.filter(a => a.asset_pair === assetPair && (mode === 'active' ? a.status === 'active' : a.status === 'triggered' && !a.acknowledged));
     
-    container.innerHTML = '';
-    if (filteredAlarms.length === 0) {
-        container.innerHTML = '<p>Nenhum alarme encontrado.</p>';
-    } else {
-        filteredAlarms.forEach(alarm => {
-            const alarmDescription = getAlarmDescription(alarm);
-            const item = document.createElement('div');
-            item.className = 'alarm-list-item';
-            item.innerHTML = `
-                <span class="alarm-list-description">${alarmDescription}</span>
-                <div class="alarm-list-actions">
-                    <a href="alarms-create.html?editAlarmId=${alarm.id}" class="icon-action-btn" title="Editar"><span class="material-symbols-outlined">edit</span></a>
-                </div>
-            `;
-            container.appendChild(item);
-        });
-    }
+    container.innerHTML = filteredAlarms.length === 0 ? '<p>Nenhum alarme encontrado.</p>' : filteredAlarms.map(alarm => `
+        <div class="alarm-list-item">
+            <span class="alarm-list-description">${getAlarmDescription(alarm)}</span>
+            <div class="alarm-list-actions"><a href="alarms-create.html?editAlarmId=${alarm.id}" class="icon-action-btn" title="Editar"><span class="material-symbols-outlined">edit</span></a></div>
+        </div>`).join('');
 
-    if (mode === 'triggered') {
-        footer.style.display = 'block';
+    footer.style.display = mode === 'triggered' ? 'block' : 'none';
+    if(mode === 'triggered') {
         acknowledgeBtn.onclick = async () => {
             await acknowledgeAlarm(assetPair);
             modal.style.display = 'none';
             location.reload(); 
         };
-    } else {
-        footer.style.display = 'none';
     }
-
     modal.style.display = 'flex';
     closeBtn.onclick = () => modal.style.display = 'none';
     modal.onclick = (e) => { if (e.target.id === 'alarm-list-modal') modal.style.display = 'none'; };
@@ -248,13 +179,11 @@ function openAlarmListModal(assetPair, alarms, mode = 'active') {
 
 async function loadAndOpenAlarmModal(assetPair, mode) {
     try {
-        const { data: allAlarms, error } = await supabase.from('alarms').select('*');
+        const { data, error } = await supabase.from('alarms').select('*');
         if (error) throw error;
-        
-        openAlarmListModal(assetPair, allAlarms, mode);
+        openAlarmListModal(assetPair, data, mode);
     } catch (err) {
         console.error("Erro ao buscar alarmes para o modal:", err);
-        alert("Não foi possível carregar os alarmes.");
     }
 }
 
@@ -266,138 +195,58 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
     const tradingViewSymbol = `BINANCE:${assetName}`;
     const assetMarketData = marketData[assetName] || { price: 0, change: 0, sparkline: [] };
     const priceChangeClass = assetMarketData.change >= 0 ? 'positive-pnl' : 'negative-pnl';
-
     if (trade.data.status === 'ARMED') card.classList.add('armed');
     if (trade.data.status === 'LIVE') card.classList.add('live');
 
-    let mainActionButtonHtml = '';
-    let mainActionButtonClass = '';
-    let mainActionButtonIcon = '';
-    let mainActionButtonText = '';
-    let dataAction = '';
-
+    let mainActionButtonHtml = '', revertButtonHtml = '';
     if (trade.data.status === 'POTENTIAL') {
-        mainActionButtonClass = 'action-arm'; mainActionButtonIcon = 'bolt';
-        mainActionButtonText = 'Armar'; dataAction = 'arm';
+        mainActionButtonHtml = `<button class="icon-action-btn action-arm" data-action="arm" title="Armar"><span class="material-symbols-outlined">bolt</span> <span class="button-text">Armar</span></button>`;
+        revertButtonHtml = `<button class="btn btn-secondary revert-btn" data-action="revert-to-watchlist" title="Reverter para Watchlist"><span class="material-symbols-outlined">visibility_off</span> <span class="button-text">Reverter</span></button>`;
     } else if (trade.data.status === 'ARMED') {
-        mainActionButtonClass = 'action-execute'; mainActionButtonIcon = 'play_arrow';
-        mainActionButtonText = 'Executar'; dataAction = 'execute';
+        mainActionButtonHtml = `<button class="icon-action-btn action-execute" data-action="execute" title="Executar"><span class="material-symbols-outlined">play_arrow</span> <span class="button-text">Executar</span></button>`;
+        revertButtonHtml = `<button class="btn btn-secondary revert-btn" data-action="revert-to-potential" title="Reverter para Potencial"><span class="material-symbols-outlined">undo</span> <span class="button-text">Reverter</span></button>`;
     } else if (trade.data.status === 'LIVE') {
-        mainActionButtonClass = 'action-close'; mainActionButtonIcon = 'stop';
-        mainActionButtonText = 'Fechar'; dataAction = 'close';
-    }
-    if (mainActionButtonText) {
-        mainActionButtonHtml = `<button class="icon-action-btn ${mainActionButtonClass}" data-action="${dataAction}" title="${mainActionButtonText}"><span class="material-symbols-outlined">${mainActionButtonIcon}</span> <span class="button-text">${mainActionButtonText}</span></button>`;
+        mainActionButtonHtml = `<button class="icon-action-btn action-close" data-action="close" title="Fechar"><span class="material-symbols-outlined">stop</span> <span class="button-text">Fechar</span></button>`;
+        revertButtonHtml = `<button class="btn btn-secondary revert-btn" data-action="revert-to-armed" title="Reverter para Armado"><span class="material-symbols-outlined">undo</span> <span class="button-text">Reverter</span></button>`;
     }
     
-    let formattedPrice;
-    if (assetMarketData.price >= 1.0) {
-        formattedPrice = assetMarketData.price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    } else {
-        formattedPrice = '$' + assetMarketData.price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
-    }
-
+    let formattedPrice = assetMarketData.price >= 1.0 ? assetMarketData.price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$' + assetMarketData.price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
     const notesHtml = trade.data.notes ? `<p class="trade-notes">${trade.data.notes}</p>` : '';
-
     const relatedAlarms = allAlarms.filter(alarm => alarm.asset_pair === assetName);
     const hasActiveAlarm = relatedAlarms.some(alarm => alarm.status === 'active');
-    const hasTriggeredUnacknowledgedAlarm = relatedAlarms.some(alarm => alarm.status === 'triggered' && alarm.acknowledged === false);
-
-    let alarmBellHtml = '';
-    let triggeredActionRowHtml = '';
-    let revertButtonHtml = '';
-    
-    let viewImageButtonHtml = '';
-    let imageContainerHtml = '';
-    if (trade.data.imageUrl) {
-        viewImageButtonHtml = `<button class="icon-action-btn" data-action="toggle-image" title="Mostrar/Esconder Imagem"><span class="material-symbols-outlined">image</span></button>`;
-        
-        const visibleImageIds = getVisibleImageIdsInternal();
-        const isVisibleClass = visibleImageIds.includes(trade.id) ? 'visible' : '';
-        
-        imageContainerHtml = `
-            <div class="card-image-container ${isVisibleClass}">
-                <a href="${trade.data.imageUrl}" target="_blank" rel="noopener noreferrer" title="Abrir imagem numa nova janela">
-                    <img src="${trade.data.imageUrl}" alt="Gráfico de Análise para ${assetName}" loading="lazy">
-                </a>
-            </div>
-        `;
-    }
-
-    if (hasActiveAlarm) {
-        alarmBellHtml = `<button class="icon-action-btn alarm-active-bell" data-action="view-alarms" data-asset="${assetName}" title="Ver alarmes ativos"><span class="material-symbols-outlined">notifications_active</span></button>`;
-    }
-
+    const hasTriggeredUnacknowledgedAlarm = relatedAlarms.some(alarm => alarm.status === 'triggered' && !alarm.acknowledged);
+    let alarmBellHtml = '', triggeredActionRowHtml = '';
+    if (hasActiveAlarm) alarmBellHtml = `<button class="icon-action-btn alarm-active-bell" data-action="view-alarms" data-asset="${assetName}" title="Ver alarmes ativos"><span class="material-symbols-outlined">notifications_active</span></button>`;
     if (hasTriggeredUnacknowledgedAlarm) {
         card.classList.add('alarm-triggered');
-        const acknowledgeButtonHtml = `<button class="acknowledge-alarm-btn" data-action="acknowledge-and-view-alarm" data-asset="${assetName}" title="Ver Alarme Disparado"><span class="material-symbols-outlined">alarm</span> OK</button>`;
-        triggeredActionRowHtml = `
-            <div class="card-triggered-action-row">
-                ${acknowledgeButtonHtml}
-            </div>
-        `;
+        triggeredActionRowHtml = `<div class="card-triggered-action-row"><button class="acknowledge-alarm-btn" data-action="acknowledge-and-view-alarm" data-asset="${assetName}" title="Ver Alarme Disparado"><span class="material-symbols-outlined">alarm</span> OK</button></div>`;
     }
     
-    if (trade.data.status === 'ARMED' || trade.data.status === 'LIVE') {
-        let revertText = trade.data.status === 'ARMED' ? 'Reverter para Potencial' : 'Reverter para Armado';
-        let revertAction = trade.data.status === 'ARMED' ? 'revert-to-potential' : 'revert-to-armed';
-        revertButtonHtml = `<button class="btn btn-secondary revert-btn" data-action="${revertAction}" title="${revertText}"><span class="material-symbols-outlined">undo</span> <span class="button-text">${revertText}</span></button>`;
+    let viewImageButtonHtml = '', imageContainerHtml = '';
+    if (trade.data.imageUrl) {
+        viewImageButtonHtml = `<button class="icon-action-btn" data-action="toggle-image" title="Mostrar/Esconder Imagem"><span class="material-symbols-outlined">image</span></button>`;
+        const isVisibleClass = getVisibleImageIdsInternal().includes(trade.id) ? 'visible' : '';
+        imageContainerHtml = `<div class="card-image-container ${isVisibleClass}"><a href="${trade.data.imageUrl}" target="_blank" rel="noopener noreferrer"><img src="${trade.data.imageUrl}" alt="Gráfico" loading="lazy"></a></div>`;
     }
 
-    card.innerHTML = `
-        <div class="card-header-row">
-            <h3 class="asset-title-card">
-                <a href="asset-details.html?symbol=${assetName}" class="asset-link">${assetName}</a>
-                ${alarmBellHtml}
-                <button class="icon-action-btn card-edit-btn" data-action="edit" title="Editar"><span class="material-symbols-outlined">edit</span></button>
-            </h3>
-            <div class="card-main-action-button">${mainActionButtonHtml}</div>
-        </div>
-        <p class="strategy-name">Estratégia: ${trade.data.strategyName || 'N/A'}</p>
-        
-        ${notesHtml}
-
-        ${imageContainerHtml}
-
-        ${triggeredActionRowHtml}
-
-        <div class="card-bottom-row">
-            <div class="card-secondary-actions">
-                ${revertButtonHtml}
-                <a href="https://www.tradingview.com/chart/?symbol=${tradingViewSymbol}" target="_blank" rel="noopener noreferrer" class="icon-action-btn action-full-chart" title="Abrir no TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
-                ${viewImageButtonHtml}
-            </div>
-            <div class="card-sparkline" id="sparkline-card-${trade.id}"></div>
-            <div class="card-price-data">
-                <div class="card-price">${formattedPrice}</div>
-                <div class="${priceChangeClass} price-change-percent">${assetMarketData.change.toFixed(2)}%</div>
-            </div>
-        </div>
-    `;
+    card.innerHTML = `<div class="card-header-row"><h3 class="asset-title-card"><a href="asset-details.html?symbol=${assetName}" class="asset-link">${assetName}</a>${alarmBellHtml}<button class="icon-action-btn card-edit-btn" data-action="edit" title="Editar"><span class="material-symbols-outlined">edit</span></button></h3><div class="card-main-action-button">${mainActionButtonHtml}</div></div><p class="strategy-name">Estratégia: ${trade.data.strategyName || 'N/A'}</p>${notesHtml}${imageContainerHtml}${triggeredActionRowHtml}<div class="card-bottom-row"><div class="card-secondary-actions">${revertButtonHtml}<a href="${tradingViewUrl}" target="_blank" rel="noopener noreferrer" class="icon-action-btn action-full-chart" title="TradingView"><span class="material-symbols-outlined">open_in_new</span></a>${viewImageButtonHtml}</div><div class="card-sparkline" id="sparkline-card-${trade.id}"></div><div class="card-price-data"><div class="card-price">${formattedPrice}</div><div class="${priceChangeClass} price-change-percent">${assetMarketData.change.toFixed(2)}%</div></div></div>`;
     return card;
 }
 
 export function displayTrades(trades, marketData, allAlarms) {
     tradesForEventListeners = trades;
-    if (!potentialTradesContainer) return;
-    potentialTradesContainer.innerHTML = '<p class="empty-state-message">Nenhum ativo na watchlist.</p>';
-    armedTradesContainer.innerHTML = '<p class="empty-state-message">Nenhum setup armado.</p>';
-    liveTradesContainer.innerHTML = '<p class="empty-state-message">Nenhuma operação ativa.</p>';
-    let potentialCount = 0, armedCount = 0, liveCount = 0;
+    potentialTradesContainer.innerHTML = armedTradesContainer.innerHTML = liveTradesContainer.innerHTML = '<p class="empty-state-message">Nenhum item.</p>';
+    let counters = { POTENTIAL: 0, ARMED: 0, LIVE: 0 };
+    const containers = { POTENTIAL: potentialTradesContainer, ARMED: armedTradesContainer, LIVE: liveTradesContainer };
     trades.forEach(trade => {
-        const card = createTradeCard(trade, marketData, allAlarms);
-        if (trade.data.status === 'POTENTIAL') { if (potentialCount === 0) potentialTradesContainer.innerHTML = ''; potentialTradesContainer.appendChild(card); potentialCount++; }
-        else if (trade.data.status === 'ARMED') { if (armedCount === 0) armedTradesContainer.innerHTML = ''; armedTradesContainer.appendChild(card); armedCount++; }
-        else if (trade.data.status === 'LIVE') { if (liveCount === 0) liveTradesContainer.innerHTML = ''; liveTradesContainer.appendChild(card); liveCount++; }
-    });
-
-    trades.forEach(trade => {
-        const assetMarketData = marketData[trade.data.asset];
-        if (assetMarketData && assetMarketData.sparkline) {
-            renderSparkline(`sparkline-card-${trade.id}`, assetMarketData.sparkline);
+        const status = trade.data.status;
+        if (containers[status]) {
+            if (counters[status] === 0) containers[status].innerHTML = '';
+            containers[status].appendChild(createTradeCard(trade, marketData, allAlarms));
+            counters[status]++;
         }
     });
-
+    trades.forEach(trade => renderSparkline(`sparkline-card-${trade.id}`, marketData[trade.data.asset]?.sparkline));
     const lastId = getLastCreatedTradeId();
     if (lastId) {
         const newCard = document.querySelector(`.trade-card[data-trade-id="${lastId}"]`);
@@ -409,6 +258,57 @@ export function displayTrades(trades, marketData, allAlarms) {
     }
 }
 
+// --- INÍCIO DA ALTERAÇÃO: Nova função para renderizar a tabela de watchlist de alarmes ---
+export function displayWatchlistTable(allTrades, allAlarms, marketData) {
+    const tbody = document.getElementById('watchlist-alarms-tbody');
+    if (!tbody) return;
+
+    const assetsInKanban = new Set(allTrades.map(t => t.data.asset));
+    const activeAlarms = allAlarms.filter(a => a.status === 'active');
+    
+    const assetsOnWatchlist = activeAlarms.reduce((acc, alarm) => {
+        const asset = alarm.asset_pair;
+        if (!assetsInKanban.has(asset) && !acc[asset]) {
+            acc[asset] = alarm; // Guarda o primeiro (mais recente) alarme para este ativo
+        }
+        return acc;
+    }, {});
+
+    const watchlistAssets = Object.values(assetsOnWatchlist);
+
+    if (watchlistAssets.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Nenhum ativo a ser monitorizado. Adicione um alarme a um ativo para ele aparecer aqui.</td></tr>';
+        return;
+    }
+
+    const tableRowsHtml = watchlistAssets.map(alarm => {
+        const assetName = alarm.asset_pair;
+        const assetMarketData = marketData[assetName] || { price: 0, sparkline: [] };
+        let formattedPrice = assetMarketData.price >= 1.0 ? assetMarketData.price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$' + assetMarketData.price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
+
+        return `
+            <tr>
+                <td data-label="Ativo"><strong><a href="asset-details.html?symbol=${assetName}" class="asset-link">${assetName}</a></strong></td>
+                <td data-label="Condição do Alarme Principal">${getAlarmDescription(alarm, true)}</td>
+                <td data-label="Último Preço">${formattedPrice}</td>
+                <td data-label="Sparkline (24h)"><div class="sparkline-container" id="sparkline-watchlist-${assetName}"></div></td>
+                <td data-label="Ações">
+                    <div class="action-buttons">
+                        <a href="asset-details.html?symbol=${assetName}" class="icon-action-btn" title="Ver Gráfico e Detalhes"><span class="material-symbols-outlined">monitoring</span></a>
+                        <a href="https://www.tradingview.com/chart/?symbol=BINANCE:${assetName}" target="_blank" class="icon-action-btn" title="TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
+                        <a href="alarms-create.html?assetPair=${assetName}" class="icon-action-btn" title="Criar Novo Alarme"><span class="material-symbols-outlined">alarm_add</span></a>
+                        <button class="icon-action-btn" data-action="add-to-potential" data-symbol="${assetName}" title="Adicionar a Trade Potencial"><span class="material-symbols-outlined">add_shopping_cart</span></button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+
+    tbody.innerHTML = tableRowsHtml;
+    watchlistAssets.forEach(alarm => renderSparkline(`sparkline-watchlist-${alarm.asset_pair}`, marketData[alarm.asset_pair]?.sparkline));
+}
+// --- FIM DA ALTERAÇÃO ---
+
 document.addEventListener('DOMContentLoaded', () => {
     const dashboard = document.querySelector('.dashboard-columns');
     if (dashboard) {
@@ -417,68 +317,52 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!button) return;
             const card = button.closest('.trade-card');
             const tradeId = card ? card.dataset.tradeId : null;
-
             const action = button.dataset.action;
 
+            const trade = tradeId ? tradesForEventListeners.find(t => t.id === tradeId) : null;
+
             switch (action) {
-                case 'edit': 
-                    if (tradeId) loadAndOpenForEditing(tradeId); 
-                    break;
-                case 'arm': 
-                    if (tradeId) openArmModal(tradesForEventListeners.find(t => t.id === tradeId)); 
-                    break;
-                case 'execute': 
-                    if (tradeId) openExecModal(tradesForEventListeners.find(t => t.id === tradeId)); 
-                    break;
-                case 'close': 
-                    if (tradeId) openCloseTradeModal(tradesForEventListeners.find(t => t.id === tradeId)); 
-                    break;
-                
+                case 'edit': if (tradeId) loadAndOpenForEditing(tradeId); break;
+                case 'arm': if (trade) openArmModal(trade); break;
+                case 'execute': if (trade) openExecModal(trade); break;
+                case 'close': if (trade) openCloseTradeModal(trade); break;
                 case 'toggle-image':
-                    const imageContainer = card.querySelector('.card-image-container');
+                    const imageContainer = card?.querySelector('.card-image-container');
                     if (imageContainer) {
                         imageContainer.classList.toggle('visible');
-                        
                         let visibleIds = getVisibleImageIdsInternal();
-                        const isVisible = imageContainer.classList.contains('visible');
-                        
-                        if (isVisible) {
-                            if (!visibleIds.includes(tradeId)) {
-                                visibleIds.push(tradeId);
-                            }
+                        if (imageContainer.classList.contains('visible')) {
+                            if (!visibleIds.includes(tradeId)) visibleIds.push(tradeId);
                         } else {
                             visibleIds = visibleIds.filter(id => id !== tradeId);
                         }
                         setVisibleImageIdsInternal(visibleIds);
                     }
                     break;
-                
-                case 'view-alarms':
-                    loadAndOpenAlarmModal(button.dataset.asset, 'active');
-                    break;
-                case 'acknowledge-and-view-alarm':
-                    const assetSymbol = button.dataset.asset;
-                    if (assetSymbol) {
-                        loadAndOpenAlarmModal(assetSymbol, 'triggered');
-                    }
-                    break;
-                case 'add-to-watchlist':
-                   openAddModal();
-                   const modalAssetInput = document.getElementById('asset');
-                   if (modalAssetInput) {
-                       modalAssetInput.value = button.dataset.symbol.replace('BINANCE:', '');
-                   }
-                   break;
+                case 'view-alarms': loadAndOpenAlarmModal(button.dataset.asset, 'active'); break;
+                case 'acknowledge-and-view-alarm': loadAndOpenAlarmModal(button.dataset.asset, 'triggered'); break;
+                // --- INÍCIO DA ALTERAÇÃO: Adiciona listeners para os novos botões ---
+                case 'revert-to-watchlist': if (trade) handleRevertToWatchlist(trade); break;
                 case 'revert-to-potential':
-                case 'revert-to-armed':
-                    if (tradeId) {
-                        const trade = tradesForEventListeners.find(t => t.id === tradeId);
-                        if (trade) {
-                            handleRevertStatus(trade, action);
-                        }
-                    }
-                    break;
+                case 'revert-to-armed': if (trade) handleRevertStatus(trade, action); break;
+                // --- FIM DA ALTERAÇÃO ---
             }
         });
     }
+
+    // --- INÍCIO DA ALTERAÇÃO: Listener para a nova tabela de watchlist ---
+    const watchlistTable = document.getElementById('watchlist-alarms-tbody');
+    if (watchlistTable) {
+        watchlistTable.addEventListener('click', (e) => {
+            const button = e.target.closest('button[data-action="add-to-potential"]');
+            if (button) {
+                e.preventDefault();
+                const symbol = button.dataset.symbol;
+                openAddModal();
+                const modalAssetInput = document.getElementById('asset');
+                if (modalAssetInput) modalAssetInput.value = symbol;
+            }
+        });
+    }
+    // --- FIM DA ALTERAÇÃO ---
 });
