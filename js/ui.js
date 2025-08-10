@@ -173,10 +173,18 @@ function getAlarmDescription(alarm) {
             const secondaryTriggerText = `Estocástico(${alarm.combo_period}) ${alarm.combo_condition === 'below' ? 'abaixo de' : 'acima de'} ${alarm.combo_target_price}`;
             description = `CONFLUÊNCIA: ${primaryTriggerText} E ${secondaryTriggerText} no ${alarm.indicator_timeframe}`;
             break;
-        // --- INÍCIO DA ALTERAÇÃO ---
         case 'rsi_trendline':
             const trendTypeText = alarm.trendline_type === 'support' ? 'Suporte' : 'Resistência';
             description = `${alarm.touch_count}º toque em L.T. de ${trendTypeText} no ${alarm.indicator_timeframe}`;
+            break;
+        // --- INÍCIO DA ALTERAÇÃO ---
+        case 'rsi_trendline_break':
+            const breakTrendType = alarm.trendline_type === 'support' ? 'Suporte (LTA)' : 'Resistência (LTB)';
+            if (alarm.status === 'triggered') {
+                description = `Quebra da L.T. de ${breakTrendType} no ${alarm.indicator_timeframe}`;
+            } else {
+                description = `A monitorizar quebra da L.T. de ${breakTrendType} no ${alarm.indicator_timeframe}`;
+            }
             break;
         // --- FIM DA ALTERAÇÃO ---
         default: // price
