@@ -102,15 +102,13 @@
                     </select>
                 </div>
                 <div class="control-group">
-                    <label>Filtros Básicos:</label>
+                    <label>Filtros:</label>
                     <input type="checkbox" id="filter-rsi">
                     <label for="filter-rsi">RSI < 45 (1h)</label>
                     <input type="checkbox" id="filter-stoch">
                     <label for="filter-stoch">STOCH < 35 (4h)</label>
-                    <!-- --- INÍCIO DA ALTERAÇÃO --- -->
                     <input type="checkbox" id="filter-third-touch">
                     <label for="filter-third-touch">Apenas 3º Toque L.T.</label>
-                    <!-- --- FIM DA ALTERAÇÃO --- -->
                 </div>
                 <div class="control-group">
                     <label for="top-n-select">Mostrar Top:</label>
@@ -128,30 +126,7 @@
                 </div>
             </div>
 
-            <div class="market-controls advanced-controls">
-                <div class="control-group">
-                    <label for="rsi-analysis-timeframe">Analisar Padrões RSI em:</label>
-                    <select id="rsi-analysis-timeframe">
-                        <option value="1h" selected>1 Hora</option>
-                        <option value="4h">4 Horas</option>
-                        <option value="1d">Diário</option>
-                    </select>
-                    <button id="analyze-rsi-patterns-btn" class="btn btn-secondary">
-                        <span class="material-symbols-outlined">auto_graph</span> Analisar
-                    </button>
-                    <span id="rsi-analysis-status" class="status-indicator"></span>
-                </div>
-                <div class="control-group">
-                    <label for="filter-rsi-trend">Filtro de Padrão:</label>
-                    <select id="filter-rsi-trend" disabled>
-                        <option value="none">Nenhum</option>
-                        <option value="support_2">2+ Fundos Ascendentes (LTA)</option>
-                        <option value="support_3">3+ Fundos Ascendentes (LTA)</option>
-                        <option value="resistance_2">2+ Picos Descendentes (LTB)</option>
-                        <option value="resistance_3">3+ Picos Descendentes (LTB)</option>
-                    </select>
-                </div>
-            </div>
+            <!-- A secção de controlos avançados foi removida -->
 
             <div class="table-wrapper">
                 <table class="market-table">
