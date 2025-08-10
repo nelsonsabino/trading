@@ -117,7 +117,6 @@ function formatVolume(volume) {
     return volume.toFixed(2);
 }
 
-// --- INÍCIO DA ALTERAÇÃO 1: Nova função para o clique no botão "Monitorizar" ---
 async function handleMonitorAssetClick(symbol) {
     const button = document.querySelector(`button[data-action="monitor"][data-symbol="${symbol}"]`);
     if (button) button.disabled = true;
@@ -126,17 +125,14 @@ async function handleMonitorAssetClick(symbol) {
         const alarmData = {
             asset_pair: symbol,
             alarm_type: 'stochastic_crossover',
-            condition: 'above', // Cruzamento Bullish
+            condition: 'above',
             indicator_timeframe: '15m',
-            indicator_period: 14, // Período K padrão
-            combo_period: 3,      // Período D padrão
+            indicator_period: 14,
+            combo_period: 3,
             status: 'active'
         };
-
         const { error } = await supabase.from('alarms').insert([alarmData]);
         if (error) throw error;
-        
-        // Feedback visual temporário
         if (button) {
             const originalIcon = button.innerHTML;
             button.innerHTML = `<span class="material-symbols-outlined">check</span>`;
@@ -145,14 +141,12 @@ async function handleMonitorAssetClick(symbol) {
                 button.disabled = false;
             }, 2000);
         }
-        
     } catch (error) {
         console.error(`Erro ao criar alarme para ${symbol}:`, error);
         alert(`Não foi possível criar o alarme para ${symbol}. Verifique se já existe um alarme similar.`);
         if (button) button.disabled = false;
     }
 }
-// --- FIM DA ALTERAÇÃO 1 ---
 
 function createTableRow(ticker, index, extraData) {
     const baseAsset = ticker.symbol.replace('USDC', '');
@@ -162,7 +156,6 @@ function createTableRow(ticker, index, extraData) {
     const priceChangeClass = priceChangePercent >= 0 ? 'positive-pnl' : 'negative-pnl';
     const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${ticker.symbol}`;
     const createAlarmUrl = `alarms-create.html?assetPair=${ticker.symbol}`;
-    const addOpportunityUrl = `dashboard.html?assetPair=${ticker.symbol}`;
 
     let rsiSignalHtml = '', stochSignalHtml = '', thirdTouchSignalHtml = '';
     const assetExtraData = extraData[ticker.symbol];
@@ -182,7 +175,6 @@ function createTableRow(ticker, index, extraData) {
     let formattedPrice = price >= 1.0 ? price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$' + price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
     const sparklineCellHtml = showSparklines ? `<td data-label="Sparkline (24h)" class="sparkline-cell"><div class="sparkline-container" id="sparkline-${ticker.symbol}"></div></td>` : `<td></td>`;
     
-    // --- INÍCIO DA ALTERAÇÃO 2: Adiciona o novo botão "Monitorizar" ---
     return `
         <tr>
             <td data-label="#">${index + 1}</td>
@@ -197,11 +189,9 @@ function createTableRow(ticker, index, extraData) {
                     <a href="#" class="icon-action-btn view-chart-btn" data-symbol="${ticker.symbol}" title="Ver Gráfico"><span class="material-symbols-outlined">monitoring</span></a>
                     <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn" title="TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
                     <a href="${createAlarmUrl}" class="icon-action-btn" title="Criar Alarme Detalhado"><span class="material-symbols-outlined">alarm_add</span></a>
-                    <a href="${addOpportunityUrl}" class="icon-action-btn" title="Adicionar a Trade Potencial"><span class="material-symbols-outlined">add_shopping_cart</span></a>
                 </div>
             </td>
         </tr>`;
-    // --- FIM DA ALTERAÇÃO 2 ---
 }
 
 function applyFiltersAndSort() {
@@ -296,12 +286,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (filterStochCheckbox) filterStochCheckbox.addEventListener('change', (e) => { filterStoch = e.target.checked; applyFiltersAndSort(); });
     if (filterThirdTouchCheckbox) filterThirdTouchCheckbox.addEventListener('change', (e) => { filterThirdTouch = e.target.checked; applyFiltersAndSort(); });
     
-    // --- INÍCIO DA ALTERAÇÃO 3: Adiciona o listener para os cliques na tabela ---
     if (tbody) {
         tbody.addEventListener('click', (e) => {
-            const button = e.target.closest('button, a'); // Captura cliques em botões ou links
+            const button = e.target.closest('button, a');
             if (!button) return;
-
             const action = button.dataset.action;
             const symbol = button.dataset.symbol;
 
@@ -314,7 +302,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-    // --- FIM DA ALTERAÇÃO 3 ---
     
     fetchAndDisplayMarketData();
 });
