@@ -360,8 +360,8 @@
 }
 
 /* --- INÍCIO DA ALTERAÇÃO --- */
-/* Novo badge para Divergência Bullish */
-.divergence-bullish-signal {
+/* Novo badge para o Sinal de 3º Toque em L.T. */
+.third-touch-signal {
     display: inline-block;
     padding: 2px 6px;
     font-size: 0.7em;
@@ -369,11 +369,17 @@
     border-radius: 4px;
     margin-left: 5px;
     cursor: help;
-    background-color: #6f42c1; /* Roxo */
     color: #fff;
-    border: 1px solid #6f42c1;
 }
-.dark-mode .divergence-bullish-signal {
-    color: #fff;
+.third-touch-signal.support {
+    background-color: var(--accent-green);
+    border: 1px solid var(--accent-green);
+}
+.third-touch-signal.resistance {
+    background-color: var(--accent-red);
+    border: 1px solid var(--accent-red);
+}
+.dark-mode .third-touch-signal {
+    color: var(--surface-primary);
 }
 /* --- FIM DA ALTERAÇÃO --- */
