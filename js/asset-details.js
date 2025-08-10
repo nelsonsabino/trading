@@ -182,10 +182,7 @@ async function displayAlarmsForAsset(symbol) {
         const activeAlarms = allAlarms.filter(a => a.status === 'active');
         const triggeredAlarms = allAlarms.filter(a => a.status === 'triggered');
         
-        // --- INÍCIO DA ALTERAÇÃO ---
-        // Ordena o histórico de alarmes pela data em que foram disparados, do mais recente para o mais antigo.
         triggeredAlarms.sort((a, b) => new Date(b.triggered_at) - new Date(a.triggered_at));
-        // --- FIM DA ALTERAÇÃO ---
 
         if (activeAlarms.length === 0) {
             activeTbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Nenhum alarme ativo para este ativo.</td></tr>';
@@ -271,6 +268,43 @@ function editTrade(tradeId) {
     window.location.href = 'dashboard.html';
 }
 
+// --- INÍCIO DA ALTERAÇÃO: Nova função para o clique no botão "Monitorizar" ---
+async function handleMonitorAssetClick(symbol) {
+    const button = document.getElementById('monitor-asset-btn');
+    if (button) button.disabled = true;
+
+    try {
+        const alarmData = {
+            asset_pair: symbol,
+            alarm_type: 'stochastic_crossover',
+            condition: 'above', // Cruzamento Bullish
+            indicator_timeframe: '15m',
+            indicator_period: 14,
+            combo_period: 3,
+            status: 'active'
+        };
+
+        const { error } = await supabase.from('alarms').insert([alarmData]);
+        if (error) throw error;
+        
+        if (button) {
+            const originalText = button.innerHTML;
+            button.innerHTML = `<span class="material-symbols-outlined">check</span> Adicionado!`;
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.disabled = false;
+                displayAlarmsForAsset(symbol); // Atualiza a tabela de alarmes
+            }, 2000);
+        }
+        
+    } catch (error) {
+        console.error(`Erro ao criar alarme para ${symbol}:`, error);
+        alert(`Não foi possível criar o alarme para ${symbol}. Verifique se já existe um alarme similar.`);
+        if (button) button.disabled = false;
+    }
+}
+// --- FIM DA ALTERAÇÃO ---
+
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const assetSymbol = urlParams.get('symbol');
@@ -298,14 +332,20 @@ document.addEventListener('DOMContentLoaded', () => {
     
     loadChart(); 
 
+    // --- INÍCIO DA ALTERAÇÃO: Lógica para o novo botão de monitorizar ---
+    const monitorBtn = document.getElementById('monitor-asset-btn');
+    if (monitorBtn) {
+        monitorBtn.addEventListener('click', () => handleMonitorAssetClick(assetSymbol));
+    }
+    // --- FIM DA ALTERAÇÃO ---
+
     const watchlistBtn = document.getElementById('add-to-watchlist-btn');
     const alarmBtn = document.getElementById('add-alarm-btn');
     const tvBtn = document.getElementById('open-tv-btn');
+
     if (watchlistBtn) watchlistBtn.href = `dashboard.html?assetPair=${assetSymbol}`;
     if (alarmBtn) alarmBtn.href = `alarms-create.html?assetPair=${assetSymbol}`;
     if (tvBtn) tvBtn.href = `https://www.tradingview.com/chart/?symbol=BINANCE:${assetSymbol}`;
-
-    const baseAsset = assetSymbol.replace(/USDC|USDT|BUSD/, '');
 
     displayAlarmsForAsset(assetSymbol);
     displayTradesForAsset(assetSymbol);
