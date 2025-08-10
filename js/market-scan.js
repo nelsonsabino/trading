@@ -11,13 +11,9 @@ let allExtraData = {};
 let currentSortBy = 'volume';
 let filterRsi = false;
 let filterStoch = false;
-let filterThirdTouch = false; // --- ALTERAÇÃO: Nova variável de filtro
+let filterThirdTouch = false;
 let showSparklines = true;
 let currentTopN = 50;
-
-let rsiPatternFilter = 'none';
-let rsiAnalysisTimeframe = '1h';
-
 
 const chartModal = document.getElementById('chart-modal');
 const closeChartModalBtn = document.getElementById('close-chart-modal');
@@ -131,24 +127,13 @@ function createTableRow(ticker, index, extraData) {
     const createAlarmUrl = `alarms-create.html?assetPair=${ticker.symbol}`;
     const addOpportunityUrl = `dashboard.html?assetPair=${ticker.symbol}`;
 
-    let rsiSignalHtml = '', stochSignalHtml = '', rsiTrendSignalHtml = '', thirdTouchSignalHtml = '';
+    let rsiSignalHtml = '', stochSignalHtml = '', thirdTouchSignalHtml = '';
 
     const assetExtraData = extraData[ticker.symbol];
     if (assetExtraData) {
         if (assetExtraData.rsi_1h !== null && assetExtraData.rsi_1h < 45) rsiSignalHtml = `<span class="rsi-signal" data-tooltip="RSI (1h) está em ${assetExtraData.rsi_1h.toFixed(1)}">RSI</span>`;
         if (assetExtraData.stoch_4h !== null && typeof assetExtraData.stoch_4h === 'number' && assetExtraData.stoch_4h < 35) stochSignalHtml = `<span class="stoch-signal" data-tooltip="Stoch (4h) K:${assetExtraData.stoch_4h.toFixed(1)}">STC</span>`;
         
-        if (assetExtraData.rsiTrend) {
-            const { type, touches, isConfirmed } = assetExtraData.rsiTrend;
-            const trendText = `${type}-${touches}`;
-            const trendTooltip = `${touches}+ ${type === 'support' ? 'Fundos Ascendentes' : 'Picos Descendentes'} (${rsiAnalysisTimeframe})`;
-            let trendClass = type === 'support' ? 'rsi-trend-support' : 'rsi-trend-resistance';
-            const confirmedHtml = isConfirmed ? ' ★' : '';
-            if (isConfirmed) trendClass += ' confirmed';
-            rsiTrendSignalHtml = `<span class="rsi-trend-signal ${trendClass}" data-tooltip="${trendTooltip}">${trendText}${confirmedHtml}</span>`;
-        }
-
-        // --- INÍCIO DA ALTERAÇÃO: Renderiza os novos badges de 3º Toque ---
         if (assetExtraData.thirdTouchSignal_1h) {
             const { type } = assetExtraData.thirdTouchSignal_1h;
             thirdTouchSignalHtml += `<span class="third-touch-signal ${type === 'LTA' ? 'support' : 'resistance'}" data-tooltip="3º Toque em ${type} (1h)">${type}-3 1h</span>`;
@@ -157,7 +142,6 @@ function createTableRow(ticker, index, extraData) {
             const { type } = assetExtraData.thirdTouchSignal_4h;
             thirdTouchSignalHtml += `<span class="third-touch-signal ${type === 'LTA' ? 'support' : 'resistance'}" data-tooltip="3º Toque em ${type} (4h)">${type}-3 4h</span>`;
         }
-        // --- FIM DA ALTERAÇÃO ---
     }
 
     let formattedPrice = price >= 1.0 ? price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$' + price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
@@ -166,7 +150,7 @@ function createTableRow(ticker, index, extraData) {
     return `
         <tr>
             <td data-label="#">${index + 1}</td>
-            <td data-label="Ativo"><div class="asset-name"><strong><a href="asset-details.html?symbol=${ticker.symbol}" class="asset-link">${baseAsset}</a></strong> ${rsiSignalHtml} ${stochSignalHtml} ${rsiTrendSignalHtml} ${thirdTouchSignalHtml}</div></td>
+            <td data-label="Ativo"><div class="asset-name"><strong><a href="asset-details.html?symbol=${ticker.symbol}" class="asset-link">${baseAsset}</a></strong> ${rsiSignalHtml} ${stochSignalHtml} ${thirdTouchSignalHtml}</div></td>
             <td data-label="Último Preço">${formattedPrice}</td>
             ${sparklineCellHtml}
             <td data-label="Volume (24h)">${formatVolume(volume)}</td>
@@ -180,21 +164,10 @@ function applyFiltersAndSort() {
     if (filterRsi) processedTickers = processedTickers.filter(t => allExtraData[t.symbol]?.rsi_1h < 45);
     if (filterStoch) processedTickers = processedTickers.filter(t => allExtraData[t.symbol]?.stoch_4h < 35);
     
-    // --- INÍCIO DA ALTERAÇÃO: Lógica para o novo filtro de 3º Toque ---
     if (filterThirdTouch) {
         processedTickers = processedTickers.filter(t => {
             const extra = allExtraData[t.symbol];
             return extra && (extra.thirdTouchSignal_1h || extra.thirdTouchSignal_4h);
-        });
-    }
-    // --- FIM DA ALTERAÇÃO ---
-
-    if (rsiPatternFilter !== 'none') {
-        processedTickers = processedTickers.filter(t => {
-            const trend = allExtraData[t.symbol]?.rsiTrend;
-            if (!trend) return false;
-            const [type, touches] = rsiPatternFilter.split('_');
-            return trend.type === type && trend.touches >= parseInt(touches) && trend.isConfirmed;
         });
     }
 
@@ -243,32 +216,6 @@ async function fetchAndDisplayMarketData() {
     }
 }
 
-async function handleRsiPatternAnalysis() {
-    const analyzeBtn = document.getElementById('analyze-rsi-patterns-btn');
-    const statusIndicator = document.getElementById('rsi-analysis-status');
-    const filterSelect = document.getElementById('filter-rsi-trend');
-    analyzeBtn.disabled = true;
-    statusIndicator.textContent = 'A analisar...';
-    filterSelect.disabled = true;
-    try {
-        const symbolsToAnalyze = allTickersData.slice(0, currentTopN).map(t => t.symbol);
-        const { data, error } = await supabase.functions.invoke('get-sparklines-data', {
-            body: { symbols: symbolsToAnalyze, analyzeRsiPatterns: true, timeframe: rsiAnalysisTimeframe },
-        });
-        if (error) throw error;
-        Object.assign(allExtraData, data);
-        sessionStorage.setItem(CACHE_KEY_DATA, JSON.stringify({ tickers: allTickersData, extraData: allExtraData }));
-        statusIndicator.textContent = 'Análise concluída!';
-        filterSelect.disabled = false;
-        applyFiltersAndSort(); 
-    } catch (err) {
-        console.error("Erro na análise de padrões RSI:", err);
-        statusIndicator.textContent = 'Erro na análise.';
-    } finally {
-        analyzeBtn.disabled = false;
-    }
-}
-
 function updateMarketScanTitle() {
     const titleElement = document.getElementById('market-scan-title');
     if (titleElement) {
@@ -282,12 +229,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const sortBySelect = document.getElementById('sort-by');
     const filterRsiCheckbox = document.getElementById('filter-rsi');
     const filterStochCheckbox = document.getElementById('filter-stoch');
-    const filterThirdTouchCheckbox = document.getElementById('filter-third-touch'); // --- ALTERAÇÃO: Novo checkbox
+    const filterThirdTouchCheckbox = document.getElementById('filter-third-touch');
     const toggleSparklinesCheckbox = document.getElementById('toggle-sparklines');
     const topNSelect = document.getElementById('top-n-select');
-    const analyzeRsiPatternsBtn = document.getElementById('analyze-rsi-patterns-btn');
-    const rsiAnalysisTimeframeSelect = document.getElementById('rsi-analysis-timeframe');
-    const rsiTrendFilterSelect = document.getElementById('filter-rsi-trend');
 
     const savedSparklinesState = localStorage.getItem('showSparklines');
     if (savedSparklinesState !== null) {
@@ -306,14 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sortBySelect) sortBySelect.addEventListener('change', (e) => { currentSortBy = e.target.value; applyFiltersAndSort(); });
     if (filterRsiCheckbox) filterRsiCheckbox.addEventListener('change', (e) => { filterRsi = e.target.checked; applyFiltersAndSort(); });
     if (filterStochCheckbox) filterStochCheckbox.addEventListener('change', (e) => { filterStoch = e.target.checked; applyFiltersAndSort(); });
-    
-    // --- INÍCIO DA ALTERAÇÃO: Listener para o novo filtro de 3º Toque ---
     if (filterThirdTouchCheckbox) filterThirdTouchCheckbox.addEventListener('change', (e) => { filterThirdTouch = e.target.checked; applyFiltersAndSort(); });
-    // --- FIM DA ALTERAÇÃO ---
-    
-    if (analyzeRsiPatternsBtn) analyzeRsiPatternsBtn.addEventListener('click', handleRsiPatternAnalysis);
-    if (rsiAnalysisTimeframeSelect) rsiAnalysisTimeframeSelect.addEventListener('change', (e) => { rsiAnalysisTimeframe = e.target.value; });
-    if (rsiTrendFilterSelect) rsiTrendFilterSelect.addEventListener('change', (e) => { rsiPatternFilter = e.target.value; applyFiltersAndSort(); });
     
     if (tbody) tbody.addEventListener('click', (e) => {
         const button = e.target.closest('.view-chart-btn');
