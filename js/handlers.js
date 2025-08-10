@@ -91,7 +91,6 @@ export async function handleArmSubmit(e) {
         });
     }
 
-    // --- INÍCIO DA ALTERAÇÃO ---
     const imageUrl = document.getElementById('image-url-arm').value;
     const updateData = {
         status: "ARMED",
@@ -100,7 +99,6 @@ export async function handleArmSubmit(e) {
         imageUrl: imageUrl
     };
     await updateTrade(currentTrade.id, updateData);
-    // --- FIM DA ALTERAÇÃO ---
 
     closeArmModal();
 }
@@ -137,7 +135,6 @@ export async function handleExecSubmit(e) {
         });
     }
 
-    // --- INÍCIO DA ALTERAÇÃO ---
     const imageUrl = document.getElementById('image-url-exec').value;
     const updateData = {
         status: "LIVE",
@@ -146,7 +143,6 @@ export async function handleExecSubmit(e) {
         imageUrl: imageUrl
     };
     await updateTrade(currentTrade.id, updateData);
-    // --- FIM DA ALTERAÇÃO ---
 
     closeExecModal();
 }
@@ -234,7 +230,6 @@ export async function loadAndOpenForEditing(tradeId) {
     }
 }
 
-// NOVA FUNÇÃO PARA REVERTER O STATUS DE UM TRADE
 export async function handleRevertStatus(trade, action) {
     const newStatus = action === 'revert-to-potential' ? 'POTENTIAL' : 'ARMED';
     const confirmationMessage = `Tem a certeza que quer reverter o status deste trade para "${newStatus}"?`;
@@ -242,10 +237,24 @@ export async function handleRevertStatus(trade, action) {
     if (confirm(confirmationMessage)) {
         try {
             await updateTrade(trade.id, { status: newStatus });
-            console.log(`Trade ${trade.id} revertido para ${newStatus} com sucesso.`);
         } catch (error) {
             console.error("Erro ao reverter o status do trade:", error);
             alert("Ocorreu um erro ao reverter o status do trade.");
         }
     }
 }
+
+// --- INÍCIO DA ALTERAÇÃO: Nova função para reverter de "Potencial" para a watchlist de alarmes ---
+export async function handleRevertToWatchlist(trade) {
+    const confirmationMessage = `Tem a certeza que quer remover este trade da coluna "Potencial"?\n\nO ativo continuará a ser monitorizado na Watchlist de Alarmes enquanto tiver alarmes ativos.`;
+    if (confirm(confirmationMessage)) {
+        try {
+            await deleteTrade(trade.id);
+            // Não é preciso fazer reload, o listener do Firebase/Supabase irá atualizar a UI
+        } catch (error) {
+            console.error("Erro ao reverter para a watchlist:", error);
+            alert("Ocorreu um erro ao reverter o trade para a watchlist.");
+        }
+    }
+}
+// --- FIM DA ALTERAÇÃO ---
