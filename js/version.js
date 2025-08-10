@@ -2,6 +2,16 @@
 
 export const changelogData = {
 current: {
+    number: '13.7.0',
+    changes: [
+        "**Novo Alarme Avançado (Quebra de Linha de Tendência RSI):**",
+        "Implementado um novo tipo de alarme para detetar automaticamente a quebra de uma linha de tendência de RSI estabelecida.",
+        "A lógica valida primeiro a existência de uma linha de tendência robusta (3 toques com ritmo proporcional) antes de monitorizar ativamente a sua quebra.",
+        "Esta funcionalidade é processada por uma nova Edge Function dedicada (`check-trendline-alarms`) para garantir a performance e o isolamento do sistema principal de alarmes."
+    ]
+},
+releases: [
+    {
     number: '13.6.0',
     changes: [
         "**Novo Sinal Avançado (Divergência Bullish Clássica):**",
@@ -10,7 +20,6 @@ current: {
         "A lógica é calculada para os timeframes de 1h e 4h, e foi adicionado um filtro 'Apenas Divergência Bullish' para uma análise focada."
     ]
 },
-releases: [
     {
         number: '13.5.0',
         changes: [
