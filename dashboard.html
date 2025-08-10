@@ -83,10 +83,9 @@
             </div>
         </nav>
         
-        <!-- Segunda Linha: Ações da Página -->
         <nav class="contextual-nav">
             <button id="add-opportunity-btn" class="btn btn-contextual">
-                <span class="material-symbols-outlined">add</span> Adicionar à Watchlist
+                <span class="material-symbols-outlined">add_shopping_cart</span> Adicionar a Trade Potencial
             </button>
         </nav>
     </header>  
@@ -108,6 +107,29 @@
                 <div id="live-trades-container"><p class="empty-state-message">A carregar...</p></div>
             </section>
         </div>
+
+        <!-- --- INÍCIO DA ALTERAÇÃO: Nova secção da Watchlist de Alarmes --- -->
+        <hr class="section-divider">
+        <section class="watchlist-alarms-section">
+            <h2><span class="material-symbols-outlined">visibility</span> Watchlist de Alarmes</h2>
+            <div class="table-wrapper">
+                <table class="alarms-table">
+                    <thead>
+                        <tr>
+                            <th>Ativo</th>
+                            <th>Condição do Alarme Principal</th>
+                            <th>Último Preço</th>
+                            <th>Sparkline (24h)</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="watchlist-alarms-tbody">
+                        <!-- O conteúdo será preenchido por JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <!-- --- FIM DA ALTERAÇÃO --- -->
     </main>
 
     <div id="add-opportunity-modal" class="modal-overlay">
@@ -155,12 +177,10 @@
             <p>Estratégia: <span id="arm-trade-strategy-name"></span></p>
             <form id="arm-trade-form">
                 <div id="arm-checklist-container"></div>
-                <!-- INÍCIO DA ALTERAÇÃO -->
                 <div class="input-item">
                     <label for="image-url-arm">Link da Imagem do Gráfico (TradingView):</label>
                     <input type="text" id="image-url-arm" placeholder="Cole aqui o link da imagem...">
                 </div>
-                <!-- FIM DA ALTERAÇÃO -->
                 <button type="submit">ARMAR TRADE</button>
             </form>
         </div>
@@ -173,12 +193,10 @@
             <p>Estratégia: <span id="execution-strategy-name"></span></p>
             <form id="execution-form">
                 <div id="execution-checklist-container"></div>
-                <!-- INÍCIO DA ALTERAÇÃO -->
                 <div class="input-item">
                     <label for="image-url-exec">Link da Imagem do Gráfico (TradingView):</label>
                     <input type="text" id="image-url-exec" placeholder="Cole aqui o link da imagem...">
                 </div>
-                <!-- FIM DA ALTERAÇÃO -->
                 <button type="submit">EXECUTAR TRADE</button>
             </form>
         </div>
@@ -207,14 +225,11 @@
         </div>
     </div>
 
-    <!-- Modal para listar alarmes -->
     <div id="alarm-list-modal" class="modal-overlay">
         <div class="modal-content">
             <span id="close-alarm-list-modal">×</span>
             <h3 id="alarm-list-title">Alarmes para Ativo</h3>
-            <div id="alarm-list-container">
-                <!-- A lista de alarmes será inserida aqui -->
-            </div>
+            <div id="alarm-list-container"></div>
             <div id="alarm-list-footer" style="margin-top: 1.5rem; text-align: right; display: none;">
                 <button id="acknowledge-alarms-btn" class="btn btn-secondary btn-contextual">
                     <span class="material-symbols-outlined">task_alt</span> Reconhecer Alarmes
@@ -234,11 +249,9 @@
     <script type="module" src="js/version.js"></script>
     <script type="module" src="js/dark-mode.js"></script>
     <script type="module" src="js/auth.js"></script>
-
     
 <script>
   let deferredPrompt;
-
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
@@ -257,7 +270,6 @@
     });
   });
 </script>
-
  <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -267,7 +279,5 @@
     });
   }
 </script>
-
-    
 </body>
 </html>
