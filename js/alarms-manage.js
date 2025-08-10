@@ -6,13 +6,11 @@ import { enterEditMode } from './alarms-create.js';
 
 // --- LÓGICA DO MODAL DO GRÁFICO ---
 
-// 1. Declara as variáveis no escopo do módulo para serem acessíveis por todas as funções.
 let chartModal = null;
 let closeChartModalBtn = null;
 let chartContainer = null;
 
 export function openChartModal(symbol) {
-    // A inicialização das variáveis já terá acontecido no DOMContentLoaded.
     if (!chartModal || !chartContainer) return;
     chartContainer.innerHTML = '';
     const currentTheme = document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light';
@@ -69,10 +67,14 @@ async function fetchAndDisplayAlarms() {
             else if (alarm.alarm_type === 'rsi_crossover') { alarmDescription = `RSI(${alarm.rsi_period}) cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} da MA(${alarm.rsi_ma_period}) no ${alarm.indicator_timeframe}`; } 
             else if (alarm.alarm_type === 'ema_touch') { alarmDescription = `Preço testa a EMA(${alarm.ema_period}) como ${alarm.condition === 'test_support' ? 'SUPORTE' : 'RESISTÊNCIA'} no ${alarm.indicator_timeframe}`; } 
             else if (alarm.alarm_type === 'combo') { const primaryTriggerText = alarm.condition === 'test_support' ? `testa a EMA (Suporte)` : `testa a EMA (Resistência)`; const secondaryTriggerText = `Estocástico(${alarm.combo_period}) ${alarm.combo_condition === 'below' ? 'abaixo de' : 'acima de'} ${alarm.combo_target_price}`; alarmDescription = `CONFLUÊNCIA: ${primaryTriggerText} E ${secondaryTriggerText} no ${alarm.indicator_timeframe}`; } 
-            // --- INÍCIO DA ALTERAÇÃO ---
             else if (alarm.alarm_type === 'rsi_trendline') { 
                 const trendTypeText = alarm.trendline_type === 'support' ? 'Suporte (Fundos Ascendentes)' : 'Resistência (Picos Descendentes)';
                 alarmDescription = `Aguardando ${alarm.touch_count}º toque na L.T. de ${trendTypeText} no ${alarm.indicator_timeframe}`;
+            }
+            // --- INÍCIO DA ALTERAÇÃO ---
+            else if (alarm.alarm_type === 'rsi_trendline_break') {
+                const trendTypeText = alarm.trendline_type === 'support' ? 'Suporte (LTA)' : 'Resistência (LTB)';
+                alarmDescription = `A monitorizar quebra da L.T. de ${trendTypeText} no ${alarm.indicator_timeframe}`;
             }
             // --- FIM DA ALTERAÇÃO ---
             else { alarmDescription = `Preço ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} USD`; }
@@ -107,10 +109,14 @@ async function fetchAndDisplayAlarms() {
             else if (alarm.alarm_type === 'rsi_crossover') { alarmDescription = `RSI(${alarm.rsi_period}) cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} da MA(${alarm.rsi_ma_period}) no ${alarm.indicator_timeframe}`; } 
             else if (alarm.alarm_type === 'ema_touch') { alarmDescription = `Preço testa a EMA(${alarm.ema_period}) como ${alarm.condition === 'test_support' ? 'SUPORTE' : 'RESISTÊNCIA'} no ${alarm.indicator_timeframe}`; } 
             else if (alarm.alarm_type === 'combo') { const primaryTriggerText = alarm.condition === 'test_support' ? `testa a EMA (Suporte)` : `testa a EMA (Resistência)`; const secondaryTriggerText = `Estocástico(${alarm.combo_period}) ${alarm.combo_condition === 'below' ? 'abaixo de' : 'acima de'} ${alarm.combo_target_price}`; alarmDescription = `CONFLUÊNCIA: ${primaryTriggerText} E ${secondaryTriggerText} no ${alarm.indicator_timeframe}`; } 
-            // --- INÍCIO DA ALTERAÇÃO ---
             else if (alarm.alarm_type === 'rsi_trendline') { 
                 const trendTypeText = alarm.trendline_type === 'support' ? 'Suporte (Fundos Ascendentes)' : 'Resistência (Picos Descendentes)';
                 alarmDescription = `Detetado ${alarm.touch_count}º toque na L.T. de ${trendTypeText} no ${alarm.indicator_timeframe}`;
+            }
+            // --- INÍCIO DA ALTERAÇÃO ---
+            else if (alarm.alarm_type === 'rsi_trendline_break') {
+                const trendTypeText = alarm.trendline_type === 'support' ? 'Suporte (LTA)' : 'Resistência (LTB)';
+                alarmDescription = `Quebra da L.T. de ${trendTypeText} no ${alarm.indicator_timeframe}`;
             }
             // --- FIM DA ALTERAÇÃO ---
             else { alarmDescription = `Preço ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} USD`; }
@@ -168,8 +174,6 @@ async function deleteAlarm(alarmId) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // 2. Inicializa as variáveis e adiciona os listeners do modal DEPOIS de o DOM estar pronto.
-    // Este código corre em AMBAS as páginas (create e manage), mas só encontra os elementos se eles existirem.
     chartModal = document.getElementById('chart-modal');
     closeChartModalBtn = document.getElementById('close-chart-modal');
     chartContainer = document.getElementById('chart-modal-container');
@@ -179,14 +183,12 @@ document.addEventListener('DOMContentLoaded', () => {
         chartModal.addEventListener('click', (e) => { if (e.target.id === 'chart-modal') closeChartModal(); });
     }
 
-    // 3. Adiciona uma verificação para o código que SÓ deve correr na página de gestão de alarmes.
     const mainContainer = document.querySelector('main');
     const activeAlarmsTable = document.getElementById('active-alarms-tbody');
     if (!mainContainer || !activeAlarmsTable) {
-        return; // Sai da função se não estiver na página 'alarms-manage'
+        return; 
     }
 
-    // O código abaixo só será executado se as condições acima forem falsas, ou seja, se estivermos na página correta.
     mainContainer.addEventListener('click', (e) => {
         const deleteBtn = e.target.closest('.delete-btn');
         if (deleteBtn) {
