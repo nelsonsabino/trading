@@ -41,7 +41,6 @@ function renderSparkline(containerId, dataSeries) {
     new ApexCharts(container, options).render();
 }
 
-// ... (as funções getIconForLabel, createChecklistItem, createInputItem, generateDynamicChecklist, populateStrategySelect permanecem inalteradas) ...
 function getIconForLabel(labelText) {
     const text = labelText.toLowerCase();
     if (text.includes('tendência')) return 'trending_up';
@@ -117,7 +116,6 @@ export function populateStrategySelect(strategies) {
         });
     }
 }
-// --- FIM DO BLOCO INALTERADO ---
 
 async function acknowledgeAlarm(assetPair) {
     try {
@@ -192,7 +190,9 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
     card.className = 'trade-card';
     card.dataset.tradeId = trade.id;
     const assetName = trade.data.asset;
+    // --- INÍCIO DA CORREÇÃO: Linha reintroduzida ---
     const tradingViewSymbol = `BINANCE:${assetName}`;
+    // --- FIM DA CORREÇÃO ---
     const assetMarketData = marketData[assetName] || { price: 0, change: 0, sparkline: [] };
     const priceChangeClass = assetMarketData.change >= 0 ? 'positive-pnl' : 'negative-pnl';
     if (trade.data.status === 'ARMED') card.classList.add('armed');
@@ -258,7 +258,6 @@ export function displayTrades(trades, marketData, allAlarms) {
     }
 }
 
-// --- INÍCIO DA ALTERAÇÃO: Nova função para renderizar a tabela de watchlist de alarmes ---
 export function displayWatchlistTable(allTrades, allAlarms, marketData) {
     const tbody = document.getElementById('watchlist-alarms-tbody');
     if (!tbody) return;
@@ -269,7 +268,7 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
     const assetsOnWatchlist = activeAlarms.reduce((acc, alarm) => {
         const asset = alarm.asset_pair;
         if (!assetsInKanban.has(asset) && !acc[asset]) {
-            acc[asset] = alarm; // Guarda o primeiro (mais recente) alarme para este ativo
+            acc[asset] = alarm;
         }
         return acc;
     }, {});
@@ -307,7 +306,6 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
     tbody.innerHTML = tableRowsHtml;
     watchlistAssets.forEach(alarm => renderSparkline(`sparkline-watchlist-${alarm.asset_pair}`, marketData[alarm.asset_pair]?.sparkline));
 }
-// --- FIM DA ALTERAÇÃO ---
 
 document.addEventListener('DOMContentLoaded', () => {
     const dashboard = document.querySelector('.dashboard-columns');
@@ -341,16 +339,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     break;
                 case 'view-alarms': loadAndOpenAlarmModal(button.dataset.asset, 'active'); break;
                 case 'acknowledge-and-view-alarm': loadAndOpenAlarmModal(button.dataset.asset, 'triggered'); break;
-                // --- INÍCIO DA ALTERAÇÃO: Adiciona listeners para os novos botões ---
                 case 'revert-to-watchlist': if (trade) handleRevertToWatchlist(trade); break;
                 case 'revert-to-potential':
                 case 'revert-to-armed': if (trade) handleRevertStatus(trade, action); break;
-                // --- FIM DA ALTERAÇÃO ---
             }
         });
     }
 
-    // --- INÍCIO DA ALTERAÇÃO: Listener para a nova tabela de watchlist ---
     const watchlistTable = document.getElementById('watchlist-alarms-tbody');
     if (watchlistTable) {
         watchlistTable.addEventListener('click', (e) => {
@@ -364,5 +359,4 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-    // --- FIM DA ALTERAÇÃO ---
 });
