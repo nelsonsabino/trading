@@ -252,7 +252,6 @@
     justify-content: flex-end; 
 }
 
-
 /* --- MODAL DE LISTA DE ALARMES --- */
 .alarm-list-item {
     display: flex;
@@ -325,42 +324,8 @@
     margin-bottom: 0.5rem;
 }
 
-/* Badge de tendência RSI */
-.rsi-trend-signal {
-    display: inline-block;
-    padding: 2px 6px;
-    font-size: 0.7em;
-    font-weight: bold;
-    border-radius: 4px;
-    margin-left: 5px;
-    cursor: help;
-    border: 1px solid var(--border-primary);
-    background-color: var(--surface-primary);
-    color: var(--text-secondary);
-}
-
-.rsi-trend-signal.rsi-trend-support.confirmed {
-    background-color: var(--accent-green);
-    color: #fff;
-    border-color: var(--accent-green);
-}
-
-.dark-mode .rsi-trend-signal.rsi-trend-support.confirmed {
-    color: var(--surface-primary);
-}
-
-.rsi-trend-signal.rsi-trend-resistance.confirmed {
-    background-color: var(--accent-red);
-    color: #fff;
-    border-color: var(--accent-red);
-}
-
-.dark-mode .rsi-trend-signal.rsi-trend-resistance.confirmed {
-    color: var(--surface-primary);
-}
-
 /* --- INÍCIO DA ALTERAÇÃO --- */
-/* Novo badge para o Sinal de 3º Toque em L.T. */
+/* Badge para o Sinal de 3º Toque em L.T. */
 .third-touch-signal {
     display: inline-block;
     padding: 2px 6px;
