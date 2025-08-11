@@ -1,6 +1,9 @@
 // js/market-scan.js
 
 import { supabase } from './services.js';
+// --- INÍCIO DA ALTERAÇÃO: Importar a função do módulo central ---
+import { openChartModal } from './chart-modal.js';
+// --- FIM DA ALTERAÇÃO ---
 
 const CACHE_KEY_DATA = 'marketScannerCache';
 const CACHE_KEY_TIMESTAMP = 'marketScannerCacheTime';
@@ -15,59 +18,9 @@ let filterThirdTouch = false;
 let showSparklines = true;
 let currentTopN = 50;
 
-const chartModal = document.getElementById('chart-modal');
-const closeChartModalBtn = document.getElementById('close-chart-modal');
-const chartContainer = document.getElementById('chart-modal-container');
-
-async function openChartModal(symbol) {
-    if (!chartModal || !chartContainer) return;
-    chartContainer.innerHTML = '<p style="padding: 2rem; text-align: center;">A carregar gráfico detalhado...</p>';
-    chartModal.style.display = 'flex';
-    try {
-        const { data: response, error } = await supabase.functions.invoke('get-asset-details-data', {
-            body: { symbol: symbol, interval: '1h', limit: 170 },
-        });
-        if (error) throw error;
-        if (!response || !response.ohlc || !response.indicators) throw new Error('Dados de gráfico ou indicadores não foram encontrados.');
-        
-        const klinesData = response.ohlc;
-        const indicatorsData = response.indicators;
-        let series = [];
-        const closePriceSeriesData = klinesData.map(kline => ({ x: kline[0], y: kline[4] }));
-        series.push({ name: 'Preço (USD)', type: 'line', data: closePriceSeriesData });
-        if (indicatorsData.ema50_data) series.push({ name: 'EMA 50', type: 'line', data: indicatorsData.ema50_data.map((emaVal, index) => ({ x: klinesData[index][0], y: emaVal })) });
-        if (indicatorsData.ema200_data) series.push({ name: 'EMA 200', type: 'line', data: indicatorsData.ema200_data.map((emaVal, index) => ({ x: klinesData[index][0], y: emaVal })) });
-        
-        const options = {
-            series: series,
-            chart: { type: 'line', height: '100%', toolbar: { show: true, autoSelected: 'pan' } },
-            title: { text: `${symbol} - Gráfico de 1 Hora`, align: 'left' },
-            colors: ['#007bff', '#ffc107', '#dc3545'],
-            stroke: { curve: 'smooth', width: 2 },
-            xaxis: { type: 'datetime' },
-            yaxis: { labels: { formatter: (val) => `$${val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 4})}` }, tooltip: { enabled: true } },
-            tooltip: { x: { format: 'dd MMM yyyy HH:mm' } },
-            theme: { mode: document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light' }
-        };
-        chartContainer.innerHTML = '';
-        const chart = new ApexCharts(chartContainer, options);
-        chart.render();
-    } catch (err) {
-        console.error("Erro ao carregar o gráfico no modal:", err);
-        chartContainer.innerHTML = `<p style="padding: 2rem; text-align: center; color: red;">Erro ao carregar o gráfico: ${err.message}</p>`;
-    }
-}
-
-function closeChartModal() {
-    if (!chartModal || !chartContainer) return;
-    chartContainer.innerHTML = '';
-    chartModal.style.display = 'none';
-}
-
-if (chartModal) {
-    closeChartModalBtn.addEventListener('click', closeChartModal);
-    chartModal.addEventListener('click', (e) => { if (e.target.id === 'chart-modal') closeChartModal(); });
-}
+// --- INÍCIO DA ALTERAÇÃO: A lógica do modal foi movida para chart-modal.js ---
+// As funções openChartModal, closeChartModal e os event listeners relacionados foram removidos daqui.
+// --- FIM DA ALTERAÇÃO ---
 
 function renderSparkline(containerId, dataSeries) {
     if (!dataSeries || dataSeries.length < 2) return;
@@ -77,10 +30,19 @@ function renderSparkline(containerId, dataSeries) {
     const firstPrice = dataSeries[0];
     const lastPrice = dataSeries[dataSeries.length - 1];
     const chartColor = lastPrice >= firstPrice ? '#28a745' : '#dc3545';
+    const isDarkMode = document.documentElement.classList.contains('dark-mode');
     const options = {
-        series: [{ data: dataSeries }], chart: { type: 'line', height: 50, sparkline: { enabled: true }},
-        stroke: { curve: 'smooth', width: 2 }, colors: [chartColor],
-        tooltip: { fixed: { enabled: false }, x: { show: false }, y: { title: { formatter: () => '' }, formatter: (val) => val.toFixed(5) }, marker: { show: false }}
+        series: [{ data: dataSeries }], 
+        chart: { type: 'line', height: 50, sparkline: { enabled: true }},
+        stroke: { curve: 'smooth', width: 2 }, 
+        colors: [chartColor],
+        tooltip: { 
+            fixed: { enabled: false }, 
+            x: { show: false }, 
+            y: { title: { formatter: () => '' }, formatter: (val) => val.toFixed(5) }, 
+            marker: { show: false },
+            theme: isDarkMode ? 'dark' : 'light'
+        }
     };
     const chart = new ApexCharts(container, options);
     chart.render();
@@ -186,7 +148,7 @@ function createTableRow(ticker, index, extraData) {
             <td data-label="Ações">
                 <div class="action-buttons">
                     <button class="icon-action-btn" data-action="monitor" data-symbol="${ticker.symbol}" title="Monitorizar Ativo (Cria Alarme Stoch 15m)"><span class="material-symbols-outlined">visibility</span></button>
-                    <a href="#" class="icon-action-btn view-chart-btn" data-symbol="${ticker.symbol}" title="Ver Gráfico"><span class="material-symbols-outlined">monitoring</span></a>
+                    <button class="icon-action-btn" data-action="view-chart" data-symbol="${ticker.symbol}" title="Ver Gráfico"><span class="material-symbols-outlined">monitoring</span></button>
                     <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn" title="TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
                     <a href="${createAlarmUrl}" class="icon-action-btn" title="Criar Alarme Detalhado"><span class="material-symbols-outlined">alarm_add</span></a>
                 </div>
@@ -288,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (tbody) {
         tbody.addEventListener('click', (e) => {
-            const button = e.target.closest('button, a');
+            const button = e.target.closest('button, a'); // Mantém o seletor
             if (!button) return;
             const action = button.dataset.action;
             const symbol = button.dataset.symbol;
@@ -296,9 +258,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (action === 'monitor' && symbol) {
                 e.preventDefault();
                 handleMonitorAssetClick(symbol);
-            } else if (button.classList.contains('view-chart-btn') && symbol) {
+            } else if (action === 'view-chart' && symbol) { // Alterado para corresponder ao novo botão
                 e.preventDefault();
-                openChartModal(symbol);
+                openChartModal(symbol); // Chama a função importada
             }
         });
     }
