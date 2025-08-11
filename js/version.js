@@ -2,14 +2,23 @@
 
 export const changelogData = {
 current: {
-    number: '14.1.1',
+    number: '14.2.0',
     changes: [
-        "**Correção do Fluxo de Trabalho (Reverter para Watchlist):**",
-        "Resolvida uma falha na lógica onde reverter um trade 'Potencial' sem alarmes ativos o removia de todas as vistas.",
-        "O sistema agora verifica se um ativo revertido tem alarmes. Se não tiver, cria automaticamente um alarme padrão (Stoch 15m), garantindo que o ativo permanece sempre na 'Watchlist de Alarmes' após a reversão."
+        "**Correção e Depuração do Alarme de Quebra de L.T.:**",
+        "Corrigido o bug na lógica de projeção da linha de tendência que impedia os alarmes de disparar.",
+        "A tolerância de alinhamento foi ajustada para 8 pontos para uma deteção de padrões mais realista, e a lógica de deteção foi melhorada para procurar sequências válidas.",
+        "Adicionado um modo de depuração à Edge Function para facilitar os testes manuais da funcionalidade."
     ]
 },
 releases: [
+    {
+        number: '14.1.1',
+        changes: [
+            "**Correção do Fluxo de Trabalho (Reverter para Watchlist):**",
+            "Resolvida uma falha na lógica onde reverter um trade 'Potencial' sem alarmes ativos o removia de todas as vistas.",
+            "O sistema agora verifica se um ativo revertido tem alarmes. Se não tiver, cria automaticamente um alarme padrão (Stoch 15m), garantindo que o ativo permanece sempre na 'Watchlist de Alarmes' após a reversão."
+        ]
+    },
     {
         number: '14.1.0',
         changes: [
