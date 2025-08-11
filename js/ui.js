@@ -3,7 +3,9 @@
 import { supabase } from './services.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openAddModal } from './modals.js';
-import { loadAndOpenForEditing, handleRevertStatus, handleRevertToWatchlist } from './handlers.js';
+// INÍCIO DA ALTERAÇÃO: Importar a nova função de apagar
+import { loadAndOpenForEditing, handleRevertStatus, handleRevertToWatchlist, handleDeleteAlarm } from './handlers.js';
+// FIM DA ALTERAÇÃO
 import { getLastCreatedTradeId, setLastCreatedTradeId, getVisibleImageIds, setVisibleImageIds } from './state.js';
 
 let tradesForEventListeners = [];
@@ -144,7 +146,8 @@ function getAlarmDescription(alarm, forTable = false) {
     }
 }
 
-function openAlarmListModal(assetPair, alarms, mode = 'active') {
+// --- INÍCIO DA ALTERAÇÃO: Função do modal refatorada e melhorada ---
+function openAlarmListModal(titleText, alarmsToDisplay) {
     const modal = document.getElementById('alarm-list-modal');
     const title = document.getElementById('alarm-list-title');
     const container = document.getElementById('alarm-list-container');
@@ -153,23 +156,44 @@ function openAlarmListModal(assetPair, alarms, mode = 'active') {
     const acknowledgeBtn = document.getElementById('acknowledge-alarms-btn');
     if (!modal) return;
     
-    title.textContent = mode === 'active' ? `Alarmes Ativos para ${assetPair}` : `Alarmes Disparados para ${assetPair}`;
-    const filteredAlarms = alarms.filter(a => a.asset_pair === assetPair && (mode === 'active' ? a.status === 'active' : a.status === 'triggered' && !a.acknowledged));
+    title.textContent = titleText;
     
-    container.innerHTML = filteredAlarms.length === 0 ? '<p>Nenhum alarme encontrado.</p>' : filteredAlarms.map(alarm => `
-        <div class="alarm-list-item">
-            <span class="alarm-list-description">${getAlarmDescription(alarm)}</span>
-            <div class="alarm-list-actions"><a href="alarms-create.html?editAlarmId=${alarm.id}" class="icon-action-btn" title="Editar"><span class="material-symbols-outlined">edit</span></a></div>
-        </div>`).join('');
+    // Ordenar por data de criação, do mais recente para o mais antigo
+    alarmsToDisplay.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
-    footer.style.display = mode === 'triggered' ? 'block' : 'none';
-    if(mode === 'triggered') {
-        acknowledgeBtn.onclick = async () => {
-            await acknowledgeAlarm(assetPair);
-            modal.style.display = 'none';
-            location.reload(); 
-        };
+    container.innerHTML = alarmsToDisplay.length === 0 ? '<p>Nenhum alarme encontrado.</p>' : alarmsToDisplay.map(alarm => {
+        const createdAt = new Date(alarm.created_at).toLocaleString('pt-PT', {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        });
+
+        return `
+        <div class="alarm-list-item">
+            <div>
+                <span class="alarm-list-description">${getAlarmDescription(alarm)}</span>
+                <span class="alarm-list-timestamp">Criado em: ${createdAt}</span>
+            </div>
+            <div class="alarm-list-actions">
+                <a href="alarms-create.html?editAlarmId=${alarm.id}" class="icon-action-btn" title="Editar"><span class="material-symbols-outlined">edit</span></a>
+                <button class="icon-action-btn" data-action="delete-alarm" data-alarm-id="${alarm.id}" title="Apagar Alarme"><span class="material-symbols-outlined">delete_forever</span></button>
+            </div>
+        </div>`;
+    }).join('');
+    
+    // Verificar se algum dos alarmes a exibir é um alarme disparado
+    const isTriggeredMode = alarmsToDisplay.some(a => a.status === 'triggered');
+    footer.style.display = isTriggeredMode ? 'block' : 'none';
+    if(isTriggeredMode) {
+        const assetPair = alarmsToDisplay.length > 0 ? alarmsToDisplay[0].asset_pair : null;
+        if (assetPair) {
+            acknowledgeBtn.onclick = async () => {
+                await acknowledgeAlarm(assetPair);
+                modal.style.display = 'none';
+                location.reload(); 
+            };
+        }
     }
+
     modal.style.display = 'flex';
     closeBtn.onclick = () => modal.style.display = 'none';
     modal.onclick = (e) => { if (e.target.id === 'alarm-list-modal') modal.style.display = 'none'; };
@@ -177,13 +201,19 @@ function openAlarmListModal(assetPair, alarms, mode = 'active') {
 
 async function loadAndOpenAlarmModal(assetPair, mode) {
     try {
-        const { data, error } = await supabase.from('alarms').select('*');
+        const { data, error } = await supabase.from('alarms').select('*').eq('asset_pair', assetPair);
         if (error) throw error;
-        openAlarmListModal(assetPair, data, mode);
+        
+        const titleText = mode === 'active' ? `Alarmes Ativos para ${assetPair}` : `Alarmes Disparados para ${assetPair}`;
+        const alarmsToDisplay = data.filter(a => mode === 'active' ? a.status === 'active' : a.status === 'triggered' && !a.acknowledged);
+
+        openAlarmListModal(titleText, alarmsToDisplay);
+
     } catch (err) {
         console.error("Erro ao buscar alarmes para o modal:", err);
     }
 }
+// --- FIM DA ALTERAÇÃO ---
 
 export function createTradeCard(trade, marketData = {}, allAlarms = []) {
     const card = document.createElement('div');
@@ -256,6 +286,7 @@ export function displayTrades(trades, marketData, allAlarms) {
     }
 }
 
+// --- INÍCIO DA ALTERAÇÃO: Lógica da tabela de watchlist completamente refatorada ---
 export function displayWatchlistTable(allTrades, allAlarms, marketData) {
     const tbody = document.getElementById('watchlist-alarms-tbody');
     if (!tbody) return;
@@ -266,40 +297,43 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
             .map(t => t.data.asset)
     );
     
-    const activeAlarms = allAlarms.filter(a => a.status === 'active');
-    
-    const assetsOnWatchlist = activeAlarms.reduce((acc, alarm) => {
-        const asset = alarm.asset_pair;
-        if (!assetsInKanban.has(asset) && !acc[asset]) {
-            acc[asset] = alarm;
+    const activeAlarmsByAsset = allAlarms.reduce((acc, alarm) => {
+        if (alarm.status === 'active') {
+            if (!acc[alarm.asset_pair]) {
+                acc[alarm.asset_pair] = [];
+            }
+            acc[alarm.asset_pair].push(alarm);
         }
         return acc;
     }, {});
+    
+    const assetsForWatchlist = Object.keys(activeAlarmsByAsset).filter(asset => !assetsInKanban.has(asset));
 
-    const watchlistAssets = Object.values(assetsOnWatchlist);
-
-    if (watchlistAssets.length === 0) {
+    if (assetsForWatchlist.length === 0) {
         tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Nenhum ativo a ser monitorizado. Adicione um alarme a um ativo para ele aparecer aqui.</td></tr>';
         return;
     }
 
-    const tableRowsHtml = watchlistAssets.map(alarm => {
-        const assetName = alarm.asset_pair;
+    const tableRowsHtml = assetsForWatchlist.map(assetName => {
+        const alarmsForAsset = activeAlarmsByAsset[assetName];
+        // Encontrar o alarme mais recente para este ativo
+        const latestAlarm = alarmsForAsset.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
+
         const assetMarketData = marketData[assetName] || { price: 0, sparkline: [] };
         let formattedPrice = assetMarketData.price >= 1.0 ? assetMarketData.price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$' + assetMarketData.price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
 
-        // --- INÍCIO DA ALTERAÇÃO ---
         const hasTriggeredUnacknowledgedAlarm = allAlarms.some(a => a.asset_pair === assetName && a.status === 'triggered' && !a.acknowledged);
         const triggeredClass = hasTriggeredUnacknowledgedAlarm ? 'class="alarm-triggered"' : '';
         const acknowledgeButtonHtml = hasTriggeredUnacknowledgedAlarm 
             ? `<button class="acknowledge-alarm-btn" data-action="acknowledge-and-view-alarm" data-asset="${assetName}" title="Ver Alarme Disparado"><span class="material-symbols-outlined">alarm</span> OK</button>`
             : '';
-        // --- FIM DA ALTERAÇÃO ---
 
         return `
             <tr ${triggeredClass}>
                 <td data-label="Ativo"><strong><a href="asset-details.html?symbol=${assetName}" class="asset-link">${assetName}</a></strong></td>
-                <td data-label="Condição do Alarme Principal">${getAlarmDescription(alarm, true)}</td>
+                <td data-label="Ultimo alarme criado">
+                    <a href="#" class="alarm-details-link" data-action="manage-alarms" data-asset="${assetName}">${getAlarmDescription(latestAlarm, true)}</a>
+                </td>
                 <td data-label="Último Preço">${formattedPrice}</td>
                 <td data-label="Sparkline (24h)"><div class="sparkline-container" id="sparkline-watchlist-${assetName}"></div></td>
                 <td data-label="Ações">
@@ -316,8 +350,9 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
     }).join('');
 
     tbody.innerHTML = tableRowsHtml;
-    watchlistAssets.forEach(alarm => renderSparkline(`sparkline-watchlist-${alarm.asset_pair}`, marketData[alarm.asset_pair]?.sparkline));
+    assetsForWatchlist.forEach(assetName => renderSparkline(`sparkline-watchlist-${assetName}`, marketData[assetName]?.sparkline));
 }
+// --- FIM DA ALTERAÇÃO ---
 
 document.addEventListener('DOMContentLoaded', () => {
     const dashboard = document.querySelector('.dashboard-columns');
@@ -361,19 +396,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const watchlistTable = document.getElementById('watchlist-alarms-tbody');
     if (watchlistTable) {
         watchlistTable.addEventListener('click', (e) => {
-            const button = e.target.closest('button[data-action]');
-            if (!button) return;
-            e.preventDefault();
-            const action = button.dataset.action;
-            const symbol = button.dataset.symbol;
+            const targetElement = e.target.closest('[data-action]');
+            if (!targetElement) return;
+            
+            const action = targetElement.dataset.action;
+            const symbol = targetElement.dataset.symbol || targetElement.dataset.asset;
+
+            if (action !== 'delete-alarm') { // A ação de apagar será tratada no modal
+                e.preventDefault();
+            }
 
             if (action === 'add-to-potential' && symbol) {
                 openAddModal();
                 const modalAssetInput = document.getElementById('asset');
                 if (modalAssetInput) modalAssetInput.value = symbol;
-            } else if (action === 'acknowledge-and-view-alarm' && button.dataset.asset) {
-                loadAndOpenAlarmModal(button.dataset.asset, 'triggered');
+            } else if (action === 'acknowledge-and-view-alarm' && symbol) {
+                loadAndOpenAlarmModal(symbol, 'triggered');
+            } else if (action === 'manage-alarms' && symbol) {
+                loadAndOpenAlarmModal(symbol, 'active');
             }
         });
     }
+
+    // --- INÍCIO DA ALTERAÇÃO: Event listener central para o modal de alarmes ---
+    const alarmModal = document.getElementById('alarm-list-modal');
+    if (alarmModal) {
+        alarmModal.addEventListener('click', (e) => {
+            const button = e.target.closest('button[data-action="delete-alarm"]');
+            if (button) {
+                e.preventDefault();
+                const alarmId = button.dataset.alarmId;
+                handleDeleteAlarm(alarmId);
+            }
+        });
+    }
+    // --- FIM DA ALTERAÇÃO ---
 });
