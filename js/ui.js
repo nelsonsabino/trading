@@ -3,9 +3,7 @@
 import { supabase } from './services.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openAddModal } from './modals.js';
-// INÍCIO DA ALTERAÇÃO: Importar a nova função de apagar
 import { loadAndOpenForEditing, handleRevertStatus, handleRevertToWatchlist, handleDeleteAlarm } from './handlers.js';
-// FIM DA ALTERAÇÃO
 import { getLastCreatedTradeId, setLastCreatedTradeId, getVisibleImageIds, setVisibleImageIds } from './state.js';
 
 let tradesForEventListeners = [];
@@ -27,21 +25,35 @@ const setVisibleImageIdsInternal = (ids) => {
     }
 };
 
+// --- INÍCIO DA ALTERAÇÃO ---
 function renderSparkline(containerId, dataSeries) {
     const container = document.getElementById(containerId);
     if (!container || !dataSeries || dataSeries.length < 2) return;
     container.innerHTML = '';
+
+    const isDarkMode = document.documentElement.classList.contains('dark-mode');
+    
     const computedStyle = getComputedStyle(document.documentElement);
     const positiveColor = computedStyle.getPropertyValue('--feedback-positive').trim();
     const negativeColor = computedStyle.getPropertyValue('--feedback-negative').trim();
     const chartColor = dataSeries[dataSeries.length - 1] >= dataSeries[0] ? positiveColor : negativeColor;
+    
     const options = {
-        series: [{ data: dataSeries }], chart: { type: 'line', height: 40, width: 100, sparkline: { enabled: true }},
-        stroke: { curve: 'smooth', width: 2 }, colors: [chartColor],
-        tooltip: { fixed: { enabled: false }, x: { show: false }, y: { title: { formatter: () => '' } }, marker: { show: false }}
+        series: [{ data: dataSeries }], 
+        chart: { type: 'line', height: 40, width: 100, sparkline: { enabled: true }},
+        stroke: { curve: 'smooth', width: 2 }, 
+        colors: [chartColor],
+        tooltip: { 
+            fixed: { enabled: false }, 
+            x: { show: false }, 
+            y: { title: { formatter: () => '' } }, 
+            marker: { show: false },
+            theme: isDarkMode ? 'dark' : 'light' // Adiciona o tema dinâmico ao tooltip
+        }
     };
     new ApexCharts(container, options).render();
 }
+// --- FIM DA ALTERAÇÃO ---
 
 function getIconForLabel(labelText) {
     const text = labelText.toLowerCase();
@@ -146,7 +158,6 @@ function getAlarmDescription(alarm, forTable = false) {
     }
 }
 
-// --- INÍCIO DA ALTERAÇÃO: Função do modal refatorada e melhorada ---
 function openAlarmListModal(titleText, alarmsToDisplay) {
     const modal = document.getElementById('alarm-list-modal');
     const title = document.getElementById('alarm-list-title');
@@ -213,7 +224,6 @@ async function loadAndOpenAlarmModal(assetPair, mode) {
         console.error("Erro ao buscar alarmes para o modal:", err);
     }
 }
-// --- FIM DA ALTERAÇÃO ---
 
 export function createTradeCard(trade, marketData = {}, allAlarms = []) {
     const card = document.createElement('div');
@@ -286,7 +296,6 @@ export function displayTrades(trades, marketData, allAlarms) {
     }
 }
 
-// --- INÍCIO DA ALTERAÇÃO: Lógica da tabela de watchlist completamente refatorada ---
 export function displayWatchlistTable(allTrades, allAlarms, marketData) {
     const tbody = document.getElementById('watchlist-alarms-tbody');
     if (!tbody) return;
@@ -352,7 +361,6 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
     tbody.innerHTML = tableRowsHtml;
     assetsForWatchlist.forEach(assetName => renderSparkline(`sparkline-watchlist-${assetName}`, marketData[assetName]?.sparkline));
 }
-// --- FIM DA ALTERAÇÃO ---
 
 document.addEventListener('DOMContentLoaded', () => {
     const dashboard = document.querySelector('.dashboard-columns');
@@ -418,7 +426,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- INÍCIO DA ALTERAÇÃO: Event listener central para o modal de alarmes ---
     const alarmModal = document.getElementById('alarm-list-modal');
     if (alarmModal) {
         alarmModal.addEventListener('click', (e) => {
@@ -430,5 +437,4 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-    // --- FIM DA ALTERAÇÃO ---
 });
