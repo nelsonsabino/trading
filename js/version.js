@@ -2,14 +2,23 @@
 
 export const changelogData = {
 current: {
-    number: '14.2.1',
+    number: '14.3.0',
     changes: [
-        "**Correção Crítica nos Alarmes de Cruzamento do Estocástico:**",
-        "Resolvido o bug onde os alarmes de cruzamento do Estocástico disparavam para ambas as direções (bullish e bearish), independentemente da condição definida.",
-        "A lógica de verificação na Edge Function `check-price-alarms` foi corrigida para respeitar rigorosamente a direção ('para CIMA' ou 'para BAIXO') definida no alarme."
+        "**Melhoria na Gestão de Alarmes da Watchlist:**",
+        "A coluna 'Condição do Alarme' na watchlist foi renomeada para 'Ultimo alarme criado' e agora exibe o alarme ativo mais recente.",
+        "A descrição do alarme na watchlist é agora um link que abre um modal com a lista de todos os alarmes ativos para o ativo, ordenados por data de criação.",
+        "O modal de gestão de alarmes agora permite apagar alarmes diretamente, oferecendo um fluxo de gestão mais rápido e integrado."
     ]
 },
 releases: [
+    {
+        number: '14.2.1',
+        changes: [
+            "**Correção Crítica nos Alarmes de Cruzamento do Estocástico:**",
+            "Resolvido o bug onde os alarmes de cruzamento do Estocástico disparavam para ambas as direções (bullish e bearish), independentemente da condição definida.",
+            "A lógica de verificação na Edge Function `check-price-alarms` foi corrigida para respeitar rigorosamente a direção ('para CIMA' ou 'para BAIXO') definida no alarme."
+        ]
+    },
     {
         number: '14.2.0',
         changes: [
