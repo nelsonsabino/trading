@@ -8,6 +8,7 @@ current: {
         "Ajustado o estilo dos botões de ação com ícone nas tabelas (Dashboard e Market Scanner) para garantir que todos têm um tamanho uniforme e quadrado, corrigindo o desalinhamento visual."
     ]
 },
+    releases: [
     {
         number: '14.4.0',
         changes: [
@@ -15,7 +16,6 @@ current: {
             "A funcionalidade de ver o gráfico detalhado foi unificada. O botão de gráfico na 'Watchlist de Alarmes' agora abre um modal com o gráfico ApexChart, em vez de navegar para outra página, replicando o comportamento do Market Scanner para uma experiência mais fluida e consistente."
         ]
     },
-releases: [
     {
         number: '14.3.2',
         changes: [
