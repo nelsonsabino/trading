@@ -6,6 +6,9 @@ import { getTrade, addTrade, updateTrade, closeTradeAndUpdateBalance, deleteTrad
 import { getCurrentTrade, setCurrentTrade, getStrategies, setLastCreatedTradeId } from './state.js';
 import { closeAddModal, closeArmModal, closeExecModal, closeCloseTradeModal, openAddModal, openArmModal, openExecModal } from './modals.js';
 import { generateDynamicChecklist } from './ui.js';
+// --- INÍCIO DA ALTERAÇÃO 1: Importar o supabase para poder interagir com a DB de alarmes ---
+import { supabase } from './services.js';
+// --- FIM DA ALTERAÇÃO 1 ---
 
 export async function handleAddSubmit(e) {
     e.preventDefault();
@@ -244,17 +247,44 @@ export async function handleRevertStatus(trade, action) {
     }
 }
 
-// --- INÍCIO DA ALTERAÇÃO: Nova função para reverter de "Potencial" para a watchlist de alarmes ---
+// --- INÍCIO DA ALTERAÇÃO 2: Lógica de "Reverter para Watchlist" refatorada ---
 export async function handleRevertToWatchlist(trade) {
-    const confirmationMessage = `Tem a certeza que quer remover este trade da coluna "Potencial"?\n\nO ativo continuará a ser monitorizado na Watchlist de Alarmes enquanto tiver alarmes ativos.`;
+    const confirmationMessage = `Tem a certeza que quer remover este trade da coluna "Potencial"?\n\nO ativo continuará a ser monitorizado na Watchlist de Alarmes.`;
     if (confirm(confirmationMessage)) {
         try {
+            // Passo 1: Verifica se o ativo já tem algum alarme ativo
+            const { data: existingAlarms, error: fetchError } = await supabase
+                .from('alarms')
+                .select('id')
+                .eq('asset_pair', trade.data.asset)
+                .eq('status', 'active');
+
+            if (fetchError) throw fetchError;
+
+            // Passo 2: Se não houver alarmes, cria o alarme padrão
+            if (existingAlarms.length === 0) {
+                console.log(`Nenhum alarme ativo para ${trade.data.asset}. A criar alarme padrão.`);
+                const alarmData = {
+                    asset_pair: trade.data.asset,
+                    alarm_type: 'stochastic_crossover',
+                    condition: 'above',
+                    indicator_timeframe: '15m',
+                    indicator_period: 14,
+                    combo_period: 3,
+                    status: 'active'
+                };
+                const { error: insertError } = await supabase.from('alarms').insert([alarmData]);
+                if (insertError) throw insertError;
+            }
+
+            // Passo 3: Apaga o trade do Firebase
             await deleteTrade(trade.id);
-            // Não é preciso fazer reload, o listener do Firebase/Supabase irá atualizar a UI
+            
+            // A UI será atualizada automaticamente pelos listeners em app.js
         } catch (error) {
             console.error("Erro ao reverter para a watchlist:", error);
             alert("Ocorreu um erro ao reverter o trade para a watchlist.");
         }
     }
 }
-// --- FIM DA ALTERAÇÃO ---
+// --- FIM DA ALTERAÇÃO 2 ---
