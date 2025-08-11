@@ -8,7 +8,7 @@ current: {
         "Ajustado o estilo dos botões de ação com ícone nas tabelas (Dashboard e Market Scanner) para garantir que todos têm um tamanho uniforme e quadrado, corrigindo o desalinhamento visual."
     ]
 },
-    releases: [
+releases: [
     {
         number: '14.4.0',
         changes: [
