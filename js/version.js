@@ -2,13 +2,21 @@
 
 export const changelogData = {
 current: {
-    number: '14.4.1',
+    number: '14.5.0',
     changes: [
-        "**Correção de UI (Botões de Ação):**",
-        "Ajustado o estilo dos botões de ação com ícone nas tabelas (Dashboard e Market Scanner) para garantir que todos têm um tamanho uniforme e quadrado, corrigindo o desalinhamento visual."
+        "**Fiabilidade do Alarme de Cruzamento do Estocástico Melhorada:**",
+        "A lógica do alarme de cruzamento do Estocástico foi refatorada para usar apenas os dados de velas fechadas.",
+        "O alarme agora só dispara após a confirmação do cruzamento no fecho da vela, eliminando sinais falsos e prematuros que ocorriam durante a formação da vela atual."
     ]
 },
 releases: [
+    {
+        number: '14.4.1',
+        changes: [
+            "**Correção de UI (Botões de Ação):**",
+            "Ajustado o estilo dos botões de ação com ícone nas tabelas (Dashboard e Market Scanner) para garantir que todos têm um tamanho uniforme e quadrado, corrigindo o desalinhamento visual."
+        ]
+    },
     {
         number: '14.4.0',
         changes: [
