@@ -4,6 +4,9 @@ import { supabase } from './services.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openAddModal } from './modals.js';
 import { loadAndOpenForEditing, handleRevertStatus, handleRevertToWatchlist, handleDeleteAlarm } from './handlers.js';
+// --- INÍCIO DA ALTERAÇÃO 1: Importar a função do novo módulo de gráfico ---
+import { openChartModal } from './chart-modal.js';
+// --- FIM DA ALTERAÇÃO 1 ---
 import { getLastCreatedTradeId, setLastCreatedTradeId, getVisibleImageIds, setVisibleImageIds } from './state.js';
 
 let tradesForEventListeners = [];
@@ -25,7 +28,6 @@ const setVisibleImageIdsInternal = (ids) => {
     }
 };
 
-// --- INÍCIO DA ALTERAÇÃO ---
 function renderSparkline(containerId, dataSeries) {
     const container = document.getElementById(containerId);
     if (!container || !dataSeries || dataSeries.length < 2) return;
@@ -48,12 +50,11 @@ function renderSparkline(containerId, dataSeries) {
             x: { show: false }, 
             y: { title: { formatter: () => '' } }, 
             marker: { show: false },
-            theme: isDarkMode ? 'dark' : 'light' // Adiciona o tema dinâmico ao tooltip
+            theme: isDarkMode ? 'dark' : 'light'
         }
     };
     new ApexCharts(container, options).render();
 }
-// --- FIM DA ALTERAÇÃO ---
 
 function getIconForLabel(labelText) {
     const text = labelText.toLowerCase();
@@ -169,7 +170,6 @@ function openAlarmListModal(titleText, alarmsToDisplay) {
     
     title.textContent = titleText;
     
-    // Ordenar por data de criação, do mais recente para o mais antigo
     alarmsToDisplay.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     container.innerHTML = alarmsToDisplay.length === 0 ? '<p>Nenhum alarme encontrado.</p>' : alarmsToDisplay.map(alarm => {
@@ -191,7 +191,6 @@ function openAlarmListModal(titleText, alarmsToDisplay) {
         </div>`;
     }).join('');
     
-    // Verificar se algum dos alarmes a exibir é um alarme disparado
     const isTriggeredMode = alarmsToDisplay.some(a => a.status === 'triggered');
     footer.style.display = isTriggeredMode ? 'block' : 'none';
     if(isTriggeredMode) {
@@ -325,18 +324,16 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
 
     const tableRowsHtml = assetsForWatchlist.map(assetName => {
         const alarmsForAsset = activeAlarmsByAsset[assetName];
-        // Encontrar o alarme mais recente para este ativo
         const latestAlarm = alarmsForAsset.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
-
         const assetMarketData = marketData[assetName] || { price: 0, sparkline: [] };
         let formattedPrice = assetMarketData.price >= 1.0 ? assetMarketData.price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$' + assetMarketData.price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
-
         const hasTriggeredUnacknowledgedAlarm = allAlarms.some(a => a.asset_pair === assetName && a.status === 'triggered' && !a.acknowledged);
         const triggeredClass = hasTriggeredUnacknowledgedAlarm ? 'class="alarm-triggered"' : '';
         const acknowledgeButtonHtml = hasTriggeredUnacknowledgedAlarm 
             ? `<button class="acknowledge-alarm-btn" data-action="acknowledge-and-view-alarm" data-asset="${assetName}" title="Ver Alarme Disparado"><span class="material-symbols-outlined">alarm</span> OK</button>`
             : '';
 
+        // --- INÍCIO DA ALTERAÇÃO 2: Mudar o botão de link para botão de ação ---
         return `
             <tr ${triggeredClass}>
                 <td data-label="Ativo"><strong><a href="asset-details.html?symbol=${assetName}" class="asset-link">${assetName}</a></strong></td>
@@ -348,7 +345,7 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
                 <td data-label="Ações">
                     <div class="action-buttons">
                         ${acknowledgeButtonHtml}
-                        <a href="asset-details.html?symbol=${assetName}" class="icon-action-btn" title="Ver Gráfico e Detalhes"><span class="material-symbols-outlined">monitoring</span></a>
+                        <button class="icon-action-btn" data-action="view-chart" data-symbol="${assetName}" title="Ver Gráfico Detalhado"><span class="material-symbols-outlined">monitoring</span></button>
                         <a href="https://www.tradingview.com/chart/?symbol=BINANCE:${assetName}" target="_blank" class="icon-action-btn" title="TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
                         <a href="alarms-create.html?assetPair=${assetName}" class="icon-action-btn" title="Criar Novo Alarme"><span class="material-symbols-outlined">alarm_add</span></a>
                         <button class="icon-action-btn" data-action="add-to-potential" data-symbol="${assetName}" title="Adicionar a Trade Potencial"><span class="material-symbols-outlined">add_shopping_cart</span></button>
@@ -356,6 +353,7 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
                 </td>
             </tr>
         `;
+        // --- FIM DA ALTERAÇÃO 2 ---
     }).join('');
 
     tbody.innerHTML = tableRowsHtml;
@@ -371,9 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const card = button.closest('.trade-card');
             const tradeId = card ? card.dataset.tradeId : null;
             const action = button.dataset.action;
-
             const trade = tradeId ? tradesForEventListeners.find(t => t.id === tradeId) : null;
-
             switch (action) {
                 case 'edit': if (tradeId) loadAndOpenForEditing(tradeId); break;
                 case 'arm': if (trade) openArmModal(trade); break;
@@ -395,8 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'view-alarms': loadAndOpenAlarmModal(button.dataset.asset, 'active'); break;
                 case 'acknowledge-and-view-alarm': loadAndOpenAlarmModal(button.dataset.asset, 'triggered'); break;
                 case 'revert-to-watchlist': if (trade) handleRevertToWatchlist(trade); break;
-                case 'revert-to-potential':
-                case 'revert-to-armed': if (trade) handleRevertStatus(trade, action); break;
+                case 'revert-to-potential': case 'revert-to-armed': if (trade) handleRevertStatus(trade, action); break;
             }
         });
     }
@@ -410,11 +405,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const action = targetElement.dataset.action;
             const symbol = targetElement.dataset.symbol || targetElement.dataset.asset;
 
-            if (action !== 'delete-alarm') { // A ação de apagar será tratada no modal
+            if (action !== 'delete-alarm') {
                 e.preventDefault();
             }
 
-            if (action === 'add-to-potential' && symbol) {
+            // --- INÍCIO DA ALTERAÇÃO 3: Adicionar a nova ação de ver gráfico ---
+            if (action === 'view-chart' && symbol) {
+                openChartModal(symbol);
+            } else if (action === 'add-to-potential' && symbol) {
                 openAddModal();
                 const modalAssetInput = document.getElementById('asset');
                 if (modalAssetInput) modalAssetInput.value = symbol;
@@ -423,6 +421,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (action === 'manage-alarms' && symbol) {
                 loadAndOpenAlarmModal(symbol, 'active');
             }
+            // --- FIM DA ALTERAÇÃO 3 ---
         });
     }
 
