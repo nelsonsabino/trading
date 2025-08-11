@@ -6,9 +6,7 @@ import { getTrade, addTrade, updateTrade, closeTradeAndUpdateBalance, deleteTrad
 import { getCurrentTrade, setCurrentTrade, getStrategies, setLastCreatedTradeId } from './state.js';
 import { closeAddModal, closeArmModal, closeExecModal, closeCloseTradeModal, openAddModal, openArmModal, openExecModal } from './modals.js';
 import { generateDynamicChecklist } from './ui.js';
-// --- INÍCIO DA ALTERAÇÃO 1: Importar o supabase para poder interagir com a DB de alarmes ---
 import { supabase } from './services.js';
-// --- FIM DA ALTERAÇÃO 1 ---
 
 export async function handleAddSubmit(e) {
     e.preventDefault();
@@ -247,7 +245,6 @@ export async function handleRevertStatus(trade, action) {
     }
 }
 
-// --- INÍCIO DA ALTERAÇÃO 2: Lógica de "Reverter para Watchlist" refatorada ---
 export async function handleRevertToWatchlist(trade) {
     const confirmationMessage = `Tem a certeza que quer remover este trade da coluna "Potencial"?\n\nO ativo continuará a ser monitorizado na Watchlist de Alarmes.`;
     if (confirm(confirmationMessage)) {
@@ -287,4 +284,30 @@ export async function handleRevertToWatchlist(trade) {
         }
     }
 }
-// --- FIM DA ALTERAÇÃO 2 ---
+
+// --- INÍCIO DA ALTERAÇÃO ---
+export async function handleDeleteAlarm(alarmId) {
+    if (!alarmId) return;
+
+    const confirmation = confirm("Tem a certeza que quer apagar este alarme permanentemente?");
+    if (confirmation) {
+        try {
+            const { error } = await supabase
+                .from('alarms')
+                .delete()
+                .eq('id', alarmId);
+
+            if (error) {
+                throw new Error(`Erro no Supabase ao apagar o alarme: ${error.message}`);
+            }
+            
+            // Força a atualização da página para garantir que todas as UIs (tabela e modal) são atualizadas
+            location.reload(); 
+
+        } catch (error) {
+            console.error("Erro ao apagar alarme:", error);
+            alert("Não foi possível apagar o alarme. Verifique a consola para mais detalhes.");
+        }
+    }
+}
+// --- FIM DA ALTERAÇÃO ---
