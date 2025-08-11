@@ -118,6 +118,17 @@
 .dark-mode .alarms-table td { 
     border-bottom-color: #333; 
 }
+
+/* --- INÍCIO DA ALTERAÇÃO --- */
+/* Estilo do link de alarme no modo escuro */
+.dark-mode .alarms-table .alarm-details-link {
+    color: #4ade80; /* Verde claro e vibrante para alto contraste */
+}
+.dark-mode .alarms-table .alarm-details-link:hover {
+    color: #6ee7b7; /* Um pouco mais claro no hover */
+}
+/* --- FIM DA ALTERAÇÃO --- */
+
 /* Ajuste para linhas de tabela em dark mode em mobile */
 @media (max-width: 768px) {
     .dark-mode .alarms-table tr, 
@@ -133,13 +144,11 @@
     border-top-color: #333;
 }
 
-/* --- INÍCIO DA ALTERAÇÃO --- */
 /* Cor de fundo específica para os cards para destacá-los do fundo da coluna */
 .dark-mode .trade-card {
     background-color: #252525; /* Um cinza ligeiramente mais claro que #1e1e1e */
     border-color: #333 !important; /* Garante que as bordas laterais também mudam */
 }
-/* --- FIM DA ALTERAÇÃO --- */
 
 .dark-mode .trade-card .card-screenshot {
     border-color: #444;
