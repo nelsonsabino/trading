@@ -24,10 +24,8 @@
 .btn-tertiary { background-color: #ffc107; color: #212529; }
 .btn-tertiary:hover { background-color: #e0a800; }
 
-/* --- INÍCIO DA ALTERAÇÃO --- */
 .btn-danger { background-color: #dc3545; color: white; }
 .btn-danger:hover { background-color: #c82333; }
-/* --- FIM DA ALTERAÇÃO --- */
 
 
 /* --- BOTÕES CONTEXTUAIS (segunda linha da navegação) --- */
@@ -88,19 +86,27 @@
     justify-content: flex-end; 
 }
 
+/* --- INÍCIO DA ALTERAÇÃO --- */
 /* Botões de ícone compactos dentro das TABELAS */
 .market-table .action-buttons .icon-action-btn,
 .alarms-table .action-buttons .icon-action-btn,
 #trades-table .action-buttons .icon-action-btn,
 .asset-related-data .action-buttons .icon-action-btn {
-    padding: 6px; 
-    width: 32px;  
-    height: 32px; 
-    border-radius: 6px; 
-    & .button-text { 
-        display: none; 
-    }
+    width: 36px;
+    height: 36px;
+    padding: 0; /* Removido para garantir que o flexbox centra o conteúdo */
+    border-radius: 8px;
 }
+
+/* Garante que o texto (se houver) é escondido e não afeta o layout do botão de ícone */
+.market-table .action-buttons .icon-action-btn .button-text,
+.alarms-table .action-buttons .icon-action-btn .button-text,
+#trades-table .action-buttons .icon-action-btn .button-text,
+.asset-related-data .action-buttons .icon-action-btn .button-text {
+    display: none;
+}
+/* --- FIM DA ALTERAÇÃO --- */
+
 
 /* Cores específicas para os ÍCONES */
 .icon-action-btn.action-summary .material-symbols-outlined, 
