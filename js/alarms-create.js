@@ -102,12 +102,10 @@ function enterEditMode(alarm) {
         document.getElementById('rsi-trendline-touches').value = alarm.touch_count || 3;
         document.getElementById('rsi-trendline-period').value = alarm.indicator_period || 14;
         document.getElementById('rsi-trendline-timeframe').value = alarm.indicator_timeframe || '1h';
-    // --- INÍCIO DA ALTERAÇÃO ---
     } else if (alarmType === 'rsi_trendline_break') {
         document.getElementById('rsi-trendline-break-type').value = alarm.trendline_type || 'support';
         document.getElementById('rsi-trendline-break-period').value = alarm.indicator_period || 14;
         document.getElementById('rsi-trendline-break-timeframe').value = alarm.indicator_timeframe || '1h';
-    // --- FIM DA ALTERAÇÃO ---
     } else { // price
         document.getElementById('alarm-condition-standalone').value = alarm.condition; 
         document.getElementById('alarm-price-standalone').value = alarm.target_price; 
@@ -175,9 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ema_touch: document.getElementById('ema-fields'), 
         combo: document.getElementById('combo-fields'),
         rsi_trendline: document.getElementById('rsi-trendline-fields'),
-        // --- INÍCIO DA ALTERAÇÃO ---
         rsi_trendline_break: document.getElementById('rsi-trendline-break-fields')
-        // --- FIM DA ALTERAÇÃO ---
     };
     
     alarmTypeSelect.addEventListener('change', () => {
@@ -292,12 +288,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 alarmData.touch_count = parseInt(document.getElementById('rsi-trendline-touches').value) || 3;
                 alarmData.indicator_period = parseInt(document.getElementById('rsi-trendline-period').value) || 14;
                 alarmData.indicator_timeframe = document.getElementById('rsi-trendline-timeframe').value;
-            // --- INÍCIO DA ALTERAÇÃO ---
             } else if (alarmType === 'rsi_trendline_break') {
                 alarmData.trendline_type = document.getElementById('rsi-trendline-break-type').value;
                 alarmData.indicator_period = parseInt(document.getElementById('rsi-trendline-break-period').value) || 14;
                 alarmData.indicator_timeframe = document.getElementById('rsi-trendline-break-timeframe').value;
-            // --- FIM DA ALTERAÇÃO ---
             } else if (alarmType === 'ema_touch') { 
                 alarmData.condition = document.getElementById('ema-condition').value; 
                 alarmData.indicator_timeframe = document.getElementById('ema-timeframe').value; 
