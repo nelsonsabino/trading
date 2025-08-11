@@ -148,10 +148,23 @@
     filter: brightness(0.9);
 }
 
-/* --- INÍCIO DA ALTERAÇÃO --- */
 /* Estilo para a linha da tabela de watchlist quando um alarme dispara */
 .alarms-table tr.alarm-triggered {
     /* Usamos box-shadow para criar um "glow" sem afetar o layout */
     box-shadow: inset 0 0 0 2px var(--feedback-alert-glow);
+}
+
+
+/* --- INÍCIO DA ALTERAÇÃO --- */
+/* Estilo para o link do último alarme criado na Watchlist de Alarmes */
+.alarms-table .alarm-details-link {
+    color: #198754; /* Verde escuro (cor de sucesso do Bootstrap) */
+    text-decoration: underline;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.alarms-table .alarm-details-link:hover {
+    color: #146c43; /* Verde um pouco mais escuro no hover */
 }
 /* --- FIM DA ALTERAÇÃO --- */
