@@ -2,15 +2,23 @@
 
 export const changelogData = {
 current: {
-    number: '14.2.0',
+    number: '14.2.1',
     changes: [
-        "**Correção e Depuração do Alarme de Quebra de L.T.:**",
-        "Corrigido o bug na lógica de projeção da linha de tendência que impedia os alarmes de disparar.",
-        "A tolerância de alinhamento foi ajustada para 8 pontos para uma deteção de padrões mais realista, e a lógica de deteção foi melhorada para procurar sequências válidas.",
-        "Adicionado um modo de depuração à Edge Function para facilitar os testes manuais da funcionalidade."
+        "**Correção Crítica nos Alarmes de Cruzamento do Estocástico:**",
+        "Resolvido o bug onde os alarmes de cruzamento do Estocástico disparavam para ambas as direções (bullish e bearish), independentemente da condição definida.",
+        "A lógica de verificação na Edge Function `check-price-alarms` foi corrigida para respeitar rigorosamente a direção ('para CIMA' ou 'para BAIXO') definida no alarme."
     ]
 },
 releases: [
+    {
+        number: '14.2.0',
+        changes: [
+            "**Correção e Depuração do Alarme de Quebra de L.T.:**",
+            "Corrigido o bug na lógica de projeção da linha de tendência que impedia os alarmes de disparar.",
+            "A tolerância de alinhamento foi ajustada para 8 pontos para uma deteção de padrões mais realista, e a lógica de deteção foi melhorada para procurar sequências válidas.",
+            "Adicionado um modo de depuração à Edge Function para facilitar os testes manuais e garantir a fiabilidade da deteção."
+        ]
+    },
     {
         number: '14.1.1',
         changes: [
