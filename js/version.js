@@ -2,15 +2,22 @@
 
 export const changelogData = {
 current: {
-    number: '14.3.0',
+    number: '14.3.1',
     changes: [
-        "**Melhoria na Gestão de Alarmes da Watchlist:**",
-        "A coluna 'Condição do Alarme' na watchlist foi renomeada para 'Ultimo alarme criado' e agora exibe o alarme ativo mais recente.",
-        "A descrição do alarme na watchlist é agora um link que abre um modal com a lista de todos os alarmes ativos para o ativo, ordenados por data de criação.",
-        "O modal de gestão de alarmes agora permite apagar alarmes diretamente, oferecendo um fluxo de gestão mais rápido e integrado."
+        "**Ajuste Visual na Watchlist de Alarmes:**",
+        "A cor do link na coluna 'Ultimo alarme criado' foi ajustada para ter melhor contraste e visibilidade em ambos os temas, claro (verde-escuro) e escuro (verde-claro)."
     ]
 },
 releases: [
+    {
+        number: '14.3.0',
+        changes: [
+            "**Melhoria na Gestão de Alarmes da Watchlist:**",
+            "A coluna 'Condição do Alarme' na watchlist foi renomeada para 'Ultimo alarme criado' e agora exibe o alarme ativo mais recente.",
+            "A descrição do alarme na watchlist é agora um link que abre um modal com a lista de todos os alarmes ativos para o ativo, ordenados por data de criação.",
+            "O modal de gestão de alarmes agora permite apagar alarmes diretamente, oferecendo um fluxo de gestão mais rápido e integrado."
+        ]
+    },
     {
         number: '14.2.1',
         changes: [
