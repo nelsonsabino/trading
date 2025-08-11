@@ -2,13 +2,21 @@
 
 export const changelogData = {
 current: {
-    number: '14.3.1',
+    number: '14.3.2',
     changes: [
-        "**Ajuste Visual na Watchlist de Alarmes:**",
-        "A cor do link na coluna 'Ultimo alarme criado' foi ajustada para ter melhor contraste e visibilidade em ambos os temas, claro (verde-escuro) e escuro (verde-claro)."
+        "**Correção do Tooltip dos Gráficos em Modo Escuro:**",
+        "Resolvido o bug visual onde o tooltip (caixa de informação) dos gráficos Sparkline tinha um fundo branco ilegível no modo escuro.",
+        "A função de renderização de gráficos agora deteta o tema da aplicação e instrui a biblioteca ApexCharts a usar o tema de tooltip correto (claro ou escuro)."
     ]
 },
 releases: [
+    {
+        number: '14.3.1',
+        changes: [
+            "**Ajuste Visual na Watchlist de Alarmes:**",
+            "A cor do link na coluna 'Ultimo alarme criado' foi ajustada para ter melhor contraste e visibilidade em ambos os temas, claro (verde-escuro) e escuro (verde-claro)."
+        ]
+    },
     {
         number: '14.3.0',
         changes: [
