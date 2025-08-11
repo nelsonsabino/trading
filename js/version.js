@@ -4,9 +4,10 @@ export const changelogData = {
 current: {
     number: '14.5.0',
     changes: [
-        "**Fiabilidade do Alarme de Cruzamento do Estocástico Melhorada:**",
-        "A lógica do alarme de cruzamento do Estocástico foi refatorada para usar apenas os dados de velas fechadas.",
-        "O alarme agora só dispara após a confirmação do cruzamento no fecho da vela, eliminando sinais falsos e prematuros que ocorriam durante a formação da vela atual."
+        "**Auditoria e Correção Geral da Fiabilidade dos Alarmes:**",
+        "Toda a lógica de verificação de alarmes de indicadores foi refatorada para usar exclusivamente os dados de velas fechadas, eliminando disparos falsos e prematuros causados pela volatilidade da vela em andamento.",
+        "As correções foram aplicadas aos alarmes de: Nível de RSI, Nível de Estocástico, Cruzamento de Estocástico, Cruzamento de RSI, Toque de EMA e o alarme Combo.",
+        "A lógica de deteção de Linha de Tendência no RSI foi auditada e confirmada como já sendo robusta."
     ]
 },
 releases: [
