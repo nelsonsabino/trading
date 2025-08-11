@@ -2,14 +2,21 @@
 
 export const changelogData = {
 current: {
-    number: '14.3.2',
+    number: '14.4.0',
     changes: [
-        "**Correção do Tooltip dos Gráficos em Modo Escuro:**",
-        "Resolvido o bug visual onde o tooltip (caixa de informação) dos gráficos Sparkline tinha um fundo branco ilegível no modo escuro.",
-        "A função de renderização de gráficos agora deteta o tema da aplicação e instrui a biblioteca ApexCharts a usar o tema de tooltip correto (claro ou escuro)."
+        "**Gráfico em Modal no Dashboard:**",
+        "A funcionalidade de ver o gráfico detalhado foi unificada. O botão de gráfico na 'Watchlist de Alarmes' agora abre um modal com o gráfico ApexChart, em vez de navegar para outra página, replicando o comportamento do Market Scanner para uma experiência mais fluida e consistente."
     ]
 },
 releases: [
+    {
+        number: '14.3.2',
+        changes: [
+            "**Correção do Tooltip dos Gráficos em Modo Escuro:**",
+            "Resolvido o bug visual onde o tooltip (caixa de informação) dos gráficos Sparkline tinha um fundo branco ilegível no modo escuro.",
+            "A função de renderização de gráficos agora deteta o tema da aplicação e instrui a biblioteca ApexCharts a usar o tema de tooltip correto (claro ou escuro)."
+        ]
+    },
     {
         number: '14.3.1',
         changes: [
