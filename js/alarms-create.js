@@ -120,6 +120,13 @@ function exitEditMode() {
     editingAlarmId = null;
     document.getElementById('alarm-form').reset();
     document.getElementById('alarm-type-select').dispatchEvent(new Event('change'));
+    
+    // --- INÍCIO DA ALTERAÇÃO ---
+    // Repor o novo valor padrão de 7 para os períodos do Estocástico após o reset
+    document.getElementById('stoch-period').value = 7;
+    document.getElementById('stoch-cross-k-period').value = 7;
+    // --- FIM DA ALTERAÇÃO ---
+
     document.querySelector('#alarm-form button[type="submit"]').textContent = 'Definir Alarme';
     document.getElementById('cancel-edit-btn').style.display = 'none';
     document.getElementById('delete-alarm-btn').style.display = 'none';
@@ -136,6 +143,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!alarmForm) {
         return;
     }
+
+    // --- INÍCIO DA ALTERAÇÃO ---
+    // Definir o novo valor padrão de 7 para os períodos do Estocástico ao carregar a página
+    document.getElementById('stoch-period').value = 7;
+    document.getElementById('stoch-cross-k-period').value = 7;
+    // --- FIM DA ALTERAÇÃO ---
 
     const feedbackDiv = document.getElementById('alarm-feedback');
     const assetInput = document.getElementById('alarm-asset');
