@@ -20,6 +20,14 @@ releases: [
         ]
     },
     {
+    number: '14.5.0',
+    changes: [
+        "**Fiabilidade do Alarme de Cruzamento do Estocástico Melhorada:**",
+        "A lógica do alarme de cruzamento do Estocástico foi refatorada para usar apenas os dados de velas fechadas.",
+        "O alarme agora só dispara após a confirmação do cruzamento no fecho da vela, eliminando sinais falsos e prematuros que ocorriam durante a formação da vela atual."
+    ]
+},
+    {
         number: '14.4.1',
         changes: [
             "**Correção de UI (Botões de Ação):**",
