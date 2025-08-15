@@ -121,6 +121,7 @@ async function fetchAndDisplayAlarms() {
             const addOpportunityUrl = `dashboard.html?assetPair=${alarm.asset_pair}`;
             const assetHtml = `<strong><a href="asset-details.html?symbol=${alarm.asset_pair}" class="asset-link">${alarm.asset_pair}</a></strong>`;
 
+            // --- INÍCIO DA ALTERAÇÃO ---
             triggeredAlarmsHtml.push(`
                 <tr data-alarm-id="${alarm.id}">
                     <td data-label="Ativo"><span class="cell-value">${assetHtml}</span></td>
@@ -129,13 +130,15 @@ async function fetchAndDisplayAlarms() {
                     <td data-label="Data Disparo"><span class="cell-value">${triggeredDate}</span></td>
                     <td data-label="Ações">
                         <div class="action-buttons cell-value">
-                            <button class="icon-action-btn delete-btn" data-id="${alarm.id}" title="Apagar Alarme"><span class="material-symbols-outlined">delete</span></button>
+                            <a href="alarms-create.html?editAlarmId=${alarm.id}" class="icon-action-btn" title="Editar / Reativar Alarme"><span class="material-symbols-outlined">edit</span></a>
+                            <button class="icon-action-btn delete-btn" data-id="${alarm.id}" title="Apagar Alarme do Histórico"><span class="material-symbols-outlined">delete</span></button>
                             <a href="#" class="icon-action-btn view-chart-btn" data-symbol="${alarm.asset_pair}" title="Ver Gráfico no Modal"><span class="material-symbols-outlined">monitoring</span></a>
                             <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn" title="Abrir no TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
                             <a href="${addOpportunityUrl}" class="icon-action-btn" title="Adicionar à Watchlist"><span class="material-symbols-outlined">add</span></a>
                         </div>
                     </td>
                 </tr>`);
+            // --- FIM DA ALTERAÇÃO ---
         }
         
         activeTbody.innerHTML = activeAlarms.length > 0 ? activeAlarmsHtml.join('') : '<tr><td colspan="4" style="text-align:center;">Nenhum alarme ativo.</td></tr>';
@@ -169,7 +172,6 @@ async function deleteAlarm(alarmId) {
     }
 }
 
-// --- INÍCIO DA ALTERAÇÃO (Ponto 2) ---
 async function deleteAllTriggeredAlarms() {
     const confirmation = confirm("TEM A CERTEZA?\n\nEsta ação irá apagar permanentemente TODO o histórico de alarmes disparados. Esta ação é irreversível.");
     if (confirmation) {
@@ -182,14 +184,13 @@ async function deleteAllTriggeredAlarms() {
             if (error) throw error;
 
             alert("Histórico de alarmes apagado com sucesso!");
-            fetchAndDisplayAlarms(); // Recarrega a tabela
+            fetchAndDisplayAlarms();
         } catch (error) {
             console.error("Erro ao apagar o histórico de alarmes:", error);
             alert("Ocorreu um erro ao apagar o histórico. Verifique a consola para mais detalhes.");
         }
     }
 }
-// --- FIM DA ALTERAÇÃO ---
 
 document.addEventListener('DOMContentLoaded', () => {
     chartModal = document.getElementById('chart-modal');
@@ -222,12 +223,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- INÍCIO DA ALTERAÇÃO (Ponto 2) ---
     const deleteHistoryBtn = document.getElementById('delete-history-btn');
     if (deleteHistoryBtn) {
         deleteHistoryBtn.addEventListener('click', deleteAllTriggeredAlarms);
     }
-    // --- FIM DA ALTERAÇÃO ---
 
     fetchAndDisplayAlarms();
 });
