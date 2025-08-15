@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Oportunidades Cripto</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>Painel de Oportunidades</h1>
+        <p class="mantra">Tem paciência, usa alarmes, espera que os setups venham.</p>
+       
+        <nav>
+            <button id="add-opportunity-btn" class="btn btn-primary">Adicionar Nova Oportunidade</button>
+            <a href="manage.html" class="nav-link">Gerir Todas as Operações</a>
+            <a href="stats.html" class="nav-link">Ver Estatísticas</a>
+            <a href="alarms.html" class="nav-link" style="background-color: #0d6efd;">Gerir Alarmes</a>
+        </nav>
+        
+    </header>  
+
+    <hr class="section-divider">
+    
+    <main>
+        <div class="dashboard-columns">
+            <section class="potential-trades">
+                <h2>Potencial</h2>
+                <div id="potential-trades-container"><p class="empty-state-message">A carregar...</p></div>
+            </section>
+            <section class="armed-trades">
+                <h2>Armado</h2>
+                <div id="armed-trades-container"><p class="empty-state-message">A carregar...</p></div>
+            </section>
+            <section class="live-trades">
+                <h2>Ativo</h2>
+                <div id="live-trades-container"><p class="empty-state-message">A carregar...</p></div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Modal de Adicionar Oportunidade -->
+    <div id="add-opportunity-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span id="close-modal-btn">×</span>
+            <form id="add-opportunity-form">
+                <h3>Adicionar Ativo à Watchlist</h3>
+                <div class="input-item">
+                    <label for="strategy-select">Estratégia:</label>
+                    <select id="strategy-select" name="strategy-select" required></select>
+                </div>
+                <div class="input-item" style="position: relative;">
+                    <label for="asset">Ativo:</label>
+                    <input type="text" id="asset" name="asset" required placeholder="Comece a escrever para pesquisar..." autocomplete="off">
+                    <div id="modal-autocomplete-results" class="autocomplete-results"></div>
+                </div>
+                <div id="dynamic-checklist-container"></div>
+                <div class="input-item">
+                    <label for="image-url">Link da Imagem do Gráfico (TradingView):</label>
+                    <input type="text" id="image-url" placeholder="Cole aqui o link da imagem...">
+                </div>
+                <div class="input-item">
+                    <label for="notes">Notas Iniciais:</label>
+                    <textarea id="notes" placeholder="Ex: A formar fundo duplo..."></textarea>
+                </div>
+                <p class="form-footnote">* Campos obrigatórios</p>
+                <button type="submit">Guardar na Watchlist</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Armar Trade -->
+    <div id="arm-trade-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span id="close-arm-trade-modal-btn">×</span>
+            <h3>Validar e Armar Setup: <span id="arm-trade-asset-name"></span></h3>
+            <p>Estratégia: <span id="arm-trade-strategy-name"></span></p>
+            <form id="arm-trade-form">
+                <div id="arm-checklist-container"></div>
+                <button type="submit">ARMAR TRADE</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Execução -->
+    <div id="execution-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span id="close-execution-modal-btn">×</span>
+            <h3>Executar Trade: <span id="execution-asset-name"></span></h3>
+            <p>Estratégia: <span id="execution-strategy-name"></span></p>
+            <form id="execution-form">
+                <div id="execution-checklist-container"></div>
+                <button type="submit">EXECUTAR TRADE</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Fecho de Trade -->
+    <div id="close-trade-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span id="close-close-trade-modal-btn">×</span>
+            <h3>Fechar Operação: <span id="close-trade-asset-name"></span></h3>
+            <form id="close-trade-form">
+                <div class="input-item"><label for="exit-price">Preço de Saída:</label><input type="number" id="exit-price" step="any" required></div>
+                <div class="input-item"><label for="final-pnl">Resultado Final (P&L em $):</label>
+                    <input type="number" id="final-pnl" step="any" required placeholder="Insire o lucro/prejuízo. Ex: 150 ou -50"></div>
+                <div class="input-item"><label for="close-reason">Motivo do Fecho:</label><select id="close-reason" required><option value="">-- Seleciona o motivo --</option><option value="take-profit">Atingiu Take Profit</option><option value="stop-loss">Atingiu Stop Loss</option><option value="manual-profit">Saída Manual (Lucro)</option><option value="manual-loss">Saída Manual (Prejuízo)</option><option value="breakeven">Saída no Ponto de Entrada (Break-Even)</option></select></div>
+                <div class="input-item"><label for="final-notes">Notas Finais / Lição Aprendida:</label><textarea id="final-notes" placeholder="Ex: Gestão de risco correta..."></textarea></div>
+                <div class="input-item"><label for="exit-screenshot-url">URL do Printscreen de Saída (Opcional):</label><input type="text" id="exit-screenshot-url" placeholder="Cole aqui o link do GitHub"></div>
+                <button type="submit">CONFIRMAR E FECHAR TRADE</button>
+            </form>
+        </div>
+    </div>
+     
+    <div id="image-modal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 90%; max-height: 90%; padding: 0; position: relative;">
+            <span id="close-image-modal" style="position: absolute; top: 10px; right: 15px; font-size: 2.5rem; color: #adb5bd; font-weight: 300; cursor: pointer;">×</span>
+            <img id="modal-image" src="" alt="Imagem ampliada" style="max-width: 100%; max-height: 90vh; border-radius: 8px; display: block; margin: auto;">
+        </div>
+    </div>
+
+    <footer>
+        <p id="app-version-display"></p>
+    </footer>    
+
+    <!-- ORDEM DE SCRIPTS CORRIGIDA -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="js/services.js"></script>
+    <script type="module" src="js/utils.js"></script>
+    <script type="module" src="js/app.js"></script>
+
+</body>
+</html>
