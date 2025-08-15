@@ -1,9 +1,7 @@
 // js/market-scan.js
 
 import { supabase } from './services.js';
-// --- INÍCIO DA ALTERAÇÃO: Importar a função do módulo central ---
 import { openChartModal } from './chart-modal.js';
-// --- FIM DA ALTERAÇÃO ---
 
 const CACHE_KEY_DATA = 'marketScannerCache';
 const CACHE_KEY_TIMESTAMP = 'marketScannerCacheTime';
@@ -17,10 +15,6 @@ let filterStoch = false;
 let filterThirdTouch = false;
 let showSparklines = true;
 let currentTopN = 50;
-
-// --- INÍCIO DA ALTERAÇÃO: A lógica do modal foi movida para chart-modal.js ---
-// As funções openChartModal, closeChartModal e os event listeners relacionados foram removidos daqui.
-// --- FIM DA ALTERAÇÃO ---
 
 function renderSparkline(containerId, dataSeries) {
     if (!dataSeries || dataSeries.length < 2) return;
@@ -122,8 +116,23 @@ function createTableRow(ticker, index, extraData) {
     let rsiSignalHtml = '', stochSignalHtml = '', thirdTouchSignalHtml = '';
     const assetExtraData = extraData[ticker.symbol];
     if (assetExtraData) {
-        if (assetExtraData.rsi_1h !== null && assetExtraData.rsi_1h < 45) rsiSignalHtml = `<span class="rsi-signal" data-tooltip="RSI (1h) está em ${assetExtraData.rsi_1h.toFixed(1)}">RSI</span>`;
-        if (assetExtraData.stoch_4h !== null && typeof assetExtraData.stoch_4h === 'number' && assetExtraData.stoch_4h < 35) stochSignalHtml = `<span class="stoch-signal" data-tooltip="Stoch (4h) K:${assetExtraData.stoch_4h.toFixed(1)}">STC</span>`;
+        if (assetExtraData.rsi_1h !== null && assetExtraData.rsi_1h < 45) {
+            rsiSignalHtml = `<span class="rsi-signal" data-tooltip="RSI (1h) está em ${assetExtraData.rsi_1h.toFixed(1)}">RSI</span>`;
+        }
+        
+        // --- INÍCIO DA ALTERAÇÃO (Ponto 1) ---
+        if (assetExtraData.stoch_4h !== null && typeof assetExtraData.stoch_4h === 'number' && assetExtraData.stoch_4h < 35) {
+            const hasConfirmedCross = assetExtraData.stoch_4h_bullish_cross;
+            const signalClass = hasConfirmedCross ? 'stoch-signal crossover-confirmed' : 'stoch-signal';
+            const signalText = hasConfirmedCross ? 'STC*' : 'STC';
+            const tooltipText = hasConfirmedCross
+                ? `Stoch (4h) K:${assetExtraData.stoch_4h.toFixed(1)} com Cruzamento Bullish Confirmado`
+                : `Stoch (4h) K:${assetExtraData.stoch_4h.toFixed(1)}`;
+
+            stochSignalHtml = `<span class="${signalClass}" data-tooltip="${tooltipText}">${signalText}</span>`;
+        }
+        // --- FIM DA ALTERAÇÃO ---
+
         if (assetExtraData.thirdTouchSignal_1h) {
             const { type } = assetExtraData.thirdTouchSignal_1h;
             thirdTouchSignalHtml += `<span class="third-touch-signal ${type === 'LTA' ? 'support' : 'resistance'}" data-tooltip="3º Toque em ${type} (1h)">${type}-3 1h</span>`;
@@ -250,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (tbody) {
         tbody.addEventListener('click', (e) => {
-            const button = e.target.closest('button, a'); // Mantém o seletor
+            const button = e.target.closest('button, a');
             if (!button) return;
             const action = button.dataset.action;
             const symbol = button.dataset.symbol;
@@ -258,9 +267,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (action === 'monitor' && symbol) {
                 e.preventDefault();
                 handleMonitorAssetClick(symbol);
-            } else if (action === 'view-chart' && symbol) { // Alterado para corresponder ao novo botão
+            } else if (action === 'view-chart' && symbol) {
                 e.preventDefault();
-                openChartModal(symbol); // Chama a função importada
+                openChartModal(symbol);
             }
         });
     }
