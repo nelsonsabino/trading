@@ -2,17 +2,24 @@
 
 export const changelogData = {
 current: {
-    number: '14.7.0',
+    number: '14.7.1',
     changes: [
-        "**Melhorias e Correções Gerais no Sistema de Alarmes e UI:**",
-        "**Sinal Avançado no Scanner:** O sinal 'STC' agora fica laranja e exibe um '*' se, além da sobrevenda, houver um cruzamento bullish confirmado do Estocástico (4h).",
-        "**Gestão de Histórico:** Adicionado um botão na página 'Meus Alarmes' para apagar todo o histórico de alarmes disparados de uma só vez.",
-        "**UI do Modal de Alarmes:** O modal de reconhecimento de alarmes no Dashboard agora exibe a data e hora exatas em que o alarme foi disparado.",
-        "**Lógica de Cruzamento do Estocástico:** O alarme foi refatorado para ser mais robusto. Agora, exige que o cruzamento se mantenha por duas velas fechadas consecutivas para disparar, eliminando sinais falsos.",
-        "**Descrições de Alarme Detalhadas:** As descrições de alarmes complexos (ex: Cruzamento de RSI) agora exibem os parâmetros específicos (intervalo de velas, buffer) definidos pelo utilizador."
+        "**Melhoria Visual no Sinal STC* do Scanner:**",
+        "O asterisco que indica um cruzamento de Estocástico confirmado foi movido para fora do círculo do sinal, melhorando significativamente a sua legibilidade e visibilidade, especialmente no modo escuro."
     ]
 },
 releases: [
+    {
+        number: '14.7.0',
+        changes: [
+            "**Melhorias e Correções Gerais no Sistema de Alarmes e UI:**",
+            "**Sinal Avançado no Scanner:** O sinal 'STC' agora fica laranja e exibe um '*' se, além da sobrevenda, houver um cruzamento bullish confirmado do Estocástico (4h).",
+            "**Gestão de Histórico:** Adicionado um botão na página 'Meus Alarmes' para apagar todo o histórico de alarmes disparados de uma só vez.",
+            "**UI do Modal de Alarmes:** O modal de reconhecimento de alarmes no Dashboard agora exibe a data e hora exatas em que o alarme foi disparado.",
+            "**Lógica de Cruzamento do Estocástico:** O alarme foi refatorado para ser mais robusto. Agora, exige que o cruzamento se mantenha por duas velas fechadas consecutivas para disparar, eliminando sinais falsos.",
+            "**Descrições de Alarme Detalhadas:** As descrições de alarmes complexos (ex: Cruzamento de RSI) agora exibem os parâmetros específicos (intervalo de velas, buffer) definidos pelo utilizador."
+        ]
+    },
     {
         number: '14.6.0', 
         changes: [
