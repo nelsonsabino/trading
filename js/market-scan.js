@@ -120,18 +120,18 @@ function createTableRow(ticker, index, extraData) {
             rsiSignalHtml = `<span class="rsi-signal" data-tooltip="RSI (1h) está em ${assetExtraData.rsi_1h.toFixed(1)}">RSI</span>`;
         }
         
-        // --- INÍCIO DA ALTERAÇÃO (Ponto 1) ---
         if (assetExtraData.stoch_4h !== null && typeof assetExtraData.stoch_4h === 'number' && assetExtraData.stoch_4h < 35) {
             const hasConfirmedCross = assetExtraData.stoch_4h_bullish_cross;
             const signalClass = hasConfirmedCross ? 'stoch-signal crossover-confirmed' : 'stoch-signal';
-            const signalText = hasConfirmedCross ? 'STC*' : 'STC';
+            // --- INÍCIO DA ALTERAÇÃO ---
+            const signalText = 'STC'; // O asterisco será adicionado via CSS
+            // --- FIM DA ALTERAÇÃO ---
             const tooltipText = hasConfirmedCross
                 ? `Stoch (4h) K:${assetExtraData.stoch_4h.toFixed(1)} com Cruzamento Bullish Confirmado`
                 : `Stoch (4h) K:${assetExtraData.stoch_4h.toFixed(1)}`;
 
             stochSignalHtml = `<span class="${signalClass}" data-tooltip="${tooltipText}">${signalText}</span>`;
         }
-        // --- FIM DA ALTERAÇÃO ---
 
         if (assetExtraData.thirdTouchSignal_1h) {
             const { type } = assetExtraData.thirdTouchSignal_1h;
