@@ -2,17 +2,28 @@
 
 export const changelogData = {
 current: {
-    number: '14.6.0',
+    number: '14.7.0',
     changes: [
-        "**Melhoria Geral e Correção da Fiabilidade dos Alarmes:**",
-        "**Cruzamento do Estocástico:** Adicionada uma camada de confirmação de 'Price Action'. O alarme agora só dispara se a vela que confirma o cruzamento fechar na mesma direção do sinal.",
-        "**Período Padrão do Estocástico:** O valor padrão para o período do Estocástico na página de criação de alarmes foi alterado de 14 para 7.",
-        "**Quebra de L.T. do RSI:** Corrigido um bug crítico na lógica de projeção da linha de tendência que impedia os alarmes de disparar. A deteção de linhas válidas foi também tornada mais robusta."
+        "**Melhorias e Correções Gerais no Sistema de Alarmes e UI:**",
+        "**Sinal Avançado no Scanner:** O sinal 'STC' agora fica laranja e exibe um '*' se, além da sobrevenda, houver um cruzamento bullish confirmado do Estocástico (4h).",
+        "**Gestão de Histórico:** Adicionado um botão na página 'Meus Alarmes' para apagar todo o histórico de alarmes disparados de uma só vez.",
+        "**UI do Modal de Alarmes:** O modal de reconhecimento de alarmes no Dashboard agora exibe a data e hora exatas em que o alarme foi disparado.",
+        "**Lógica de Cruzamento do Estocástico:** O alarme foi refatorado para ser mais robusto. Agora, exige que o cruzamento se mantenha por duas velas fechadas consecutivas para disparar, eliminando sinais falsos.",
+        "**Descrições de Alarme Detalhadas:** As descrições de alarmes complexos (ex: Cruzamento de RSI) agora exibem os parâmetros específicos (intervalo de velas, buffer) definidos pelo utilizador."
     ]
 },
 releases: [
     {
-        number: '14.5.1', // A versão anterior passa para a lista
+        number: '14.6.0', 
+        changes: [
+            "**Auditoria e Correção Geral da Fiabilidade dos Alarmes:**",
+            "Toda a lógica de verificação de alarmes de indicadores foi refatorada para usar exclusivamente os dados de velas fechadas, eliminando disparos falsos e prematuros causados pela volatilidade da vela em andamento.",
+            "As correções foram aplicadas aos alarmes de: Nível de RSI, Nível de Estocástico, Cruzamento de Estocástico, Cruzamento de RSI, Toque de EMA e o alarme Combo.",
+            "A lógica de deteção de Linha de Tendência no RSI foi auditada e confirmada como já sendo robusta."
+        ]
+    },
+    {
+        number: '14.5.1', 
         changes: [
             "**Correção de Fiabilidade no Alarme de Nível de RSI:**",
             "A lógica do alarme de nível de RSI (sobrecompra/sobrevenda) foi ajustada para usar apenas os dados da última vela fechada.",
