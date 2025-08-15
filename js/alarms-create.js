@@ -66,7 +66,6 @@ function enterEditMode(alarm) {
     document.getElementById('alarm-type-select').value = alarmType;
     document.getElementById('alarm-type-select').dispatchEvent(new Event('change'));
 
-    // Preenche os campos do formulário com base no tipo de alarme
     if (alarmType === 'stochastic') { 
         document.getElementById('stoch-condition').value = alarm.condition; 
         document.getElementById('stoch-value').value = alarm.target_price; 
@@ -121,11 +120,8 @@ function exitEditMode() {
     document.getElementById('alarm-form').reset();
     document.getElementById('alarm-type-select').dispatchEvent(new Event('change'));
     
-    // --- INÍCIO DA ALTERAÇÃO ---
-    // Repor o novo valor padrão de 7 para os períodos do Estocástico após o reset
     document.getElementById('stoch-period').value = 7;
     document.getElementById('stoch-cross-k-period').value = 7;
-    // --- FIM DA ALTERAÇÃO ---
 
     document.querySelector('#alarm-form button[type="submit"]').textContent = 'Definir Alarme';
     document.getElementById('cancel-edit-btn').style.display = 'none';
@@ -136,19 +132,14 @@ function exitEditMode() {
 
 export { enterEditMode };
 
-
-// --- PONTO DE ENTRADA DO SCRIPT ---
 document.addEventListener('DOMContentLoaded', () => {
     const alarmForm = document.getElementById('alarm-form');
     if (!alarmForm) {
         return;
     }
 
-    // --- INÍCIO DA ALTERAÇÃO ---
-    // Definir o novo valor padrão de 7 para os períodos do Estocástico ao carregar a página
     document.getElementById('stoch-period').value = 7;
     document.getElementById('stoch-cross-k-period').value = 7;
-    // --- FIM DA ALTERAÇÃO ---
 
     const feedbackDiv = document.getElementById('alarm-feedback');
     const assetInput = document.getElementById('alarm-asset');
@@ -320,6 +311,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (editingAlarmId) {
+                // --- INÍCIO DA ALTERAÇÃO ---
+                // Forçar o status para 'active' e limpar a data de disparo ao reativar/editar
+                alarmData.status = 'active';
+                alarmData.triggered_at = null;
+                // --- FIM DA ALTERAÇÃO ---
                 const { error } = await supabase.from('alarms').update(alarmData).eq('id', editingAlarmId);
                 if (error) throw error;
                 setLastCreatedAlarmId(null);
