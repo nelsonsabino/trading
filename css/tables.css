@@ -155,7 +155,6 @@
 }
 
 
-/* --- INÍCIO DA ALTERAÇÃO --- */
 /* Estilo para o link do último alarme criado na Watchlist de Alarmes */
 .alarms-table .alarm-details-link {
     color: #198754; /* Verde escuro (cor de sucesso do Bootstrap) */
@@ -166,5 +165,11 @@
 
 .alarms-table .alarm-details-link:hover {
     color: #146c43; /* Verde um pouco mais escuro no hover */
+}
+
+/* --- INÍCIO DA ALTERAÇÃO (Ponto 1) --- */
+/* Nova cor para o sinal STC quando há cruzamento confirmado */
+.stoch-signal.crossover-confirmed {
+    background-color: #fd7e14; /* Laranja Bootstrap */
 }
 /* --- FIM DA ALTERAÇÃO --- */
