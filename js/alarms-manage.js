@@ -71,12 +71,10 @@ async function fetchAndDisplayAlarms() {
                 const trendTypeText = alarm.trendline_type === 'support' ? 'Suporte (Fundos Ascendentes)' : 'Resistência (Picos Descendentes)';
                 alarmDescription = `Aguardando ${alarm.touch_count}º toque na L.T. de ${trendTypeText} no ${alarm.indicator_timeframe}`;
             }
-            // --- INÍCIO DA ALTERAÇÃO ---
             else if (alarm.alarm_type === 'rsi_trendline_break') {
                 const trendTypeText = alarm.trendline_type === 'support' ? 'Suporte (LTA)' : 'Resistência (LTB)';
                 alarmDescription = `A monitorizar quebra da L.T. de ${trendTypeText} no ${alarm.indicator_timeframe}`;
             }
-            // --- FIM DA ALTERAÇÃO ---
             else { alarmDescription = `Preço ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} USD`; }
             
             const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${alarm.asset_pair}`;
@@ -113,12 +111,10 @@ async function fetchAndDisplayAlarms() {
                 const trendTypeText = alarm.trendline_type === 'support' ? 'Suporte (Fundos Ascendentes)' : 'Resistência (Picos Descendentes)';
                 alarmDescription = `Detetado ${alarm.touch_count}º toque na L.T. de ${trendTypeText} no ${alarm.indicator_timeframe}`;
             }
-            // --- INÍCIO DA ALTERAÇÃO ---
             else if (alarm.alarm_type === 'rsi_trendline_break') {
                 const trendTypeText = alarm.trendline_type === 'support' ? 'Suporte (LTA)' : 'Resistência (LTB)';
                 alarmDescription = `Quebra da L.T. de ${trendTypeText} no ${alarm.indicator_timeframe}`;
             }
-            // --- FIM DA ALTERAÇÃO ---
             else { alarmDescription = `Preço ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} USD`; }
 
             const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${alarm.asset_pair}`;
@@ -173,6 +169,28 @@ async function deleteAlarm(alarmId) {
     }
 }
 
+// --- INÍCIO DA ALTERAÇÃO (Ponto 2) ---
+async function deleteAllTriggeredAlarms() {
+    const confirmation = confirm("TEM A CERTEZA?\n\nEsta ação irá apagar permanentemente TODO o histórico de alarmes disparados. Esta ação é irreversível.");
+    if (confirmation) {
+        try {
+            const { error } = await supabase
+                .from('alarms')
+                .delete()
+                .eq('status', 'triggered');
+
+            if (error) throw error;
+
+            alert("Histórico de alarmes apagado com sucesso!");
+            fetchAndDisplayAlarms(); // Recarrega a tabela
+        } catch (error) {
+            console.error("Erro ao apagar o histórico de alarmes:", error);
+            alert("Ocorreu um erro ao apagar o histórico. Verifique a consola para mais detalhes.");
+        }
+    }
+}
+// --- FIM DA ALTERAÇÃO ---
+
 document.addEventListener('DOMContentLoaded', () => {
     chartModal = document.getElementById('chart-modal');
     closeChartModalBtn = document.getElementById('close-chart-modal');
@@ -203,6 +221,13 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
     });
+
+    // --- INÍCIO DA ALTERAÇÃO (Ponto 2) ---
+    const deleteHistoryBtn = document.getElementById('delete-history-btn');
+    if (deleteHistoryBtn) {
+        deleteHistoryBtn.addEventListener('click', deleteAllTriggeredAlarms);
+    }
+    // --- FIM DA ALTERAÇÃO ---
 
     fetchAndDisplayAlarms();
 });
