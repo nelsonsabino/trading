@@ -4,9 +4,7 @@ import { supabase } from './services.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openAddModal } from './modals.js';
 import { loadAndOpenForEditing, handleRevertStatus, handleRevertToWatchlist, handleDeleteAlarm } from './handlers.js';
-// --- INÍCIO DA ALTERAÇÃO 1: Importar a função do novo módulo de gráfico ---
 import { openChartModal } from './chart-modal.js';
-// --- FIM DA ALTERAÇÃO 1 ---
 import { getLastCreatedTradeId, setLastCreatedTradeId, getVisibleImageIds, setVisibleImageIds } from './state.js';
 
 let tradesForEventListeners = [];
@@ -32,14 +30,11 @@ function renderSparkline(containerId, dataSeries) {
     const container = document.getElementById(containerId);
     if (!container || !dataSeries || dataSeries.length < 2) return;
     container.innerHTML = '';
-
     const isDarkMode = document.documentElement.classList.contains('dark-mode');
-    
     const computedStyle = getComputedStyle(document.documentElement);
     const positiveColor = computedStyle.getPropertyValue('--feedback-positive').trim();
     const negativeColor = computedStyle.getPropertyValue('--feedback-negative').trim();
     const chartColor = dataSeries[dataSeries.length - 1] >= dataSeries[0] ? positiveColor : negativeColor;
-    
     const options = {
         series: [{ data: dataSeries }], 
         chart: { type: 'line', height: 40, width: 100, sparkline: { enabled: true }},
@@ -142,23 +137,37 @@ async function acknowledgeAlarm(assetPair) {
     }
 }
 
+// --- INÍCIO DA ALTERAÇÃO (Ponto 5) ---
 function getAlarmDescription(alarm, forTable = false) {
     if (!alarm) return 'N/A';
+    const timeframe = `(${alarm.indicator_timeframe})`;
     switch (alarm.alarm_type) {
-        case 'stochastic': return `Stoch(${alarm.indicator_period}) ${alarm.condition === 'above' ? '>' : '<'} ${alarm.target_price} (${alarm.indicator_timeframe})`;
-        case 'rsi_level': return `RSI(${alarm.indicator_period}) ${alarm.condition === 'above' ? '>' : '<'} ${alarm.target_price} (${alarm.indicator_timeframe})`;
-        case 'stochastic_crossover': return `Stoch %K cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} de %D (${alarm.indicator_timeframe})`;
-        case 'rsi_crossover': return `RSI cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} da MA (${alarm.indicator_timeframe})`;
-        case 'ema_touch': return `Preço testa EMA(${alarm.ema_period}) (${alarm.indicator_timeframe})`;
-        case 'combo': return `Confluência EMA/Stoch (${alarm.indicator_timeframe})`;
-        case 'rsi_trendline': return `${alarm.touch_count}º toque em L.T. de ${alarm.trendline_type} (${alarm.indicator_timeframe})`;
+        case 'stochastic': return `Stoch(${alarm.indicator_period}) ${alarm.condition === 'above' ? '>' : '<'} ${alarm.target_price} ${timeframe}`;
+        case 'rsi_level': return `RSI(${alarm.indicator_period}) ${alarm.condition === 'above' ? '>' : '<'} ${alarm.target_price} ${timeframe}`;
+        case 'stochastic_crossover': return `Stoch %K cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} de %D ${timeframe}`;
+        case 'rsi_crossover': {
+            let details = [];
+            if (alarm.crossover_interval && alarm.crossover_interval > 1) {
+                details.push(`em ${alarm.crossover_interval} velas`);
+            }
+            if (alarm.crossover_threshold && alarm.crossover_threshold > 0) {
+                details.push(`buffer ${alarm.crossover_threshold}`);
+            }
+            const detailsText = details.length > 0 ? `(${details.join(', ')}) ` : '';
+            return `RSI cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} da MA ${detailsText}${timeframe}`;
+        }
+        case 'ema_touch': return `Preço testa EMA(${alarm.ema_period}) ${timeframe}`;
+        case 'combo': return `Confluência EMA/Stoch ${timeframe}`;
+        case 'rsi_trendline': return `${alarm.touch_count}º toque em L.T. de ${alarm.trendline_type} ${timeframe}`;
         case 'rsi_trendline_break':
             const statusText = forTable ? 'Monitoriza quebra' : (alarm.status === 'triggered' ? 'Quebra da' : 'Monitoriza quebra da');
-            return `${statusText} L.T. de ${alarm.trendline_type} (${alarm.indicator_timeframe})`;
+            return `${statusText} L.T. de ${alarm.trendline_type} ${timeframe}`;
         default: return `Preço ${alarm.condition === 'above' ? '>' : '<'} ${alarm.target_price} USD`;
     }
 }
+// --- FIM DA ALTERAÇÃO ---
 
+// --- INÍCIO DA ALTERAÇÃO (Ponto 3) ---
 function openAlarmListModal(titleText, alarmsToDisplay) {
     const modal = document.getElementById('alarm-list-modal');
     const title = document.getElementById('alarm-list-title');
@@ -169,20 +178,23 @@ function openAlarmListModal(titleText, alarmsToDisplay) {
     if (!modal) return;
     
     title.textContent = titleText;
-    
     alarmsToDisplay.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     container.innerHTML = alarmsToDisplay.length === 0 ? '<p>Nenhum alarme encontrado.</p>' : alarmsToDisplay.map(alarm => {
-        const createdAt = new Date(alarm.created_at).toLocaleString('pt-PT', {
-            day: '2-digit', month: '2-digit', year: 'numeric',
-            hour: '2-digit', minute: '2-digit'
-        });
+        const createdAt = new Date(alarm.created_at).toLocaleString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        
+        let triggeredAtHtml = '';
+        if (alarm.status === 'triggered' && alarm.triggered_at) {
+            const triggeredAt = new Date(alarm.triggered_at).toLocaleString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            triggeredAtHtml = `<span class="alarm-list-timestamp triggered">Disparado em: ${triggeredAt}</span>`;
+        }
 
         return `
         <div class="alarm-list-item">
             <div>
                 <span class="alarm-list-description">${getAlarmDescription(alarm)}</span>
                 <span class="alarm-list-timestamp">Criado em: ${createdAt}</span>
+                ${triggeredAtHtml}
             </div>
             <div class="alarm-list-actions">
                 <a href="alarms-create.html?editAlarmId=${alarm.id}" class="icon-action-btn" title="Editar"><span class="material-symbols-outlined">edit</span></a>
@@ -208,17 +220,15 @@ function openAlarmListModal(titleText, alarmsToDisplay) {
     closeBtn.onclick = () => modal.style.display = 'none';
     modal.onclick = (e) => { if (e.target.id === 'alarm-list-modal') modal.style.display = 'none'; };
 }
+// --- FIM DA ALTERAÇÃO ---
 
 async function loadAndOpenAlarmModal(assetPair, mode) {
     try {
         const { data, error } = await supabase.from('alarms').select('*').eq('asset_pair', assetPair);
         if (error) throw error;
-        
         const titleText = mode === 'active' ? `Alarmes Ativos para ${assetPair}` : `Alarmes Disparados para ${assetPair}`;
         const alarmsToDisplay = data.filter(a => mode === 'active' ? a.status === 'active' : a.status === 'triggered' && !a.acknowledged);
-
         openAlarmListModal(titleText, alarmsToDisplay);
-
     } catch (err) {
         console.error("Erro ao buscar alarmes para o modal:", err);
     }
@@ -298,30 +308,19 @@ export function displayTrades(trades, marketData, allAlarms) {
 export function displayWatchlistTable(allTrades, allAlarms, marketData) {
     const tbody = document.getElementById('watchlist-alarms-tbody');
     if (!tbody) return;
-
-    const assetsInKanban = new Set(
-        allTrades
-            .filter(t => ['POTENTIAL', 'ARMED', 'LIVE'].includes(t.data.status))
-            .map(t => t.data.asset)
-    );
-    
+    const assetsInKanban = new Set(allTrades.filter(t => ['POTENTIAL', 'ARMED', 'LIVE'].includes(t.data.status)).map(t => t.data.asset));
     const activeAlarmsByAsset = allAlarms.reduce((acc, alarm) => {
         if (alarm.status === 'active') {
-            if (!acc[alarm.asset_pair]) {
-                acc[alarm.asset_pair] = [];
-            }
+            if (!acc[alarm.asset_pair]) acc[alarm.asset_pair] = [];
             acc[alarm.asset_pair].push(alarm);
         }
         return acc;
     }, {});
-    
     const assetsForWatchlist = Object.keys(activeAlarmsByAsset).filter(asset => !assetsInKanban.has(asset));
-
     if (assetsForWatchlist.length === 0) {
         tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Nenhum ativo a ser monitorizado. Adicione um alarme a um ativo para ele aparecer aqui.</td></tr>';
         return;
     }
-
     const tableRowsHtml = assetsForWatchlist.map(assetName => {
         const alarmsForAsset = activeAlarmsByAsset[assetName];
         const latestAlarm = alarmsForAsset.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
@@ -329,11 +328,7 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
         let formattedPrice = assetMarketData.price >= 1.0 ? assetMarketData.price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$' + assetMarketData.price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
         const hasTriggeredUnacknowledgedAlarm = allAlarms.some(a => a.asset_pair === assetName && a.status === 'triggered' && !a.acknowledged);
         const triggeredClass = hasTriggeredUnacknowledgedAlarm ? 'class="alarm-triggered"' : '';
-        const acknowledgeButtonHtml = hasTriggeredUnacknowledgedAlarm 
-            ? `<button class="acknowledge-alarm-btn" data-action="acknowledge-and-view-alarm" data-asset="${assetName}" title="Ver Alarme Disparado"><span class="material-symbols-outlined">alarm</span> OK</button>`
-            : '';
-
-        // --- INÍCIO DA ALTERAÇÃO 2: Mudar o botão de link para botão de ação ---
+        const acknowledgeButtonHtml = hasTriggeredUnacknowledgedAlarm ? `<button class="acknowledge-alarm-btn" data-action="acknowledge-and-view-alarm" data-asset="${assetName}" title="Ver Alarme Disparado"><span class="material-symbols-outlined">alarm</span> OK</button>` : '';
         return `
             <tr ${triggeredClass}>
                 <td data-label="Ativo"><strong><a href="asset-details.html?symbol=${assetName}" class="asset-link">${assetName}</a></strong></td>
@@ -353,9 +348,7 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
                 </td>
             </tr>
         `;
-        // --- FIM DA ALTERAÇÃO 2 ---
     }).join('');
-
     tbody.innerHTML = tableRowsHtml;
     assetsForWatchlist.forEach(assetName => renderSparkline(`sparkline-watchlist-${assetName}`, marketData[assetName]?.sparkline));
 }
@@ -401,15 +394,9 @@ document.addEventListener('DOMContentLoaded', () => {
         watchlistTable.addEventListener('click', (e) => {
             const targetElement = e.target.closest('[data-action]');
             if (!targetElement) return;
-            
             const action = targetElement.dataset.action;
             const symbol = targetElement.dataset.symbol || targetElement.dataset.asset;
-
-            if (action !== 'delete-alarm') {
-                e.preventDefault();
-            }
-
-            // --- INÍCIO DA ALTERAÇÃO 3: Adicionar a nova ação de ver gráfico ---
+            if (action !== 'delete-alarm') e.preventDefault();
             if (action === 'view-chart' && symbol) {
                 openChartModal(symbol);
             } else if (action === 'add-to-potential' && symbol) {
@@ -421,7 +408,6 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (action === 'manage-alarms' && symbol) {
                 loadAndOpenAlarmModal(symbol, 'active');
             }
-            // --- FIM DA ALTERAÇÃO 3 ---
         });
     }
 
