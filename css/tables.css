@@ -172,9 +172,9 @@
     background-color: #fd7e14; /* Laranja Bootstrap */
 }
 
-/* --- INÍCIO DA ALTERAÇÃO --- */
-/* Asterisco para o sinal de cruzamento confirmado */
-.stoch-signal.crossover-confirmed::after {
+/* --- INÍCIO DA CORREÇÃO --- */
+/* Asterisco para o sinal de cruzamento confirmado, usando ::before para evitar conflito com o tooltip (::after) */
+.stoch-signal.crossover-confirmed::before {
     content: '*';
     position: absolute;
     top: -5px;      /* Posição vertical */
@@ -182,11 +182,7 @@
     font-size: 1.2em;
     font-weight: bold;
     color: #fd7e14; /* Mesma cor do círculo */
-    /* Remove o comportamento de tooltip para este pseudo-elemento */
-    background-color: transparent;
-    padding: 0;
-    border-radius: 0;
-    opacity: 1;
-    visibility: visible;
+    /* Garante que não interfere com o layout */
+    z-index: 5; 
 }
-/* --- FIM DA ALTERAÇÃO --- */
+/* --- FIM DA CORREÇÃO --- */
