@@ -2,13 +2,20 @@
 
 export const changelogData = {
 current: {
-    number: '14.7.1',
+    number: '14.7.2',
     changes: [
-        "**Melhoria Visual no Sinal STC* do Scanner:**",
-        "O asterisco que indica um cruzamento de Estocástico confirmado foi movido para fora do círculo do sinal, melhorando significativamente a sua legibilidade e visibilidade, especialmente no modo escuro."
+        "**Melhoria de UX na Gestão de Alarmes:**",
+        "Adicionada a funcionalidade para editar e reativar alarmes diretamente do histórico de alarmes disparados, agilizando a reutilização de setups de alarme."
     ]
 },
 releases: [
+    {
+        number: '14.7.1',
+        changes: [
+            "**Melhoria Visual no Sinal STC* do Scanner:**",
+            "O asterisco que indica um cruzamento de Estocástico confirmado foi movido para fora do círculo do sinal, melhorando significativamente a sua legibilidade e visibilidade, especialmente no modo escuro."
+        ]
+    },
     {
         number: '14.7.0',
         changes: [
