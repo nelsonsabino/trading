@@ -7,11 +7,8 @@ import {
     query, orderBy, onSnapshot, runTransaction, getDocs, where, setDoc
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 import { firebaseConfig } from './config.js';
-// --- INÍCIO DA ALTERAÇÃO ---
-import { supabase } from './services.js'; // Importar o cliente Supabase
-// --- FIM DA ALTERAÇÃO ---
+import { supabase } from './services.js';
 
-// Inicializa o Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 export const auth = getAuth(app);
@@ -20,20 +17,12 @@ setPersistence(auth, browserLocalPersistence)
   .then(() => console.log("Persistência de autenticação configurada para LOCAL."))
   .catch((error) => console.error("Erro ao configurar persistência:", error));
 
-// --- INÍCIO DA ALTERAÇÃO ---
-/**
- * Apaga um ficheiro de imagem do Supabase Storage com base no seu URL público.
- * @param {string} imageUrl - O URL público completo da imagem a apagar.
- */
 async function deleteTradeImage(imageUrl) {
     if (!imageUrl || !imageUrl.includes(supabase.storage.url)) {
         console.log("Nenhuma imagem válida do Supabase Storage para apagar.");
         return;
     }
     try {
-        // Extrai o caminho do ficheiro do URL completo
-        // Ex: https://<id>.supabase.co/storage/v1/object/public/trade_images/caminho/para/ficheiro.png
-        // -> caminho/para/ficheiro.png
         const urlParts = imageUrl.split('/trade_images/');
         if (urlParts.length < 2) {
             throw new Error("URL da imagem inválido ou não reconhecido.");
@@ -41,18 +30,20 @@ async function deleteTradeImage(imageUrl) {
         const filePath = urlParts[1];
 
         console.log(`A tentar apagar a imagem do Storage no caminho: ${filePath}`);
+        // --- INÍCIO DA ALTERAÇÃO: Autenticar no Supabase antes de apagar ---
+        const token = await getCurrentUserToken();
+        if (!token) throw new Error("Não foi possível obter o token do utilizador para apagar a imagem.");
+        supabase.auth.setAuth(token);
+        // --- FIM DA ALTERAÇÃO ---
+
         const { error } = await supabase.storage.from('trade_images').remove([filePath]);
         if (error) throw error;
 
         console.log(`Imagem ${filePath} apagada com sucesso do Supabase Storage.`);
     } catch (error) {
         console.error("Erro ao apagar a imagem do Supabase Storage. O ficheiro pode ter de ser removido manualmente.", error);
-        // Não lançamos o erro para não impedir que o trade seja apagado do Firestore
     }
 }
-// --- FIM DA ALTERAÇÃO ---
-
-// --- FUNÇÕES PARA A COLEÇÃO "TRADES" ---
 
 export function listenToTrades(callback) {
     const q = query(collection(db, 'trades'), orderBy('dateAdded', 'desc'));
@@ -118,31 +109,25 @@ export async function updateTrade(tradeId, updatedData) {
     }
 }
 
-// --- INÍCIO DA ALTERAÇÃO ---
 export async function deleteTrade(tradeId) {
     try {
         const tradeRef = doc(db, 'trades', tradeId);
-        
-        // Antes de apagar, obter os dados do trade para verificar se há uma imagem associada
         const tradeDoc = await getDoc(tradeRef);
         if (tradeDoc.exists()) {
             const tradeData = tradeDoc.data();
             if (tradeData.imageUrl) {
-                // Chamar a função para apagar a imagem do Storage
                 await deleteTradeImage(tradeData.imageUrl);
             }
         }
-        
-        // Apagar o registo do trade do Firestore
         await deleteDoc(tradeRef);
     } catch (error) {
         console.error("Erro no serviço ao apagar trade:", error);
         throw error;
     }
 }
-// --- FIM DA ALTERAÇÃO ---
 
-// ... (o resto do ficheiro permanece exatamente igual) ...
+// ... (Resto do ficheiro sem alterações, exceto a adição no final) ...
+
 // --- FUNÇÕES PARA O PORTFÓLIO E TRANSAÇÕES ---
 export function listenToPortfolioSummary(callback) {
     const portfolioRef = doc(db, "portfolio", "summary");
@@ -277,3 +262,17 @@ export async function deleteStrategy(strategyId) {
         await deleteDoc(strategyRef);
     } catch (error) { console.error("Erro no serviço ao apagar estratégia:", error); throw error; }
 }
+
+// --- INÍCIO DA ALTERAÇÃO: Função para obter o token de autenticação ---
+/**
+ * Obtém o token JWT do utilizador Firebase atualmente logado.
+ * @returns {Promise<string|null>} O token JWT ou null se não houver utilizador.
+ */
+export async function getCurrentUserToken() {
+    const user = auth.currentUser;
+    if (user) {
+        return await user.getIdToken();
+    }
+    return null;
+}
+// --- FIM DA ALTERAÇÃO ---
