@@ -2,9 +2,7 @@
 
 import { supabaseUrl, supabaseAnonKey } from './config.js';
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-// --- INÍCIO DA ALTERAÇÃO ---
 import { getCurrentUserToken } from './firebase-service.js';
-// --- FIM DA ALTERAÇÃO ---
 
 // Exportamos a instância do cliente Supabase para ser usada por toda a aplicação
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
@@ -49,9 +47,10 @@ export function listenToAlarms(callback) {
     return alarmsChannel;
 }
 
-// --- INÍCIO DA ALTERAÇÃO: Lógica de autenticação híbrida ---
+
+// --- INÍCIO DA ALTERAÇÃO FINAL ---
 /**
- * Faz o upload de um ficheiro de imagem para o Supabase Storage.
+ * Faz o upload de um ficheiro de imagem para o Supabase Storage, autenticando com o token do Firebase.
  * @param {File} file - O ficheiro de imagem a ser enviado.
  * @param {string} assetName - O nome do ativo (ex: 'BTCUSDC') para organizar o ficheiro.
  * @returns {Promise<string>} O URL público da imagem enviada.
@@ -61,42 +60,47 @@ export async function uploadTradeImage(file, assetName) {
         throw new Error("Ficheiro e nome do ativo são obrigatórios para o upload.");
     }
 
-    // 1. Obter o token de sessão do Firebase para autenticar no Supabase
+    // 1. Obter o token de sessão do Firebase
     const token = await getCurrentUserToken();
     if (!token) {
-        throw new Error("Utilizador não autenticado. Não é possível fazer o upload.");
-    }
-    
-    // 2. Definir a sessão no Supabase usando o token do Firebase
-    const { error: authError } = await supabase.auth.setSession({ access_token: token, refresh_token: '' });
-    if (authError) {
-        console.error("Erro ao definir a sessão no Supabase:", authError);
-        throw new Error("Falha na autenticação com o serviço de armazenamento.");
-    }
-    
-    // Obter o ID do utilizador da sessão que acabámos de definir
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-        throw new Error("Sessão do utilizador inválida no Supabase após definir o token.");
+        throw new Error("Utilizador não autenticado no Firebase. Não é possível fazer o upload.");
     }
 
+    // 2. Autenticar no Supabase usando o token do Firebase
+    const { data: { user }, error: signInError } = await supabase.auth.signInWithIdToken({
+        provider: 'firebase',
+        token: token,
+    });
+
+    if (signInError) {
+        console.error("Erro ao autenticar no Supabase com o token do Firebase:", signInError);
+        throw new Error("Falha na autenticação com o serviço de armazenamento.");
+    }
+
+    if (!user) {
+        throw new Error("Autenticação com Supabase não retornou um utilizador.");
+    }
+
+    // 3. Preparar o caminho e o nome do ficheiro
     const fileExtension = file.name.split('.').pop() || 'png';
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const fileName = `${assetName}_${timestamp}.${fileExtension}`;
     const filePath = `${user.id}/${fileName}`;
 
-    console.log(`A enviar imagem para: ${filePath}`);
+    console.log(`Utilizador autenticado no Supabase (ID: ${user.id}). A enviar imagem para: ${filePath}`);
 
-    const { data, error } = await supabase
+    // 4. Fazer o upload para o Supabase Storage
+    const { data, error: uploadError } = await supabase
         .storage
         .from('trade_images')
         .upload(filePath, file);
 
-    if (error) {
-        console.error("Erro no upload para o Supabase Storage:", error);
-        throw error;
+    if (uploadError) {
+        console.error("Erro no upload para o Supabase Storage:", uploadError);
+        throw uploadError;
     }
 
+    // 5. Obter o URL público para guardar no Firestore
     const { data: publicUrlData } = supabase
         .storage
         .from('trade_images')
@@ -105,4 +109,4 @@ export async function uploadTradeImage(file, assetName) {
     console.log("Upload bem-sucedido. URL público:", publicUrlData.publicUrl);
     return publicUrlData.publicUrl;
 }
-// --- FIM DA ALTERAÇÃO ---
+// --- FIM DA ALTERAÇÃO FINAL ---
