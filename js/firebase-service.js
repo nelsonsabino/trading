@@ -3,36 +3,54 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
 import { getAuth, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 import { 
-    getFirestore, 
-    collection, 
-    addDoc, 
-    doc, 
-    updateDoc, 
-    getDoc, 
-    deleteDoc,
-    query, 
-    orderBy, 
-    onSnapshot, 
-    runTransaction,
-    getDocs,
-    where,
-    setDoc
+    getFirestore, collection, addDoc, doc, updateDoc, getDoc, deleteDoc,
+    query, orderBy, onSnapshot, runTransaction, getDocs, where, setDoc
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 import { firebaseConfig } from './config.js';
+// --- INÍCIO DA ALTERAÇÃO ---
+import { supabase } from './services.js'; // Importar o cliente Supabase
+// --- FIM DA ALTERAÇÃO ---
 
 // Inicializa o Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-export const auth = getAuth(app); // Inicializa e exporta o serviço de autenticação
+export const auth = getAuth(app);
 
-// Configura a persistência local para a autenticação
 setPersistence(auth, browserLocalPersistence)
-  .then(() => {
-    console.log("Persistência de autenticação configurada para LOCAL.");
-  })
-  .catch((error) => {
-    console.error("Erro ao configurar persistência:", error);
-  });
+  .then(() => console.log("Persistência de autenticação configurada para LOCAL."))
+  .catch((error) => console.error("Erro ao configurar persistência:", error));
+
+// --- INÍCIO DA ALTERAÇÃO ---
+/**
+ * Apaga um ficheiro de imagem do Supabase Storage com base no seu URL público.
+ * @param {string} imageUrl - O URL público completo da imagem a apagar.
+ */
+async function deleteTradeImage(imageUrl) {
+    if (!imageUrl || !imageUrl.includes(supabase.storage.url)) {
+        console.log("Nenhuma imagem válida do Supabase Storage para apagar.");
+        return;
+    }
+    try {
+        // Extrai o caminho do ficheiro do URL completo
+        // Ex: https://<id>.supabase.co/storage/v1/object/public/trade_images/caminho/para/ficheiro.png
+        // -> caminho/para/ficheiro.png
+        const urlParts = imageUrl.split('/trade_images/');
+        if (urlParts.length < 2) {
+            throw new Error("URL da imagem inválido ou não reconhecido.");
+        }
+        const filePath = urlParts[1];
+
+        console.log(`A tentar apagar a imagem do Storage no caminho: ${filePath}`);
+        const { error } = await supabase.storage.from('trade_images').remove([filePath]);
+        if (error) throw error;
+
+        console.log(`Imagem ${filePath} apagada com sucesso do Supabase Storage.`);
+    } catch (error) {
+        console.error("Erro ao apagar a imagem do Supabase Storage. O ficheiro pode ter de ser removido manualmente.", error);
+        // Não lançamos o erro para não impedir que o trade seja apagado do Firestore
+    }
+}
+// --- FIM DA ALTERAÇÃO ---
 
 // --- FUNÇÕES PARA A COLEÇÃO "TRADES" ---
 
@@ -50,13 +68,12 @@ export function listenToTrades(callback) {
     });
 }
 
-// Função para obter todos os trades de um ativo específico (APENAS FECHADOS)
 export async function getTradesForAsset(assetSymbol) {
     try {
         const q = query(
             collection(db, 'trades'),
             where("asset", "==", assetSymbol),
-            where("status", "==", "CLOSED"), // NOVO: Filtra apenas por trades fechados
+            where("status", "==", "CLOSED"),
             orderBy('dateAdded', 'desc')
         );
         const querySnapshot = await getDocs(q);
@@ -67,7 +84,7 @@ export async function getTradesForAsset(assetSymbol) {
         return trades;
     } catch (error) {
         console.error(`Erro ao buscar trades para o ativo ${assetSymbol}:`, error);
-        return []; // Retorna um array vazio em caso de erro
+        return [];
     }
 }
 
@@ -101,16 +118,31 @@ export async function updateTrade(tradeId, updatedData) {
     }
 }
 
+// --- INÍCIO DA ALTERAÇÃO ---
 export async function deleteTrade(tradeId) {
     try {
         const tradeRef = doc(db, 'trades', tradeId);
+        
+        // Antes de apagar, obter os dados do trade para verificar se há uma imagem associada
+        const tradeDoc = await getDoc(tradeRef);
+        if (tradeDoc.exists()) {
+            const tradeData = tradeDoc.data();
+            if (tradeData.imageUrl) {
+                // Chamar a função para apagar a imagem do Storage
+                await deleteTradeImage(tradeData.imageUrl);
+            }
+        }
+        
+        // Apagar o registo do trade do Firestore
         await deleteDoc(tradeRef);
     } catch (error) {
         console.error("Erro no serviço ao apagar trade:", error);
         throw error;
     }
 }
+// --- FIM DA ALTERAÇÃO ---
 
+// ... (o resto do ficheiro permanece exatamente igual) ...
 // --- FUNÇÕES PARA O PORTFÓLIO E TRANSAÇÕES ---
 export function listenToPortfolioSummary(callback) {
     const portfolioRef = doc(db, "portfolio", "summary");
