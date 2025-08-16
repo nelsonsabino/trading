@@ -2,13 +2,20 @@
 
 export const changelogData = {
 current: {
-    number: '14.7.2',
+    number: '14.8.0',
     changes: [
-        "**Melhoria de UX na Gestão de Alarmes:**",
-        "Adicionada a funcionalidade para editar e reativar alarmes diretamente do histórico de alarmes disparados, agilizando a reutilização de setups de alarme."
+        "**Melhoria de UX no Dashboard:**",
+        "Adicionado um botão de 'Criar Alarme' diretamente nos cards de trade (Potencial, Armado, Ativo), permitindo a criação rápida de alarmes para ativos que já estão no funil de trading."
     ]
 },
 releases: [
+    {
+        number: '14.7.2',
+        changes: [
+            "**Melhoria de UX na Gestão de Alarmes:**",
+            "Adicionada a funcionalidade para editar e reativar alarmes diretamente do histórico de alarmes disparados, agilizando a reutilização de setups de alarme."
+        ]
+    },
     {
         number: '14.7.1',
         changes: [
