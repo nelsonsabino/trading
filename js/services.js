@@ -2,6 +2,9 @@
 
 import { supabaseUrl, supabaseAnonKey } from './config.js';
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+// --- INÍCIO DA ALTERAÇÃO ---
+import { getCurrentUserToken } from './firebase-service.js';
+// --- FIM DA ALTERAÇÃO ---
 
 // Exportamos a instância do cliente Supabase para ser usada por toda a aplicação
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
@@ -46,7 +49,7 @@ export function listenToAlarms(callback) {
     return alarmsChannel;
 }
 
-// --- INÍCIO DA ALTERAÇÃO ---
+// --- INÍCIO DA ALTERAÇÃO: Lógica de autenticação híbrida ---
 /**
  * Faz o upload de um ficheiro de imagem para o Supabase Storage.
  * @param {File} file - O ficheiro de imagem a ser enviado.
@@ -58,12 +61,25 @@ export async function uploadTradeImage(file, assetName) {
         throw new Error("Ficheiro e nome do ativo são obrigatórios para o upload.");
     }
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
+    // 1. Obter o token de sessão do Firebase para autenticar no Supabase
+    const token = await getCurrentUserToken();
+    if (!token) {
         throw new Error("Utilizador não autenticado. Não é possível fazer o upload.");
     }
+    
+    // 2. Definir a sessão no Supabase usando o token do Firebase
+    const { error: authError } = await supabase.auth.setSession({ access_token: token, refresh_token: '' });
+    if (authError) {
+        console.error("Erro ao definir a sessão no Supabase:", authError);
+        throw new Error("Falha na autenticação com o serviço de armazenamento.");
+    }
+    
+    // Obter o ID do utilizador da sessão que acabámos de definir
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+        throw new Error("Sessão do utilizador inválida no Supabase após definir o token.");
+    }
 
-    // Criar um nome de ficheiro único para evitar conflitos
     const fileExtension = file.name.split('.').pop() || 'png';
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const fileName = `${assetName}_${timestamp}.${fileExtension}`;
@@ -73,7 +89,7 @@ export async function uploadTradeImage(file, assetName) {
 
     const { data, error } = await supabase
         .storage
-        .from('trade_images') // Nome do nosso bucket
+        .from('trade_images')
         .upload(filePath, file);
 
     if (error) {
@@ -81,7 +97,6 @@ export async function uploadTradeImage(file, assetName) {
         throw error;
     }
 
-    // Obter o URL público para guardar no Firestore
     const { data: publicUrlData } = supabase
         .storage
         .from('trade_images')
