@@ -236,7 +236,7 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
     card.dataset.tradeId = trade.id;
     const assetName = trade.data.asset;
     const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${assetName}`;
-    const createAlarmUrl = `alarms-create.html?assetPair=${assetName}`; // URL para o novo botão
+    const createAlarmUrl = `alarms-create.html?assetPair=${assetName}`;
     const assetMarketData = marketData[assetName] || { price: 0, change: 0, sparkline: [] };
     const priceChangeClass = assetMarketData.change >= 0 ? 'positive-pnl' : 'negative-pnl';
     if (trade.data.status === 'ARMED') card.classList.add('armed');
