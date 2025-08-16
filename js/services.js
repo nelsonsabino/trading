@@ -20,7 +20,7 @@ export function listenToAlarms(callback) {
         });
 
     // 2. Subscrição em tempo real para mudanças na tabela 'alarms'
-    const alarmsChannel = supabase.channel('public:alarms'); // Nome do canal deve ser único e descritivo
+    const alarmsChannel = supabase.channel('public:alarms');
 
     alarmsChannel
         .on('postgres_changes', { event: '*', schema: 'public', table: 'alarms' }, payload => {
@@ -30,9 +30,8 @@ export function listenToAlarms(callback) {
                 .then(({ data, error }) => {
                     if (error) {
                         console.error("Erro ao escutar alarmes Supabase (realtime callback):", error);
-                        // Aqui pode decidir como lidar com o erro no realtime; talvez não chame o callback com erro
                     } else {
-                        callback(data); // Chama o callback com os novos dados
+                        callback(data);
                     }
                 });
         })
@@ -44,76 +43,51 @@ export function listenToAlarms(callback) {
             }
         });
 
-    // Retorna o objeto do canal caso seja necessário cancelar a subscrição externamente
     return alarmsChannel;
 }
 
+// --- INÍCIO DA ALTERAÇÃO ---
+/**
+ * Faz o upload de um ficheiro de imagem para o Supabase Storage.
+ * @param {File} file - O ficheiro de imagem a ser enviado.
+ * @param {string} assetName - O nome do ativo (ex: 'BTCUSDC') para organizar o ficheiro.
+ * @returns {Promise<string>} O URL público da imagem enviada.
+ */
+export async function uploadTradeImage(file, assetName) {
+    if (!file || !assetName) {
+        throw new Error("Ficheiro e nome do ativo são obrigatórios para o upload.");
+    }
 
-// --- INÍCIO DA ALTERAÇÃO: Função de teste para upload de imagem ---
-export async function uploadTestImageSupabase() {
-    console.log("Iniciando teste de upload para o Supabase Storage...");
-
-    // 1. Verificar se o utilizador está autenticado
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-        console.error("Erro: Utilizador não autenticado. Por favor, faça login primeiro.");
-        alert("Erro: Utilizador não autenticado. Por favor, faça login primeiro.");
-        return;
+        throw new Error("Utilizador não autenticado. Não é possível fazer o upload.");
     }
-    console.log(`Utilizador autenticado: ${user.email} (ID: ${user.id})`);
 
-    // 2. Criar uma imagem de teste em canvas
-    const canvas = document.createElement('canvas');
-    canvas.width = 150;
-    canvas.height = 100;
-    const ctx = canvas.getContext('2d');
-    
-    // Fundo azul
-    ctx.fillStyle = '#007bff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // Texto "TEST" a branco
-    ctx.fillStyle = 'white';
-    ctx.font = 'bold 30px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('TEST', canvas.width / 2, canvas.height / 2);
+    // Criar um nome de ficheiro único para evitar conflitos
+    const fileExtension = file.name.split('.').pop() || 'png';
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const fileName = `${assetName}_${timestamp}.${fileExtension}`;
+    const filePath = `${user.id}/${fileName}`;
 
-    // 3. Converter o canvas para um ficheiro (Blob)
-    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-    const testFile = new File([blob], 'test-image.png', { type: 'image/png' });
-    console.log("Imagem de teste criada com sucesso.");
+    console.log(`A enviar imagem para: ${filePath}`);
 
-    // 4. Definir o caminho do ficheiro no Storage
-    // O caminho usa o UID do utilizador para cumprir as regras de segurança
-    const filePath = `${user.id}/test-image-${Date.now()}.png`;
-    console.log(`A tentar fazer upload para o bucket 'trade_images' no caminho: ${filePath}`);
+    const { data, error } = await supabase
+        .storage
+        .from('trade_images') // Nome do nosso bucket
+        .upload(filePath, file);
 
-    // 5. Fazer o upload para o Supabase Storage
-    try {
-        const { data, error } = await supabase
-            .storage
-            .from('trade_images')
-            .upload(filePath, testFile);
-
-        if (error) {
-            throw error;
-        }
-
-        console.log("Upload bem-sucedido!", data);
-
-        // 6. Obter o URL público da imagem
-        const { data: publicUrlData } = supabase
-            .storage
-            .from('trade_images')
-            .getPublicUrl(data.path);
-
-        console.log("URL Público da imagem:", publicUrlData.publicUrl);
-        alert(`Upload concluído com sucesso! Verifique a consola (F12) para ver o URL público da imagem.`);
-
-    } catch (error) {
-        console.error("Ocorreu um erro durante o upload:", error);
-        alert(`Ocorreu um erro durante o upload. Verifique a consola (F12) para mais detalhes.`);
+    if (error) {
+        console.error("Erro no upload para o Supabase Storage:", error);
+        throw error;
     }
+
+    // Obter o URL público para guardar no Firestore
+    const { data: publicUrlData } = supabase
+        .storage
+        .from('trade_images')
+        .getPublicUrl(data.path);
+
+    console.log("Upload bem-sucedido. URL público:", publicUrlData.publicUrl);
+    return publicUrlData.publicUrl;
 }
 // --- FIM DA ALTERAÇÃO ---
