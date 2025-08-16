@@ -137,7 +137,6 @@ async function acknowledgeAlarm(assetPair) {
     }
 }
 
-// --- INÍCIO DA ALTERAÇÃO (Ponto 5) ---
 function getAlarmDescription(alarm, forTable = false) {
     if (!alarm) return 'N/A';
     const timeframe = `(${alarm.indicator_timeframe})`;
@@ -165,9 +164,7 @@ function getAlarmDescription(alarm, forTable = false) {
         default: return `Preço ${alarm.condition === 'above' ? '>' : '<'} ${alarm.target_price} USD`;
     }
 }
-// --- FIM DA ALTERAÇÃO ---
 
-// --- INÍCIO DA ALTERAÇÃO (Ponto 3) ---
 function openAlarmListModal(titleText, alarmsToDisplay) {
     const modal = document.getElementById('alarm-list-modal');
     const title = document.getElementById('alarm-list-title');
@@ -220,7 +217,6 @@ function openAlarmListModal(titleText, alarmsToDisplay) {
     closeBtn.onclick = () => modal.style.display = 'none';
     modal.onclick = (e) => { if (e.target.id === 'alarm-list-modal') modal.style.display = 'none'; };
 }
-// --- FIM DA ALTERAÇÃO ---
 
 async function loadAndOpenAlarmModal(assetPair, mode) {
     try {
@@ -240,6 +236,7 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
     card.dataset.tradeId = trade.id;
     const assetName = trade.data.asset;
     const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${assetName}`;
+    const createAlarmUrl = `alarms-create.html?assetPair=${assetName}`; // URL para o novo botão
     const assetMarketData = marketData[assetName] || { price: 0, change: 0, sparkline: [] };
     const priceChangeClass = assetMarketData.change >= 0 ? 'positive-pnl' : 'negative-pnl';
     if (trade.data.status === 'ARMED') card.classList.add('armed');
@@ -276,7 +273,9 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
         imageContainerHtml = `<div class="card-image-container ${isVisibleClass}"><a href="${trade.data.imageUrl}" target="_blank" rel="noopener noreferrer"><img src="${trade.data.imageUrl}" alt="Gráfico" loading="lazy"></a></div>`;
     }
 
-    card.innerHTML = `<div class="card-header-row"><h3 class="asset-title-card"><a href="asset-details.html?symbol=${assetName}" class="asset-link">${assetName}</a>${alarmBellHtml}<button class="icon-action-btn card-edit-btn" data-action="edit" title="Editar"><span class="material-symbols-outlined">edit</span></button></h3><div class="card-main-action-button">${mainActionButtonHtml}</div></div><p class="strategy-name">Estratégia: ${trade.data.strategyName || 'N/A'}</p>${notesHtml}${imageContainerHtml}${triggeredActionRowHtml}<div class="card-bottom-row"><div class="card-secondary-actions">${revertButtonHtml}<a href="${tradingViewUrl}" target="_blank" rel="noopener noreferrer" class="icon-action-btn action-full-chart" title="TradingView"><span class="material-symbols-outlined">open_in_new</span></a>${viewImageButtonHtml}</div><div class="card-sparkline" id="sparkline-card-${trade.id}"></div><div class="card-price-data"><div class="card-price">${formattedPrice}</div><div class="${priceChangeClass} price-change-percent">${assetMarketData.change.toFixed(2)}%</div></div></div>`;
+    // --- INÍCIO DA ALTERAÇÃO ---
+    card.innerHTML = `<div class="card-header-row"><h3 class="asset-title-card"><a href="asset-details.html?symbol=${assetName}" class="asset-link">${assetName}</a>${alarmBellHtml}<button class="icon-action-btn card-edit-btn" data-action="edit" title="Editar"><span class="material-symbols-outlined">edit</span></button></h3><div class="card-main-action-button">${mainActionButtonHtml}</div></div><p class="strategy-name">Estratégia: ${trade.data.strategyName || 'N/A'}</p>${notesHtml}${imageContainerHtml}${triggeredActionRowHtml}<div class="card-bottom-row"><div class="card-secondary-actions">${revertButtonHtml}<a href="${tradingViewUrl}" target="_blank" rel="noopener noreferrer" class="icon-action-btn" title="TradingView"><span class="material-symbols-outlined">open_in_new</span></a><a href="${createAlarmUrl}" class="icon-action-btn" title="Criar Alarme"><span class="material-symbols-outlined">alarm_add</span></a>${viewImageButtonHtml}</div><div class="card-sparkline" id="sparkline-card-${trade.id}"></div><div class="card-price-data"><div class="card-price">${formattedPrice}</div><div class="${priceChangeClass} price-change-percent">${assetMarketData.change.toFixed(2)}%</div></div></div>`;
+    // --- FIM DA ALTERAÇÃO ---
     return card;
 }
 
