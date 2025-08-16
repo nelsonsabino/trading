@@ -66,6 +66,7 @@ function enterEditMode(alarm) {
     document.getElementById('alarm-type-select').value = alarmType;
     document.getElementById('alarm-type-select').dispatchEvent(new Event('change'));
 
+    // Preenche os campos do formulário com base no tipo de alarme
     if (alarmType === 'stochastic') { 
         document.getElementById('stoch-condition').value = alarm.condition; 
         document.getElementById('stoch-value').value = alarm.target_price; 
