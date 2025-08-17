@@ -2,7 +2,7 @@
 
 import { addModal, armModal, execModal } from './dom-elements.js';
 import { GESTAO_PADRAO } from './config.js';
-import { getTrade, addTrade, updateTrade, closeTradeAndUpdateBalance, deleteTrade, getCurrentUserToken } from './firebase-service.js';
+import { getTrade, addTrade, updateTrade, closeTradeAndUpdateBalance, deleteTrade, getCurrentUserToken, auth } from './firebase-service.js';
 import { getCurrentTrade, setCurrentTrade, getStrategies, setLastCreatedTradeId } from './state.js';
 import { closeAddModal, closeArmModal, closeExecModal, closeCloseTradeModal, openAddModal, openArmModal, openExecModal } from './modals.js';
 import { generateDynamicChecklist } from './ui.js';
@@ -61,23 +61,21 @@ function setupImagePaste(containerId) {
     });
 }
 
+// --- INÍCIO DA ALTERAÇÃO FINAL ---
 async function uploadPastedImage(imageFile, assetName) {
     try {
-        const token = await getCurrentUserToken();
-        if (!token) throw new Error("Utilizador não autenticado.");
+        const user = auth.currentUser;
+        if (!user) throw new Error("Utilizador não autenticado.");
+        const userId = user.uid;
 
-        // --- INÍCIO DA ALTERAÇÃO ---
-        // A linha supabase.auth.setAuth(token) foi removida.
-        // O token é passado diretamente no header da chamada invoke.
-        // --- FIM DA ALTERAÇÃO ---
-
+        // 1. Chamar a Edge Function ANÓNIMA para obter o Signed URL, passando o userId no corpo
         const { data: signedUrlData, error: signedUrlError } = await supabase.functions.invoke('create-signed-upload-url', {
-            body: { assetName: assetName },
-            headers: { Authorization: `Bearer ${token}` }
+            body: { userId: userId, assetName: assetName }
         });
 
         if (signedUrlError) throw signedUrlError;
 
+        // 2. Fazer o upload do ficheiro para o Signed URL com o método PUT
         const uploadResponse = await fetch(signedUrlData.uploadUrl, {
             method: 'PUT',
             body: imageFile,
@@ -97,6 +95,7 @@ async function uploadPastedImage(imageFile, assetName) {
         return null;
     }
 }
+// --- FIM DA ALTERAÇÃO FINAL ---
 
 export async function handleAddSubmit(e) {
     e.preventDefault();
