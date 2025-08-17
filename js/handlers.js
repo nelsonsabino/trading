@@ -61,23 +61,18 @@ function setupImagePaste(containerId) {
     });
 }
 
-// --- INÍCIO DA ALTERAÇÃO FINAL ---
 async function uploadPastedImage(imageFile, assetName) {
     try {
         const token = await getCurrentUserToken();
         if (!token) throw new Error("Utilizador não autenticado.");
 
-        // Definir o token de autenticação no cliente Supabase ANTES de chamar a função
-        supabase.auth.setAuth(token);
-
-        // Chamar a Edge Function (agora autenticada) para obter o Signed URL
         const { data: signedUrlData, error: signedUrlError } = await supabase.functions.invoke('create-signed-upload-url', {
-            body: { assetName: assetName }
+            body: { assetName: assetName },
+            headers: { Authorization: `Bearer ${token}` }
         });
 
         if (signedUrlError) throw signedUrlError;
 
-        // Fazer o upload do ficheiro para o Signed URL com o método PUT
         const uploadResponse = await fetch(signedUrlData.uploadUrl, {
             method: 'PUT',
             body: imageFile,
@@ -97,7 +92,6 @@ async function uploadPastedImage(imageFile, assetName) {
         return null;
     }
 }
-// --- FIM DA ALTERAÇÃO FINAL ---
 
 export async function handleAddSubmit(e) {
     e.preventDefault();
