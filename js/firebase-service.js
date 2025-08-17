@@ -17,29 +17,36 @@ setPersistence(auth, browserLocalPersistence)
   .then(() => console.log("Persistência de autenticação configurada para LOCAL."))
   .catch((error) => console.error("Erro ao configurar persistência:", error));
 
+// --- INÍCIO DA ALTERAÇÃO ---
 async function deleteTradeImage(imageUrl) {
     if (!imageUrl || !imageUrl.includes('supabase.co')) {
         console.log("Nenhuma imagem válida do Supabase Storage para apagar.");
         return;
     }
     try {
+        const token = await getCurrentUserToken();
+        if (!token) throw new Error("Não foi possível obter o token do utilizador para apagar a imagem.");
+        
+        // Autenticar no Supabase para que a política RLS de DELETE funcione
+        const { error: authError } = await supabase.auth.signInWithIdToken({ provider: 'firebase', token });
+        if (authError) throw authError;
+
         const urlParts = imageUrl.split('/trade_images/');
         if (urlParts.length < 2) {
             throw new Error("URL da imagem inválido ou não reconhecido.");
         }
         const filePath = urlParts[1];
-        
+
         console.log(`A tentar apagar a imagem do Storage no caminho: ${filePath}`);
-        // A autenticação será gerida pela Edge Function que apaga, se necessário, ou por políticas RLS.
-        // Por agora, o cliente autenticado (via JWT) deve ter permissão para apagar os seus próprios ficheiros.
         const { error } = await supabase.storage.from('trade_images').remove([filePath]);
         if (error) throw error;
 
         console.log(`Imagem ${filePath} apagada com sucesso do Supabase Storage.`);
     } catch (error) {
-        console.error("Erro ao apagar a imagem do Supabase Storage. O ficheiro pode ter de ser removido manualmente.", error);
+        console.error("Erro ao apagar a imagem do Supabase Storage:", error);
     }
 }
+// --- FIM DA ALTERAÇÃO ---
 
 export function listenToTrades(callback) {
     const q = query(collection(db, 'trades'), orderBy('dateAdded', 'desc'));
