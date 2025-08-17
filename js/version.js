@@ -2,22 +2,13 @@
 
 export const changelogData = {
 current: {
-    number: '14.9.0',
+    number: '14.8.0',
     changes: [
-        "**Upload Direto de Imagens (Paste-to-Upload):**",
-        "Implementada a funcionalidade para colar imagens diretamente (Ctrl+V) nos modais de gestão de trades, em vez de usar links.",
-        "As imagens são agora enviadas de forma segura para o Supabase Storage e associadas ao trade.",
-        "Implementado um sistema automático que apaga a imagem do Storage quando o trade correspondente é eliminado."
+        "**Melhoria de UX no Dashboard:**",
+        "Adicionado um botão de 'Criar Alarme' diretamente nos cards de trade (Potencial, Armado, Ativo), permitindo a criação rápida de alarmes para ativos que já estão no funil de trading."
     ]
 },
 releases: [
-    {
-        number: '14.8.0',
-        changes: [
-            "**Melhoria de UX no Dashboard:**",
-            "Adicionado um botão de 'Criar Alarme' diretamente nos cards de trade (Potencial, Armado, Ativo), permitindo a criação rápida de alarmes para ativos que já estão no funil de trading."
-        ]
-    },
     {
         number: '14.7.2',
         changes: [

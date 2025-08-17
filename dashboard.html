@@ -144,22 +144,11 @@
                     <input type="text" id="asset" name="asset" required placeholder="Comece a escrever para pesquisar..." autocomplete="off">
                     <div id="modal-autocomplete-results" class="autocomplete-results"></div>
                 </div>
-                <div id="dynamic-checklist-container"></div>  
-
-                <!-- --- INÍCIO DA ALTERAÇÃO --- -->
-                <div class="input-item" id="paste-image-container-add">
-                    <label>Imagem do Gráfico:</label>
-                    <div class="paste-area">
-                        <span class="material-symbols-outlined">add_photo_alternate</span>
-                        <p>Cole a imagem aqui (Ctrl+V)</p>
-                    </div>
-                    <div class="preview-container" style="display: none;">
-                        <img src="" alt="Pré-visualização da imagem" class="image-preview">
-                        <button type="button" class="remove-image-btn">×</button>
-                    </div>
+                <div id="dynamic-checklist-container"></div>                
+                <div class="input-item">
+                    <label for="image-url">Link da Imagem do Gráfico (TradingView):</label>
+                    <input type="text" id="image-url" placeholder="Cole aqui o link da imagem...">
                 </div>
-                <!-- --- FIM DA ALTERAÇÃO --- -->
-                              
                 <div class="input-item">
                     <label for="notes">Notas Iniciais:</label>
                     <textarea id="notes" placeholder="Ex: A formar fundo duplo..."></textarea>
@@ -186,19 +175,10 @@
             <p>Estratégia: <span id="arm-trade-strategy-name"></span></p>
             <form id="arm-trade-form">
                 <div id="arm-checklist-container"></div>
-                <!-- --- INÍCIO DA ALTERAÇÃO --- -->
-                <div class="input-item" id="paste-image-container-arm">
-                    <label>Imagem do Gráfico:</label>
-                    <div class="paste-area">
-                        <span class="material-symbols-outlined">add_photo_alternate</span>
-                        <p>Cole a imagem aqui (Ctrl+V)</p>
-                    </div>
-                    <div class="preview-container" style="display: none;">
-                        <img src="" alt="Pré-visualização da imagem" class="image-preview">
-                        <button type="button" class="remove-image-btn">×</button>
-                    </div>
+                <div class="input-item">
+                    <label for="image-url-arm">Link da Imagem do Gráfico (TradingView):</label>
+                    <input type="text" id="image-url-arm" placeholder="Cole aqui o link da imagem...">
                 </div>
-                <!-- --- FIM DA ALTERAÇÃO --- -->
                 <button type="submit">ARMAR TRADE</button>
             </form>
         </div>
@@ -211,19 +191,10 @@
             <p>Estratégia: <span id="execution-strategy-name"></span></p>
             <form id="execution-form">
                 <div id="execution-checklist-container"></div>
-                <!-- --- INÍCIO DA ALTERAÇÃO --- -->
-                <div class="input-item" id="paste-image-container-exec">
-                    <label>Imagem do Gráfico:</label>
-                    <div class="paste-area">
-                        <span class="material-symbols-outlined">add_photo_alternate</span>
-                        <p>Cole a imagem aqui (Ctrl+V)</p>
-                    </div>
-                    <div class="preview-container" style="display: none;">
-                        <img src="" alt="Pré-visualização da imagem" class="image-preview">
-                        <button type="button" class="remove-image-btn">×</button>
-                    </div>
+                <div class="input-item">
+                    <label for="image-url-exec">Link da Imagem do Gráfico (TradingView):</label>
+                    <input type="text" id="image-url-exec" placeholder="Cole aqui o link da imagem...">
                 </div>
-                <!-- --- FIM DA ALTERAÇÃO --- -->
                 <button type="submit">EXECUTAR TRADE</button>
             </form>
         </div>
@@ -265,12 +236,14 @@
         </div>
     </div>
 
+    <!-- --- INÍCIO DA ALTERAÇÃO 1: Adicionar o modal do gráfico --- -->
     <div id="chart-modal" class="modal-overlay">
         <div class="modal-content" style="max-width: 90%; height: 90%; padding: 1rem;">
             <span id="close-chart-modal" style="position: absolute; top: 15px; right: 25px; font-size: 2.5rem; color: #adb5bd; font-weight: 300; cursor: pointer; z-index: 10;">×</span>
             <div id="chart-modal-container" style="height: 100%; width: 100%;"></div>
         </div>
     </div>
+    <!-- --- FIM DA ALTERAÇÃO 1 --- -->
 
     <footer></footer>    
 
@@ -278,7 +251,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="js/services.js"></script>
     <script type="module" src="js/utils.js"></script>
+    <!-- --- INÍCIO DA ALTERAÇÃO 2: Carregar o novo script do modal --- -->
     <script type="module" src="js/chart-modal.js"></script>
+    <!-- --- FIM DA ALTERAÇÃO 2 --- -->
     <script type="module" src="js/app.js"></script>
     <script type="module" src="js/navigation.js"></script>
     <script type="module" src="js/version.js"></script>

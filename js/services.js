@@ -20,7 +20,7 @@ export function listenToAlarms(callback) {
         });
 
     // 2. Subscrição em tempo real para mudanças na tabela 'alarms'
-    const alarmsChannel = supabase.channel('public:alarms');
+    const alarmsChannel = supabase.channel('public:alarms'); // Nome do canal deve ser único e descritivo
 
     alarmsChannel
         .on('postgres_changes', { event: '*', schema: 'public', table: 'alarms' }, payload => {
@@ -30,8 +30,9 @@ export function listenToAlarms(callback) {
                 .then(({ data, error }) => {
                     if (error) {
                         console.error("Erro ao escutar alarmes Supabase (realtime callback):", error);
+                        // Aqui pode decidir como lidar com o erro no realtime; talvez não chame o callback com erro
                     } else {
-                        callback(data);
+                        callback(data); // Chama o callback com os novos dados
                     }
                 });
         })
@@ -43,5 +44,6 @@ export function listenToAlarms(callback) {
             }
         });
 
+    // Retorna o objeto do canal caso seja necessário cancelar a subscrição externamente
     return alarmsChannel;
 }
