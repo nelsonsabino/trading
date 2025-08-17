@@ -64,13 +64,9 @@ function setupImagePaste(containerId) {
 // --- INÍCIO DA ALTERAÇÃO FINAL ---
 async function uploadPastedImage(imageFile, assetName) {
     try {
-        const user = auth.currentUser;
-        if (!user) throw new Error("Utilizador não autenticado.");
-        const userId = user.uid;
-
-        // 1. Chamar a Edge Function ANÓNIMA para obter o Signed URL, passando o userId no corpo
+        // 1. Chamar a Edge Function anónima para obter o Signed URL
         const { data: signedUrlData, error: signedUrlError } = await supabase.functions.invoke('create-signed-upload-url', {
-            body: { userId: userId, assetName: assetName }
+            body: { assetName: assetName }
         });
 
         if (signedUrlError) throw signedUrlError;
