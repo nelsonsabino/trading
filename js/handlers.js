@@ -48,7 +48,7 @@ function setupImagePaste(containerId) {
     
     pasteArea.addEventListener('paste', pasteHandler);
     document.addEventListener('paste', (e) => {
-        if (container.closest('.modal-overlay').style.display === 'flex') {
+        if (container.closest('.modal-overlay')?.style.display === 'flex') {
             handlePaste(e, previewContainer, pasteArea);
         }
     });
@@ -94,10 +94,8 @@ export async function handleAddSubmit(e) {
         try {
             imageUrl = await uploadTradeImage(pastedImageFile, assetName);
         } catch (error) {
-            // --- INÍCIO DA ALTERAÇÃO ---
             console.error("Erro detalhado do upload:", error);
             alert("Erro ao fazer o upload da imagem. O trade não foi guardado.");
-            // --- FIM DA ALTERAÇÃO ---
             return;
         }
     }
@@ -164,10 +162,8 @@ export async function handleArmSubmit(e) {
         try {
             imageUrl = await uploadTradeImage(pastedImageFile, currentTrade.data.asset);
         } catch (error) {
-            // --- INÍCIO DA ALTERAÇÃO ---
             console.error("Erro detalhado do upload:", error);
             alert("Erro ao fazer o upload da imagem. As alterações não foram guardadas.");
-            // --- FIM DA ALTERAÇÃO ---
             return;
         }
     }
@@ -220,10 +216,8 @@ export async function handleExecSubmit(e) {
         try {
             imageUrl = await uploadTradeImage(pastedImageFile, currentTrade.data.asset);
         } catch (error) {
-            // --- INÍCIO DA ALTERAÇÃO ---
             console.error("Erro detalhado do upload:", error);
             alert("Erro ao fazer o upload da imagem. As alterações não foram guardadas.");
-            // --- FIM DA ALTERAÇÃO ---
             return;
         }
     }
