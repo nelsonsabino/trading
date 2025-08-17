@@ -23,18 +23,15 @@ async function deleteTradeImage(imageUrl) {
         return;
     }
     try {
-        const token = await getCurrentUserToken();
-        if (!token) throw new Error("Não foi possível obter o token do utilizador para apagar a imagem.");
-        
-        await supabase.auth.setSession({ access_token: token, refresh_token: '' });
-
         const urlParts = imageUrl.split('/trade_images/');
         if (urlParts.length < 2) {
             throw new Error("URL da imagem inválido ou não reconhecido.");
         }
         const filePath = urlParts[1];
-
+        
         console.log(`A tentar apagar a imagem do Storage no caminho: ${filePath}`);
+        // A autenticação será gerida pela Edge Function que apaga, se necessário, ou por políticas RLS.
+        // Por agora, o cliente autenticado (via JWT) deve ter permissão para apagar os seus próprios ficheiros.
         const { error } = await supabase.storage.from('trade_images').remove([filePath]);
         if (error) throw error;
 
