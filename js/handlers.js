@@ -2,8 +2,7 @@
 
 import { addModal, armModal, execModal } from './dom-elements.js';
 import { GESTAO_PADRAO } from './config.js';
-import { getTrade, addTrade, updateTrade, closeTradeAndUpdateBalance, deleteTrade } from './firebase-service.js';
-import { uploadTradeImage } from './services.js';
+import { getTrade, addTrade, updateTrade, closeTradeAndUpdateBalance, deleteTrade, getCurrentUserToken } from './firebase-service.js';
 import { getCurrentTrade, setCurrentTrade, getStrategies, setLastCreatedTradeId } from './state.js';
 import { closeAddModal, closeArmModal, closeExecModal, closeCloseTradeModal, openAddModal, openArmModal, openExecModal } from './modals.js';
 import { generateDynamicChecklist } from './ui.js';
@@ -62,6 +61,37 @@ function setupImagePaste(containerId) {
     });
 }
 
+async function uploadPastedImage(imageFile, assetName) {
+    try {
+        const token = await getCurrentUserToken();
+        if (!token) throw new Error("Utilizador não autenticado.");
+
+        const { data: signedUrlData, error: signedUrlError } = await supabase.functions.invoke('create-signed-upload-url', {
+            body: { assetName: assetName },
+            headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (signedUrlError) throw signedUrlError;
+
+        const uploadResponse = await fetch(signedUrlData.uploadUrl, {
+            method: 'PUT',
+            body: imageFile,
+            headers: { 'Content-Type': imageFile.type }
+        });
+        
+        if (!uploadResponse.ok) {
+            throw new Error(`Falha no upload: ${uploadResponse.statusText}`);
+        }
+        
+        console.log("Upload bem-sucedido. URL público:", signedUrlData.publicUrl);
+        return signedUrlData.publicUrl;
+
+    } catch (error) {
+        console.error("Falha no processo de upload da imagem:", error);
+        return null;
+    }
+}
+
 export async function handleAddSubmit(e) {
     e.preventDefault();
     
@@ -91,10 +121,10 @@ export async function handleAddSubmit(e) {
 
     let imageUrl = getCurrentTrade()?.data?.imageUrl || '';
     if (pastedImageFile) {
-        try {
-            imageUrl = await uploadTradeImage(pastedImageFile, assetName);
-        } catch (error) {
-            console.error("Erro detalhado do upload:", error);
+        const newUrl = await uploadPastedImage(pastedImageFile, assetName);
+        if (newUrl) {
+            imageUrl = newUrl;
+        } else {
             alert("Erro ao fazer o upload da imagem. O trade não foi guardado.");
             return;
         }
@@ -159,10 +189,10 @@ export async function handleArmSubmit(e) {
     
     let imageUrl = currentTrade.data.imageUrl || '';
     if (pastedImageFile) {
-        try {
-            imageUrl = await uploadTradeImage(pastedImageFile, currentTrade.data.asset);
-        } catch (error) {
-            console.error("Erro detalhado do upload:", error);
+        const newUrl = await uploadPastedImage(pastedImageFile, currentTrade.data.asset);
+        if (newUrl) {
+            imageUrl = newUrl;
+        } else {
             alert("Erro ao fazer o upload da imagem. As alterações não foram guardadas.");
             return;
         }
@@ -213,10 +243,10 @@ export async function handleExecSubmit(e) {
 
     let imageUrl = currentTrade.data.imageUrl || '';
     if (pastedImageFile) {
-        try {
-            imageUrl = await uploadTradeImage(pastedImageFile, currentTrade.data.asset);
-        } catch (error) {
-            console.error("Erro detalhado do upload:", error);
+        const newUrl = await uploadPastedImage(pastedImageFile, currentTrade.data.asset);
+        if (newUrl) {
+            imageUrl = newUrl;
+        } else {
             alert("Erro ao fazer o upload da imagem. As alterações não foram guardadas.");
             return;
         }
