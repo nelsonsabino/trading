@@ -66,6 +66,11 @@ async function uploadPastedImage(imageFile, assetName) {
         const token = await getCurrentUserToken();
         if (!token) throw new Error("Utilizador não autenticado.");
 
+        // --- INÍCIO DA ALTERAÇÃO ---
+        // A linha supabase.auth.setAuth(token) foi removida.
+        // O token é passado diretamente no header da chamada invoke.
+        // --- FIM DA ALTERAÇÃO ---
+
         const { data: signedUrlData, error: signedUrlError } = await supabase.functions.invoke('create-signed-upload-url', {
             body: { assetName: assetName },
             headers: { Authorization: `Bearer ${token}` }
