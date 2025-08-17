@@ -47,8 +47,7 @@ export function listenToAlarms(callback) {
     return alarmsChannel;
 }
 
-
-// --- INÍCIO DA ALTERAÇÃO FINAL ---
+// --- INÍCIO DA ALTERAÇÃO ---
 /**
  * Faz o upload de um ficheiro de imagem para o Supabase Storage, autenticando com o token do Firebase.
  * @param {File} file - O ficheiro de imagem a ser enviado.
@@ -82,7 +81,7 @@ export async function uploadTradeImage(file, assetName) {
     }
 
     // 3. Preparar o caminho e o nome do ficheiro
-    const fileExtension = file.name.split('.').pop() || 'png';
+    const fileExtension = file.type.split('/')[1] || 'png';
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const fileName = `${assetName}_${timestamp}.${fileExtension}`;
     const filePath = `${user.id}/${fileName}`;
@@ -109,4 +108,4 @@ export async function uploadTradeImage(file, assetName) {
     console.log("Upload bem-sucedido. URL público:", publicUrlData.publicUrl);
     return publicUrlData.publicUrl;
 }
-// --- FIM DA ALTERAÇÃO FINAL ---
+// --- FIM DA ALTERAÇÃO ---
