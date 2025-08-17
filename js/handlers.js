@@ -1,97 +1,12 @@
-// js/handlers.js
+// js/handlers.js - VERSÃO COM CAPTURA DE ID PARA DESTAQUE
 
-import { addModal, armModal, execModal } from './dom-elements.js';
+import { addModal } from './dom-elements.js';
 import { GESTAO_PADRAO } from './config.js';
-import { getTrade, addTrade, updateTrade, closeTradeAndUpdateBalance, deleteTrade, getCurrentUserToken, auth } from './firebase-service.js';
+import { getTrade, addTrade, updateTrade, closeTradeAndUpdateBalance, deleteTrade } from './firebase-service.js';
 import { getCurrentTrade, setCurrentTrade, getStrategies, setLastCreatedTradeId } from './state.js';
 import { closeAddModal, closeArmModal, closeExecModal, closeCloseTradeModal, openAddModal, openArmModal, openExecModal } from './modals.js';
 import { generateDynamicChecklist } from './ui.js';
 import { supabase } from './services.js';
-
-let pastedImageFile = null;
-
-function handlePaste(e, previewContainer, pasteArea) {
-    const items = e.clipboardData?.items;
-    if (!items) return;
-
-    for (const item of items) {
-        if (item.type.indexOf('image') !== -1) {
-            e.preventDefault();
-            const blob = item.getAsFile();
-            if (blob) {
-                pastedImageFile = new File([blob], "pasted_image.png", { type: "image/png" });
-                
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const previewImg = previewContainer.querySelector('.image-preview');
-                    previewImg.src = event.target.result;
-                    pasteArea.style.display = 'none';
-                    previewContainer.style.display = 'flex';
-                };
-                reader.readAsDataURL(blob);
-            }
-            break; 
-        }
-    }
-}
-
-function setupImagePaste(containerId) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-
-    const pasteArea = container.querySelector('.paste-area');
-    const previewContainer = container.querySelector('.preview-container');
-    const removeBtn = container.querySelector('.remove-image-btn');
-
-    const pasteHandler = (e) => handlePaste(e, previewContainer, pasteArea);
-    
-    pasteArea.addEventListener('paste', pasteHandler);
-    document.addEventListener('paste', (e) => {
-        if (container.closest('.modal-overlay')?.style.display === 'flex') {
-            handlePaste(e, previewContainer, pasteArea);
-        }
-    });
-
-    removeBtn.addEventListener('click', () => {
-        pastedImageFile = null;
-        const previewImg = previewContainer.querySelector('.image-preview');
-        previewImg.src = '';
-        previewContainer.style.display = 'none';
-        pasteArea.style.display = 'flex';
-    });
-}
-
-// --- INÍCIO DA ALTERAÇÃO FINAL ---
-async function uploadPastedImage(imageFile, assetName) {
-    try {
-        // 1. Chamar a Edge Function anónima para obter o Signed URL
-        const { data: signedUrlData, error: signedUrlError } = await supabase.functions.invoke('create-signed-upload-url', {
-            body: { assetName: assetName }
-        });
-
-        if (signedUrlError) throw signedUrlError;
-
-        // 2. Fazer o upload do ficheiro para o Signed URL com o método PUT
-        const uploadResponse = await fetch(signedUrlData.uploadUrl, {
-            method: 'PUT',
-            body: imageFile,
-            headers: { 'Content-Type': imageFile.type }
-        });
-        
-        if (!uploadResponse.ok) {
-            const errorBody = await uploadResponse.text();
-            throw new Error(`Falha no upload para o Storage: ${uploadResponse.statusText} - ${errorBody}`);
-        }
-        
-        console.log("Upload bem-sucedido. URL público:", signedUrlData.publicUrl);
-        return signedUrlData.publicUrl;
-
-    } catch (error) {
-        console.error("Falha no processo de upload da imagem:", error);
-        return null;
-    }
-}
-// --- FIM DA ALTERAÇÃO FINAL ---
 
 export async function handleAddSubmit(e) {
     e.preventDefault();
@@ -120,20 +35,9 @@ export async function handleAddSubmit(e) {
         });
     }
 
-    let imageUrl = getCurrentTrade()?.data?.imageUrl || '';
-    if (pastedImageFile) {
-        const newUrl = await uploadPastedImage(pastedImageFile, assetName);
-        if (newUrl) {
-            imageUrl = newUrl;
-        } else {
-            alert("Erro ao fazer o upload da imagem. O trade não foi guardado.");
-            return;
-        }
-    }
-
     const tradeData = {
         asset: assetName,
-        imageUrl: imageUrl,
+        imageUrl: document.getElementById('image-url').value,
         notes: document.getElementById('notes').value,
         strategyId: strategyId,
         strategyName: selectedStrategy.data.name || 'N/A',
@@ -187,18 +91,8 @@ export async function handleArmSubmit(e) {
             }
         });
     }
-    
-    let imageUrl = currentTrade.data.imageUrl || '';
-    if (pastedImageFile) {
-        const newUrl = await uploadPastedImage(pastedImageFile, currentTrade.data.asset);
-        if (newUrl) {
-            imageUrl = newUrl;
-        } else {
-            alert("Erro ao fazer o upload da imagem. As alterações não foram guardadas.");
-            return;
-        }
-    }
 
+    const imageUrl = document.getElementById('image-url-arm').value;
     const updateData = {
         status: "ARMED",
         armedSetup: checklistData,
@@ -242,17 +136,7 @@ export async function handleExecSubmit(e) {
         });
     }
 
-    let imageUrl = currentTrade.data.imageUrl || '';
-    if (pastedImageFile) {
-        const newUrl = await uploadPastedImage(pastedImageFile, currentTrade.data.asset);
-        if (newUrl) {
-            imageUrl = newUrl;
-        } else {
-            alert("Erro ao fazer o upload da imagem. As alterações não foram guardadas.");
-            return;
-        }
-    }
-    
+    const imageUrl = document.getElementById('image-url-exec').value;
     const updateData = {
         status: "LIVE",
         executionDetails: executionData,
@@ -307,19 +191,6 @@ export async function loadAndOpenForEditing(tradeId) {
         const selectedStrategy = strategies.find(s => s.id === trade.data.strategyId);
         if (!selectedStrategy) return;
 
-        const setupModalImage = (containerId, imageUrl) => {
-            const container = document.getElementById(containerId);
-            if (!container || !imageUrl) return;
-
-            const pasteArea = container.querySelector('.paste-area');
-            const previewContainer = container.querySelector('.preview-container');
-            const previewImg = previewContainer.querySelector('.image-preview');
-            
-            previewImg.src = imageUrl;
-            pasteArea.style.display = 'none';
-            previewContainer.style.display = 'flex';
-        };
-
         if (trade.data.status === 'POTENTIAL') {
             openAddModal();
             addModal.strategySelect.value = trade.data.strategyId;
@@ -328,7 +199,7 @@ export async function loadAndOpenForEditing(tradeId) {
             
             const modalAssetInput = document.getElementById('asset');
             modalAssetInput.value = trade.data.asset;
-            setupModalImage('paste-image-container-add', trade.data.imageUrl);
+            document.getElementById('image-url').value = trade.data.imageUrl || '';
             document.getElementById('notes').value = trade.data.notes;
 
             if (deleteBtn) {
@@ -349,11 +220,9 @@ export async function loadAndOpenForEditing(tradeId) {
 
         } else if (trade.data.status === 'ARMED') {
             openArmModal(trade);
-            setupModalImage('paste-image-container-arm', trade.data.imageUrl);
             if (deleteBtn) deleteBtn.style.display = 'none';
         } else if (trade.data.status === 'LIVE') {
             openExecModal(trade);
-            setupModalImage('paste-image-container-exec', trade.data.imageUrl);
             if (deleteBtn) deleteBtn.style.display = 'none';
         } else if (trade.data.status === 'CLOSED') {
             alert("Este trade já está fechado e não pode ser editado através deste modal.");
@@ -380,6 +249,7 @@ export async function handleRevertToWatchlist(trade) {
     const confirmationMessage = `Tem a certeza que quer remover este trade da coluna "Potencial"?\n\nO ativo continuará a ser monitorizado na Watchlist de Alarmes.`;
     if (confirm(confirmationMessage)) {
         try {
+            // Passo 1: Verifica se o ativo já tem algum alarme ativo
             const { data: existingAlarms, error: fetchError } = await supabase
                 .from('alarms')
                 .select('id')
@@ -388,6 +258,7 @@ export async function handleRevertToWatchlist(trade) {
 
             if (fetchError) throw fetchError;
 
+            // Passo 2: Se não houver alarmes, cria o alarme padrão
             if (existingAlarms.length === 0) {
                 console.log(`Nenhum alarme ativo para ${trade.data.asset}. A criar alarme padrão.`);
                 const alarmData = {
@@ -403,7 +274,10 @@ export async function handleRevertToWatchlist(trade) {
                 if (insertError) throw insertError;
             }
 
+            // Passo 3: Apaga o trade do Firebase
             await deleteTrade(trade.id);
+            
+            // A UI será atualizada automaticamente pelos listeners em app.js
         } catch (error) {
             console.error("Erro ao reverter para a watchlist:", error);
             alert("Ocorreu um erro ao reverter o trade para a watchlist.");
@@ -411,6 +285,7 @@ export async function handleRevertToWatchlist(trade) {
     }
 }
 
+// --- INÍCIO DA ALTERAÇÃO ---
 export async function handleDeleteAlarm(alarmId) {
     if (!alarmId) return;
 
@@ -425,16 +300,14 @@ export async function handleDeleteAlarm(alarmId) {
             if (error) {
                 throw new Error(`Erro no Supabase ao apagar o alarme: ${error.message}`);
             }
+            
+            // Força a atualização da página para garantir que todas as UIs (tabela e modal) são atualizadas
             location.reload(); 
+
         } catch (error) {
             console.error("Erro ao apagar alarme:", error);
             alert("Não foi possível apagar o alarme. Verifique a consola para mais detalhes.");
         }
     }
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    setupImagePaste('paste-image-container-add');
-    setupImagePaste('paste-image-container-arm');
-    setupImagePaste('paste-image-container-exec');
-});
+// --- FIM DA ALTERAÇÃO ---
