@@ -55,9 +55,9 @@ header .main-nav {
 /* --- INÍCIO DA ALTERAÇÃO --- */
 .asset-details-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 1fr 1fr; /* Dividido em 50/50 */
     gap: 2rem;
-    align-items: start;
+    align-items: stretch; /* Garante que as colunas têm a mesma altura */
 }
 /* --- FIM DA ALTERAÇÃO --- */
 
@@ -69,8 +69,8 @@ header .main-nav {
     align-items: center;
     gap: 1.5rem;
     padding: 1rem;
-    background-color: var(--surface-primary); /* Alterado para usar variável */
-    border: 1px solid var(--border-primary);   /* Adicionada borda para contraste no modo escuro */
+    background-color: var(--surface-primary);
+    border: 1px solid var(--border-primary);
     border-radius: 8px;
     margin-bottom: 1.5rem;
     flex-wrap: wrap; 
