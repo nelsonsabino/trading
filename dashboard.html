@@ -61,9 +61,11 @@
         <h1>Watchlist de Trading</h1>
         <p class="mantra">Tem paciência, usa alarmes, espera que os setups venham.</p>
        
+        <!-- --- INÍCIO DA ALTERAÇÃO --- -->
         <nav class="main-nav">
             <a href="dashboard.html" class="nav-icon-link" title="Dashboard"><span class="material-symbols-outlined">home</span></a>
             <a href="market-scan.html" class="nav-icon-link" title="Scanner de Mercado"><span class="material-symbols-outlined">query_stats</span></a>
+            <a href="#" id="add-opportunity-btn-nav" class="nav-icon-link" title="Adicionar Trade Potencial"><span class="material-symbols-outlined">add</span></a>
             <a href="alarms-create.html" class="nav-icon-link action-create-alarm" title="Criar Alarme"><span class="material-symbols-outlined">alarm_add</span></a>
             <a href="alarms-manage.html" class="nav-icon-link" title="Meus Alarmes"><span class="material-symbols-outlined">alarm</span></a>
             
@@ -83,11 +85,9 @@
             </div>
         </nav>
         
-        <nav class="contextual-nav">
-            <button id="add-opportunity-btn" class="btn btn-contextual">
-                <span class="material-symbols-outlined">add_shopping_cart</span> Adicionar a Trade Potencial
-            </button>
-        </nav>
+        <!-- A <nav class="contextual-nav"> foi removida -->
+        <!-- --- FIM DA ALTERAÇÃO --- -->
+
     </header>  
 
     <hr class="section-divider">
@@ -236,14 +236,12 @@
         </div>
     </div>
 
-    <!-- --- INÍCIO DA ALTERAÇÃO 1: Adicionar o modal do gráfico --- -->
     <div id="chart-modal" class="modal-overlay">
         <div class="modal-content" style="max-width: 90%; height: 90%; padding: 1rem;">
             <span id="close-chart-modal" style="position: absolute; top: 15px; right: 25px; font-size: 2.5rem; color: #adb5bd; font-weight: 300; cursor: pointer; z-index: 10;">×</span>
             <div id="chart-modal-container" style="height: 100%; width: 100%;"></div>
         </div>
     </div>
-    <!-- --- FIM DA ALTERAÇÃO 1 --- -->
 
     <footer></footer>    
 
@@ -251,9 +249,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="js/services.js"></script>
     <script type="module" src="js/utils.js"></script>
-    <!-- --- INÍCIO DA ALTERAÇÃO 2: Carregar o novo script do modal --- -->
     <script type="module" src="js/chart-modal.js"></script>
-    <!-- --- FIM DA ALTERAÇÃO 2 --- -->
     <script type="module" src="js/app.js"></script>
     <script type="module" src="js/navigation.js"></script>
     <script type="module" src="js/version.js"></script>
