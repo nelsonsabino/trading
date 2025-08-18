@@ -81,6 +81,7 @@ async function fetchAndDisplayAlarms() {
             const addOpportunityUrl = `dashboard.html?assetPair=${alarm.asset_pair}`;
             const assetHtml = `<strong><a href="asset-details.html?symbol=${alarm.asset_pair}" class="asset-link">${alarm.asset_pair}</a></strong>`;
 
+            // --- INÍCIO DA ALTERAÇÃO ---
             activeAlarmsHtml.push(`
                 <tr data-alarm-id="${alarm.id}">
                     <td data-label="Ativo"><span class="cell-value">${assetHtml}</span></td>
@@ -90,12 +91,13 @@ async function fetchAndDisplayAlarms() {
                         <div class="action-buttons cell-value">
                             <a href="alarms-create.html?editAlarmId=${alarm.id}" class="icon-action-btn" title="Editar Alarme"><span class="material-symbols-outlined">edit</span></a>
                             <button class="icon-action-btn delete-btn" data-id="${alarm.id}" title="Apagar Alarme"><span class="material-symbols-outlined">delete</span></button>
-                            <a href="#" class="icon-action-btn view-chart-btn" data-symbol="${alarm.asset_pair}" title="Ver Gráfico no Modal"><span class="material-symbols-outlined">monitoring</span></a>
-                            <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn" title="Abrir no TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
+                            <a href="#" class="icon-action-btn view-chart-btn btn-view-chart" data-symbol="${alarm.asset_pair}" title="Ver Gráfico no Modal"><span class="material-symbols-outlined">monitoring</span></a>
+                            <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn btn-trading-view" title="Abrir no TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
                             <a href="${addOpportunityUrl}" class="icon-action-btn" title="Adicionar à Watchlist"><span class="material-symbols-outlined">add</span></a>
                         </div>
                     </td>
                 </tr>`);
+            // --- FIM DA ALTERAÇÃO ---
         }
 
         for (const alarm of triggeredAlarms) {
@@ -132,8 +134,8 @@ async function fetchAndDisplayAlarms() {
                         <div class="action-buttons cell-value">
                             <a href="alarms-create.html?editAlarmId=${alarm.id}" class="icon-action-btn" title="Editar / Reativar Alarme"><span class="material-symbols-outlined">edit</span></a>
                             <button class="icon-action-btn delete-btn" data-id="${alarm.id}" title="Apagar Alarme do Histórico"><span class="material-symbols-outlined">delete</span></button>
-                            <a href="#" class="icon-action-btn view-chart-btn" data-symbol="${alarm.asset_pair}" title="Ver Gráfico no Modal"><span class="material-symbols-outlined">monitoring</span></a>
-                            <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn" title="Abrir no TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
+                            <a href="#" class="icon-action-btn view-chart-btn btn-view-chart" data-symbol="${alarm.asset_pair}" title="Ver Gráfico no Modal"><span class="material-symbols-outlined">monitoring</span></a>
+                            <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn btn-trading-view" title="Abrir no TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
                             <a href="${addOpportunityUrl}" class="icon-action-btn" title="Adicionar à Watchlist"><span class="material-symbols-outlined">add</span></a>
                         </div>
                     </td>
