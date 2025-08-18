@@ -76,17 +76,19 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
         const ema200Color = '#0d6efd'; 
         const colors = [priceChartColor, ema50Color, ema200Color];
 
+        // --- INÍCIO DA ALTERAÇÃO ---
         let options = {
             series: series,
             chart: {
                 type: 'line', 
-                height: 400, 
+                /* height: 400, --- REMOVIDO PARA PERMITIR ALTURA FLEXÍVEL --- */
                 toolbar: { 
                     show: true, 
                     autoSelected: 'pan' 
                 },
                 zoom: { enabled: true }
             },
+            // --- FIM DA ALTERAÇÃO ---
             dataLabels: { enabled: false },
             colors: colors, 
             stroke: { 
@@ -149,7 +151,6 @@ async function displayNewsForAsset(symbolPair) {
     
     container.innerHTML = '<p>A carregar notícias...</p>';
     
-    // Extrai o símbolo base (ex: BTC de BTCUSDC)
     const baseSymbol = symbolPair.replace('USDT', '').replace('USDC', '').replace('BUSD', '');
 
     try {
@@ -166,7 +167,6 @@ async function displayNewsForAsset(symbolPair) {
             return;
         }
 
-        // --- INÍCIO DA ALTERAÇÃO ---
         const newsHtml = news.map(article => {
             const publishedDate = new Date(article.published_on * 1000).toLocaleString('pt-PT', {
                 day: '2-digit',
@@ -182,7 +182,6 @@ async function displayNewsForAsset(symbolPair) {
                 </div>
             `;
         }).join('');
-        // --- FIM DA ALTERAÇÃO ---
 
         container.innerHTML = newsHtml;
 
