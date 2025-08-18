@@ -9,12 +9,31 @@ const CACHE_DURATION_MS = 2 * 60 * 1000;
 
 let allTickersData = [];
 let allExtraData = {};
+let monitoredAssets = new Set();
 let currentSortBy = 'volume';
 let filterRsi = false;
 let filterStoch = false;
 let filterThirdTouch = false;
 let showSparklines = true;
 let currentTopN = 50;
+
+async function fetchMonitoredAssets() {
+    try {
+        const { data, error } = await supabase
+            .from('alarms')
+            .select('asset_pair')
+            .eq('status', 'active');
+
+        if (error) {
+            console.error("Erro ao buscar ativos monitorizados:", error);
+            return; 
+        }
+        
+        monitoredAssets = new Set(data.map(item => item.asset_pair));
+    } catch (err) {
+        console.error("Exceção ao buscar ativos monitorizados:", err);
+    }
+}
 
 function renderSparkline(containerId, dataSeries) {
     if (!dataSeries || dataSeries.length < 2) return;
@@ -54,7 +73,7 @@ function renderPageContent(processedTickers) {
         return;
     }
     const finalTickersToDisplay = processedTickers.slice(0, currentTopN); 
-    tbody.innerHTML = finalTickersToDisplay.map((ticker, index) => createTableRow(ticker, index, allExtraData)).join('');
+    tbody.innerHTML = finalTickersToDisplay.map((ticker, index) => createTableRow(ticker, index, allExtraData, monitoredAssets)).join('');
     
     if (showSparklines) {
         finalTickersToDisplay.forEach(ticker => {
@@ -89,13 +108,12 @@ async function handleMonitorAssetClick(symbol) {
         };
         const { error } = await supabase.from('alarms').insert([alarmData]);
         if (error) throw error;
+
         if (button) {
-            const originalIcon = button.innerHTML;
+            monitoredAssets.add(symbol);
             button.innerHTML = `<span class="material-symbols-outlined">check</span>`;
-            setTimeout(() => {
-                button.innerHTML = originalIcon;
-                button.disabled = false;
-            }, 2000);
+            button.classList.add('monitored');
+            button.title = "Ativo já está a ser monitorizado";
         }
     } catch (error) {
         console.error(`Erro ao criar alarme para ${symbol}:`, error);
@@ -104,7 +122,7 @@ async function handleMonitorAssetClick(symbol) {
     }
 }
 
-function createTableRow(ticker, index, extraData) {
+function createTableRow(ticker, index, extraData, monitoredAssetsSet) {
     const baseAsset = ticker.symbol.replace('USDC', '');
     const price = parseFloat(ticker.lastPrice);
     const volume = parseFloat(ticker.quoteVolume);
@@ -123,13 +141,10 @@ function createTableRow(ticker, index, extraData) {
         if (assetExtraData.stoch_4h !== null && typeof assetExtraData.stoch_4h === 'number' && assetExtraData.stoch_4h < 35) {
             const hasConfirmedCross = assetExtraData.stoch_4h_bullish_cross;
             const signalClass = hasConfirmedCross ? 'stoch-signal crossover-confirmed' : 'stoch-signal';
-            // --- INÍCIO DA ALTERAÇÃO ---
-            const signalText = 'STC'; // O asterisco será adicionado via CSS
-            // --- FIM DA ALTERAÇÃO ---
+            const signalText = 'STC';
             const tooltipText = hasConfirmedCross
                 ? `Stoch (4h) K:${assetExtraData.stoch_4h.toFixed(1)} com Cruzamento Bullish Confirmado`
                 : `Stoch (4h) K:${assetExtraData.stoch_4h.toFixed(1)}`;
-
             stochSignalHtml = `<span class="${signalClass}" data-tooltip="${tooltipText}">${signalText}</span>`;
         }
 
@@ -146,6 +161,11 @@ function createTableRow(ticker, index, extraData) {
     let formattedPrice = price >= 1.0 ? price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$' + price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
     const sparklineCellHtml = showSparklines ? `<td data-label="Sparkline (24h)" class="sparkline-cell"><div class="sparkline-container" id="sparkline-${ticker.symbol}"></div></td>` : `<td></td>`;
     
+    const isMonitored = monitoredAssetsSet.has(ticker.symbol);
+    const monitorButtonHtml = isMonitored
+        ? `<button class="icon-action-btn monitored" title="Ativo já está a ser monitorizado" disabled><span class="material-symbols-outlined">check</span></button>`
+        : `<button class="icon-action-btn" data-action="monitor" data-symbol="${ticker.symbol}" title="Monitorizar Ativo (Cria Alarme Stoch 15m)"><span class="material-symbols-outlined">visibility</span></button>`;
+
     return `
         <tr>
             <td data-label="#">${index + 1}</td>
@@ -156,10 +176,10 @@ function createTableRow(ticker, index, extraData) {
             <td data-label="Variação (24h)" class="${priceChangeClass}">${priceChangePercent.toFixed(2)}%</td>
             <td data-label="Ações">
                 <div class="action-buttons">
-                    <button class="icon-action-btn" data-action="monitor" data-symbol="${ticker.symbol}" title="Monitorizar Ativo (Cria Alarme Stoch 15m)"><span class="material-symbols-outlined">visibility</span></button>
-                    <button class="icon-action-btn" data-action="view-chart" data-symbol="${ticker.symbol}" title="Ver Gráfico"><span class="material-symbols-outlined">monitoring</span></button>
-                    <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn" title="TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
+                    ${monitorButtonHtml}
                     <a href="${createAlarmUrl}" class="icon-action-btn" title="Criar Alarme Detalhado"><span class="material-symbols-outlined">alarm_add</span></a>
+                    <button class="icon-action-btn btn-view-chart" data-action="view-chart" data-symbol="${ticker.symbol}" title="Ver Gráfico"><span class="material-symbols-outlined">monitoring</span></button>
+                    <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn btn-trading-view" title="TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
                 </div>
             </td>
         </tr>`;
@@ -190,6 +210,8 @@ async function fetchAndDisplayMarketData() {
     const tbody = document.getElementById('market-scan-tbody');
     if (!tbody) return;
     tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">A carregar dados...</td></tr>';
+    
+    await fetchMonitoredAssets();
     
     const cachedDataJSON = sessionStorage.getItem(CACHE_KEY_DATA);
     const cacheTimestamp = sessionStorage.getItem(CACHE_KEY_TIMESTAMP);
