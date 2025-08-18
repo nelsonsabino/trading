@@ -17,8 +17,7 @@ releases: [
             "Ajustado o layout da página para um ecrã dividido 50/50 entre o gráfico de preço e o feed de notícias.",
             "Ambas as secções agora partilham o mesmo espaço e altura, criando uma experiência de análise mais equilibrada e simétrica."
         ]
-    }
-]
+    },
     {
         number: '15.0.1',
         changes: [
@@ -26,8 +25,7 @@ releases: [
             "Removidas as imagens do feed de notícias para uma interface mais limpa e focada na informação textual.",
             "Melhorada a formatação dos títulos e metadados para maior legibilidade e um melhor alinhamento visual com o gráfico."
         ]
-    }
-]
+    },
     {
         number: '15.0.0',
         changes: [
@@ -36,8 +34,7 @@ releases: [
             "A funcionalidade é potenciada por uma nova Supabase Edge Function (`get-crypto-news`) que comunica de forma segura com a API da CryptoCompare.",
             "O layout é responsivo, posicionando as notícias ao lado do gráfico em ecrãs maiores e abaixo em dispositivos móveis."
         ]
-    }
-]
+    },
     {
         number: '14.9.0',
         changes: [
@@ -45,8 +42,7 @@ releases: [
             "Substituído o botão genérico 'Gerir' por ícones de ação direta para 'Editar' e 'Apagar' na tabela de alarmes ativos.",
             "Agiliza a gestão de alarmes, permitindo modificá-los ou removê-los diretamente da página de análise do ativo."
         ]
-    }
-]
+    },
         {
             number: '14.8.0',
             changes: [
