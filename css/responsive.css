@@ -13,6 +13,7 @@
     /* --- INÍCIO DA ALTERAÇÃO --- */
     .asset-details-grid {
         grid-template-columns: 1fr; /* Empilha o gráfico e as notícias */
+        height: auto; /* Remove a altura fixa em ecrãs menores */
     }
     /* --- FIM DA ALTERAÇÃO --- */
 }
