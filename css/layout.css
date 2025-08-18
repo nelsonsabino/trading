@@ -55,9 +55,10 @@ header .main-nav {
 /* --- INÍCIO DA ALTERAÇÃO --- */
 .asset-details-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Dividido em 50/50 */
+    grid-template-columns: 1fr 1fr;
     gap: 2rem;
-    align-items: stretch; /* Garante que as colunas têm a mesma altura */
+    align-items: stretch;
+    height: 900px; /* Altura fixa para o container */
 }
 /* --- FIM DA ALTERAÇÃO --- */
 
