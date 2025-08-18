@@ -3,6 +3,8 @@
 
 import { supabase } from './services.js';
 import { getTradesForAsset } from './firebase-service.js';
+import { getAlarmDescription } from './ui.js';
+import { handleDeleteAlarm } from './handlers.js';
 
 let currentAssetSymbol = null; 
 let currentChartTimeframe = '1h'; 
@@ -187,18 +189,27 @@ async function displayAlarmsForAsset(symbol) {
         if (activeAlarms.length === 0) {
             activeTbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Nenhum alarme ativo para este ativo.</td></tr>';
         } else {
+            // --- INÍCIO DA ALTERAÇÃO ---
             const activeAlarmsHtml = activeAlarms.map(alarm => {
-                let alarmDescription = '';
-                if (alarm.alarm_type === 'stochastic') { alarmDescription = `Estocástico(${alarm.indicator_period}) ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} no ${alarm.indicator_timeframe}`; }
-                else if (alarm.alarm_type === 'rsi_level') { alarmDescription = `RSI(${alarm.indicator_period}) ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} no ${alarm.indicator_timeframe}`; }
-                else if (alarm.alarm_type === 'stochastic_crossover') { alarmDescription = `Estocástico %K(${alarm.indicator_period}) cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} de %D(${alarm.combo_period}) no ${alarm.indicator_timeframe}`; } 
-                else if (alarm.alarm_type === 'rsi_crossover') { alarmDescription = `RSI(${alarm.rsi_period}) cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} da MA(${alarm.rsi_ma_period}) no ${alarm.indicator_timeframe}`; } 
-                else if (alarm.alarm_type === 'ema_touch') { alarmDescription = `Preço testa a EMA(${alarm.ema_period}) como ${alarm.condition === 'test_support' ? 'SUPORTE' : 'RESISTÊNCIA'} no ${alarm.indicator_timeframe}`; } 
-                else if (alarm.alarm_type === 'combo') { const primaryTriggerText = alarm.condition === 'test_support' ? `testa a EMA (Suporte)` : `testa a EMA (Resistência)`; const secondaryTriggerText = `Estocástico(${alarm.combo_period}) ${alarm.combo_condition === 'below' ? 'abaixo de' : 'acima de'} ${alarm.combo_target_price}`; alarmDescription = `CONFLUÊNCIA: ${primaryTriggerText} E ${secondaryTriggerText} no ${alarm.indicator_timeframe}`; } 
-                else { alarmDescription = `Preço ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} USD`; }
+                const alarmDescription = getAlarmDescription(alarm, true);
 
-                return `<tr><td>${alarmDescription}</td><td>${new Date(alarm.created_at).toLocaleString('pt-PT')}</td><td><a href="alarms-manage.html" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.9em;">Gerir</a></td></tr>`;
+                return `
+                    <tr>
+                        <td>${alarmDescription}</td>
+                        <td>${new Date(alarm.created_at).toLocaleString('pt-PT')}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="alarms-create.html?editAlarmId=${alarm.id}" class="icon-action-btn" title="Editar Alarme">
+                                    <span class="material-symbols-outlined">edit</span>
+                                </a>
+                                <button class="icon-action-btn" data-action="delete-alarm" data-alarm-id="${alarm.id}" title="Apagar Alarme">
+                                    <span class="material-symbols-outlined">delete_forever</span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>`;
             }).join('');
+            // --- FIM DA ALTERAÇÃO ---
             activeTbody.innerHTML = activeAlarmsHtml;
         }
 
@@ -206,14 +217,7 @@ async function displayAlarmsForAsset(symbol) {
             triggeredTbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Nenhum alarme disparado para este ativo.</td></tr>';
         } else {
             const triggeredAlarmsHtml = triggeredAlarms.map(alarm => {
-                let alarmDescription = '';
-                if (alarm.alarm_type === 'stochastic') { alarmDescription = `Estocástico(${alarm.indicator_period}) ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} no ${alarm.indicator_timeframe}`; }
-                else if (alarm.alarm_type === 'rsi_level') { alarmDescription = `RSI(${alarm.indicator_period}) ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} no ${alarm.indicator_timeframe}`; }
-                else if (alarm.alarm_type === 'stochastic_crossover') { alarmDescription = `Estocástico %K(${alarm.indicator_period}) cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} de %D(${alarm.combo_period}) no ${alarm.indicator_timeframe}`; } 
-                else if (alarm.alarm_type === 'rsi_crossover') { alarmDescription = `RSI(${alarm.rsi_period}) cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} da MA(${alarm.rsi_ma_period}) no ${alarm.indicator_timeframe}`; } 
-                else if (alarm.alarm_type === 'ema_touch') { alarmDescription = `Preço testa a EMA(${alarm.ema_period}) como ${alarm.condition === 'test_support' ? 'SUPORTE' : 'RESISTÊNCIA'} no ${alarm.indicator_timeframe}`; } 
-                else if (alarm.alarm_type === 'combo') { const primaryTriggerText = alarm.condition === 'test_support' ? `testa a EMA (Suporte)` : `testa a EMA (Resistência)`; const secondaryTriggerText = `Estocástico(${alarm.combo_period}) ${alarm.combo_condition === 'below' ? 'abaixo de' : 'acima de'} ${alarm.combo_target_price}`; alarmDescription = `CONFLUÊNCIA: ${primaryTriggerText} E ${secondaryTriggerText} no ${alarm.indicator_timeframe}`; } 
-                else { alarmDescription = `Preço ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} USD`; }
+                const alarmDescription = getAlarmDescription(alarm, true);
                 
                 const triggeredDate = alarm.triggered_at ? new Date(alarm.triggered_at).toLocaleString('pt-PT') : 'N/A';
                 return `<tr><td>${alarmDescription}</td><td>${triggeredDate}</td><td><a href="alarms-manage.html" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.9em;">Ver Histórico</a></td></tr>`;
@@ -268,7 +272,6 @@ function editTrade(tradeId) {
     window.location.href = 'dashboard.html';
 }
 
-// --- INÍCIO DA ALTERAÇÃO: Nova função para o clique no botão "Monitorizar" ---
 async function handleMonitorAssetClick(symbol) {
     const button = document.getElementById('monitor-asset-btn');
     if (button) button.disabled = true;
@@ -303,7 +306,6 @@ async function handleMonitorAssetClick(symbol) {
         if (button) button.disabled = false;
     }
 }
-// --- FIM DA ALTERAÇÃO ---
 
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -332,12 +334,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     loadChart(); 
 
-    // --- INÍCIO DA ALTERAÇÃO: Lógica para o novo botão de monitorizar ---
     const monitorBtn = document.getElementById('monitor-asset-btn');
     if (monitorBtn) {
         monitorBtn.addEventListener('click', () => handleMonitorAssetClick(assetSymbol));
     }
-    // --- FIM DA ALTERAÇÃO ---
 
     const watchlistBtn = document.getElementById('add-to-watchlist-btn');
     const alarmBtn = document.getElementById('add-alarm-btn');
@@ -362,6 +362,20 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // --- INÍCIO DA ALTERAÇÃO ---
+    const alarmsTableBody = document.getElementById('asset-alarms-tbody');
+    if (alarmsTableBody) {
+        alarmsTableBody.addEventListener('click', (e) => {
+            const deleteButton = e.target.closest('button[data-action="delete-alarm"]');
+            if (deleteButton) {
+                e.preventDefault();
+                const alarmId = deleteButton.dataset.alarmId;
+                handleDeleteAlarm(alarmId);
+            }
+        });
+    }
+    // --- FIM DA ALTERAÇÃO ---
 
     document.addEventListener('themeChange', () => {
         loadChart(); 
