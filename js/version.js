@@ -2,14 +2,23 @@
 
 export const changelogData = {
 current: {
-    number: '15.0.1',
+    number: '15.1.0',
     changes: [
-        "**Refinamento do Feed de Notícias:**",
-        "Removidas as imagens do feed de notícias para uma interface mais limpa e focada na informação textual.",
-        "Melhorada a formatação dos títulos e metadados para maior legibilidade e um melhor alinhamento visual com o gráfico."
+        "**Refinamento do Layout (Detalhes do Ativo):**",
+        "Ajustado o layout da página para um ecrã dividido 50/50 entre o gráfico de preço e o feed de notícias.",
+        "Ambas as secções agora partilham o mesmo espaço e altura, criando uma experiência de análise mais equilibrada e simétrica."
     ]
 },
 releases: [
+    {
+        number: '15.0.1',
+        changes: [
+            "**Refinamento do Feed de Notícias:**",
+            "Removidas as imagens do feed de notícias para uma interface mais limpa e focada na informação textual.",
+            "Melhorada a formatação dos títulos e metadados para maior legibilidade e um melhor alinhamento visual com o gráfico."
+        ]
+    }
+]
     {
         number: '15.0.0',
         changes: [
