@@ -2,14 +2,23 @@
 
 export const changelogData = {
 current: {
-    number: '15.1.0',
+    number: '15.1.1',
     changes: [
-        "**Refinamento do Layout (Detalhes do Ativo):**",
-        "Ajustado o layout da página para um ecrã dividido 50/50 entre o gráfico de preço e o feed de notícias.",
-        "Ambas as secções agora partilham o mesmo espaço e altura, criando uma experiência de análise mais equilibrada e simétrica."
+        "**Correção de Layout (Detalhes do Ativo):**",
+        "Resolvido um problema de alinhamento em que a coluna de notícias ficava mais alta que a do gráfico.",
+        "Ambas as colunas agora partilham uma altura fixa e consistente, garantindo a simetria visual pretendida."
     ]
 },
 releases: [
+    {
+        number: '15.1.0',
+        changes: [
+            "**Refinamento do Layout (Detalhes do Ativo):**",
+            "Ajustado o layout da página para um ecrã dividido 50/50 entre o gráfico de preço e o feed de notícias.",
+            "Ambas as secções agora partilham o mesmo espaço e altura, criando uma experiência de análise mais equilibrada e simétrica."
+        ]
+    }
+]
     {
         number: '15.0.1',
         changes: [
