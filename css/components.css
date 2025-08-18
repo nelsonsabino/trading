@@ -364,7 +364,7 @@
 
 #main-asset-chart {
     flex-grow: 1; /* Faz o gráfico preencher o espaço vertical */
-    min-height: 300px; /* Altura mínima para o gráfico */
+    /* min-height: 300px; --- REMOVIDO --- */
 }
 
 #news-feed-section {
@@ -373,16 +373,16 @@
     border-radius: 8px;
     padding: 1.5rem;
     box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-    height: 100%; /* Garante que a secção preenche a altura da grid */
+    height: 100%; 
     display: flex;
     flex-direction: column;
 }
 
 #news-feed-container {
     overflow-y: auto;
-    padding-right: 0.5rem; /* Espaço para a scrollbar */
-    flex-grow: 1; /* Faz o container crescer */
-    min-height: 0; /* Corrige bug de scroll em flex containers */
+    padding-right: 0.5rem; 
+    flex-grow: 1; 
+    min-height: 0; 
 }
 
 .news-article {
