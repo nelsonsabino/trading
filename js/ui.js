@@ -137,7 +137,7 @@ async function acknowledgeAlarm(assetPair) {
     }
 }
 
-function getAlarmDescription(alarm, forTable = false) {
+export function getAlarmDescription(alarm, forTable = false) {
     if (!alarm) return 'N/A';
     const timeframe = `(${alarm.indicator_timeframe})`;
     switch (alarm.alarm_type) {
