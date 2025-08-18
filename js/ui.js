@@ -236,7 +236,7 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
     card.dataset.tradeId = trade.id;
     const assetName = trade.data.asset;
     const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${assetName}`;
-    const createAlarmUrl = `alarms-create.html?assetPair=${assetName}`; // URL para o novo botão
+    const createAlarmUrl = `alarms-create.html?assetPair=${assetName}`;
     const assetMarketData = marketData[assetName] || { price: 0, change: 0, sparkline: [] };
     const priceChangeClass = assetMarketData.change >= 0 ? 'positive-pnl' : 'negative-pnl';
     if (trade.data.status === 'ARMED') card.classList.add('armed');
@@ -320,14 +320,14 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
     }
     const tableRowsHtml = assetsForWatchlist.map(assetName => {
         const alarmsForAsset = activeAlarmsByAsset[assetName];
-        // --- INÍCIO DA ALTERAÇÃO ---
         const latestAlarm = [...alarmsForAsset].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
-        // --- FIM DA ALTERAÇÃO ---
         const assetMarketData = marketData[assetName] || { price: 0, sparkline: [] };
         let formattedPrice = assetMarketData.price >= 1.0 ? assetMarketData.price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$' + assetMarketData.price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
         const hasTriggeredUnacknowledgedAlarm = allAlarms.some(a => a.asset_pair === assetName && a.status === 'triggered' && !a.acknowledged);
         const triggeredClass = hasTriggeredUnacknowledgedAlarm ? 'class="alarm-triggered"' : '';
         const acknowledgeButtonHtml = hasTriggeredUnacknowledgedAlarm ? `<button class="acknowledge-alarm-btn" data-action="acknowledge-and-view-alarm" data-asset="${assetName}" title="Ver Alarme Disparado"><span class="material-symbols-outlined">alarm</span> OK</button>` : '';
+        
+        // --- INÍCIO DA ALTERAÇÃO ---
         return `
             <tr ${triggeredClass}>
                 <td data-label="Ativo"><strong><a href="asset-details.html?symbol=${assetName}" class="asset-link">${assetName}</a></strong></td>
@@ -339,14 +339,15 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
                 <td data-label="Ações">
                     <div class="action-buttons">
                         ${acknowledgeButtonHtml}
-                        <button class="icon-action-btn" data-action="view-chart" data-symbol="${assetName}" title="Ver Gráfico Detalhado"><span class="material-symbols-outlined">monitoring</span></button>
-                        <a href="https://www.tradingview.com/chart/?symbol=BINANCE:${assetName}" target="_blank" class="icon-action-btn" title="TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
+                        <button class="icon-action-btn btn-view-chart" data-action="view-chart" data-symbol="${assetName}" title="Ver Gráfico Detalhado"><span class="material-symbols-outlined">monitoring</span></button>
+                        <a href="https://www.tradingview.com/chart/?symbol=BINANCE:${assetName}" target="_blank" class="icon-action-btn btn-trading-view" title="TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
                         <a href="alarms-create.html?assetPair=${assetName}" class="icon-action-btn" title="Criar Novo Alarme"><span class="material-symbols-outlined">alarm_add</span></a>
                         <button class="icon-action-btn" data-action="add-to-potential" data-symbol="${assetName}" title="Adicionar a Trade Potencial"><span class="material-symbols-outlined">add_shopping_cart</span></button>
                     </div>
                 </td>
             </tr>
         `;
+        // --- FIM DA ALTERAÇÃO ---
     }).join('');
     tbody.innerHTML = tableRowsHtml;
     assetsForWatchlist.forEach(assetName => renderSparkline(`sparkline-watchlist-${assetName}`, marketData[assetName]?.sparkline));
