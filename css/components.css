@@ -354,34 +354,49 @@
     color: var(--surface-primary);
 }
 
-/* --- COMPONENTE: FEED DE NOTÍCIAS --- */
+/* --- INÍCIO DA ALTERAÇÃO --- */
+/* --- COMPONENTE: FEED DE NOTÍCIAS E GRÁFICO (LAYOUT 50/50) --- */
+.main-chart-section .stat-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#main-asset-chart {
+    flex-grow: 1; /* Faz o gráfico preencher o espaço vertical */
+    min-height: 300px; /* Altura mínima para o gráfico */
+}
+
 #news-feed-section {
     background-color: var(--surface-primary);
     border: 1px solid var(--border-primary);
     border-radius: 8px;
     padding: 1.5rem;
     box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    height: 100%; /* Garante que a secção preenche a altura da grid */
+    display: flex;
+    flex-direction: column;
 }
 
 #news-feed-container {
-    max-height: 460px; /* Ajustado para alinhar melhor com o gráfico */
     overflow-y: auto;
     padding-right: 0.5rem; /* Espaço para a scrollbar */
+    flex-grow: 1; /* Faz o container crescer */
+    min-height: 0; /* Corrige bug de scroll em flex containers */
 }
 
-/* --- INÍCIO DA ALTERAÇÃO --- */
 .news-article {
     padding: 1rem 0.5rem 1rem 0;
     border-bottom: 1px solid var(--border-secondary);
 }
 
 .news-article-title {
-    display: block; /* Garante que o link ocupa a sua própria linha */
+    display: block; 
     font-size: 1em;
     font-weight: 600;
     color: var(--text-primary);
     text-decoration: none;
-    margin-bottom: 0.35rem; /* Aumenta ligeiramente o espaço */
+    margin-bottom: 0.35rem; 
     line-height: 1.4;
 }
 .news-article-title:hover {
