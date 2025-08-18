@@ -52,6 +52,15 @@ header .main-nav {
     gap: 1.5rem;
 }
 
+/* --- INÍCIO DA ALTERAÇÃO --- */
+.asset-details-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+/* --- FIM DA ALTERAÇÃO --- */
+
 
 /* --- CONTROLES DO MERCADO --- */
 .market-controls {
