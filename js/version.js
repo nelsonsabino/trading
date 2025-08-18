@@ -1,15 +1,25 @@
 // js/version.js - Ponto central de controlo de versão e changelog 
 
 export const changelogData = {
-  current: {
+ current: {
+    number: '15.0.0',
+    changes: [
+        "**Feature: Feed de Notícias Contextuais:**",
+        "Adicionada uma secção de notícias na página de detalhes do ativo, que exibe as últimas notícias em português para a criptomoeda a ser analisada.",
+        "A funcionalidade é potenciada por uma nova Supabase Edge Function (`get-crypto-news`) que comunica de forma segura com a API da CryptoCompare.",
+        "O layout é responsivo, posicionando as notícias ao lado do gráfico em ecrãs maiores e abaixo em dispositivos móveis."
+    ]
+},
+releases: [
+    {
         number: '14.9.0',
         changes: [
             "**Melhoria na Gestão de Alarmes (Detalhes do Ativo):**",
             "Substituído o botão genérico 'Gerir' por ícones de ação direta para 'Editar' e 'Apagar' na tabela de alarmes ativos.",
             "Agiliza a gestão de alarmes, permitindo modificá-los ou removê-los diretamente da página de análise do ativo."
         ]
-    },
-    releases: [
+    }
+]
         {
             number: '14.8.0',
             changes: [
