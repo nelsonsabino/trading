@@ -57,8 +57,7 @@ header .main-nav {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
-    align-items: stretch;
-    /* height: 900px; --- REMOVIDO para permitir altura natural --- */
+    align-items: start; /* Revertido de stretch, pois a altura será fixa nos filhos */
 }
 /* --- FIM DA ALTERAÇÃO --- */
 
