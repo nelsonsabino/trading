@@ -273,9 +273,7 @@ export function createTradeCard(trade, marketData = {}, allAlarms = []) {
         imageContainerHtml = `<div class="card-image-container ${isVisibleClass}"><a href="${trade.data.imageUrl}" target="_blank" rel="noopener noreferrer"><img src="${trade.data.imageUrl}" alt="Gráfico" loading="lazy"></a></div>`;
     }
 
-    // --- INÍCIO DA ALTERAÇÃO ---
     card.innerHTML = `<div class="card-header-row"><h3 class="asset-title-card"><a href="asset-details.html?symbol=${assetName}" class="asset-link">${assetName}</a>${alarmBellHtml}<button class="icon-action-btn card-edit-btn" data-action="edit" title="Editar"><span class="material-symbols-outlined">edit</span></button></h3><div class="card-main-action-button">${mainActionButtonHtml}</div></div><p class="strategy-name">Estratégia: ${trade.data.strategyName || 'N/A'}</p>${notesHtml}${imageContainerHtml}${triggeredActionRowHtml}<div class="card-bottom-row"><div class="card-secondary-actions">${revertButtonHtml}<a href="${tradingViewUrl}" target="_blank" rel="noopener noreferrer" class="icon-action-btn" title="TradingView"><span class="material-symbols-outlined">open_in_new</span></a><a href="${createAlarmUrl}" class="icon-action-btn" title="Criar Alarme"><span class="material-symbols-outlined">alarm_add</span></a>${viewImageButtonHtml}</div><div class="card-sparkline" id="sparkline-card-${trade.id}"></div><div class="card-price-data"><div class="card-price">${formattedPrice}</div><div class="${priceChangeClass} price-change-percent">${assetMarketData.change.toFixed(2)}%</div></div></div>`;
-    // --- FIM DA ALTERAÇÃO ---
     return card;
 }
 
@@ -322,7 +320,9 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
     }
     const tableRowsHtml = assetsForWatchlist.map(assetName => {
         const alarmsForAsset = activeAlarmsByAsset[assetName];
-        const latestAlarm = alarmsForAsset.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
+        // --- INÍCIO DA ALTERAÇÃO ---
+        const latestAlarm = [...alarmsForAsset].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
+        // --- FIM DA ALTERAÇÃO ---
         const assetMarketData = marketData[assetName] || { price: 0, sparkline: [] };
         let formattedPrice = assetMarketData.price >= 1.0 ? assetMarketData.price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$' + assetMarketData.price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
         const hasTriggeredUnacknowledgedAlarm = allAlarms.some(a => a.asset_pair === assetName && a.status === 'triggered' && !a.acknowledged);
