@@ -9,6 +9,7 @@ import { enterEditMode } from './alarms-create.js';
 let chartModal = null;
 let closeChartModalBtn = null;
 let chartContainer = null;
+let monitoredAssets = new Set(); // --- INÍCIO DA ALTERAÇÃO ---
 
 export function openChartModal(symbol) {
     if (!chartModal || !chartContainer) return;
@@ -32,6 +33,55 @@ function closeChartModal() {
 
 // --- FUNÇÕES DE GESTÃO DE ALARMES ---
 
+// --- INÍCIO DA ALTERAÇÃO ---
+async function fetchMonitoredAssets() {
+    try {
+        const { data, error } = await supabase
+            .from('alarms')
+            .select('asset_pair')
+            .eq('status', 'active');
+        if (error) {
+            console.error("Erro ao buscar ativos monitorizados:", error);
+            return;
+        }
+        monitoredAssets = new Set(data.map(item => item.asset_pair));
+    } catch (err) {
+        console.error("Exceção ao buscar ativos monitorizados:", err);
+    }
+}
+
+async function handleMonitorAssetClick(symbol) {
+    const button = document.querySelector(`button[data-action="monitor"][data-symbol="${symbol}"]`);
+    if (button) button.disabled = true;
+
+    try {
+        const alarmData = {
+            asset_pair: symbol,
+            alarm_type: 'stochastic_crossover',
+            condition: 'above',
+            indicator_timeframe: '15m',
+            indicator_period: 7,
+            combo_period: 3,
+            status: 'active'
+        };
+        const { error } = await supabase.from('alarms').insert([alarmData]);
+        if (error) throw error;
+
+        if (button) {
+            monitoredAssets.add(symbol);
+            button.innerHTML = `<span class="material-symbols-outlined">check</span>`;
+            button.classList.add('monitored');
+            button.title = "Ativo já está a ser monitorizado";
+            // A tabela de ativos será atualizada na próxima recarga de dados
+        }
+    } catch (error) {
+        console.error(`Erro ao criar alarme para ${symbol}:`, error);
+        alert(`Não foi possível criar o alarme para ${symbol}. Verifique se já existe um alarme similar.`);
+        if (button) button.disabled = false;
+    }
+}
+// --- FIM DA ALTERAÇÃO ---
+
 async function fetchAndDisplayAlarms() {
     const activeTbody = document.getElementById('active-alarms-tbody');
     const triggeredTbody = document.getElementById('triggered-alarms-tbody');
@@ -41,6 +91,8 @@ async function fetchAndDisplayAlarms() {
         activeTbody.innerHTML = '<tr><td colspan="4">A carregar...</td></tr>';
         triggeredTbody.innerHTML = '<tr><td colspan="5">A carregar...</td></tr>';
         
+        await fetchMonitoredAssets(); // --- INÍCIO DA ALTERAÇÃO ---
+
         const [activeAlarmsResponse, triggeredAlarmsResponse] = await Promise.all([
             supabase.from('alarms').select('*').eq('status', 'active').order('created_at', { ascending: false }),
             supabase.from('alarms').select('*').eq('status', 'triggered').order('triggered_at', { ascending: false })
@@ -78,10 +130,14 @@ async function fetchAndDisplayAlarms() {
             else { alarmDescription = `Preço ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} USD`; }
             
             const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${alarm.asset_pair}`;
-            const addOpportunityUrl = `dashboard.html?assetPair=${alarm.asset_pair}`;
             const assetHtml = `<strong><a href="asset-details.html?symbol=${alarm.asset_pair}" class="asset-link">${alarm.asset_pair}</a></strong>`;
+            
+            const isMonitored = monitoredAssets.has(alarm.asset_pair);
+            const monitorButtonHtml = isMonitored
+                ? `<button class="icon-action-btn monitored" title="Ativo já está a ser monitorizado" disabled><span class="material-symbols-outlined">check</span></button>`
+                : `<button class="icon-action-btn" data-action="monitor" data-symbol="${alarm.asset_pair}" title="Monitorizar Ativo"><span class="material-symbols-outlined">visibility</span></button>`;
 
-            // --- INÍCIO DA ALTERAÇÃO ---
+
             activeAlarmsHtml.push(`
                 <tr data-alarm-id="${alarm.id}">
                     <td data-label="Ativo"><span class="cell-value">${assetHtml}</span></td>
@@ -93,11 +149,10 @@ async function fetchAndDisplayAlarms() {
                             <button class="icon-action-btn delete-btn" data-id="${alarm.id}" title="Apagar Alarme"><span class="material-symbols-outlined">delete</span></button>
                             <a href="#" class="icon-action-btn view-chart-btn btn-view-chart" data-symbol="${alarm.asset_pair}" title="Ver Gráfico no Modal"><span class="material-symbols-outlined">monitoring</span></a>
                             <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn btn-trading-view" title="Abrir no TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
-                            <a href="${addOpportunityUrl}" class="icon-action-btn" title="Adicionar à Watchlist"><span class="material-symbols-outlined">add</span></a>
+                            ${monitorButtonHtml} 
                         </div>
                     </td>
                 </tr>`);
-            // --- FIM DA ALTERAÇÃO ---
         }
 
         for (const alarm of triggeredAlarms) {
@@ -120,10 +175,13 @@ async function fetchAndDisplayAlarms() {
             else { alarmDescription = `Preço ${alarm.condition === 'above' ? 'acima de' : 'abaixo de'} ${alarm.target_price} USD`; }
 
             const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${alarm.asset_pair}`;
-            const addOpportunityUrl = `dashboard.html?assetPair=${alarm.asset_pair}`;
             const assetHtml = `<strong><a href="asset-details.html?symbol=${alarm.asset_pair}" class="asset-link">${alarm.asset_pair}</a></strong>`;
+            
+            const isMonitored = monitoredAssets.has(alarm.asset_pair);
+            const monitorButtonHtml = isMonitored
+                ? `<button class="icon-action-btn monitored" title="Ativo já está a ser monitorizado" disabled><span class="material-symbols-outlined">check</span></button>`
+                : `<button class="icon-action-btn" data-action="monitor" data-symbol="${alarm.asset_pair}" title="Monitorizar Ativo"><span class="material-symbols-outlined">visibility</span></button>`;
 
-            // --- INÍCIO DA ALTERAÇÃO ---
             triggeredAlarmsHtml.push(`
                 <tr data-alarm-id="${alarm.id}">
                     <td data-label="Ativo"><span class="cell-value">${assetHtml}</span></td>
@@ -136,11 +194,10 @@ async function fetchAndDisplayAlarms() {
                             <button class="icon-action-btn delete-btn" data-id="${alarm.id}" title="Apagar Alarme do Histórico"><span class="material-symbols-outlined">delete</span></button>
                             <a href="#" class="icon-action-btn view-chart-btn btn-view-chart" data-symbol="${alarm.asset_pair}" title="Ver Gráfico no Modal"><span class="material-symbols-outlined">monitoring</span></a>
                             <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn btn-trading-view" title="Abrir no TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
-                            <a href="${addOpportunityUrl}" class="icon-action-btn" title="Adicionar à Watchlist"><span class="material-symbols-outlined">add</span></a>
+                            ${monitorButtonHtml}
                         </div>
                     </td>
                 </tr>`);
-            // --- FIM DA ALTERAÇÃO ---
         }
         
         activeTbody.innerHTML = activeAlarms.length > 0 ? activeAlarmsHtml.join('') : '<tr><td colspan="4" style="text-align:center;">Nenhum alarme ativo.</td></tr>';
@@ -211,18 +268,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     mainContainer.addEventListener('click', (e) => {
-        const deleteBtn = e.target.closest('.delete-btn');
-        if (deleteBtn) {
-            deleteAlarm(deleteBtn.getAttribute('data-id'));
+        const targetButton = e.target.closest('button, a');
+        if (!targetButton) return;
+
+        const action = targetButton.dataset.action;
+        const symbol = targetButton.dataset.symbol;
+        const alarmId = targetButton.dataset.id;
+
+        if (targetButton.classList.contains('delete-btn') && alarmId) {
+            deleteAlarm(alarmId);
             return;
         }
-        const chartBtn = e.target.closest('.view-chart-btn');
-        if (chartBtn) {
+        if (targetButton.classList.contains('view-chart-btn') && symbol) {
             e.preventDefault();
-            const symbol = chartBtn.dataset.symbol;
-            if (symbol) openChartModal(symbol);
+            openChartModal(symbol);
             return;
         }
+        // --- INÍCIO DA ALTERAÇÃO ---
+        if (action === 'monitor' && symbol) {
+            e.preventDefault();
+            handleMonitorAssetClick(symbol);
+            return;
+        }
+        // --- FIM DA ALTERAÇÃO ---
     });
 
     const deleteHistoryBtn = document.getElementById('delete-history-btn');
