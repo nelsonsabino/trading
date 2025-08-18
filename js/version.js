@@ -1,14 +1,22 @@
 // js/version.js - Ponto central de controlo de versão e changelog 
 
 export const changelogData = {
-current: {
-    number: '14.8.0',
-    changes: [
-        "**Melhoria de UX no Dashboard:**",
-        "Adicionado um botão de 'Criar Alarme' diretamente nos cards de trade (Potencial, Armado, Ativo), permitindo a criação rápida de alarmes para ativos que já estão no funil de trading."
-    ]
-},
-releases: [
+  current: {
+        number: '14.9.0',
+        changes: [
+            "**Melhoria na Gestão de Alarmes (Detalhes do Ativo):**",
+            "Substituído o botão genérico 'Gerir' por ícones de ação direta para 'Editar' e 'Apagar' na tabela de alarmes ativos.",
+            "Agiliza a gestão de alarmes, permitindo modificá-los ou removê-los diretamente da página de análise do ativo."
+        ]
+    },
+    releases: [
+        {
+            number: '14.8.0',
+            changes: [
+                "**Melhoria de UX no Dashboard:**",
+                "Adicionado um botão de 'Criar Alarme' diretamente nos cards de trade (Potencial, Armado, Ativo), permitindo a criação rápida de alarmes para ativos que já estão no funil de trading."
+            ]
+        },
     {
         number: '14.7.2',
         changes: [
