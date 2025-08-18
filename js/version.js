@@ -2,14 +2,23 @@
 
 export const changelogData = {
 current: {
-    number: '15.1.1',
+    number: '15.2.0',
     changes: [
-        "**Correção de Layout (Detalhes do Ativo):**",
-        "Resolvido um problema de alinhamento em que a coluna de notícias ficava mais alta que a do gráfico.",
-        "Ambas as colunas agora partilham uma altura fixa e consistente, garantindo a simetria visual pretendida."
+        "**Melhoria de UX e Funcionalidade (Market Scanner):**",
+        "Reordenados os botões de ação para uma sequência mais lógica (Monitorizar, Criar Alarme, Ver Gráfico, TradingView).",
+        "Adicionadas cores distintas aos botões 'Ver Gráfico' (verde) e 'TradingView' (azul) para melhor identificação visual.",
+        "O botão 'Monitorizar' agora reflete o estado real, exibindo um visto amarelo permanente se o ativo já tiver um alarme ativo."
     ]
 },
 releases: [
+    {
+        number: '15.1.1',
+        changes: [
+            "**Correção de Layout (Detalhes do Ativo):**",
+            "Resolvido um problema de alinhamento em que a coluna de notícias ficava mais alta que a do gráfico.",
+            "Ambas as colunas agora partilham uma altura fixa e consistente, garantindo a simetria visual pretendida."
+        ]
+    },
     {
         number: '15.1.0',
         changes: [
