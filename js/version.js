@@ -1,16 +1,25 @@
 // js/version.js - Ponto central de controlo de versão e changelog 
 
 export const changelogData = {
- current: {
-    number: '15.0.0',
+current: {
+    number: '15.0.1',
     changes: [
-        "**Feature: Feed de Notícias Contextuais:**",
-        "Adicionada uma secção de notícias na página de detalhes do ativo, que exibe as últimas notícias em português para a criptomoeda a ser analisada.",
-        "A funcionalidade é potenciada por uma nova Supabase Edge Function (`get-crypto-news`) que comunica de forma segura com a API da CryptoCompare.",
-        "O layout é responsivo, posicionando as notícias ao lado do gráfico em ecrãs maiores e abaixo em dispositivos móveis."
+        "**Refinamento do Feed de Notícias:**",
+        "Removidas as imagens do feed de notícias para uma interface mais limpa e focada na informação textual.",
+        "Melhorada a formatação dos títulos e metadados para maior legibilidade e um melhor alinhamento visual com o gráfico."
     ]
 },
 releases: [
+    {
+        number: '15.0.0',
+        changes: [
+            "**Feature: Feed de Notícias Contextuais:**",
+            "Adicionada uma secção de notícias na página de detalhes do ativo, que exibe as últimas notícias em português para a criptomoeda a ser analisada.",
+            "A funcionalidade é potenciada por uma nova Supabase Edge Function (`get-crypto-news`) que comunica de forma segura com a API da CryptoCompare.",
+            "O layout é responsivo, posicionando as notícias ao lado do gráfico em ecrãs maiores e abaixo em dispositivos móveis."
+        ]
+    }
+]
     {
         number: '14.9.0',
         changes: [
