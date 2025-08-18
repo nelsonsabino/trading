@@ -81,7 +81,7 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
             series: series,
             chart: {
                 type: 'line', 
-                /* height: 400, --- REMOVIDO PARA PERMITIR ALTURA FLEXÍVEL --- */
+                height: 550, /* --- REINTRODUZIDO com valor equilibrado --- */
                 toolbar: { 
                     show: true, 
                     autoSelected: 'pan' 
