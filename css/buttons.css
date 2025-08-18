@@ -107,38 +107,38 @@
 
 
 /* --- INÍCIO DA ALTERAÇÃO --- */
-/* Cores específicas para os ÍCONES no Market Scanner */
-.market-table .action-buttons .btn-view-chart {
+/* Cores específicas e globais para botões de ação com ícone */
+.action-buttons .btn-view-chart {
     background-color: #134524; /* Verde escuro */
     color: white;
     border-color: #134524;
 }
-.market-table .action-buttons .btn-view-chart:hover {
+.action-buttons .btn-view-chart:hover {
     filter: brightness(1.1);
 }
-/* --- FIM DA ALTERAÇÃO --- */
 
-.market-table .action-buttons .btn-trading-view {
+.action-buttons .btn-trading-view {
     background-color: #17275c; /* Azul escuro */
     color: white;
     border-color: #17275c;
 }
-.market-table .action-buttons .btn-trading-view:hover {
+.action-buttons .btn-trading-view:hover {
     filter: brightness(1.2);
 }
 
-.market-table .action-buttons .icon-action-btn.monitored {
+.action-buttons .icon-action-btn.monitored {
     background-color: #45440b; /* Amarelo escuro */
     color: white;
     border-color: #45440b;
     cursor: not-allowed;
     opacity: 0.9;
 }
-.market-table .action-buttons .icon-action-btn.monitored:hover {
+.action-buttons .icon-action-btn.monitored:hover {
     transform: none;
     box-shadow: none;
     filter: none;
 }
+/* --- FIM DA ALTERAÇÃO --- */
 
 
 /* --- LINKS DE NAVEGAÇÃO SECUNDÁRIOS (dentro do dropdown) --- */
