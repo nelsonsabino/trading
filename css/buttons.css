@@ -107,33 +107,38 @@
 
 
 /* --- INÍCIO DA ALTERAÇÃO --- */
-/* Cores específicas e globais para botões de ação com ícone */
-.action-buttons .btn-view-chart {
+/* Cores específicas para botões de ação em tabelas */
+.market-table .action-buttons .btn-view-chart,
+.alarms-table .action-buttons .btn-view-chart {
     background-color: #134524; /* Verde escuro */
     color: white;
     border-color: #134524;
 }
-.action-buttons .btn-view-chart:hover {
+.market-table .action-buttons .btn-view-chart:hover,
+.alarms-table .action-buttons .btn-view-chart:hover {
     filter: brightness(1.1);
 }
 
-.action-buttons .btn-trading-view {
+.market-table .action-buttons .btn-trading-view,
+.alarms-table .action-buttons .btn-trading-view {
     background-color: #17275c; /* Azul escuro */
     color: white;
     border-color: #17275c;
 }
-.action-buttons .btn-trading-view:hover {
+.market-table .action-buttons .btn-trading-view:hover,
+.alarms-table .action-buttons .btn-trading-view:hover {
     filter: brightness(1.2);
 }
 
-.action-buttons .icon-action-btn.monitored {
+/* O estado 'monitored' é específico do Market Scanner por enquanto */
+.market-table .action-buttons .icon-action-btn.monitored {
     background-color: #45440b; /* Amarelo escuro */
     color: white;
     border-color: #45440b;
     cursor: not-allowed;
     opacity: 0.9;
 }
-.action-buttons .icon-action-btn.monitored:hover {
+.market-table .action-buttons .icon-action-btn.monitored:hover {
     transform: none;
     box-shadow: none;
     filter: none;
