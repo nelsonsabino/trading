@@ -81,7 +81,7 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
             series: series,
             chart: {
                 type: 'line', 
-                height: 550, /* --- REINTRODUZIDO com valor equilibrado --- */
+                height: '100%', /* Alterado para preencher o container */
                 toolbar: { 
                     show: true, 
                     autoSelected: 'pan' 
