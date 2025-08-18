@@ -2,14 +2,22 @@
 
 export const changelogData = {
 current: {
-    number: '15.2.4',
+    number: '15.2.5',
     changes: [
-        "**Correção Visual (Botões de Ação):**",
-        "Restaurada a formatação de cor dos botões no Market Scanner e na Watchlist de Alarmes, que havia sido perdida na versão anterior.",
-        "A lógica de CSS foi corrigida para garantir que os estilos específicos (verde, azul, amarelo) se aplicam corretamente em todas as tabelas relevantes."
+        "**Consistência Visual (Gestão de Alarmes):**",
+        "Aplicada a formatação de cor dos botões de ação (verde para gráfico, azul para TradingView) à página 'Meus Alarmes'.",
+        "Garantida a consistência do estilo visual dos botões em todas as tabelas da aplicação."
     ]
 },
 releases: [
+    {
+        number: '15.2.4',
+        changes: [
+            "**Correção Visual (Botões de Ação):**",
+            "Restaurada a formatação de cor dos botões no Market Scanner e na Watchlist de Alarmes, que havia sido perdida na versão anterior.",
+            "A lógica de CSS foi corrigida para garantir que os estilos específicos (verde, azul, amarelo) se aplicam corretamente em todas as tabelas relevantes."
+        ]
+    },
     {
         number: '15.2.3',
         changes: [
