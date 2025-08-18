@@ -264,14 +264,12 @@
     border-bottom: none;
 }
 
-/* --- INÍCIO DA ALTERAÇÃO --- */
 /* Estilos para botões de ação em tabelas */
 .table-wrapper .action-buttons {
     display: flex;
     gap: 0.75rem;
     align-items: center;
 }
-/* --- FIM DA ALTERAÇÃO --- */
 
 /* Secções de Histórico */
 .closed-trades-history-section {
@@ -355,3 +353,43 @@
 .dark-mode .third-touch-signal {
     color: var(--surface-primary);
 }
+
+/* --- COMPONENTE: FEED DE NOTÍCIAS --- */
+#news-feed-section {
+    background-color: var(--surface-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+}
+
+#news-feed-container {
+    max-height: 460px; /* Ajustado para alinhar melhor com o gráfico */
+    overflow-y: auto;
+    padding-right: 0.5rem; /* Espaço para a scrollbar */
+}
+
+/* --- INÍCIO DA ALTERAÇÃO --- */
+.news-article {
+    padding: 1rem 0.5rem 1rem 0;
+    border-bottom: 1px solid var(--border-secondary);
+}
+
+.news-article-title {
+    display: block; /* Garante que o link ocupa a sua própria linha */
+    font-size: 1em;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-decoration: none;
+    margin-bottom: 0.35rem; /* Aumenta ligeiramente o espaço */
+    line-height: 1.4;
+}
+.news-article-title:hover {
+    color: var(--accent-blue);
+}
+
+.news-article-meta {
+    font-size: 0.8em;
+    color: var(--text-secondary);
+}
+/* --- FIM DA ALTERAÇÃO --- */
