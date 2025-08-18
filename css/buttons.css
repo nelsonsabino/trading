@@ -109,13 +109,14 @@
 /* --- INÍCIO DA ALTERAÇÃO --- */
 /* Cores específicas para os ÍCONES no Market Scanner */
 .market-table .action-buttons .btn-view-chart {
-    background-color: #28a745; /* Verde */
+    background-color: #134524; /* Verde escuro */
     color: white;
-    border-color: #28a745;
+    border-color: #134524;
 }
 .market-table .action-buttons .btn-view-chart:hover {
     filter: brightness(1.1);
 }
+/* --- FIM DA ALTERAÇÃO --- */
 
 .market-table .action-buttons .btn-trading-view {
     background-color: #17275c; /* Azul escuro */
@@ -138,7 +139,6 @@
     box-shadow: none;
     filter: none;
 }
-/* --- FIM DA ALTERAÇÃO --- */
 
 
 /* --- LINKS DE NAVEGAÇÃO SECUNDÁRIOS (dentro do dropdown) --- */
