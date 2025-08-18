@@ -86,7 +86,6 @@
     justify-content: flex-end; 
 }
 
-/* --- INÍCIO DA ALTERAÇÃO --- */
 /* Botões de ícone compactos dentro das TABELAS */
 .market-table .action-buttons .icon-action-btn,
 .alarms-table .action-buttons .icon-action-btn,
@@ -94,7 +93,7 @@
 .asset-related-data .action-buttons .icon-action-btn {
     width: 36px;
     height: 36px;
-    padding: 0; /* Removido para garantir que o flexbox centra o conteúdo */
+    padding: 0; 
     border-radius: 8px;
 }
 
@@ -105,19 +104,41 @@
 .asset-related-data .action-buttons .icon-action-btn .button-text {
     display: none;
 }
+
+
+/* --- INÍCIO DA ALTERAÇÃO --- */
+/* Cores específicas para os ÍCONES no Market Scanner */
+.market-table .action-buttons .btn-view-chart {
+    background-color: #28a745; /* Verde */
+    color: white;
+    border-color: #28a745;
+}
+.market-table .action-buttons .btn-view-chart:hover {
+    filter: brightness(1.1);
+}
+
+.market-table .action-buttons .btn-trading-view {
+    background-color: #17275c; /* Azul escuro */
+    color: white;
+    border-color: #17275c;
+}
+.market-table .action-buttons .btn-trading-view:hover {
+    filter: brightness(1.2);
+}
+
+.market-table .action-buttons .icon-action-btn.monitored {
+    background-color: #45440b; /* Amarelo escuro */
+    color: white;
+    border-color: #45440b;
+    cursor: not-allowed;
+    opacity: 0.9;
+}
+.market-table .action-buttons .icon-action-btn.monitored:hover {
+    transform: none;
+    box-shadow: none;
+    filter: none;
+}
 /* --- FIM DA ALTERAÇÃO --- */
-
-
-/* Cores específicas para os ÍCONES */
-.icon-action-btn.action-summary .material-symbols-outlined, 
-.icon-action-btn.view-chart-btn .material-symbols-outlined { color: #198754; } 
-
-.icon-action-btn.action-full-chart .material-symbols-outlined { color: #0d6efd; }
-.icon-action-btn.action-bell .material-symbols-outlined { color: #0d6efd; }
-.icon-action-btn.action-plus .material-symbols-outlined { color: #0d6efd; }
-.icon-action-btn.action-arm .material-symbols-outlined { color: #ffc107; }
-.icon-action-btn.action-execute .material-symbols-outlined { color: #20c997; }
-.icon-action-btn.action-close .material-symbols-outlined { color: #dc3545; }
 
 
 /* --- LINKS DE NAVEGAÇÃO SECUNDÁRIOS (dentro do dropdown) --- */
