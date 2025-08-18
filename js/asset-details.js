@@ -1,5 +1,4 @@
 // js/asset-details.js
-// VERSÃO CORRIGIDA: Gráficos originais mantidos, descrições de alarme corrigidas.
 
 import { supabase } from './services.js';
 import { getTradesForAsset } from './firebase-service.js';
@@ -144,6 +143,59 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
     }
 }
 
+// --- INÍCIO DA ALTERAÇÃO ---
+async function displayNewsForAsset(symbolPair) {
+    const container = document.getElementById('news-feed-container');
+    if (!container) return;
+    
+    container.innerHTML = '<p>A carregar notícias...</p>';
+    
+    // Extrai o símbolo base (ex: BTC de BTCUSDC)
+    const baseSymbol = symbolPair.replace('USDT', '').replace('USDC', '').replace('BUSD', '');
+
+    try {
+        const { data: news, error } = await supabase.functions.invoke('get-crypto-news', {
+            body: { symbol: baseSymbol },
+        });
+
+        if (error) {
+            throw new Error(`Erro na Edge Function: ${error.message}`);
+        }
+
+        if (!news || news.length === 0) {
+            container.innerHTML = '<p>Nenhuma notícia recente encontrada para este ativo.</p>';
+            return;
+        }
+
+        const newsHtml = news.map(article => {
+            const publishedDate = new Date(article.published_on * 1000).toLocaleString('pt-PT', {
+                day: '2-digit',
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            return `
+                <div class="news-article">
+                    <img src="${article.imageurl}" alt="Imagem da notícia" class="news-article-image">
+                    <div class="news-article-content">
+                        <a href="${article.url}" target="_blank" rel="noopener noreferrer" class="news-article-title">${article.title}</a>
+                        <span class="news-article-meta">${article.source} &bull; ${publishedDate}</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        container.innerHTML = newsHtml;
+
+    } catch (err) {
+        console.error("Erro ao buscar notícias:", err);
+        container.innerHTML = '<p style="color:red;">Não foi possível carregar as notícias.</p>';
+    }
+}
+// --- FIM DA ALTERAÇÃO ---
+
+
 function renderTradingViewTechnicalAnalysisWidget(symbol) {
     const container = document.getElementById('tradingview-tech-analysis-container');
     if (!container) return;
@@ -189,7 +241,6 @@ async function displayAlarmsForAsset(symbol) {
         if (activeAlarms.length === 0) {
             activeTbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">Nenhum alarme ativo para este ativo.</td></tr>';
         } else {
-            // --- INÍCIO DA ALTERAÇÃO ---
             const activeAlarmsHtml = activeAlarms.map(alarm => {
                 const alarmDescription = getAlarmDescription(alarm, true);
 
@@ -209,7 +260,6 @@ async function displayAlarmsForAsset(symbol) {
                         </td>
                     </tr>`;
             }).join('');
-            // --- FIM DA ALTERAÇÃO ---
             activeTbody.innerHTML = activeAlarmsHtml;
         }
 
@@ -237,8 +287,7 @@ async function displayTradesForAsset(symbol) {
     tbody.innerHTML = '<tr><td colspan="5">A carregar trades...</td></tr>';
     try {
         const trades = await getTradesForAsset(symbol);
-        console.log(`Trades recebidos para ${symbol}:`, trades);
-
+        
         if (trades.length === 0) {
             tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Nenhum trade encontrado para este ativo.</td></tr>';
             return;
@@ -346,6 +395,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (watchlistBtn) watchlistBtn.href = `dashboard.html?assetPair=${assetSymbol}`;
     if (alarmBtn) alarmBtn.href = `alarms-create.html?assetPair=${assetSymbol}`;
     if (tvBtn) tvBtn.href = `https://www.tradingview.com/chart/?symbol=BINANCE:${assetSymbol}`;
+    
+    // --- INÍCIO DA ALTERAÇÃO ---
+    displayNewsForAsset(assetSymbol);
+    // --- FIM DA ALTERAÇÃO ---
 
     displayAlarmsForAsset(assetSymbol);
     displayTradesForAsset(assetSymbol);
@@ -363,7 +416,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- INÍCIO DA ALTERAÇÃO ---
     const alarmsTableBody = document.getElementById('asset-alarms-tbody');
     if (alarmsTableBody) {
         alarmsTableBody.addEventListener('click', (e) => {
@@ -375,7 +427,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-    // --- FIM DA ALTERAÇÃO ---
 
     document.addEventListener('themeChange', () => {
         loadChart(); 
