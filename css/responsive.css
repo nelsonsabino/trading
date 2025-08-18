@@ -9,6 +9,12 @@
     .asset-charts-grid {
         grid-template-columns: 1fr; /* Gráficos da página de detalhes empilhados */
     }
+
+    /* --- INÍCIO DA ALTERAÇÃO --- */
+    .asset-details-grid {
+        grid-template-columns: 1fr; /* Empilha o gráfico e as notícias */
+    }
+    /* --- FIM DA ALTERAÇÃO --- */
 }
 
 /* Telemóvel (menor que 768px) */
