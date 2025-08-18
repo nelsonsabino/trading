@@ -327,7 +327,6 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
         const triggeredClass = hasTriggeredUnacknowledgedAlarm ? 'class="alarm-triggered"' : '';
         const acknowledgeButtonHtml = hasTriggeredUnacknowledgedAlarm ? `<button class="acknowledge-alarm-btn" data-action="acknowledge-and-view-alarm" data-asset="${assetName}" title="Ver Alarme Disparado"><span class="material-symbols-outlined">alarm</span> OK</button>` : '';
         
-        // --- INÍCIO DA ALTERAÇÃO ---
         return `
             <tr ${triggeredClass}>
                 <td data-label="Ativo"><strong><a href="asset-details.html?symbol=${assetName}" class="asset-link">${assetName}</a></strong></td>
@@ -342,12 +341,13 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
                         <button class="icon-action-btn btn-view-chart" data-action="view-chart" data-symbol="${assetName}" title="Ver Gráfico Detalhado"><span class="material-symbols-outlined">monitoring</span></button>
                         <a href="https://www.tradingview.com/chart/?symbol=BINANCE:${assetName}" target="_blank" class="icon-action-btn btn-trading-view" title="TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
                         <a href="alarms-create.html?assetPair=${assetName}" class="icon-action-btn" title="Criar Novo Alarme"><span class="material-symbols-outlined">alarm_add</span></a>
-                        <button class="icon-action-btn" data-action="add-to-potential" data-symbol="${assetName}" title="Adicionar a Trade Potencial"><span class="material-symbols-outlined">add_shopping_cart</span></button>
+                        <!-- --- INÍCIO DA ALTERAÇÃO --- -->
+                        <button class="icon-action-btn" data-action="add-to-potential" data-symbol="${assetName}" title="Adicionar a Trade Potencial"><span class="material-symbols-outlined">add</span></button>
+                        <!-- --- FIM DA ALTERAÇÃO --- -->
                     </div>
                 </td>
             </tr>
         `;
-        // --- FIM DA ALTERAÇÃO ---
     }).join('');
     tbody.innerHTML = tableRowsHtml;
     assetsForWatchlist.forEach(assetName => renderSparkline(`sparkline-watchlist-${assetName}`, marketData[assetName]?.sparkline));
