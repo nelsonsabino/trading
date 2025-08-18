@@ -2,13 +2,21 @@
 
 export const changelogData = {
 current: {
-    number: '15.2.1',
+    number: '15.2.2',
     changes: [
-        "**Ajuste Visual (Market Scanner):**",
-        "Refinada a cor do botão 'Ver Gráfico' para um tom de verde mais escuro (#134524), melhorando a harmonia visual da interface."
+        "**Consistência de Alarmes e Correção da Watchlist:**",
+        "O alarme rápido 'Monitorizar' no Market Scanner agora usa os mesmos parâmetros padrão (Stoch K=7) do formulário principal, garantindo consistência.",
+        "Corrigida a lógica da 'Watchlist de Alarmes' no Dashboard para exibir sempre o alarme mais recente de um ativo, resolvendo o problema de exibição incorreta."
     ]
 },
 releases: [
+    {
+        number: '15.2.1',
+        changes: [
+            "**Ajuste Visual (Market Scanner):**",
+            "Refinada a cor do botão 'Ver Gráfico' para um tom de verde mais escuro (#134524), melhorando a harmonia visual da interface."
+        ]
+    },
     {
         number: '15.2.0',
         changes: [
