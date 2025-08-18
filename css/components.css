@@ -264,6 +264,15 @@
     border-bottom: none;
 }
 
+/* --- INÍCIO DA ALTERAÇÃO --- */
+/* Estilos para botões de ação em tabelas */
+.table-wrapper .action-buttons {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+/* --- FIM DA ALTERAÇÃO --- */
+
 /* Secções de Histórico */
 .closed-trades-history-section {
     background-color: var(--surface-primary);
@@ -324,7 +333,6 @@
     margin-bottom: 0.5rem;
 }
 
-/* --- INÍCIO DA ALTERAÇÃO --- */
 /* Badge para o Sinal de 3º Toque em L.T. */
 .third-touch-signal {
     display: inline-block;
@@ -347,4 +355,3 @@
 .dark-mode .third-touch-signal {
     color: var(--surface-primary);
 }
-/* --- FIM DA ALTERAÇÃO --- */
