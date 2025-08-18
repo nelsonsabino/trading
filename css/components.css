@@ -357,14 +357,13 @@
 /* --- INÍCIO DA ALTERAÇÃO --- */
 /* --- COMPONENTE: FEED DE NOTÍCIAS E GRÁFICO (LAYOUT 50/50) --- */
 .main-chart-section .stat-card {
-    height: 100%;
+    height: 550px; /* Altura fixa para o card do gráfico */
     display: flex;
     flex-direction: column;
 }
 
 #main-asset-chart {
-    flex-grow: 1; /* Faz o gráfico preencher o espaço vertical */
-    /* min-height: 300px; --- REMOVIDO --- */
+    /* flex-grow: 1; --- REMOVIDO --- */
 }
 
 #news-feed-section {
@@ -373,7 +372,7 @@
     border-radius: 8px;
     padding: 1.5rem;
     box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-    height: 100%; 
+    height: 550px; /* Mesma altura fixa do card do gráfico */
     display: flex;
     flex-direction: column;
 }
