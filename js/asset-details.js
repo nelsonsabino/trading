@@ -143,7 +143,6 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
     }
 }
 
-// --- INÍCIO DA ALTERAÇÃO ---
 async function displayNewsForAsset(symbolPair) {
     const container = document.getElementById('news-feed-container');
     if (!container) return;
@@ -167,6 +166,7 @@ async function displayNewsForAsset(symbolPair) {
             return;
         }
 
+        // --- INÍCIO DA ALTERAÇÃO ---
         const newsHtml = news.map(article => {
             const publishedDate = new Date(article.published_on * 1000).toLocaleString('pt-PT', {
                 day: '2-digit',
@@ -177,14 +177,12 @@ async function displayNewsForAsset(symbolPair) {
 
             return `
                 <div class="news-article">
-                    <img src="${article.imageurl}" alt="Imagem da notícia" class="news-article-image">
-                    <div class="news-article-content">
-                        <a href="${article.url}" target="_blank" rel="noopener noreferrer" class="news-article-title">${article.title}</a>
-                        <span class="news-article-meta">${article.source} &bull; ${publishedDate}</span>
-                    </div>
+                    <a href="${article.url}" target="_blank" rel="noopener noreferrer" class="news-article-title">${article.title}</a>
+                    <span class="news-article-meta">${article.source} &bull; ${publishedDate}</span>
                 </div>
             `;
         }).join('');
+        // --- FIM DA ALTERAÇÃO ---
 
         container.innerHTML = newsHtml;
 
@@ -193,7 +191,6 @@ async function displayNewsForAsset(symbolPair) {
         container.innerHTML = '<p style="color:red;">Não foi possível carregar as notícias.</p>';
     }
 }
-// --- FIM DA ALTERAÇÃO ---
 
 
 function renderTradingViewTechnicalAnalysisWidget(symbol) {
@@ -396,10 +393,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (alarmBtn) alarmBtn.href = `alarms-create.html?assetPair=${assetSymbol}`;
     if (tvBtn) tvBtn.href = `https://www.tradingview.com/chart/?symbol=BINANCE:${assetSymbol}`;
     
-    // --- INÍCIO DA ALTERAÇÃO ---
     displayNewsForAsset(assetSymbol);
-    // --- FIM DA ALTERAÇÃO ---
-
+    
     displayAlarmsForAsset(assetSymbol);
     displayTradesForAsset(assetSymbol);
 
