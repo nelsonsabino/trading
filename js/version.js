@@ -2,15 +2,22 @@
 
 export const changelogData = {
 current: {
-    number: '15.2.0',
+    number: '15.2.1',
     changes: [
-        "**Melhoria de UX e Funcionalidade (Market Scanner):**",
-        "Reordenados os botões de ação para uma sequência mais lógica (Monitorizar, Criar Alarme, Ver Gráfico, TradingView).",
-        "Adicionadas cores distintas aos botões 'Ver Gráfico' (verde) e 'TradingView' (azul) para melhor identificação visual.",
-        "O botão 'Monitorizar' agora reflete o estado real, exibindo um visto amarelo permanente se o ativo já tiver um alarme ativo."
+        "**Ajuste Visual (Market Scanner):**",
+        "Refinada a cor do botão 'Ver Gráfico' para um tom de verde mais escuro (#134524), melhorando a harmonia visual da interface."
     ]
 },
 releases: [
+    {
+        number: '15.2.0',
+        changes: [
+            "**Melhoria de UX e Funcionalidade (Market Scanner):**",
+            "Reordenados os botões de ação para uma sequência mais lógica (Monitorizar, Criar Alarme, Ver Gráfico, TradingView).",
+            "Adicionadas cores distintas aos botões 'Ver Gráfico' (verde) e 'TradingView' (azul) para melhor identificação visual.",
+            "O botão 'Monitorizar' agora reflete o estado real, exibindo um visto amarelo permanente se o ativo já tiver um alarme ativo."
+        ]
+    },
     {
         number: '15.1.1',
         changes: [
