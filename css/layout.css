@@ -58,7 +58,7 @@ header .main-nav {
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
     align-items: stretch;
-    height: 900px; /* Altura fixa para o container */
+    /* height: 900px; --- REMOVIDO para permitir altura natural --- */
 }
 /* --- FIM DA ALTERAÇÃO --- */
 
