@@ -145,12 +145,12 @@
 }
 
 /* --- INÍCIO DA ALTERAÇÃO --- */
-.action-buttons .btn-view-trendline {
+.alarms-table .action-buttons .btn-view-trendline {
     background-color: #6f42c1; /* Roxo */
     color: white;
     border-color: #6f42c1;
 }
-.action-buttons .btn-view-trendline:hover {
+.alarms-table .action-buttons .btn-view-trendline:hover {
     filter: brightness(1.1);
 }
 /* --- FIM DA ALTERAÇÃO --- */
