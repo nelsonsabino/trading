@@ -2,6 +2,26 @@
 
 export const changelogData = {
 current: {
+    number: '16.2.0',
+    changes: [
+        "**Refatoração do Fluxo de Trabalho de Alarmes de Quebra de L.T.:**",
+        "Removida a opção de criar alarmes de 'Quebra de L.T.' do formulário geral para evitar a criação de alarmes para padrões inválidos.",
+        "A criação agora é contextual: as 'badges' de sinal de L.T. no scanner são agora botões que abrem um modal com a visualização do gráfico da linha de tendência.",
+        "Adicionado um botão 'Criar Alarme de Quebra' dentro do modal do gráfico, garantindo que os alarmes são criados apenas para sinais validados visualmente."
+    ]
+},
+releases: [
+    {
+        number: '16.1.0',
+        changes: [
+            "**Refatoração do Fluxo de Trabalho de Alarmes de L.T.:**",
+            "Removida a opção de criar alarmes de 'Quebra de L.T.' diretamente do formulário geral para evitar a criação de alarmes inválidos.",
+            "A criação deste tipo de alarme é agora contextual: novos botões aparecem no Market Scanner apenas quando um sinal de 3 toques válido é detetado.",
+            "Adicionado um botão para visualizar a L.T. diretamente do scanner e um para ir para a página de criação de alarme com todos os dados já preenchidos.",
+            "Melhorado o tratamento de erros na visualização de gráficos para evitar 'crashes' e exibir mensagens claras."
+        ]
+    },
+     {
     number: '16.0.0',
     changes: [
         "**Melhoria Fundamental na Deteção de Linhas de Tendência (Versão 16):**",
@@ -10,7 +30,6 @@ current: {
         "Esta alteração resulta em sinais e alarmes de L.T. significativamente mais fiáveis e alinhados com a análise técnica manual."
     ]
 },
-releases: [
     {
         number: '15.8.0',
         changes: [
