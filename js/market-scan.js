@@ -1,7 +1,9 @@
 // js/market-scan.js
 
 import { supabase } from './services.js';
-import { openChartModal } from './chart-modal.js';
+// --- INÍCIO DA ALTERAÇÃO ---
+import { openChartModal, openRsiTrendlineChartModal } from './chart-modal.js';
+// --- FIM DA ALTERAÇÃO ---
 
 const CACHE_KEY_DATA = 'marketScannerCache';
 const CACHE_KEY_TIMESTAMP = 'marketScannerCacheTime';
@@ -129,7 +131,6 @@ function createTableRow(ticker, index, extraData, monitoredAssetsSet) {
     const priceChangePercent = parseFloat(ticker.priceChangePercent);
     const priceChangeClass = priceChangePercent >= 0 ? 'positive-pnl' : 'negative-pnl';
     
-    // --- INÍCIO DA ALTERAÇÃO ---
     const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${ticker.symbol}`;
     let rsiSignalHtml = '', stochSignalHtml = '', thirdTouchSignalHtml = '';
     const assetExtraData = extraData[ticker.symbol];
@@ -145,24 +146,26 @@ function createTableRow(ticker, index, extraData, monitoredAssetsSet) {
             const tooltipText = hasConfirmedCross ? `Stoch (4h) K:${assetExtraData.stoch_4h.toFixed(1)} com Cruzamento Bullish Confirmado` : `Stoch (4h) K:${assetExtraData.stoch_4h.toFixed(1)}`;
             stochSignalHtml = `<span class="${signalClass}" data-tooltip="${tooltipText}">${signalText}</span>`;
         }
-
+        
+        // --- INÍCIO DA ALTERAÇÃO ---
         const createTrendlineSignal = (signal, timeframe) => {
             if (!signal) return '';
             const trendlineType = signal.type === 'LTA' ? 'support' : 'resistance';
-            const createAlarmUrl = `alarms-create.html?assetPair=${ticker.symbol}&alarmType=rsi_trendline_break&trendlineType=${trendlineType}&timeframe=${timeframe}`;
-            const alarm = { asset_pair: ticker.symbol, indicator_timeframe: timeframe, indicator_period: 14, trendline_type: trendlineType };
-            const alarmDataString = encodeURIComponent(JSON.stringify(alarm));
+            const alarmParams = { asset_pair: ticker.symbol, indicator_timeframe: timeframe, indicator_period: 14, trendline_type: trendlineType };
+            const alarmDataString = encodeURIComponent(JSON.stringify(alarmParams));
+            
+            const creationParams = { assetPair: ticker.symbol, trendlineType: trendlineType, timeframe: timeframe };
+            const creationDataString = encodeURIComponent(JSON.stringify(creationParams));
 
             return `
-                <div class="trendline-signal-group">
-                    <span class="third-touch-signal ${signal.type === 'LTA' ? 'support' : 'resistance'}" data-tooltip="3º Toque em ${signal.type} (${timeframe})">${signal.type}-3 ${timeframe}</span>
-                    <button class="icon-action-btn btn-view-trendline" data-action="view-trendline" data-alarm='${alarmDataString}' title="Visualizar Linha de Tendência"><span class="material-symbols-outlined">analytics</span></button>
-                    <a href="${createAlarmUrl}" class="icon-action-btn" title="Criar Alarme de Quebra de L.T."><span class="material-symbols-outlined">alarm_add</span></a>
-                </div>`;
+                <button class="third-touch-signal ${trendlineType}" data-action="view-trendline" data-alarm='${alarmDataString}' data-creation='${creationDataString}' title="Ver L.T. e Criar Alarme de Quebra">
+                    ${signal.type}-3 ${timeframe}
+                </button>`;
         };
         
         thirdTouchSignalHtml += createTrendlineSignal(assetExtraData.thirdTouchSignal_1h, '1h');
         thirdTouchSignalHtml += createTrendlineSignal(assetExtraData.thirdTouchSignal_4h, '4h');
+        // --- FIM DA ALTERAÇÃO ---
     }
 
     let formattedPrice = price >= 1.0 ? price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$' + price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
@@ -171,8 +174,7 @@ function createTableRow(ticker, index, extraData, monitoredAssetsSet) {
     const isMonitored = monitoredAssetsSet.has(ticker.symbol);
     const monitorButtonHtml = isMonitored
         ? `<button class="icon-action-btn monitored" title="Ativo já está a ser monitorizado" disabled><span class="material-symbols-outlined">check</span></button>`
-        : `<button class="icon-action-btn" data-action="monitor" data-symbol="${ticker.symbol}" title="Monitorizar Ativo"><span class="material-symbols-outlined">visibility</span></button>`;
-    // --- FIM DA ALTERAÇÃO ---
+        : `<button class="icon-action-btn" data-action="monitor" data-symbol="${ticker.symbol}" title="Monitorizar Ativo (Cria Alarme Stoch 15m)"><span class="material-symbols-outlined">visibility</span></button>`;
 
     return `
         <tr>
@@ -299,7 +301,15 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (action === 'view-chart' && symbol) {
                 e.preventDefault();
                 openChartModal(symbol);
+            } 
+            // --- INÍCIO DA ALTERAÇÃO ---
+            else if (action === 'view-trendline') {
+                e.preventDefault();
+                const alarmData = JSON.parse(decodeURIComponent(button.dataset.alarm));
+                const creationData = JSON.parse(decodeURIComponent(button.dataset.creation));
+                openRsiTrendlineChartModal(alarmData, creationData);
             }
+            // --- FIM DA ALTERAÇÃO ---
         });
     }
     
