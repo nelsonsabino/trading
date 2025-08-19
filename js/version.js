@@ -2,14 +2,22 @@
 
 export const changelogData = {
 current: {
-    number: '15.3.0',
+    number: '15.4.0',
     changes: [
-        "**Consistência de Funcionalidade (Monitorização Rápida):**",
-        "Substituído o botão '+' na página 'Meus Alarmes' pelo botão 'Monitorizar Ativo', unificando a sua função com a do Market Scanner.",
-        "A ação de monitorização rápida agora tem um comportamento e um feedback visual consistentes em toda a aplicação."
+        "**Melhoria de UX no Dashboard:**",
+        "Substituído o botão principal 'Adicionar a Trade Potencial' por um ícone de '+' mais discreto e integrado na barra de navegação.",
+        "Esta alteração simplifica a interface do Dashboard e melhora a consistência visual com as outras páginas."
     ]
 },
 releases: [
+    {
+        number: '15.3.0',
+        changes: [
+            "**Consistência de Funcionalidade (Monitorização Rápida):**",
+            "Substituído o botão '+' na página 'Meus Alarmes' pelo botão 'Monitorizar Ativo', unificando a sua função com a do Market Scanner.",
+            "A ação de monitorização rápida agora tem um comportamento e um feedback visual consistentes em toda a aplicação."
+        ]
+    },
     {
         number: '15.2.5',
         changes: [
