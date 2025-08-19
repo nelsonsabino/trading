@@ -3,6 +3,7 @@
 import { supabase } from './services.js';
 import { setAlarmsData, getLastCreatedAlarmId, setLastCreatedAlarmId } from './state.js';
 import { enterEditMode } from './alarms-create.js';
+import { openChartModal } from './chart-modal.js';
 
 // --- LÓGICA DO MODAL DO GRÁFICO ---
 
@@ -10,10 +11,16 @@ let chartModal = null;
 let closeChartModalBtn = null;
 let chartContainer = null;
 let monitoredAssets = new Set();
+let currentApexChart = null; // Mova esta variável para o escopo do módulo
 
-// --- INÍCIO DA ALTERAÇÃO ---
 async function openRsiTrendlineChartModal(alarm) {
     if (!chartModal || !chartContainer) return;
+    
+    if (currentApexChart) {
+        currentApexChart.destroy();
+        currentApexChart = null;
+    }
+    
     chartContainer.innerHTML = '<p style="text-align: center; padding: 2rem;">A gerar visualização da linha de tendência...</p>';
     chartModal.style.display = 'flex';
 
@@ -36,10 +43,10 @@ async function openRsiTrendlineChartModal(alarm) {
             ],
             chart: { type: 'line', height: '100%', toolbar: { show: true } },
             stroke: {
-                width: [1, 2], // Linha do RSI fina, linha de tendência mais grossa
-                dashArray: [0, 5] // Linha de tendência tracejada
+                width: [1, 2],
+                dashArray: [0, 5]
             },
-            colors: ['#008FFB', '#00E396'], // Cores para RSI e L.T.
+            colors: ['#008FFB', '#00E396'],
             annotations: {
                 points: [
                     { x: data.p1.x, y: data.p1.y, marker: { size: 4, fillColor: '#FF4560', strokeColor: '#fff', strokeWidth: 2, radius: 2 } },
@@ -53,7 +60,7 @@ async function openRsiTrendlineChartModal(alarm) {
                 intersect: true,
                 y: {
                     formatter: function (value, { seriesIndex }) {
-                        if (seriesIndex === 1) return undefined; // Esconde tooltip para a linha de tendência
+                        if (seriesIndex === 1) return undefined;
                         return value ? value.toFixed(2) : value;
                     }
                 }
@@ -68,35 +75,14 @@ async function openRsiTrendlineChartModal(alarm) {
         };
 
         chartContainer.innerHTML = '';
-        const chart = new ApexCharts(chartContainer, options);
-        chart.render();
+        currentApexChart = new ApexCharts(chartContainer, options);
+        currentApexChart.render();
 
     } catch (err) {
         console.error("Erro ao gerar gráfico de L.T.:", err);
         chartContainer.innerHTML = `<p style="text-align: center; padding: 2rem; color: red;">Não foi possível gerar a visualização: ${err.message}</p>`;
     }
 }
-// --- FIM DA ALTERAÇÃO ---
-
-export function openChartModal(symbol) {
-    if (!chartModal || !chartContainer) return;
-    chartContainer.innerHTML = '';
-    const currentTheme = document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light';
-    new TradingView.widget({
-        "container_id": "chart-modal-container", "autosize": true, "symbol": `BINANCE:${symbol}`,
-        "interval": "240", "timezone": "Etc/UTC", "theme": currentTheme, "style": "1", "locale": "pt",
-        "hide_side_toolbar": false, "allow_symbol_change": true,
-        "studies": ["STD;MA%Ribbon", "STD;RSI"]
-    });
-    chartModal.style.display = 'flex';
-}
-
-function closeChartModal() {
-    if (!chartModal || !chartContainer) return;
-    chartContainer.innerHTML = '';
-    chartModal.style.display = 'none';
-}
-
 
 // --- FUNÇÕES DE GESTÃO DE ALARMES ---
 async function fetchMonitoredAssets() {
@@ -216,7 +202,7 @@ async function fetchAndDisplayAlarms() {
                             <a href="alarms-create.html?editAlarmId=${alarm.id}" class="icon-action-btn" title="Editar Alarme"><span class="material-symbols-outlined">edit</span></a>
                             <button class="icon-action-btn delete-btn" data-id="${alarm.id}" title="Apagar Alarme"><span class="material-symbols-outlined">delete</span></button>
                             ${trendlineButtonHtml}
-                            <a href="#" class="icon-action-btn view-chart-btn btn-view-chart" data-symbol="${alarm.asset_pair}" title="Ver Gráfico no Modal"><span class="material-symbols-outlined">monitoring</span></a>
+                            <a href="#" class="icon-action-btn view-chart-btn btn-view-chart" data-action="view-chart" data-symbol="${alarm.asset_pair}" title="Ver Gráfico no Modal"><span class="material-symbols-outlined">monitoring</span></a>
                             <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn btn-trading-view" title="Abrir no TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
                             ${monitorButtonHtml} 
                         </div>
@@ -261,7 +247,7 @@ async function fetchAndDisplayAlarms() {
                         <div class="action-buttons cell-value">
                             <a href="alarms-create.html?editAlarmId=${alarm.id}" class="icon-action-btn" title="Editar / Reativar Alarme"><span class="material-symbols-outlined">edit</span></a>
                             <button class="icon-action-btn delete-btn" data-id="${alarm.id}" title="Apagar Alarme do Histórico"><span class="material-symbols-outlined">delete</span></button>
-                            <a href="#" class="icon-action-btn view-chart-btn btn-view-chart" data-symbol="${alarm.asset_pair}" title="Ver Gráfico no Modal"><span class="material-symbols-outlined">monitoring</span></a>
+                            <a href="#" class="icon-action-btn view-chart-btn btn-view-chart" data-action="view-chart" data-symbol="${alarm.asset_pair}" title="Ver Gráfico no Modal"><span class="material-symbols-outlined">monitoring</span></a>
                             <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn btn-trading-view" title="Abrir no TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
                             ${monitorButtonHtml}
                         </div>
@@ -326,15 +312,23 @@ document.addEventListener('DOMContentLoaded', () => {
     chartContainer = document.getElementById('chart-modal-container');
 
     if (chartModal && closeChartModalBtn) {
-        closeChartModalBtn.addEventListener('click', closeChartModal);
-        chartModal.addEventListener('click', (e) => { if (e.target.id === 'chart-modal') closeChartModal(); });
+        // --- INÍCIO DA ALTERAÇÃO ---
+        // Removido listener duplicado de closeChartModalBtn
+        chartModal.addEventListener('click', (e) => { 
+            if (e.target.id === 'chart-modal' || e.target.id === 'close-chart-modal') {
+                if (currentApexChart) {
+                    currentApexChart.destroy();
+                    currentApexChart = null;
+                }
+                chartContainer.innerHTML = '';
+                chartModal.style.display = 'none';
+            }
+        });
+        // --- FIM DA ALTERAÇÃO ---
     }
 
     const mainContainer = document.querySelector('main');
-    const activeAlarmsTable = document.getElementById('active-alarms-tbody');
-    if (!mainContainer || !activeAlarmsTable) {
-        return; 
-    }
+    if (!mainContainer) return; 
 
     mainContainer.addEventListener('click', (e) => {
         const targetButton = e.target.closest('button, a');
@@ -348,11 +342,15 @@ document.addEventListener('DOMContentLoaded', () => {
             deleteAlarm(alarmId);
             return;
         }
-        if (targetButton.classList.contains('view-chart-btn') && symbol) {
+        
+        // --- INÍCIO DA ALTERAÇÃO ---
+        if (action === 'view-chart' && symbol) {
             e.preventDefault();
-            openChartModal(symbol);
+            openChartModal(symbol, '15m'); // Chama a função central com o novo timeframe
             return;
         }
+        // --- FIM DA ALTERAÇÃO ---
+        
         if (action === 'monitor' && symbol) {
             e.preventDefault();
             handleMonitorAssetClick(symbol);
