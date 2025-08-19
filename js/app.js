@@ -80,7 +80,6 @@ async function fetchMarketDataForDashboard(trades, alarms) {
     }
 }
 
-// --- INÍCIO DA ALTERAÇÃO: Lógica de sincronização ---
 async function initializeApp() {
     const potentialTradesContainer = document.getElementById('potential-trades-container');
     if (!potentialTradesContainer) return;
@@ -121,7 +120,6 @@ async function initializeApp() {
         loadAndOpenForEditing(tradeIdToEdit);
     }
 }
-// --- FIM DA ALTERAÇÃO ---
 
 document.addEventListener('DOMContentLoaded', () => {
     
@@ -134,7 +132,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const addOpportunityBtn = document.getElementById('add-opportunity-btn');
+    // --- INÍCIO DA ALTERAÇÃO ---
+    const addOpportunityBtn = document.getElementById('add-opportunity-btn-nav');
+    // --- FIM DA ALTERAÇÃO ---
     if (addOpportunityBtn) addOpportunityBtn.addEventListener('click', openAddModal);
     
     if (addModal.container) {
