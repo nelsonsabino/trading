@@ -402,16 +402,21 @@
     border: none;
     font-family: inherit;
     line-height: 1.5;
+    position: relative; /* Contexto para o asterisco */
 }
+.third-touch-signal.support { background-color: var(--accent-green); }
+.third-touch-signal.resistance { background-color: var(--accent-red); }
+.dark-mode .third-touch-signal { color: var(--surface-primary); }
 
-.third-touch-signal.support {
-    background-color: var(--accent-green);
-}
-.third-touch-signal.resistance {
-    background-color: var(--accent-red);
-}
-.dark-mode .third-touch-signal {
-    color: var(--surface-primary);
+/* Asterisco para linha quebrada */
+.third-touch-signal.trendline-broken::after {
+    content: '*';
+    position: absolute;
+    top: -3px;
+    right: -5px;
+    font-size: 1.2em;
+    color: var(--accent-yellow);
+    font-weight: bold;
 }
 
 .chart-modal-footer {
