@@ -3,7 +3,7 @@
 import { supabase } from './services.js';
 import { setupAutocomplete } from './utils.js';
 import { setLastCreatedAlarmId } from './state.js';
-import { openChartModal } from './alarms-manage.js';
+import { openChartModal } from './chart-modal.js';
 
 let editingAlarmId = null;
 let currentAssetPrice = null; // Variável para guardar o preço atual do ativo
