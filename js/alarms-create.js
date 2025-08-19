@@ -6,15 +6,13 @@ import { setLastCreatedAlarmId } from './state.js';
 import { openChartModal } from './chart-modal.js';
 
 let editingAlarmId = null;
-let currentAssetPrice = null; // Variável para guardar o preço atual do ativo
-
-// --- FUNÇÕES ESPECÍFICAS DE ALARMS-CREATE ---
+let currentAssetPrice = null;
 
 async function fetchPriceForPair(pair) {
     const priceDisplay = document.getElementById('asset-current-price');
     if (!priceDisplay || !pair) { 
         if (priceDisplay) priceDisplay.textContent = ''; 
-        currentAssetPrice = null; // Limpa o preço
+        currentAssetPrice = null;
         return; 
     }
     priceDisplay.textContent = 'A obter preço...';
@@ -23,14 +21,14 @@ async function fetchPriceForPair(pair) {
         if (!response.ok) throw new Error('Par não encontrado na Binance');
         const data = await response.json();
         const price = parseFloat(data.price);
-        currentAssetPrice = price; // Guarda o preço bruto
+        currentAssetPrice = price;
         let formattedPrice = price >= 1.0 
             ? price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 })
             : '$' + price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
         priceDisplay.innerHTML = `Preço Atual: <span style="color: #28a745;">${formattedPrice}</span>`;
     } catch (error) { 
         priceDisplay.textContent = 'Preço não disponível.';
-        currentAssetPrice = null; // Limpa o preço em caso de erro
+        currentAssetPrice = null;
     }
 }
 
@@ -66,7 +64,6 @@ function enterEditMode(alarm) {
     document.getElementById('alarm-type-select').value = alarmType;
     document.getElementById('alarm-type-select').dispatchEvent(new Event('change'));
 
-    // Preenche os campos do formulário com base no tipo de alarme
     if (alarmType === 'stochastic') { 
         document.getElementById('stoch-condition').value = alarm.condition; 
         document.getElementById('stoch-value').value = alarm.target_price; 
@@ -135,9 +132,7 @@ export { enterEditMode };
 
 document.addEventListener('DOMContentLoaded', () => {
     const alarmForm = document.getElementById('alarm-form');
-    if (!alarmForm) {
-        return;
-    }
+    if (!alarmForm) return;
 
     document.getElementById('stoch-period').value = 7;
     document.getElementById('stoch-cross-k-period').value = 7;
@@ -145,26 +140,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const feedbackDiv = document.getElementById('alarm-feedback');
     const assetInput = document.getElementById('alarm-asset');
     const resultsDiv = document.getElementById('autocomplete-results');
-    const mainContainer = document.querySelector('main');
     const alarmTypeSelect = document.getElementById('alarm-type-select');
     const priceInput = document.getElementById('alarm-price-standalone');
     
     const deleteBtn = document.getElementById('delete-alarm-btn');
-    if (deleteBtn) {
-        deleteBtn.addEventListener('click', deleteAlarm);
-    }
+    if (deleteBtn) deleteBtn.addEventListener('click', deleteAlarm);
 
     if (priceInput) {
         priceInput.addEventListener('dblclick', () => {
             if (currentAssetPrice !== null && !isNaN(currentAssetPrice)) {
                 priceInput.value = currentAssetPrice.toString();
-                priceInput.style.transition = 'background-color 0.3s';
-                priceInput.style.backgroundColor = '#d4edda';
-                setTimeout(() => {
-                    priceInput.style.backgroundColor = '';
-                }, 500);
-            } else {
-                console.warn("Preço atual não disponível para preenchimento automático.");
             }
         });
     }
@@ -188,65 +173,52 @@ document.addEventListener('DOMContentLoaded', () => {
                 fields[type].style.display = type === selectedType ? 'block' : 'none'; 
             } 
         }
-        if (selectedType === 'rsi_level') { document.getElementById('rsi-level-condition').dispatchEvent(new Event('change')); }
-        if (selectedType === 'stochastic') { document.getElementById('stoch-condition').dispatchEvent(new Event('change')); }
     });
-
-    const rsiLevelConditionSelect = document.getElementById('rsi-level-condition');
-    if(rsiLevelConditionSelect) { rsiLevelConditionSelect.addEventListener('change', (e) => { const rsiValueInput = document.getElementById('rsi-level-value'); if(e.target.value === 'below') { rsiValueInput.value = 35; } else { rsiValueInput.value = 70; } }); }
-
-    const stochConditionSelect = document.getElementById('stoch-condition');
-    if (stochConditionSelect) {
-        stochConditionSelect.addEventListener('change', (e) => {
-            const stochValueInput = document.getElementById('stoch-value');
-            if (e.target.value === 'below') { stochValueInput.value = 30; } else { stochValueInput.value = 70; }
-        });
-    }
 
     const urlParams = new URLSearchParams(window.location.search);
     const assetPairFromUrl = urlParams.get('assetPair');
     const alarmIdToEdit = urlParams.get('editAlarmId');
     
-    if (assetPairFromUrl && assetInput) {
+    // --- INÍCIO DA ALTERAÇÃO (Lógica de Pré-preenchimento) ---
+    const alarmTypeFromUrl = urlParams.get('alarmType');
+    const trendlineTypeFromUrl = urlParams.get('trendlineType');
+    const timeframeFromUrl = urlParams.get('timeframe');
+
+    if (assetPairFromUrl) {
         const pair = assetPairFromUrl.toUpperCase();
         assetInput.value = pair;
         fetchPriceForPair(pair); 
     }
 
+    if (alarmTypeFromUrl === 'rsi_trendline_break') {
+        alarmTypeSelect.value = 'rsi_trendline_break';
+        alarmTypeSelect.dispatchEvent(new Event('change'));
+        
+        if (trendlineTypeFromUrl && fields.rsi_trendline_break) {
+            document.getElementById('rsi-trendline-break-type').value = trendlineTypeFromUrl;
+        }
+        if (timeframeFromUrl && fields.rsi_trendline_break) {
+            document.getElementById('rsi-trendline-break-timeframe').value = timeframeFromUrl;
+        }
+    }
+    // --- FIM DA ALTERAÇÃO ---
+
     if (alarmIdToEdit) {
         const fetchAndEditAlarm = async (id) => {
             feedbackDiv.textContent = 'A carregar dados do alarme para edição...';
             try {
-                const { data: alarmToEdit, error } = await supabase
-                    .from('alarms')
-                    .select('*')
-                    .eq('id', id)
-                    .single();
-
+                const { data: alarmToEdit, error } = await supabase.from('alarms').select('*').eq('id', id).single();
                 if (error) throw error;
-
                 if (alarmToEdit) {
                     feedbackDiv.textContent = '';
                     enterEditMode(alarmToEdit);
-                } else {
-                    console.warn(`Alarme com ID ${id} não encontrado na base de dados.`);
-                    feedbackDiv.textContent = 'Erro: Alarme a editar não encontrado.';
                 }
             } catch (err) {
                 console.error("Erro ao buscar alarme para edição:", err);
-                feedbackDiv.textContent = 'Erro ao carregar os dados do alarme para edição.';
             }
         };
         fetchAndEditAlarm(alarmIdToEdit);
     }
-
-    mainContainer.addEventListener('click', (e) => {
-        const chartBtn = e.target.closest('.view-chart-btn');
-        if (chartBtn) {
-            const symbol = chartBtn.dataset.symbol;
-            if (symbol) openChartModal(symbol);
-        }
-    });
     
     document.getElementById('cancel-edit-btn').addEventListener('click', exitEditMode);
 
@@ -312,11 +284,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (editingAlarmId) {
-                // --- INÍCIO DA ALTERAÇÃO ---
-                // Forçar o status para 'active' e limpar a data de disparo ao reativar/editar
                 alarmData.status = 'active';
                 alarmData.triggered_at = null;
-                // --- FIM DA ALTERAÇÃO ---
                 const { error } = await supabase.from('alarms').update(alarmData).eq('id', editingAlarmId);
                 if (error) throw error;
                 setLastCreatedAlarmId(null);
@@ -328,8 +297,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 setLastCreatedAlarmId(data.id);
                 window.location.href = 'alarms-manage.html';
             }
-
-            feedbackDiv.textContent = `✅ Operação concluída com sucesso!`;
         } catch (error) { 
             console.error("Erro na operação do alarme:", error); 
             feedbackDiv.textContent = `Erro: ${error.message}`; 
