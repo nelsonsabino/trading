@@ -2,15 +2,23 @@
 
 export const changelogData = {
 current: {
-    number: '17.0.0',
+    number: '17.1.0',
     changes: [
-        "**Refatoração Definitiva do Algoritmo de Linhas de Tendência (Versão 17):**",
-        "Substituído o algoritmo de deteção de L.T. pelo método do 'Pico Dominante', que ancora a linha no ponto mais extremo do período.",
-        "Adicionada uma validação estrita para que a linha de tendência não seja sobreposta pelos valores do RSI entre os seus pontos de definição.",
-        "O resultado são sinais, alarmes e visualizações de L.T. significativamente mais fiáveis e alinhados com a análise técnica manual."
+        "**Sinal Avançado (Quebra de L.T. no Scanner):**",
+        "As 'badges' de sinal de Linha de Tendência no Market Scanner agora exibem um asterisco (*) se a linha já tiver sido quebrada.",
+        "Esta funcionalidade fornece um alerta visual imediato para setups que podem estar em andamento, adicionando uma nova camada de informação acionável."
     ]
 },
 releases: [
+    {
+        number: '17.0.0',
+        changes: [
+            "**Refatoração Definitiva do Algoritmo de Linhas de Tendência (Versão 17):**",
+            "Substituído o algoritmo de deteção de L.T. pelo método do 'Pico Dominante', que ancora a linha no ponto mais extremo do período.",
+            "Adicionada uma validação estrita para que a linha de tendência não seja sobreposta pelos valores do RSI (com uma pequena tolerância para ruído), replicando a análise técnica manual.",
+            "O resultado são sinais, alarmes e visualizações de L.T. significativamente mais fiáveis e visualmente corretos."
+        ]
+    },
     {
         number: '16.2.0',
         changes: [
