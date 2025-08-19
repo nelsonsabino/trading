@@ -60,7 +60,6 @@
         <h1><i class="fa-solid fa-bell-plus"></i> Criar ou Editar Alarme</h1>
         <p class="mantra">Defina os seus gatilhos e deixe que o mercado venha até si.</p>
         
-        <!-- Primeira Linha: Navegação Global com Google Icons -->
         <nav class="main-nav">
             <a href="dashboard.html" class="nav-icon-link" title="Dashboard"><span class="material-symbols-outlined">home</span></a>
             <a href="market-scan.html" class="nav-icon-link" title="Scanner de Mercado"><span class="material-symbols-outlined">query_stats</span></a>
@@ -76,7 +75,6 @@
                 </div>
             </div>
 
-            <!-- Secção do Utilizador -->
             <div id="user-session" class="user-session" style="display: none;">
                 <img id="user-photo" src="" alt="Foto do Utilizador" class="user-photo">
                 <button id="logout-btn" class="btn btn-secondary">Sair</button>
@@ -96,7 +94,9 @@
                         <option value="price">Preço</option>
                         <option value="rsi_level">RSI (Nível)</option> 
                         <option value="rsi_trendline">RSI - Padrão de Toques</option>
-                        <option value="rsi_trendline_break">RSI - Quebra de L.T.</option>
+                        <!-- --- INÍCIO DA ALTERAÇÃO --- -->
+                        <option value="rsi_trendline_break" style="display: none;">RSI - Quebra de L.T.</option>
+                        <!-- --- FIM DA ALTERAÇÃO --- -->
                         <option value="ema_touch">Toque na EMA</option>
                         <option value="stochastic">Estocástico (Nível)</option>
                         <option value="stochastic_crossover">Estocástico (Cruzamento)</option>
@@ -295,9 +295,7 @@
                         <div class="input-item">
                             <label for="rsi-trendline-break-timeframe">Timeframe</label>
                             <select id="rsi-trendline-break-timeframe">
-                                <!-- --- INÍCIO DA ALTERAÇÃO --- -->
                                 <option value="5m">5 Minutos</option>
-                                <!-- --- FIM DA ALTERAÇÃO --- -->
                                 <option value="15m">15 Minutos</option>
                                 <option value="1h" selected>1 Hora</option>
                                 <option value="4h">4 Horas</option>
