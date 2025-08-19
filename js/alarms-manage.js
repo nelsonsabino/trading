@@ -3,15 +3,11 @@
 import { supabase } from './services.js';
 import { setAlarmsData, getLastCreatedAlarmId, setLastCreatedAlarmId } from './state.js';
 import { enterEditMode } from './alarms-create.js';
-// --- INÍCIO DA ALTERAÇÃO ---
 import { openChartModal, openRsiTrendlineChartModal } from './chart-modal.js';
-// --- FIM DA ALTERAÇÃO ---
-
-// --- LÓGICA DO MODAL DO GRÁFICO (REMOVIDA) ---
 
 let monitoredAssets = new Set();
+let currentApexChart = null; 
 
-// --- FUNÇÕES DE GESTÃO DE ALARMES ---
 async function fetchMonitoredAssets() {
     try {
         const { data, error } = await supabase
@@ -234,8 +230,9 @@ async function deleteAllTriggeredAlarms() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    chartModal = document.getElementById('chart-modal');
-    chartContainer = document.getElementById('chart-modal-container');
+    // --- INÍCIO DA ALTERAÇÃO (Lógica de inicialização do modal removida) ---
+    // O chart-modal.js agora trata de toda a sua própria inicialização.
+    // --- FIM DA ALTERAÇÃO ---
 
     const mainContainer = document.querySelector('main');
     if (!mainContainer) return; 
