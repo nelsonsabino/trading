@@ -11,7 +11,7 @@ let chartModal = null;
 let closeChartModalBtn = null;
 let chartContainer = null;
 let monitoredAssets = new Set();
-let currentApexChart = null; // Mova esta variável para o escopo do módulo
+let currentApexChart = null;
 
 async function openRsiTrendlineChartModal(alarm) {
     if (!chartModal || !chartContainer) return;
@@ -33,8 +33,13 @@ async function openRsiTrendlineChartModal(alarm) {
                 trendline_type: alarm.trendline_type
             }
         });
-
-        if (error) throw new Error(data.error || error.message);
+        
+        // --- INÍCIO DA ALTERAÇÃO (Tratamento de Erro Robusto) ---
+        if (error) {
+            const errorMessage = data ? data.error : (error.message || "Erro desconhecido.");
+            throw new Error(errorMessage);
+        }
+        // --- FIM DA ALTERAÇÃO ---
 
         const options = {
             series: [
@@ -312,8 +317,6 @@ document.addEventListener('DOMContentLoaded', () => {
     chartContainer = document.getElementById('chart-modal-container');
 
     if (chartModal && closeChartModalBtn) {
-        // --- INÍCIO DA ALTERAÇÃO ---
-        // Removido listener duplicado de closeChartModalBtn
         chartModal.addEventListener('click', (e) => { 
             if (e.target.id === 'chart-modal' || e.target.id === 'close-chart-modal') {
                 if (currentApexChart) {
@@ -324,7 +327,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 chartModal.style.display = 'none';
             }
         });
-        // --- FIM DA ALTERAÇÃO ---
     }
 
     const mainContainer = document.querySelector('main');
@@ -343,13 +345,11 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        // --- INÍCIO DA ALTERAÇÃO ---
         if (action === 'view-chart' && symbol) {
             e.preventDefault();
-            openChartModal(symbol, '15m'); // Chama a função central com o novo timeframe
+            openChartModal(symbol, '15m');
             return;
         }
-        // --- FIM DA ALTERAÇÃO ---
         
         if (action === 'monitor' && symbol) {
             e.preventDefault();
