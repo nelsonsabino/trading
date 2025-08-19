@@ -2,15 +2,24 @@
 
 export const changelogData = {
 current: {
-    number: '15.5.0',
+    number: '15.6.0',
     changes: [
-        "**Feature: Visualização de Linhas de Tendência RSI:**",
-        "Adicionado um novo botão na página 'Meus Alarmes' para alarmes de quebra de L.T. de RSI.",
-        "A ação abre um gráfico ApexCharts que desenha a linha do RSI e anota os 3 pivôs e a linha de tendência exata que está a ser monitorizada pelo backend.",
-        "Esta funcionalidade é potenciada por uma nova Edge Function (`get-rsi-trendline-data`) dedicada a fornecer os dados para a visualização."
+        "**Refatoração do Modal de Gráfico e Correção de Bug:**",
+        "Toda a lógica do modal de gráfico foi centralizada num novo módulo (`chart-modal.js`) para melhorar a manutenibilidade.",
+        "O botão 'Ver Gráfico' na página 'Meus Alarmes' agora abre o gráfico ApexCharts (em vez do TradingView) com o timeframe de 15 minutos, unificando a experiência do utilizador.",
+        "Corrigido o bug crítico onde o gráfico de linha de tendência RSI ficava 'preso' no modal, impedindo a visualização de outros gráficos."
     ]
 },
 releases: [
+    {
+        number: '15.5.0',
+        changes: [
+            "**Feature: Visualização de Linhas de Tendência RSI:**",
+            "Adicionado um novo botão na página 'Meus Alarmes' para alarmes de quebra de L.T. de RSI.",
+            "A ação abre um gráfico ApexCharts que desenha a linha do RSI, os 3 pivôs e a linha de tendência exata que está a ser monitorizada pelo backend.",
+            "**Correção Crítica:** Resolvido o bug que impedia o alarme de 'Quebra de Linha de Tendência de Resistência' de ser validado e disparado."
+        ]
+    },
     {
         number: '15.4.0',
         changes: [
