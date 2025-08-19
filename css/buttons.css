@@ -129,7 +129,6 @@
     filter: brightness(1.2);
 }
 
-/* --- INÍCIO DA ALTERAÇÃO --- */
 .market-table .action-buttons .icon-action-btn.monitored,
 .alarms-table .action-buttons .icon-action-btn.monitored {
     background-color: #45440b; /* Amarelo escuro */
@@ -143,6 +142,16 @@
     transform: none;
     box-shadow: none;
     filter: none;
+}
+
+/* --- INÍCIO DA ALTERAÇÃO --- */
+.action-buttons .btn-view-trendline {
+    background-color: #8a2be2; /* Roxo */
+    color: white;
+    border-color: #8a2be2;
+}
+.action-buttons .btn-view-trendline:hover {
+    filter: brightness(1.1);
 }
 /* --- FIM DA ALTERAÇÃO --- */
 
