@@ -2,15 +2,24 @@
 
 export const changelogData = {
 current: {
-    number: '16.2.0',
+    number: '17.0.0',
     changes: [
-        "**Refatoração do Fluxo de Trabalho de Alarmes de Quebra de L.T.:**",
-        "Removida a opção de criar alarmes de 'Quebra de L.T.' do formulário geral para evitar a criação de alarmes para padrões inválidos.",
-        "A criação agora é contextual: as 'badges' de sinal de L.T. no scanner são agora botões que abrem um modal com a visualização do gráfico da linha de tendência.",
-        "Adicionado um botão 'Criar Alarme de Quebra' dentro do modal do gráfico, garantindo que os alarmes são criados apenas para sinais validados visualmente."
+        "**Refatoração Definitiva do Algoritmo de Linhas de Tendência (Versão 17):**",
+        "Substituído o algoritmo de deteção de L.T. pelo método do 'Pico Dominante', que ancora a linha no ponto mais extremo do período.",
+        "Adicionada uma validação estrita para que a linha de tendência não seja sobreposta pelos valores do RSI entre os seus pontos de definição.",
+        "O resultado são sinais, alarmes e visualizações de L.T. significativamente mais fiáveis e alinhados com a análise técnica manual."
     ]
 },
 releases: [
+    {
+        number: '16.2.0',
+        changes: [
+            "**Refatoração do Fluxo de Trabalho de Alarmes de Quebra de L.T.:**",
+            "Removida a opção de criar alarmes de 'Quebra de L.T.' do formulário geral para evitar a criação de alarmes para padrões inválidos.",
+            "A criação agora é contextual: as 'badges' de sinal de L.T. no scanner são agora botões que abrem um modal com a visualização do gráfico da linha de tendência.",
+            "Adicionado um botão 'Criar Alarme de Quebra' dentro do modal do gráfico, garantindo que os alarmes são criados apenas para sinais validados visualmente."
+        ]
+    },
     {
         number: '16.1.0',
         changes: [
