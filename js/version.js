@@ -2,15 +2,23 @@
 
 export const changelogData = {
 current: {
-    number: '15.6.0',
+    number: '15.6.1',
     changes: [
-        "**Refatoração do Modal de Gráfico e Correção de Bug:**",
-        "Toda a lógica do modal de gráfico foi centralizada num novo módulo (`chart-modal.js`) para melhorar a manutenibilidade.",
-        "O botão 'Ver Gráfico' na página 'Meus Alarmes' agora abre o gráfico ApexCharts (em vez do TradingView) com o timeframe de 15 minutos, unificando a experiência do utilizador.",
-        "Corrigido o bug crítico onde o gráfico de linha de tendência RSI ficava 'preso' no modal, impedindo a visualização de outros gráficos."
+        "**Correção Pós-Refatoração:**",
+        "Resolvido um `SyntaxError` na página 'Criar Alarme' causado por um caminho de importação incorreto, após a centralização da função do modal de gráfico.",
+        "A funcionalidade da página foi restaurada."
     ]
 },
 releases: [
+    {
+        number: '15.6.0',
+        changes: [
+            "**Refatoração do Modal de Gráfico e Correção de Bug:**",
+            "Toda a lógica do modal de gráfico foi centralizada num novo módulo (`chart-modal.js`) para melhorar a manutenibilidade.",
+            "O botão 'Ver Gráfico' na página 'Meus Alarmes' agora abre o gráfico ApexCharts (em vez do TradingView) com o timeframe de 15 minutos, unificando a experiência do utilizador.",
+            "Corrigido o bug crítico onde o gráfico de linha de tendência RSI ficava 'preso' no modal, impedindo a visualização de outros gráficos."
+        ]
+    },
     {
         number: '15.5.0',
         changes: [
