@@ -146,9 +146,9 @@
 
 /* --- INÍCIO DA ALTERAÇÃO --- */
 .action-buttons .btn-view-trendline {
-    background-color: #8a2be2; /* Roxo */
+    background-color: #6f42c1; /* Roxo */
     color: white;
-    border-color: #8a2be2;
+    border-color: #6f42c1;
 }
 .action-buttons .btn-view-trendline:hover {
     filter: brightness(1.1);
