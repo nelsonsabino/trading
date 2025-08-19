@@ -1,9 +1,7 @@
 // js/market-scan.js
 
 import { supabase } from './services.js';
-// --- INÍCIO DA ALTERAÇÃO ---
 import { openChartModal, openRsiTrendlineChartModal } from './chart-modal.js';
-// --- FIM DA ALTERAÇÃO ---
 
 const CACHE_KEY_DATA = 'marketScannerCache';
 const CACHE_KEY_TIMESTAMP = 'marketScannerCacheTime';
@@ -147,10 +145,16 @@ function createTableRow(ticker, index, extraData, monitoredAssetsSet) {
             stochSignalHtml = `<span class="${signalClass}" data-tooltip="${tooltipText}">${signalText}</span>`;
         }
         
-        // --- INÍCIO DA ALTERAÇÃO ---
         const createTrendlineSignal = (signal, timeframe) => {
             if (!signal) return '';
+            
+            // --- INÍCIO DA ALTERAÇÃO ---
             const trendlineType = signal.type === 'LTA' ? 'support' : 'resistance';
+            const isBrokenClass = signal.isBroken ? 'trendline-broken' : '';
+            const tooltipText = signal.isBroken 
+                ? `QUEBRA da ${signal.type} (${timeframe})!`
+                : `3º Toque em ${signal.type} (${timeframe})`;
+
             const alarmParams = { asset_pair: ticker.symbol, indicator_timeframe: timeframe, indicator_period: 14, trendline_type: trendlineType };
             const alarmDataString = encodeURIComponent(JSON.stringify(alarmParams));
             
@@ -158,14 +162,14 @@ function createTableRow(ticker, index, extraData, monitoredAssetsSet) {
             const creationDataString = encodeURIComponent(JSON.stringify(creationParams));
 
             return `
-                <button class="third-touch-signal ${trendlineType}" data-action="view-trendline" data-alarm='${alarmDataString}' data-creation='${creationDataString}' title="Ver L.T. e Criar Alarme de Quebra">
+                <button class="third-touch-signal ${trendlineType} ${isBrokenClass}" data-action="view-trendline" data-alarm='${alarmDataString}' data-creation='${creationDataString}' title="${tooltipText}">
                     ${signal.type}-3 ${timeframe}
                 </button>`;
+            // --- FIM DA ALTERAÇÃO ---
         };
         
         thirdTouchSignalHtml += createTrendlineSignal(assetExtraData.thirdTouchSignal_1h, '1h');
         thirdTouchSignalHtml += createTrendlineSignal(assetExtraData.thirdTouchSignal_4h, '4h');
-        // --- FIM DA ALTERAÇÃO ---
     }
 
     let formattedPrice = price >= 1.0 ? price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$' + price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
@@ -302,14 +306,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 openChartModal(symbol);
             } 
-            // --- INÍCIO DA ALTERAÇÃO ---
             else if (action === 'view-trendline') {
                 e.preventDefault();
                 const alarmData = JSON.parse(decodeURIComponent(button.dataset.alarm));
                 const creationData = JSON.parse(decodeURIComponent(button.dataset.creation));
                 openRsiTrendlineChartModal(alarmData, creationData);
             }
-            // --- FIM DA ALTERAÇÃO ---
         });
     }
     
