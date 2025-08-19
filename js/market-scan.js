@@ -97,17 +97,15 @@ async function handleMonitorAssetClick(symbol) {
     if (button) button.disabled = true;
 
     try {
-        // --- INÍCIO DA ALTERAÇÃO ---
         const alarmData = {
             asset_pair: symbol,
             alarm_type: 'stochastic_crossover',
             condition: 'above',
             indicator_timeframe: '15m',
-            indicator_period: 7, // Ajustado de 14 para 7
+            indicator_period: 7,
             combo_period: 3,
             status: 'active'
         };
-        // --- FIM DA ALTERAÇÃO ---
         const { error } = await supabase.from('alarms').insert([alarmData]);
         if (error) throw error;
 
