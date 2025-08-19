@@ -2,6 +2,25 @@
 
 export const changelogData = {
 current: {
+    number: '15.8.0',
+    changes: [
+        "**Consistência dos Sinais de Linha de Tendência (Market Scanner):**",
+        "A lógica de deteção de sinais de L.T. ('LTA-3', 'LTB-3') no scanner foi sincronizada com a lógica usada nos alarmes e na ferramenta de visualização.",
+        "Os sinais agora usam os mesmos critérios restritos (análise de 96 velas, tolerância de alinhamento apertada), garantindo que um sinal no scanner corresponde sempre a uma linha de tendência válida no resto da aplicação."
+    ]
+},
+releases: [
+    {
+        number: '15.7.0',
+        changes: [
+            "**Refinamento da Lógica de Linhas de Tendência:**",
+            "Reduzido o histórico de análise para 96 velas para focar a deteção de padrões em dados mais recentes.",
+            "A tolerância de alinhamento dos pivôs foi tornada mais restrita para garantir a deteção de linhas de tendência de maior qualidade e mais fiáveis.",
+            "Estas alterações resultam em menos sinais, mas com uma probabilidade de acerto significativamente maior."
+        ]
+    },
+releases: [
+  {
     number: '15.6.1',
     changes: [
         "**Correção Pós-Refatoração:**",
@@ -9,7 +28,6 @@ current: {
         "A funcionalidade da página foi restaurada."
     ]
 },
-releases: [
     {
         number: '15.6.0',
         changes: [
