@@ -5,13 +5,11 @@ import { setAlarmsData, getLastCreatedAlarmId, setLastCreatedAlarmId } from './s
 import { enterEditMode } from './alarms-create.js';
 import { openChartModal } from './chart-modal.js';
 
-// --- LÓGICA DO MODAL DO GRÁFICO ---
-
 let chartModal = null;
 let closeChartModalBtn = null;
 let chartContainer = null;
 let monitoredAssets = new Set();
-let currentApexChart = null;
+let currentApexChart = null; 
 
 async function openRsiTrendlineChartModal(alarm) {
     if (!chartModal || !chartContainer) return;
@@ -34,12 +32,10 @@ async function openRsiTrendlineChartModal(alarm) {
             }
         });
         
-        // --- INÍCIO DA ALTERAÇÃO (Tratamento de Erro Robusto) ---
         if (error) {
             const errorMessage = data ? data.error : (error.message || "Erro desconhecido.");
             throw new Error(errorMessage);
         }
-        // --- FIM DA ALTERAÇÃO ---
 
         const options = {
             series: [
@@ -89,7 +85,6 @@ async function openRsiTrendlineChartModal(alarm) {
     }
 }
 
-// --- FUNÇÕES DE GESTÃO DE ALARMES ---
 async function fetchMonitoredAssets() {
     try {
         const { data, error } = await supabase
