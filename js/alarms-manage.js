@@ -3,88 +3,15 @@
 import { supabase } from './services.js';
 import { setAlarmsData, getLastCreatedAlarmId, setLastCreatedAlarmId } from './state.js';
 import { enterEditMode } from './alarms-create.js';
-import { openChartModal } from './chart-modal.js';
+// --- INÍCIO DA ALTERAÇÃO ---
+import { openChartModal, openRsiTrendlineChartModal } from './chart-modal.js';
+// --- FIM DA ALTERAÇÃO ---
 
-let chartModal = null;
-let closeChartModalBtn = null;
-let chartContainer = null;
+// --- LÓGICA DO MODAL DO GRÁFICO (REMOVIDA) ---
+
 let monitoredAssets = new Set();
-let currentApexChart = null; 
 
-async function openRsiTrendlineChartModal(alarm) {
-    if (!chartModal || !chartContainer) return;
-    
-    if (currentApexChart) {
-        currentApexChart.destroy();
-        currentApexChart = null;
-    }
-    
-    chartContainer.innerHTML = '<p style="text-align: center; padding: 2rem;">A gerar visualização da linha de tendência...</p>';
-    chartModal.style.display = 'flex';
-
-    try {
-        const { data, error } = await supabase.functions.invoke('get-rsi-trendline-data', {
-            body: {
-                asset_pair: alarm.asset_pair,
-                indicator_timeframe: alarm.indicator_timeframe,
-                indicator_period: alarm.indicator_period,
-                trendline_type: alarm.trendline_type
-            }
-        });
-        
-        if (error) {
-            const errorMessage = data ? data.error : (error.message || "Erro desconhecido.");
-            throw new Error(errorMessage);
-        }
-
-        const options = {
-            series: [
-                { name: 'RSI', type: 'line', data: data.rsi_series },
-                { name: 'Linha de Tendência', type: 'line', data: data.trendline_series }
-            ],
-            chart: { type: 'line', height: '100%', toolbar: { show: true } },
-            stroke: {
-                width: [1, 2],
-                dashArray: [0, 5]
-            },
-            colors: ['#008FFB', '#00E396'],
-            annotations: {
-                points: [
-                    { x: data.p1.x, y: data.p1.y, marker: { size: 4, fillColor: '#FF4560', strokeColor: '#fff', strokeWidth: 2, radius: 2 } },
-                    { x: data.p2.x, y: data.p2.y, marker: { size: 4, fillColor: '#FF4560', strokeColor: '#fff', strokeWidth: 2, radius: 2 } },
-                    { x: data.p3.x, y: data.p3.y, marker: { size: 4, fillColor: '#FF4560', strokeColor: '#fff', strokeWidth: 2, radius: 2 } }
-                ]
-            },
-            tooltip: {
-                enabled: true,
-                shared: false,
-                intersect: true,
-                y: {
-                    formatter: function (value, { seriesIndex }) {
-                        if (seriesIndex === 1) return undefined;
-                        return value ? value.toFixed(2) : value;
-                    }
-                }
-            },
-            title: {
-                text: `Visualização da Linha de Tendência RSI para ${alarm.asset_pair} (${alarm.indicator_timeframe})`,
-                align: 'center'
-            },
-            xaxis: { type: 'numeric', title: { text: 'Índice da Vela' } },
-            yaxis: { title: { text: 'Valor do RSI' } },
-            theme: { mode: document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light' }
-        };
-
-        chartContainer.innerHTML = '';
-        currentApexChart = new ApexCharts(chartContainer, options);
-        currentApexChart.render();
-
-    } catch (err) {
-        console.error("Erro ao gerar gráfico de L.T.:", err);
-        chartContainer.innerHTML = `<p style="text-align: center; padding: 2rem; color: red;">Não foi possível gerar a visualização: ${err.message}</p>`;
-    }
-}
-
+// --- FUNÇÕES DE GESTÃO DE ALARMES ---
 async function fetchMonitoredAssets() {
     try {
         const { data, error } = await supabase
@@ -308,21 +235,7 @@ async function deleteAllTriggeredAlarms() {
 
 document.addEventListener('DOMContentLoaded', () => {
     chartModal = document.getElementById('chart-modal');
-    closeChartModalBtn = document.getElementById('close-chart-modal');
     chartContainer = document.getElementById('chart-modal-container');
-
-    if (chartModal && closeChartModalBtn) {
-        chartModal.addEventListener('click', (e) => { 
-            if (e.target.id === 'chart-modal' || e.target.id === 'close-chart-modal') {
-                if (currentApexChart) {
-                    currentApexChart.destroy();
-                    currentApexChart = null;
-                }
-                chartContainer.innerHTML = '';
-                chartModal.style.display = 'none';
-            }
-        });
-    }
 
     const mainContainer = document.querySelector('main');
     if (!mainContainer) return; 
