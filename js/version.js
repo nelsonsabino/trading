@@ -19,7 +19,6 @@ releases: [
             "Estas alterações resultam em menos sinais, mas com uma probabilidade de acerto significativamente maior."
         ]
     },
-releases: [
   {
     number: '15.6.1',
     changes: [
