@@ -2,14 +2,23 @@
 
 export const changelogData = {
 current: {
-    number: '15.4.0',
+    number: '15.5.0',
     changes: [
-        "**Melhoria de UX no Dashboard:**",
-        "Substituído o botão principal 'Adicionar a Trade Potencial' por um ícone de '+' mais discreto e integrado na barra de navegação.",
-        "Esta alteração simplifica a interface do Dashboard e melhora a consistência visual com as outras páginas."
+        "**Feature: Visualização de Linhas de Tendência RSI:**",
+        "Adicionado um novo botão na página 'Meus Alarmes' para alarmes de quebra de L.T. de RSI.",
+        "A ação abre um gráfico ApexCharts que desenha a linha do RSI e anota os 3 pivôs e a linha de tendência exata que está a ser monitorizada pelo backend.",
+        "Esta funcionalidade é potenciada por uma nova Edge Function (`get-rsi-trendline-data`) dedicada a fornecer os dados para a visualização."
     ]
 },
 releases: [
+    {
+        number: '15.4.0',
+        changes: [
+            "**Melhoria de UX no Dashboard:**",
+            "Substituído o botão principal 'Adicionar a Trade Potencial' por um ícone de '+' mais discreto e integrado na barra de navegação.",
+            "Esta alteração simplifica a interface do Dashboard e melhora a consistência visual com as outras páginas."
+        ]
+    },
     {
         number: '15.3.0',
         changes: [
