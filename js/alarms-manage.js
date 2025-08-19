@@ -9,7 +9,63 @@ import { enterEditMode } from './alarms-create.js';
 let chartModal = null;
 let closeChartModalBtn = null;
 let chartContainer = null;
-let monitoredAssets = new Set(); // --- INÍCIO DA ALTERAÇÃO ---
+let monitoredAssets = new Set();
+
+// --- INÍCIO DA ALTERAÇÃO ---
+async function openRsiTrendlineChartModal(alarm) {
+    if (!chartModal || !chartContainer) return;
+    chartContainer.innerHTML = '<p style="text-align: center; padding: 2rem;">A gerar visualização da linha de tendência...</p>';
+    chartModal.style.display = 'flex';
+
+    try {
+        const { data, error } = await supabase.functions.invoke('get-rsi-trendline-data', {
+            body: {
+                asset_pair: alarm.asset_pair,
+                indicator_timeframe: alarm.indicator_timeframe,
+                indicator_period: alarm.indicator_period,
+                trendline_type: alarm.trendline_type
+            }
+        });
+
+        if (error) throw new Error(data.error || error.message);
+
+        const options = {
+            series: [{ name: 'RSI', data: data.rsi_series }],
+            chart: { type: 'line', height: '100%', toolbar: { show: true } },
+            annotations: {
+                points: [
+                    { x: data.p1.x, y: data.p1.y, marker: { size: 6, fillColor: '#FF4560' }, label: { text: 'P1' } },
+                    { x: data.p2.x, y: data.p2.y, marker: { size: 6, fillColor: '#FF4560' }, label: { text: 'P2' } },
+                    { x: data.p3.x, y: data.p3.y, marker: { size: 6, fillColor: '#FF4560' }, label: { text: 'P3' } }
+                ],
+                lines: [{
+                    x: data.p1.x,
+                    y: data.p1.y,
+                    x2: data.p3.x + 20, // Projeta a linha um pouco para o futuro
+                    y2: data.p3.y + (data.p3.y - data.p1.y) / (data.p3.x - data.p1.x) * 20,
+                    strokeDashArray: 2,
+                    borderColor: '#00E396'
+                }]
+            },
+            title: {
+                text: `Visualização da Linha de Tendência RSI para ${alarm.asset_pair} (${alarm.indicator_timeframe})`,
+                align: 'center'
+            },
+            xaxis: { type: 'numeric', title: { text: 'Índice da Vela' } },
+            yaxis: { title: { text: 'Valor do RSI' } },
+            theme: { mode: document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light' }
+        };
+
+        chartContainer.innerHTML = '';
+        const chart = new ApexCharts(chartContainer, options);
+        chart.render();
+
+    } catch (err) {
+        console.error("Erro ao gerar gráfico de L.T.:", err);
+        chartContainer.innerHTML = `<p style="text-align: center; padding: 2rem; color: red;">Não foi possível gerar a visualização: ${err.message}</p>`;
+    }
+}
+// --- FIM DA ALTERAÇÃO ---
 
 export function openChartModal(symbol) {
     if (!chartModal || !chartContainer) return;
@@ -32,8 +88,6 @@ function closeChartModal() {
 
 
 // --- FUNÇÕES DE GESTÃO DE ALARMES ---
-
-// --- INÍCIO DA ALTERAÇÃO ---
 async function fetchMonitoredAssets() {
     try {
         const { data, error } = await supabase
@@ -72,7 +126,6 @@ async function handleMonitorAssetClick(symbol) {
             button.innerHTML = `<span class="material-symbols-outlined">check</span>`;
             button.classList.add('monitored');
             button.title = "Ativo já está a ser monitorizado";
-            // A tabela de ativos será atualizada na próxima recarga de dados
         }
     } catch (error) {
         console.error(`Erro ao criar alarme para ${symbol}:`, error);
@@ -80,7 +133,6 @@ async function handleMonitorAssetClick(symbol) {
         if (button) button.disabled = false;
     }
 }
-// --- FIM DA ALTERAÇÃO ---
 
 async function fetchAndDisplayAlarms() {
     const activeTbody = document.getElementById('active-alarms-tbody');
@@ -91,7 +143,7 @@ async function fetchAndDisplayAlarms() {
         activeTbody.innerHTML = '<tr><td colspan="4">A carregar...</td></tr>';
         triggeredTbody.innerHTML = '<tr><td colspan="5">A carregar...</td></tr>';
         
-        await fetchMonitoredAssets(); // --- INÍCIO DA ALTERAÇÃO ---
+        await fetchMonitoredAssets();
 
         const [activeAlarmsResponse, triggeredAlarmsResponse] = await Promise.all([
             supabase.from('alarms').select('*').eq('status', 'active').order('created_at', { ascending: false }),
@@ -136,7 +188,14 @@ async function fetchAndDisplayAlarms() {
             const monitorButtonHtml = isMonitored
                 ? `<button class="icon-action-btn monitored" title="Ativo já está a ser monitorizado" disabled><span class="material-symbols-outlined">check</span></button>`
                 : `<button class="icon-action-btn" data-action="monitor" data-symbol="${alarm.asset_pair}" title="Monitorizar Ativo"><span class="material-symbols-outlined">visibility</span></button>`;
-
+            
+            // --- INÍCIO DA ALTERAÇÃO ---
+            let trendlineButtonHtml = '';
+            if (alarm.alarm_type === 'rsi_trendline_break') {
+                const alarmDataString = encodeURIComponent(JSON.stringify(alarm));
+                trendlineButtonHtml = `<button class="icon-action-btn btn-view-trendline" data-action="view-trendline" data-alarm='${alarmDataString}' title="Visualizar Linha de Tendência"><span class="material-symbols-outlined">analytics</span></button>`;
+            }
+            // --- FIM DA ALTERAÇÃO ---
 
             activeAlarmsHtml.push(`
                 <tr data-alarm-id="${alarm.id}">
@@ -147,6 +206,7 @@ async function fetchAndDisplayAlarms() {
                         <div class="action-buttons cell-value">
                             <a href="alarms-create.html?editAlarmId=${alarm.id}" class="icon-action-btn" title="Editar Alarme"><span class="material-symbols-outlined">edit</span></a>
                             <button class="icon-action-btn delete-btn" data-id="${alarm.id}" title="Apagar Alarme"><span class="material-symbols-outlined">delete</span></button>
+                            ${trendlineButtonHtml}
                             <a href="#" class="icon-action-btn view-chart-btn btn-view-chart" data-symbol="${alarm.asset_pair}" title="Ver Gráfico no Modal"><span class="material-symbols-outlined">monitoring</span></a>
                             <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn btn-trading-view" title="Abrir no TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
                             ${monitorButtonHtml} 
@@ -284,10 +344,16 @@ document.addEventListener('DOMContentLoaded', () => {
             openChartModal(symbol);
             return;
         }
-        // --- INÍCIO DA ALTERAÇÃO ---
         if (action === 'monitor' && symbol) {
             e.preventDefault();
             handleMonitorAssetClick(symbol);
+            return;
+        }
+        // --- INÍCIO DA ALTERAÇÃO ---
+        if (action === 'view-trendline') {
+            e.preventDefault();
+            const alarmData = JSON.parse(decodeURIComponent(targetButton.dataset.alarm));
+            openRsiTrendlineChartModal(alarmData);
             return;
         }
         // --- FIM DA ALTERAÇÃO ---
