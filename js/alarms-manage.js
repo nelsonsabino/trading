@@ -30,22 +30,33 @@ async function openRsiTrendlineChartModal(alarm) {
         if (error) throw new Error(data.error || error.message);
 
         const options = {
-            series: [{ name: 'RSI', data: data.rsi_series }],
+            series: [
+                { name: 'RSI', type: 'line', data: data.rsi_series },
+                { name: 'Linha de Tendência', type: 'line', data: data.trendline_series }
+            ],
             chart: { type: 'line', height: '100%', toolbar: { show: true } },
+            stroke: {
+                width: [1, 2], // Linha do RSI fina, linha de tendência mais grossa
+                dashArray: [0, 5] // Linha de tendência tracejada
+            },
+            colors: ['#008FFB', '#00E396'], // Cores para RSI e L.T.
             annotations: {
                 points: [
-                    { x: data.p1.x, y: data.p1.y, marker: { size: 6, fillColor: '#FF4560' }, label: { text: 'P1' } },
-                    { x: data.p2.x, y: data.p2.y, marker: { size: 6, fillColor: '#FF4560' }, label: { text: 'P2' } },
-                    { x: data.p3.x, y: data.p3.y, marker: { size: 6, fillColor: '#FF4560' }, label: { text: 'P3' } }
-                ],
-                lines: [{
-                    x: data.p1.x,
-                    y: data.p1.y,
-                    x2: data.p3.x + 20, // Projeta a linha um pouco para o futuro
-                    y2: data.p3.y + (data.p3.y - data.p1.y) / (data.p3.x - data.p1.x) * 20,
-                    strokeDashArray: 2,
-                    borderColor: '#00E396'
-                }]
+                    { x: data.p1.x, y: data.p1.y, marker: { size: 4, fillColor: '#FF4560', strokeColor: '#fff', strokeWidth: 2, radius: 2 } },
+                    { x: data.p2.x, y: data.p2.y, marker: { size: 4, fillColor: '#FF4560', strokeColor: '#fff', strokeWidth: 2, radius: 2 } },
+                    { x: data.p3.x, y: data.p3.y, marker: { size: 4, fillColor: '#FF4560', strokeColor: '#fff', strokeWidth: 2, radius: 2 } }
+                ]
+            },
+            tooltip: {
+                enabled: true,
+                shared: false,
+                intersect: true,
+                y: {
+                    formatter: function (value, { seriesIndex }) {
+                        if (seriesIndex === 1) return undefined; // Esconde tooltip para a linha de tendência
+                        return value ? value.toFixed(2) : value;
+                    }
+                }
             },
             title: {
                 text: `Visualização da Linha de Tendência RSI para ${alarm.asset_pair} (${alarm.indicator_timeframe})`,
@@ -189,13 +200,11 @@ async function fetchAndDisplayAlarms() {
                 ? `<button class="icon-action-btn monitored" title="Ativo já está a ser monitorizado" disabled><span class="material-symbols-outlined">check</span></button>`
                 : `<button class="icon-action-btn" data-action="monitor" data-symbol="${alarm.asset_pair}" title="Monitorizar Ativo"><span class="material-symbols-outlined">visibility</span></button>`;
             
-            // --- INÍCIO DA ALTERAÇÃO ---
             let trendlineButtonHtml = '';
             if (alarm.alarm_type === 'rsi_trendline_break') {
                 const alarmDataString = encodeURIComponent(JSON.stringify(alarm));
                 trendlineButtonHtml = `<button class="icon-action-btn btn-view-trendline" data-action="view-trendline" data-alarm='${alarmDataString}' title="Visualizar Linha de Tendência"><span class="material-symbols-outlined">analytics</span></button>`;
             }
-            // --- FIM DA ALTERAÇÃO ---
 
             activeAlarmsHtml.push(`
                 <tr data-alarm-id="${alarm.id}">
@@ -349,14 +358,12 @@ document.addEventListener('DOMContentLoaded', () => {
             handleMonitorAssetClick(symbol);
             return;
         }
-        // --- INÍCIO DA ALTERAÇÃO ---
         if (action === 'view-trendline') {
             e.preventDefault();
             const alarmData = JSON.parse(decodeURIComponent(targetButton.dataset.alarm));
             openRsiTrendlineChartModal(alarmData);
             return;
         }
-        // --- FIM DA ALTERAÇÃO ---
     });
 
     const deleteHistoryBtn = document.getElementById('delete-history-btn');
