@@ -9,11 +9,41 @@ import { handleAddSubmit, handleArmSubmit, handleExecSubmit, handleCloseSubmit, 
 import { setupAutocomplete } from './utils.js';
 import { setCurrentStrategies, getStrategies } from './state.js';
 
-// --- Variáveis de Estado da Dashboard ---
 let allTrades = [];
 let currentAlarms = [];
 
-// --- Função Central de Atualização da UI ---
+// --- INÍCIO DA ALTERAÇÃO ---
+/**
+ * Esconde as secções vazias do Dashboard (Kanban e Watchlist).
+ */
+function manageEmptySections() {
+    const kanbanColumns = [
+        { section: document.querySelector('.potential-trades'), container: document.getElementById('potential-trades-container') },
+        { section: document.querySelector('.armed-trades'), container: document.getElementById('armed-trades-container') },
+        { section: document.querySelector('.live-trades'), container: document.getElementById('live-trades-container') }
+    ];
+
+    let hasVisibleKanbanCard = false;
+    kanbanColumns.forEach(({ section, container }) => {
+        if (section && container) {
+            const hasContent = container.querySelector('.trade-card');
+            section.style.display = hasContent ? 'block' : 'none';
+            if (hasContent) {
+                hasVisibleKanbanCard = true;
+            }
+        }
+    });
+
+    const watchlistDivider = document.getElementById('watchlist-divider');
+    const watchlistSection = document.getElementById('watchlist-section');
+    if (watchlistDivider && watchlistSection) {
+        // Esconde a linha divisória se ambas as secções (Kanban e Watchlist) estiverem vazias
+        const isWatchlistVisible = watchlistSection.style.display !== 'none';
+        watchlistDivider.style.display = (hasVisibleKanbanCard && isWatchlistVisible) ? 'block' : 'none';
+    }
+}
+// --- FIM DA ALTERAÇÃO ---
+
 async function refreshDashboardView() {
     console.log("A atualizar a vista da dashboard...");
     const activeTrades = allTrades.filter(t => ['POTENTIAL', 'ARMED', 'LIVE'].includes(t.data.status));
@@ -23,7 +53,9 @@ async function refreshDashboardView() {
     displayTrades(activeTrades, marketData, currentAlarms);
     displayWatchlistTable(allTrades, currentAlarms, marketData);
     
-    hideEmptyDashboardCards();
+    // --- INÍCIO DA ALTERAÇÃO ---
+    manageEmptySections(); // Gestão de visibilidade centralizada
+    // --- FIM DA ALTERAÇÃO ---
 }
 
 async function fetchMarketDataForDashboard(trades, alarms) {
@@ -132,9 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- INÍCIO DA ALTERAÇÃO ---
     const addOpportunityBtn = document.getElementById('add-opportunity-btn-nav');
-    // --- FIM DA ALTERAÇÃO ---
     if (addOpportunityBtn) addOpportunityBtn.addEventListener('click', openAddModal);
     
     if (addModal.container) {
@@ -199,21 +229,3 @@ document.addEventListener('DOMContentLoaded', () => {
     
     initializeApp();
 });
-
-function hideEmptyDashboardCards() {
-    const cards = [
-        { card: document.querySelector('.live-trades'),   container: document.getElementById('live-trades-container') },
-        { card: document.querySelector('.armed-trades'),  container: document.getElementById('armed-trades-container') },
-        { card: document.querySelector('.potential-trades'), container: document.getElementById('potential-trades-container') }
-    ];
-
-    cards.forEach(({ card, container }) => {
-        if (card && container) {
-            const hasContent = container.querySelector('.trade-card');
-            card.classList.toggle('dashboard-hide', !hasContent);
-        }
-    });
-}
-
-window.addEventListener('DOMContentLoaded', hideEmptyDashboardCards);
-window.addEventListener('resize', hideEmptyDashboardCards);
