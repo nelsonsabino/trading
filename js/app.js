@@ -14,33 +14,22 @@ let currentAlarms = [];
 
 // --- INÍCIO DA ALTERAÇÃO ---
 /**
- * Esconde as secções vazias do Dashboard (Kanban e Watchlist).
+ * Esconde as colunas vazias do Kanban e a watchlist se não houver conteúdo.
  */
-function manageEmptySections() {
+function manageEmptySectionsVisibility() {
     const kanbanColumns = [
         { section: document.querySelector('.potential-trades'), container: document.getElementById('potential-trades-container') },
         { section: document.querySelector('.armed-trades'), container: document.getElementById('armed-trades-container') },
         { section: document.querySelector('.live-trades'), container: document.getElementById('live-trades-container') }
     ];
 
-    let hasVisibleKanbanCard = false;
     kanbanColumns.forEach(({ section, container }) => {
         if (section && container) {
             const hasContent = container.querySelector('.trade-card');
-            section.style.display = hasContent ? 'block' : 'none';
-            if (hasContent) {
-                hasVisibleKanbanCard = true;
-            }
+            // Usa string vazia para reverter para o default do CSS (seja grid, block ou flex)
+            section.style.display = hasContent ? '' : 'none';
         }
     });
-
-    const watchlistDivider = document.getElementById('watchlist-divider');
-    const watchlistSection = document.getElementById('watchlist-section');
-    if (watchlistDivider && watchlistSection) {
-        // Esconde a linha divisória se ambas as secções (Kanban e Watchlist) estiverem vazias
-        const isWatchlistVisible = watchlistSection.style.display !== 'none';
-        watchlistDivider.style.display = (hasVisibleKanbanCard && isWatchlistVisible) ? 'block' : 'none';
-    }
 }
 // --- FIM DA ALTERAÇÃO ---
 
@@ -54,7 +43,7 @@ async function refreshDashboardView() {
     displayWatchlistTable(allTrades, currentAlarms, marketData);
     
     // --- INÍCIO DA ALTERAÇÃO ---
-    manageEmptySections(); // Gestão de visibilidade centralizada
+    manageEmptySectionsVisibility();
     // --- FIM DA ALTERAÇÃO ---
 }
 
@@ -229,3 +218,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     initializeApp();
 });
+
+// --- INÍCIO DA ALTERAÇÃO (Função e listeners removidos) ---
+// A função hideEmptyDashboardCards foi removida, e a sua lógica está agora em manageEmptySectionsVisibility
+// Os listeners de 'DOMContentLoaded' e 'resize' para esta função foram removidos por serem redundantes.
+// --- FIM DA ALTERAÇÃO ---
