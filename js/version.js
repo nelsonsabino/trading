@@ -2,14 +2,22 @@
 
 export const changelogData = {
 current: {
-    number: '17.1.2',
+    number: '17.1.3',
     changes: [
-        "**Otimização de Layout (Dashboard):**",
-        "As secções vazias (colunas do Kanban e a tabela da Watchlist de Alarmes) são agora escondidas automaticamente quando não têm conteúdo.",
-        "Esta alteração otimiza o espaço vertical e proporciona uma interface mais limpa, especialmente em dispositivos móveis."
+        "**Correção Definitiva de Layout (Dashboard):**",
+        "Resolvido o bug que impedia que as secções vazias (colunas do Kanban e a tabela da Watchlist) e a sua linha divisória fossem escondidas em todas as resoluções de ecrã.",
+        "A lógica foi refatorada para ser controlada exclusivamente pelo JavaScript, removendo regras de CSS conflituantes e garantindo um comportamento consistente."
     ]
 },
 releases: [
+    {
+        number: '17.1.2',
+        changes: [
+            "**Otimização de Layout (Dashboard):**",
+            "As secções vazias (colunas do Kanban e a tabela da Watchlist de Alarmes) são agora escondidas automaticamente quando não têm conteúdo.",
+            "Esta alteração otimiza o espaço vertical e proporciona uma interface mais limpa, especialmente em dispositivos móveis."
+        ]
+    },
     {
         number: '17.1.1',
         changes: [
