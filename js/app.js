@@ -29,17 +29,53 @@ function manageEmptySectionsVisibility() {
             }
         }
     });
-
-    // --- INÍCIO DA ALTERAÇÃO ---
+    
     const watchlistDivider = document.getElementById('watchlist-divider');
     const watchlistSection = document.getElementById('watchlist-section');
     if (watchlistDivider && watchlistSection) {
         const isWatchlistVisible = watchlistSection.style.display !== 'none';
-        // O separador só é visível se houver conteúdo tanto acima como abaixo dele.
         watchlistDivider.style.display = (hasVisibleKanbanCard && isWatchlistVisible) ? 'block' : 'none';
     }
-    // --- FIM DA ALTERAÇÃO ---
 }
+
+// --- INÍCIO DA ALTERAÇÃO ---
+async function displayGeneralNews() {
+    const container = document.getElementById('general-news-container');
+    if (!container) return;
+
+    container.innerHTML = '<p>A carregar notícias...</p>';
+
+    try {
+        const { data: news, error } = await supabase.functions.invoke('get-general-crypto-news');
+        if (error) throw error;
+
+        if (!news || news.length === 0) {
+            container.innerHTML = '<p>Nenhuma notícia encontrada.</p>';
+            return;
+        }
+
+        const newsHtml = news.map(article => {
+             const publishedDate = new Date(article.published_on * 1000).toLocaleString('pt-PT', {
+                day: '2-digit',
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            return `
+                <div class="news-article">
+                    <a href="${article.url}" target="_blank" rel="noopener noreferrer" class="news-article-title">${article.title}</a>
+                    <span class="news-article-meta">${article.source} &bull; ${publishedDate}</span>
+                </div>
+            `;
+        }).join('');
+
+        container.innerHTML = newsHtml;
+    } catch (err) {
+        console.error("Erro ao buscar notícias gerais:", err);
+        container.innerHTML = '<p style="color:red;">Não foi possível carregar as notícias.</p>';
+    }
+}
+// --- FIM DA ALTERAÇÃO ---
 
 async function refreshDashboardView() {
     console.log("A atualizar a vista da dashboard...");
@@ -146,6 +182,10 @@ async function initializeApp() {
         localStorage.removeItem('tradeToEdit');
         loadAndOpenForEditing(tradeIdToEdit);
     }
+    
+    // --- INÍCIO DA ALTERAÇÃO ---
+    displayGeneralNews();
+    // --- FIM DA ALTERAÇÃO ---
 }
 
 document.addEventListener('DOMContentLoaded', () => {
