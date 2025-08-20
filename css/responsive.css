@@ -10,12 +10,10 @@
         grid-template-columns: 1fr; /* Gráficos da página de detalhes empilhados */
     }
 
-    /* --- INÍCIO DA ALTERAÇÃO --- */
     .asset-details-grid {
         grid-template-columns: 1fr; /* Empilha o gráfico e as notícias */
         height: auto; /* Remove a altura fixa em ecrãs menores */
     }
-    /* --- FIM DA ALTERAÇÃO --- */
 }
 
 /* Telemóvel (menor que 768px) */
@@ -73,10 +71,9 @@
         justify-content: flex-start;
     }
 
-    /* Esconde cards vazios apenas em dispositivos móveis */
-    .dashboard-hide {
-        display: none !important;
-    }
+    /* --- INÍCIO DA ALTERAÇÃO --- */
+    /* Regra removida daqui para ser aplicada globalmente */
+    /* --- FIM DA ALTERAÇÃO --- */
 }
 
 /* Garante que as colunas sejam visíveis no desktop, mesmo vazias */
