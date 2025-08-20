@@ -2,13 +2,20 @@
 
 export const changelogData = {
 current: {
-    number: '17.3.1',
+    number: '17.3.2',
     changes: [
-        "**Melhoria de UI (Market Scanner):**",
-        "Reorganizada a barra de controlos para uma estrutura de duas linhas, melhorando a clareza e a organização dos filtros e opções."
+        "**Simplificação de UI (Gráficos):**",
+        "Removida a barra de ferramentas (zoom, pan, etc.) de todos os gráficos ApexCharts (página de detalhes e modais) para uma interface mais limpa e minimalista."
     ]
 },
 releases: [
+    {
+        number: '17.3.1',
+        changes: [
+            "**Melhoria de UI (Market Scanner):**",
+            "Reorganizada a barra de controlos para uma estrutura de duas linhas, melhorando a clareza e a organização dos filtros e opções."
+        ]
+    },
     {
         number: '17.3.0',
         changes: [
