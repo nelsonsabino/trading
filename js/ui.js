@@ -303,11 +303,9 @@ export function displayTrades(trades, marketData, allAlarms) {
 }
 
 export function displayWatchlistTable(allTrades, allAlarms, marketData) {
-    // --- INÍCIO DA ALTERAÇÃO ---
     const watchlistSection = document.getElementById('watchlist-section');
     const tbody = document.getElementById('watchlist-alarms-tbody');
     if (!tbody || !watchlistSection) return;
-    // --- FIM DA ALTERAÇÃO ---
 
     const assetsInKanban = new Set(allTrades.filter(t => ['POTENTIAL', 'ARMED', 'LIVE'].includes(t.data.status)).map(t => t.data.asset));
     const activeAlarmsByAsset = allAlarms.reduce((acc, alarm) => {
@@ -319,13 +317,11 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
     }, {});
     const assetsForWatchlist = Object.keys(activeAlarmsByAsset).filter(asset => !assetsInKanban.has(asset));
 
-    // --- INÍCIO DA ALTERAÇÃO ---
     if (assetsForWatchlist.length === 0) {
         watchlistSection.style.display = 'none';
         return;
     }
     watchlistSection.style.display = 'block';
-    // --- FIM DA ALTERAÇÃO ---
 
     const tableRowsHtml = assetsForWatchlist.map(assetName => {
         const alarmsForAsset = activeAlarmsByAsset[assetName];
