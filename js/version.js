@@ -2,14 +2,21 @@
 
 export const changelogData = {
 current: {
-    number: '17.3.0',
+    number: '17.3.1',
     changes: [
-        "**Melhorias de Funcionalidade (Market Scanner):**",
-        "Adicionado um campo para filtrar a lista de ativos por símbolo em tempo real.",
-        "Adicionada a opção 'Mostrar Tudo' ao dropdown de contagem de resultados, permitindo a visualização de todos os pares disponíveis."
+        "**Melhoria de UI (Market Scanner):**",
+        "Reorganizada a barra de controlos para uma estrutura de duas linhas, melhorando a clareza e a organização dos filtros e opções."
     ]
 },
 releases: [
+    {
+        number: '17.3.0',
+        changes: [
+            "**Melhorias de Funcionalidade (Market Scanner):**",
+            "Adicionado um campo para filtrar a lista de ativos por símbolo em tempo real.",
+            "Adicionada a opção 'Mostrar Tudo' ao dropdown de contagem de resultados, permitindo a visualização de todos os pares disponíveis."
+        ]
+    },
     {
         number: '17.2.0',
         changes: [
