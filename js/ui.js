@@ -141,7 +141,7 @@ export function getAlarmDescription(alarm, forTable = false) {
     if (!alarm) return 'N/A';
     const timeframe = `(${alarm.indicator_timeframe})`;
     switch (alarm.alarm_type) {
-        case 'stochastic': return `Stoch(${alarm.indicator_period}) ${alarm.condition === 'above' ? '>' : '<'} ${alarm.target_price} ${timeframe}`;
+        case 'stochastic': return `Stoch(${alarm.indicator_period}) ≤ ${alarm.target_price} ${timeframe}`;
         case 'rsi_level': return `RSI(${alarm.indicator_period}) ${alarm.condition === 'above' ? '>' : '<'} ${alarm.target_price} ${timeframe}`;
         case 'stochastic_crossover': return `Stoch %K cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} de %D ${timeframe}`;
         case 'rsi_crossover': {
@@ -303,8 +303,12 @@ export function displayTrades(trades, marketData, allAlarms) {
 }
 
 export function displayWatchlistTable(allTrades, allAlarms, marketData) {
+    // --- INÍCIO DA ALTERAÇÃO ---
+    const watchlistSection = document.getElementById('watchlist-section');
     const tbody = document.getElementById('watchlist-alarms-tbody');
-    if (!tbody) return;
+    if (!tbody || !watchlistSection) return;
+    // --- FIM DA ALTERAÇÃO ---
+
     const assetsInKanban = new Set(allTrades.filter(t => ['POTENTIAL', 'ARMED', 'LIVE'].includes(t.data.status)).map(t => t.data.asset));
     const activeAlarmsByAsset = allAlarms.reduce((acc, alarm) => {
         if (alarm.status === 'active') {
@@ -314,10 +318,15 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
         return acc;
     }, {});
     const assetsForWatchlist = Object.keys(activeAlarmsByAsset).filter(asset => !assetsInKanban.has(asset));
+
+    // --- INÍCIO DA ALTERAÇÃO ---
     if (assetsForWatchlist.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Nenhum ativo a ser monitorizado. Adicione um alarme a um ativo para ele aparecer aqui.</td></tr>';
+        watchlistSection.style.display = 'none';
         return;
     }
+    watchlistSection.style.display = 'block';
+    // --- FIM DA ALTERAÇÃO ---
+
     const tableRowsHtml = assetsForWatchlist.map(assetName => {
         const alarmsForAsset = activeAlarmsByAsset[assetName];
         const latestAlarm = [...alarmsForAsset].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
@@ -341,9 +350,7 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
                         <button class="icon-action-btn btn-view-chart" data-action="view-chart" data-symbol="${assetName}" title="Ver Gráfico Detalhado"><span class="material-symbols-outlined">monitoring</span></button>
                         <a href="https://www.tradingview.com/chart/?symbol=BINANCE:${assetName}" target="_blank" class="icon-action-btn btn-trading-view" title="TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
                         <a href="alarms-create.html?assetPair=${assetName}" class="icon-action-btn" title="Criar Novo Alarme"><span class="material-symbols-outlined">alarm_add</span></a>
-                        <!-- --- INÍCIO DA ALTERAÇÃO --- -->
                         <button class="icon-action-btn" data-action="add-to-potential" data-symbol="${assetName}" title="Adicionar a Trade Potencial"><span class="material-symbols-outlined">add</span></button>
-                        <!-- --- FIM DA ALTERAÇÃO --- -->
                     </div>
                 </td>
             </tr>
