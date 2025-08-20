@@ -148,24 +148,23 @@ function createTableRow(ticker, index, extraData, monitoredAssetsSet) {
         const createTrendlineSignal = (signal, timeframe) => {
             if (!signal) return '';
             
+            const trendlineBaseClass = signal.type === 'LTA' ? 'support' : 'resistance';
             // --- INÍCIO DA ALTERAÇÃO ---
-            const trendlineType = signal.type === 'LTA' ? 'support' : 'resistance';
+            const trendlineColorClass = timeframe === '1h' ? `${trendlineBaseClass}-light` : trendlineBaseClass;
+            // --- FIM DA ALTERAÇÃO ---
             const isBrokenClass = signal.isBroken ? 'trendline-broken' : '';
-            const tooltipText = signal.isBroken 
-                ? `QUEBRA da ${signal.type} (${timeframe})!`
-                : `3º Toque em ${signal.type} (${timeframe})`;
+            const tooltipText = signal.isBroken ? `QUEBRA da ${signal.type} (${timeframe})!` : `3º Toque em ${signal.type} (${timeframe})`;
 
-            const alarmParams = { asset_pair: ticker.symbol, indicator_timeframe: timeframe, indicator_period: 14, trendline_type: trendlineType };
+            const alarmParams = { asset_pair: ticker.symbol, indicator_timeframe: timeframe, indicator_period: 14, trendline_type: trendlineBaseClass };
             const alarmDataString = encodeURIComponent(JSON.stringify(alarmParams));
             
-            const creationParams = { assetPair: ticker.symbol, trendlineType: trendlineType, timeframe: timeframe };
+            const creationParams = { assetPair: ticker.symbol, trendlineType: trendlineBaseClass, timeframe: timeframe };
             const creationDataString = encodeURIComponent(JSON.stringify(creationParams));
 
             return `
-                <button class="third-touch-signal ${trendlineType} ${isBrokenClass}" data-action="view-trendline" data-alarm='${alarmDataString}' data-creation='${creationDataString}' title="${tooltipText}">
+                <button class="third-touch-signal ${trendlineColorClass} ${isBrokenClass}" data-action="view-trendline" data-alarm='${alarmDataString}' data-creation='${creationDataString}' title="${tooltipText}">
                     ${signal.type}-3 ${timeframe}
                 </button>`;
-            // --- FIM DA ALTERAÇÃO ---
         };
         
         thirdTouchSignalHtml += createTrendlineSignal(assetExtraData.thirdTouchSignal_1h, '1h');
