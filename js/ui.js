@@ -36,14 +36,14 @@ function renderSparkline(containerId, dataSeries) {
     const negativeColor = computedStyle.getPropertyValue('--feedback-negative').trim();
     const chartColor = dataSeries[dataSeries.length - 1] >= dataSeries[0] ? positiveColor : negativeColor;
     const options = {
-        series: [{ data: dataSeries }], 
+        series: [{ data: dataSeries }],
         chart: { type: 'line', height: 40, width: 100, sparkline: { enabled: true }},
-        stroke: { curve: 'smooth', width: 2 }, 
+        stroke: { curve: 'smooth', width: 2 },
         colors: [chartColor],
-        tooltip: { 
-            fixed: { enabled: false }, 
-            x: { show: false }, 
-            y: { title: { formatter: () => '' } }, 
+        tooltip: {
+            fixed: { enabled: false },
+            x: { show: false },
+            y: { title: { formatter: () => '' } },
             marker: { show: false },
             theme: isDarkMode ? 'dark' : 'light'
         }
@@ -80,7 +80,7 @@ function createChecklistItem(item, data) {
 }
 function createInputItem(item, data) {
     const element = document.createElement('div');
-    element.className = 'input-item-styled'; 
+    element.className = 'input-item-styled';
     const isRequired = item.required ? 'required' : '';
     const labelText = item.required ? `${item.label} <span class="required-asterisk">*</span>` : item.label;
     const value = data && data[item.id] ? data[item.id] : '';
@@ -97,7 +97,7 @@ function createInputItem(item, data) {
 export function generateDynamicChecklist(container, phases, data = {}) {
     if (!phases || phases.length === 0) return;
     phases.forEach(phase => {
-        if (!phase || !Array.isArray(phase.items)) return; 
+        if (!phase || !Array.isArray(phase.items)) return;
         const phaseDiv = document.createElement('div');
         const titleEl = document.createElement('h4');
         titleEl.textContent = phase.title;
@@ -141,9 +141,16 @@ export function getAlarmDescription(alarm, forTable = false) {
     if (!alarm) return 'N/A';
     const timeframe = `(${alarm.indicator_timeframe})`;
     switch (alarm.alarm_type) {
-        case 'stochastic': return `Stoch(${alarm.indicator_period}) ≤ ${alarm.target_price} ${timeframe}`;
+        case 'stochastic': return `Stoch(${alarm.indicator_period}) <= ${alarm.target_price} ${timeframe}`;
         case 'rsi_level': return `RSI(${alarm.indicator_period}) ${alarm.condition === 'above' ? '>' : '<'} ${alarm.target_price} ${timeframe}`;
-        case 'stochastic_crossover': return `Stoch %K cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} de %D ${timeframe}`;
+        case 'stochastic_crossover': {
+            let stochDetails = '';
+            if (alarm.crossover_level_type === 'specific' && alarm.crossover_level_value) {
+                const levelCondition = alarm.condition === 'above' ? 'abaixo de' : 'acima de';
+                stochDetails = ` ${levelCondition} ${alarm.crossover_level_value}`;
+            }
+            return `Stoch %K cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} de %D${stochDetails} ${timeframe}`;
+        }
         case 'rsi_crossover': {
             let details = [];
             if (alarm.crossover_interval && alarm.crossover_interval > 1) {
@@ -208,7 +215,7 @@ function openAlarmListModal(titleText, alarmsToDisplay) {
             acknowledgeBtn.onclick = async () => {
                 await acknowledgeAlarm(assetPair);
                 modal.style.display = 'none';
-                location.reload(); 
+                location.reload();
             };
         }
     }
@@ -317,13 +324,11 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
     }, {});
     const assetsForWatchlist = Object.keys(activeAlarmsByAsset).filter(asset => !assetsInKanban.has(asset));
 
-    // --- INÍCIO DA ALTERAÇÃO ---
     if (assetsForWatchlist.length === 0) {
         watchlistSection.style.display = 'none';
         return;
     }
     watchlistSection.style.display = 'block';
-    // --- FIM DA ALTERAÇÃO ---
 
     const tableRowsHtml = assetsForWatchlist.map(assetName => {
         const alarmsForAsset = activeAlarmsByAsset[assetName];
