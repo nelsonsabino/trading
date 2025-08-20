@@ -2,6 +2,15 @@
 
 export const changelogData = {
 current: {
+    number: '17.2.0',
+    changes: [
+        "**Feature: Feed de Notícias Gerais no Dashboard:**",
+        "Adicionada uma nova secção no final do Dashboard que exibe as 3 principais notícias do mercado de criptomoedas.",
+        "A funcionalidade é potenciada por uma nova Edge Function (`get-general-crypto-news`) para buscar os dados de forma eficiente."
+    ]
+},
+releases: [
+    {
     number: '17.1.3',
     changes: [
         "**Correção Definitiva de Layout (Dashboard):**",
@@ -9,7 +18,6 @@ current: {
         "A lógica foi refatorada para ser controlada exclusivamente pelo JavaScript, removendo regras de CSS conflituantes e garantindo um comportamento consistente."
     ]
 },
-releases: [
     {
         number: '17.1.2',
         changes: [
