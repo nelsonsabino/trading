@@ -2,14 +2,21 @@
 
 export const changelogData = {
 current: {
-    number: '17.1.0',
+    number: '17.1.1',
     changes: [
-        "**Sinal Avançado (Quebra de L.T. no Scanner):**",
-        "As 'badges' de sinal de Linha de Tendência no Market Scanner agora exibem um asterisco (*) se a linha já tiver sido quebrada.",
-        "Esta funcionalidade fornece um alerta visual imediato para setups que podem estar em andamento, adicionando uma nova camada de informação acionável."
+        "**Diferenciação Visual de Sinais (Market Scanner):**",
+        "Os sinais de Linha de Tendência para o timeframe de 1 hora agora têm cores mais claras (verde/vermelho claro), diferenciando-os visualmente dos sinais de 4 horas para uma melhor hierarquia de informação."
     ]
 },
 releases: [
+    {
+        number: '17.1.0',
+        changes: [
+            "**Sinal Avançado (Quebra de L.T. no Scanner):**",
+            "As 'badges' de sinal de Linha de Tendência no Market Scanner agora exibem um asterisco (*) se a linha já tiver sido quebrada.",
+            "Esta funcionalidade fornece um alerta visual imediato para setups que podem estar em andamento, adicionando uma nova camada de informação acionável."
+        ]
+    },
     {
         number: '17.0.0',
         changes: [
