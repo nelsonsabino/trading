@@ -61,7 +61,6 @@
         <h1>Watchlist de Trading</h1>
         <p class="mantra">Tem paciência, usa alarmes, espera que os setups venham.</p>
        
-        <!-- --- INÍCIO DA ALTERAÇÃO --- -->
         <nav class="main-nav">
             <a href="dashboard.html" class="nav-icon-link" title="Dashboard"><span class="material-symbols-outlined">home</span></a>
             <a href="market-scan.html" class="nav-icon-link" title="Scanner de Mercado"><span class="material-symbols-outlined">query_stats</span></a>
@@ -78,16 +77,12 @@
                 </div>
             </div>
 
-            <!-- Secção do Utilizador -->
             <div id="user-session" class="user-session" style="display: none;">
                 <img id="user-photo" src="" alt="Foto do Utilizador" class="user-photo">
                 <button id="logout-btn" class="btn btn-secondary">Sair</button>
             </div>
         </nav>
         
-        <!-- A <nav class="contextual-nav"> foi removida -->
-        <!-- --- FIM DA ALTERAÇÃO --- -->
-
     </header>  
 
     <hr class="section-divider">
@@ -109,7 +104,10 @@
         </div>
 
         <hr class="section-divider">
-        <section class="watchlist-alarms-section">
+        
+        <!-- --- INÍCIO DA ALTERAÇÃO --- -->
+        <section class="watchlist-alarms-section" id="watchlist-section">
+        <!-- --- FIM DA ALTERAÇÃO --- -->
             <h2><span class="material-symbols-outlined">visibility</span> Watchlist de Alarmes</h2>
             <div class="table-wrapper">
                 <table class="alarms-table">
@@ -123,7 +121,6 @@
                         </tr>
                     </thead>
                     <tbody id="watchlist-alarms-tbody">
-                        <!-- O conteúdo será preenchido por JavaScript -->
                     </tbody>
                 </table>
             </div>
