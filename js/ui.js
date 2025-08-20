@@ -317,11 +317,13 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
     }, {});
     const assetsForWatchlist = Object.keys(activeAlarmsByAsset).filter(asset => !assetsInKanban.has(asset));
 
+    // --- INÍCIO DA ALTERAÇÃO ---
     if (assetsForWatchlist.length === 0) {
         watchlistSection.style.display = 'none';
         return;
     }
     watchlistSection.style.display = 'block';
+    // --- FIM DA ALTERAÇÃO ---
 
     const tableRowsHtml = assetsForWatchlist.map(assetName => {
         const alarmsForAsset = activeAlarmsByAsset[assetName];
