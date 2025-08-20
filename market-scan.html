@@ -89,9 +89,14 @@
 
     <main>
         <section class="market-scan-section">
-            <h2 id="market-scan-title"><span class="material-symbols-outlined" style="color: #ffc107;">local_fire_department</span> Top 50 Pares com Maior Volume (USDC)</h2>
+            <h2 id="market-scan-title"><span class="material-symbols-outlined" style="color: #ffc107;">local_fire_department</span> Pares com Maior Volume (USDC)</h2>
 
+            <!-- --- INÍCIO DA ALTERAÇÃO --- -->
             <div class="market-controls">
+                <div class="control-group">
+                    <label for="filter-by-symbol">Filtrar:</label>
+                    <input type="text" id="filter-by-symbol" placeholder="Ex: BTC">
+                </div>
                 <div class="control-group">
                     <label for="sort-by">Ordenar por:</label>
                     <select id="sort-by">
@@ -102,7 +107,7 @@
                     </select>
                 </div>
                 <div class="control-group">
-                    <label>Filtros:</label>
+                    <label>Filtros Avançados:</label>
                     <input type="checkbox" id="filter-rsi">
                     <label for="filter-rsi">RSI < 45 (1h)</label>
                     <input type="checkbox" id="filter-stoch">
@@ -111,12 +116,13 @@
                     <label for="filter-third-touch">Apenas 3º Toque L.T.</label>
                 </div>
                 <div class="control-group">
-                    <label for="top-n-select">Mostrar Top:</label>
+                    <label for="top-n-select">Mostrar:</label>
                     <select id="top-n-select">
-                        <option value="30">30</option>
-                        <option value="50" selected>50</option>
-                        <option value="100">100</option>
-                        <option value="200">200</option>
+                        <option value="30">Top 30</option>
+                        <option value="50" selected>Top 50</option>
+                        <option value="100">Top 100</option>
+                        <option value="200">Top 200</option>
+                        <option value="all">Tudo</option>
                     </select>
                 </div>
                 <div class="control-group">
@@ -125,6 +131,7 @@
                     <label for="toggle-sparklines">Sparklines</label>
                 </div>
             </div>
+            <!-- --- FIM DA ALTERAÇÃO --- -->
 
             <div class="table-wrapper">
                 <table class="market-table">
