@@ -12,10 +12,6 @@ import { setCurrentStrategies, getStrategies } from './state.js';
 let allTrades = [];
 let currentAlarms = [];
 
-// --- INÍCIO DA ALTERAÇÃO ---
-/**
- * Esconde as colunas vazias do Kanban e a watchlist se não houver conteúdo.
- */
 function manageEmptySectionsVisibility() {
     const kanbanColumns = [
         { section: document.querySelector('.potential-trades'), container: document.getElementById('potential-trades-container') },
@@ -23,15 +19,27 @@ function manageEmptySectionsVisibility() {
         { section: document.querySelector('.live-trades'), container: document.getElementById('live-trades-container') }
     ];
 
+    let hasVisibleKanbanCard = false;
     kanbanColumns.forEach(({ section, container }) => {
         if (section && container) {
             const hasContent = container.querySelector('.trade-card');
-            // Usa string vazia para reverter para o default do CSS (seja grid, block ou flex)
             section.style.display = hasContent ? '' : 'none';
+            if (hasContent) {
+                hasVisibleKanbanCard = true;
+            }
         }
     });
+
+    // --- INÍCIO DA ALTERAÇÃO ---
+    const watchlistDivider = document.getElementById('watchlist-divider');
+    const watchlistSection = document.getElementById('watchlist-section');
+    if (watchlistDivider && watchlistSection) {
+        const isWatchlistVisible = watchlistSection.style.display !== 'none';
+        // O separador só é visível se houver conteúdo tanto acima como abaixo dele.
+        watchlistDivider.style.display = (hasVisibleKanbanCard && isWatchlistVisible) ? 'block' : 'none';
+    }
+    // --- FIM DA ALTERAÇÃO ---
 }
-// --- FIM DA ALTERAÇÃO ---
 
 async function refreshDashboardView() {
     console.log("A atualizar a vista da dashboard...");
@@ -42,9 +50,7 @@ async function refreshDashboardView() {
     displayTrades(activeTrades, marketData, currentAlarms);
     displayWatchlistTable(allTrades, currentAlarms, marketData);
     
-    // --- INÍCIO DA ALTERAÇÃO ---
     manageEmptySectionsVisibility();
-    // --- FIM DA ALTERAÇÃO ---
 }
 
 async function fetchMarketDataForDashboard(trades, alarms) {
@@ -218,8 +224,3 @@ document.addEventListener('DOMContentLoaded', () => {
     
     initializeApp();
 });
-
-// --- INÍCIO DA ALTERAÇÃO (Função e listeners removidos) ---
-// A função hideEmptyDashboardCards foi removida, e a sua lógica está agora em manageEmptySectionsVisibility
-// Os listeners de 'DOMContentLoaded' e 'resize' para esta função foram removidos por serem redundantes.
-// --- FIM DA ALTERAÇÃO ---
