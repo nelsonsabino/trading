@@ -70,20 +70,12 @@
         width: 100%;
         justify-content: flex-start;
     }
-
-    /* Esconde cards vazios apenas em dispositivos móveis */
-    .dashboard-hide {
-        display: none !important;
-    }
+    
+    /* --- INÍCIO DA ALTERAÇÃO --- */
+    /* A regra .dashboard-hide foi removida daqui, pois agora é controlada por JS */
+    /* --- FIM DA ALTERAÇÃO --- */
 }
 
 /* --- INÍCIO DA ALTERAÇÃO --- */
-/* Garante que as colunas sejam visíveis no desktop, a menos que devam ser escondidas */
-@media (min-width: 769px) {
-    .potential-trades:not(.dashboard-hide),
-    .armed-trades:not(.dashboard-hide),
-    .live-trades:not(.dashboard-hide) {
-        display: block !important;
-    }
-}
+/* A regra @media (min-width: 769px) que forçava a visibilidade foi removida */
 /* --- FIM DA ALTERAÇÃO --- */
