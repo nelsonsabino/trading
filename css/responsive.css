@@ -71,16 +71,19 @@
         justify-content: flex-start;
     }
 
-    /* --- INÍCIO DA ALTERAÇÃO --- */
-    /* Regra .dashboard-hide removida daqui */
-    /* --- FIM DA ALTERAÇÃO --- */
+    /* Esconde cards vazios apenas em dispositivos móveis */
+    .dashboard-hide {
+        display: none !important;
+    }
 }
 
-/* Garante que as colunas sejam visíveis no desktop, mesmo vazias */
+/* --- INÍCIO DA ALTERAÇÃO --- */
+/* Garante que as colunas sejam visíveis no desktop, a menos que devam ser escondidas */
 @media (min-width: 769px) {
-    .potential-trades,
-    .armed-trades,
-    .live-trades {
+    .potential-trades:not(.dashboard-hide),
+    .armed-trades:not(.dashboard-hide),
+    .live-trades:not(.dashboard-hide) {
         display: block !important;
     }
 }
+/* --- FIM DA ALTERAÇÃO --- */
