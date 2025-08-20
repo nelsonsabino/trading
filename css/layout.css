@@ -39,12 +39,10 @@ header .main-nav {
     gap: 2rem; 
 }
 
-/* --- INÍCIO DA ALTERAÇÃO --- */
 /* Esconde colunas vazias do Kanban em todas as resoluções */
 .dashboard-hide {
     display: none !important;
 }
-/* --- FIM DA ALTERAÇÃO --- */
 
 .asset-charts-grid {
     display: grid;
@@ -70,21 +68,26 @@ header .main-nav {
 /* --- CONTROLES DO MERCADO --- */
 .market-controls {
     display: flex;
-    justify-content: flex-start; 
-    align-items: center;
-    gap: 1.5rem;
+    flex-direction: column; /* --- INÍCIO DA ALTERAÇÃO --- */
+    align-items: flex-start; /* --- INÍCIO DA ALTERAÇÃO --- */
+    gap: 0.8rem; /* --- INÍCIO DA ALTERAÇÃO --- */
     padding: 1rem;
     background-color: var(--surface-primary);
     border: 1px solid var(--border-primary);
     border-radius: 8px;
     margin-bottom: 1.5rem;
-    flex-wrap: wrap; 
 }
+
+.controls-row { /* --- INÍCIO DA ALTERAÇÃO --- */
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    width: 100%;
+} /* --- FIM DA ALTERAÇÃO --- */
+
 .control-group {
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
-
-/* --- DARK MODE PARA LAYOUT (REMOVIDO) --- */
-/* A regra .dark-mode .contextual-nav foi removida pois agora é gerida pelas variáveis */
