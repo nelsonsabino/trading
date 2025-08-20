@@ -72,7 +72,9 @@ export async function openChartModal(symbol, timeframe = '1h') {
 
         const options = {
             series: series,
-            chart: { type: 'line', height: '100%', toolbar: { show: true, autoSelected: 'pan' } },
+            // --- INÍCIO DA ALTERAÇÃO ---
+            chart: { type: 'line', height: '100%', toolbar: { show: false } },
+            // --- FIM DA ALTERAÇÃO ---
             title: { text: `${symbol} - Gráfico de ${timeframe}`, align: 'left' },
             colors: ['#008FFB', '#ffc107', '#0d6efd'],
             stroke: { curve: 'smooth', width: 2 },
@@ -128,8 +130,13 @@ export async function openRsiTrendlineChartModal(alarm, creationParams = null) {
                 { name: 'RSI', type: 'line', data: data.rsi_series },
                 { name: 'Linha de Tendência', type: 'line', data: data.trendline_series }
             ],
-            chart: { type: 'line', height: '100%', toolbar: { show: true } },
-            stroke: { width: [1, 2], dashArray: [0, 5] },
+            // --- INÍCIO DA ALTERAÇÃO ---
+            chart: { type: 'line', height: '100%', toolbar: { show: false } },
+            // --- FIM DA ALTERAÇÃO ---
+            stroke: {
+                width: [1, 2],
+                dashArray: [0, 5]
+            },
             colors: ['#008FFB', '#00E396'],
             annotations: {
                 points: [
@@ -142,7 +149,10 @@ export async function openRsiTrendlineChartModal(alarm, creationParams = null) {
                 enabled: true, shared: false, intersect: true,
                 y: { formatter: (value, { seriesIndex }) => (seriesIndex === 1) ? undefined : (value ? value.toFixed(2) : value) }
             },
-            title: { text: `Visualização da Linha de Tendência RSI para ${alarm.asset_pair} (${alarm.indicator_timeframe})`, align: 'center' },
+            title: {
+                text: `Visualização da Linha de Tendência RSI para ${alarm.asset_pair} (${alarm.indicator_timeframe})`,
+                align: 'center'
+            },
             xaxis: { type: 'numeric', title: { text: 'Índice da Vela' } },
             yaxis: { title: { text: 'Valor do RSI' } },
             theme: { mode: document.documentElement.classList.contains('dark-mode') ? 'dark' : 'light' }
