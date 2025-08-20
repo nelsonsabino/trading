@@ -382,7 +382,6 @@
     color: var(--text-secondary);
 }
 
-/* --- INÍCIO DA ALTERAÇÃO --- */
 /* --- COMPONENTES DO SCANNER E MODAL DE GRÁFICO --- */
 .trendline-signal-group {
     display: inline-flex;
@@ -402,11 +401,21 @@
     border: none;
     font-family: inherit;
     line-height: 1.5;
-    position: relative; /* Contexto para o asterisco */
+    position: relative;
 }
 .third-touch-signal.support { background-color: var(--accent-green); }
 .third-touch-signal.resistance { background-color: var(--accent-red); }
 .dark-mode .third-touch-signal { color: var(--surface-primary); }
+
+/* --- INÍCIO DA ALTERAÇÃO --- */
+.third-touch-signal.support-light { background-color: #66bb6a; }
+.third-touch-signal.resistance-light { background-color: #ef5350; }
+
+.dark-mode .third-touch-signal.support-light,
+.dark-mode .third-touch-signal.resistance-light {
+    color: #fff;
+}
+/* --- FIM DA ALTERAÇÃO --- */
 
 /* Asterisco para linha quebrada */
 .third-touch-signal.trendline-broken::after {
@@ -425,4 +434,3 @@
     border-top: 1px solid var(--border-secondary);
     text-align: right;
 }
-/* --- FIM DA ALTERAÇÃO --- */
