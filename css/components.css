@@ -331,33 +331,34 @@
     margin-bottom: 0.5rem;
 }
 
-/* --- COMPONENTE: FEED DE NOTÍCIAS E GRÁFICO (LAYOUT 50/50) --- */
-.main-chart-section .stat-card {
-    height: 550px;
-    display: flex;
-    flex-direction: column;
-}
-
-#main-asset-chart {
-}
-
-#news-feed-section {
+/* --- COMPONENTE: FEED DE NOTÍCIAS --- */
+#news-feed-section,
+#general-news-section { /* --- INÍCIO DA ALTERAÇÃO --- */
     background-color: var(--surface-primary);
     border: 1px solid var(--border-primary);
     border-radius: 8px;
     padding: 1.5rem;
     box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+}
+
+#news-feed-section {
     height: 550px;
     display: flex;
     flex-direction: column;
 }
+/* --- FIM DA ALTERAÇÃO --- */
 
-#news-feed-container {
+#news-feed-container,
+#general-news-container { /* --- INÍCIO DA ALTERAÇÃO --- */
     overflow-y: auto;
     padding-right: 0.5rem; 
+}
+
+#news-feed-container {
     flex-grow: 1; 
     min-height: 0; 
 }
+/* --- FIM DA ALTERAÇÃO --- */
 
 .news-article {
     padding: 1rem 0.5rem 1rem 0;
@@ -407,7 +408,6 @@
 .third-touch-signal.resistance { background-color: var(--accent-red); }
 .dark-mode .third-touch-signal { color: var(--surface-primary); }
 
-/* --- INÍCIO DA ALTERAÇÃO --- */
 .third-touch-signal.support-light { background-color: #66bb6a; }
 .third-touch-signal.resistance-light { background-color: #ef5350; }
 
@@ -415,9 +415,7 @@
 .dark-mode .third-touch-signal.resistance-light {
     color: #fff;
 }
-/* --- FIM DA ALTERAÇÃO --- */
 
-/* Asterisco para linha quebrada */
 .third-touch-signal.trendline-broken::after {
     content: '*';
     position: absolute;
