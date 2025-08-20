@@ -39,6 +39,13 @@ header .main-nav {
     gap: 2rem; 
 }
 
+/* --- INÍCIO DA ALTERAÇÃO --- */
+/* Esconde colunas vazias do Kanban em todas as resoluções */
+.dashboard-hide {
+    display: none !important;
+}
+/* --- FIM DA ALTERAÇÃO --- */
+
 .asset-charts-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -52,14 +59,12 @@ header .main-nav {
     gap: 1.5rem;
 }
 
-/* --- INÍCIO DA ALTERAÇÃO --- */
 .asset-details-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
-    align-items: start; /* Revertido de stretch, pois a altura será fixa nos filhos */
+    align-items: start;
 }
-/* --- FIM DA ALTERAÇÃO --- */
 
 
 /* --- CONTROLES DO MERCADO --- */
