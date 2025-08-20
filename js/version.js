@@ -2,14 +2,22 @@
 
 export const changelogData = {
 current: {
-    number: '17.2.0',
+    number: '17.3.0',
     changes: [
-        "**Feature: Feed de Notícias Gerais no Dashboard:**",
-        "Adicionada uma nova secção no final do Dashboard que exibe as 3 principais notícias do mercado de criptomoedas.",
-        "A funcionalidade é potenciada por uma nova Edge Function (`get-general-crypto-news`) para buscar os dados de forma eficiente."
+        "**Melhorias de Funcionalidade (Market Scanner):**",
+        "Adicionado um campo para filtrar a lista de ativos por símbolo em tempo real.",
+        "Adicionada a opção 'Mostrar Tudo' ao dropdown de contagem de resultados, permitindo a visualização de todos os pares disponíveis."
     ]
 },
 releases: [
+    {
+        number: '17.2.0',
+        changes: [
+            "**Feature: Feed de Notícias Gerais no Dashboard:**",
+            "Adicionada uma nova secção no final do Dashboard que exibe as 3 principais notícias do mercado de criptomoedas.",
+            "A funcionalidade é potenciada por uma nova Edge Function (`get-general-crypto-news`) para buscar os dados de forma eficiente."
+        ]
+    },
     {
     number: '17.1.3',
     changes: [
