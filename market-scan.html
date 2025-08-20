@@ -93,42 +93,46 @@
 
             <!-- --- INÍCIO DA ALTERAÇÃO --- -->
             <div class="market-controls">
-                <div class="control-group">
-                    <label for="filter-by-symbol">Filtrar:</label>
-                    <input type="text" id="filter-by-symbol" placeholder="Ex: BTC">
+                <div class="controls-row">
+                    <div class="control-group">
+                        <label for="filter-by-symbol">Filtrar:</label>
+                        <input type="text" id="filter-by-symbol" placeholder="Ex: BTC">
+                    </div>
+                    <div class="control-group">
+                        <label for="top-n-select">Mostrar:</label>
+                        <select id="top-n-select">
+                            <option value="30">Top 30</option>
+                            <option value="50" selected>Top 50</option>
+                            <option value="100">Top 100</option>
+                            <option value="200">Top 200</option>
+                            <option value="all">Tudo</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="sort-by">Ordenar por:</label>
+                        <select id="sort-by">
+                            <option value="volume">Volume (Descendente)</option>
+                            <option value="price_change_percent_desc">Variação % (Descendente)</option>
+                            <option value="price_change_percent_asc">Variação % (Ascendente)</option>
+                            <option value="symbol_asc">Ativo (A-Z)</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="control-group">
-                    <label for="sort-by">Ordenar por:</label>
-                    <select id="sort-by">
-                        <option value="volume">Volume (Descendente)</option>
-                        <option value="price_change_percent_desc">Variação % (Descendente)</option>
-                        <option value="price_change_percent_asc">Variação % (Ascendente)</option>
-                        <option value="symbol_asc">Ativo (A-Z)</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label>Filtros Avançados:</label>
-                    <input type="checkbox" id="filter-rsi">
-                    <label for="filter-rsi">RSI < 45 (1h)</label>
-                    <input type="checkbox" id="filter-stoch">
-                    <label for="filter-stoch">STOCH < 35 (4h)</label>
-                    <input type="checkbox" id="filter-third-touch">
-                    <label for="filter-third-touch">Apenas 3º Toque L.T.</label>
-                </div>
-                <div class="control-group">
-                    <label for="top-n-select">Mostrar:</label>
-                    <select id="top-n-select">
-                        <option value="30">Top 30</option>
-                        <option value="50" selected>Top 50</option>
-                        <option value="100">Top 100</option>
-                        <option value="200">Top 200</option>
-                        <option value="all">Tudo</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label>Exibir:</label>
-                    <input type="checkbox" id="toggle-sparklines" checked>
-                    <label for="toggle-sparklines">Sparklines</label>
+                <div class="controls-row">
+                    <div class="control-group">
+                        <label>Filtros Avançados:</label>
+                        <input type="checkbox" id="filter-rsi">
+                        <label for="filter-rsi">RSI < 45 (1h)</label>
+                        <input type="checkbox" id="filter-stoch">
+                        <label for="filter-stoch">STOCH < 35 (4h)</label>
+                        <input type="checkbox" id="filter-third-touch">
+                        <label for="filter-third-touch">Apenas 3º Toque L.T.</label>
+                    </div>
+                     <div class="control-group">
+                        <label>Exibir:</label>
+                        <input type="checkbox" id="toggle-sparklines" checked>
+                        <label for="toggle-sparklines">Sparklines</label>
+                    </div>
                 </div>
             </div>
             <!-- --- FIM DA ALTERAÇÃO --- -->
