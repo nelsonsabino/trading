@@ -2,13 +2,21 @@
 
 export const changelogData = {
 current: {
-    number: '17.1.1',
+    number: '17.1.2',
     changes: [
-        "**Diferenciação Visual de Sinais (Market Scanner):**",
-        "Os sinais de Linha de Tendência para o timeframe de 1 hora agora têm cores mais claras (verde/vermelho claro), diferenciando-os visualmente dos sinais de 4 horas para uma melhor hierarquia de informação."
+        "**Otimização de Layout (Dashboard):**",
+        "As secções vazias (colunas do Kanban e a tabela da Watchlist de Alarmes) são agora escondidas automaticamente quando não têm conteúdo.",
+        "Esta alteração otimiza o espaço vertical e proporciona uma interface mais limpa, especialmente em dispositivos móveis."
     ]
 },
 releases: [
+    {
+        number: '17.1.1',
+        changes: [
+            "**Diferenciação Visual de Sinais (Market Scanner):**",
+            "Os sinais de Linha de Tendência para o timeframe de 1 hora agora têm cores mais claras (verde/vermelho claro), diferenciando-os visualmente dos sinais de 4 horas para uma melhor hierarquia de informação."
+        ]
+    },
     {
         number: '17.1.0',
         changes: [
