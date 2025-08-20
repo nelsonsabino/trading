@@ -76,19 +76,18 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
         const ema200Color = '#0d6efd'; 
         const colors = [priceChartColor, ema50Color, ema200Color];
 
-        // --- INÍCIO DA ALTERAÇÃO ---
         let options = {
             series: series,
             chart: {
                 type: 'line', 
-                height: '100%', /* Alterado para preencher o container */
+                height: '100%',
+                // --- INÍCIO DA ALTERAÇÃO ---
                 toolbar: { 
-                    show: true, 
-                    autoSelected: 'pan' 
+                    show: false 
                 },
+                // --- FIM DA ALTERAÇÃO ---
                 zoom: { enabled: true }
             },
-            // --- FIM DA ALTERAÇÃO ---
             dataLabels: { enabled: false },
             colors: colors, 
             stroke: { 
@@ -98,7 +97,7 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
             xaxis: { type: 'datetime', labels: { datetimeUTC: false, format: 'dd MMM \'yy' } },
             yaxis: { 
                 labels: { 
-                    formatter: (val) => `$${val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` 
+                    formatter: (val) => `$${val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 8})}` 
                 },
                 tooltip: { enabled: true } 
             },
@@ -157,9 +156,10 @@ async function displayNewsForAsset(symbolPair) {
         const { data: news, error } = await supabase.functions.invoke('get-crypto-news', {
             body: { symbol: baseSymbol },
         });
-
+        
         if (error) {
-            throw new Error(`Erro na Edge Function: ${error.message}`);
+            const errorMessage = data ? data.error : (error.message || "Erro desconhecido.");
+            throw new Error(errorMessage);
         }
 
         if (!news || news.length === 0) {
@@ -325,7 +325,7 @@ async function handleMonitorAssetClick(symbol) {
         const alarmData = {
             asset_pair: symbol,
             alarm_type: 'stochastic_crossover',
-            condition: 'above', // Cruzamento Bullish
+            condition: 'above',
             indicator_timeframe: '15m',
             indicator_period: 14,
             combo_period: 3,
@@ -341,7 +341,7 @@ async function handleMonitorAssetClick(symbol) {
             setTimeout(() => {
                 button.innerHTML = originalText;
                 button.disabled = false;
-                displayAlarmsForAsset(symbol); // Atualiza a tabela de alarmes
+                displayAlarmsForAsset(symbol);
             }, 2000);
         }
         
