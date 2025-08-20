@@ -11,11 +11,12 @@ let allTickersData = [];
 let allExtraData = {};
 let monitoredAssets = new Set();
 let currentSortBy = 'volume';
+let currentSymbolFilter = ''; // --- INÍCIO DA ALTERAÇÃO ---
 let filterRsi = false;
 let filterStoch = false;
 let filterThirdTouch = false;
 let showSparklines = true;
-let currentTopN = 50;
+let currentTopN = '50'; // Alterado para string para acomodar 'all'
 
 async function fetchMonitoredAssets() {
     try {
@@ -72,7 +73,9 @@ function renderPageContent(processedTickers) {
         tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Nenhum ativo corresponde aos filtros.</td></tr>';
         return;
     }
-    const finalTickersToDisplay = processedTickers.slice(0, currentTopN); 
+    // --- INÍCIO DA ALTERAÇÃO ---
+    const finalTickersToDisplay = currentTopN === 'all' ? processedTickers : processedTickers.slice(0, parseInt(currentTopN, 10));
+    // --- FIM DA ALTERAÇÃO ---
     tbody.innerHTML = finalTickersToDisplay.map((ticker, index) => createTableRow(ticker, index, allExtraData, monitoredAssets)).join('');
     
     if (showSparklines) {
@@ -149,9 +152,7 @@ function createTableRow(ticker, index, extraData, monitoredAssetsSet) {
             if (!signal) return '';
             
             const trendlineBaseClass = signal.type === 'LTA' ? 'support' : 'resistance';
-            // --- INÍCIO DA ALTERAÇÃO ---
             const trendlineColorClass = timeframe === '1h' ? `${trendlineBaseClass}-light` : trendlineBaseClass;
-            // --- FIM DA ALTERAÇÃO ---
             const isBrokenClass = signal.isBroken ? 'trendline-broken' : '';
             const tooltipText = signal.isBroken ? `QUEBRA da ${signal.type} (${timeframe})!` : `3º Toque em ${signal.type} (${timeframe})`;
 
@@ -199,6 +200,13 @@ function createTableRow(ticker, index, extraData, monitoredAssetsSet) {
 
 function applyFiltersAndSort() {
     let processedTickers = [...allTickersData];
+    
+    // --- INÍCIO DA ALTERAÇÃO ---
+    if (currentSymbolFilter) {
+        processedTickers = processedTickers.filter(t => t.symbol.toUpperCase().includes(currentSymbolFilter.toUpperCase()));
+    }
+    // --- FIM DA ALTERAÇÃO ---
+
     if (filterRsi) processedTickers = processedTickers.filter(t => allExtraData[t.symbol]?.rsi_1h < 45);
     if (filterStoch) processedTickers = processedTickers.filter(t => allExtraData[t.symbol]?.stoch_4h < 35);
     if (filterThirdTouch) {
@@ -259,7 +267,11 @@ function updateMarketScanTitle() {
     const titleElement = document.getElementById('market-scan-title');
     if (titleElement) {
         const textNode = [...titleElement.childNodes].find(node => node.nodeType === Node.TEXT_NODE);
-        if (textNode) textNode.textContent = ` Top ${currentTopN} Pares com Maior Volume (USDC)`;
+        if (textNode) {
+            textNode.textContent = currentTopN === 'all'
+                ? ' Pares com Maior Volume (USDC)'
+                : ` Top ${currentTopN} Pares com Maior Volume (USDC)`;
+        }
     }
 }
 
@@ -271,6 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterThirdTouchCheckbox = document.getElementById('filter-third-touch');
     const toggleSparklinesCheckbox = document.getElementById('toggle-sparklines');
     const topNSelect = document.getElementById('top-n-select');
+    const filterSymbolInput = document.getElementById('filter-by-symbol'); // --- INÍCIO DA ALTERAÇÃO ---
 
     const savedSparklinesState = localStorage.getItem('showSparklines');
     if (savedSparklinesState !== null) {
@@ -279,17 +292,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const savedTopNState = localStorage.getItem('marketScannerTopN');
     if (savedTopNState !== null) {
-        currentTopN = parseInt(savedTopNState);
-        if (topNSelect) topNSelect.value = currentTopN.toString();
+        currentTopN = savedTopNState;
+        if (topNSelect) topNSelect.value = currentTopN;
     }
     updateMarketScanTitle();
 
     if (toggleSparklinesCheckbox) toggleSparklinesCheckbox.addEventListener('change', (e) => { showSparklines = e.target.checked; localStorage.setItem('showSparklines', JSON.stringify(showSparklines)); applyFiltersAndSort(); });
-    if (topNSelect) topNSelect.addEventListener('change', (e) => { currentTopN = parseInt(e.target.value); localStorage.setItem('marketScannerTopN', currentTopN.toString()); updateMarketScanTitle(); fetchAndDisplayMarketData(); });
+    if (topNSelect) topNSelect.addEventListener('change', (e) => { currentTopN = e.target.value; localStorage.setItem('marketScannerTopN', currentTopN); updateMarketScanTitle(); applyFiltersAndSort(); });
     if (sortBySelect) sortBySelect.addEventListener('change', (e) => { currentSortBy = e.target.value; applyFiltersAndSort(); });
     if (filterRsiCheckbox) filterRsiCheckbox.addEventListener('change', (e) => { filterRsi = e.target.checked; applyFiltersAndSort(); });
     if (filterStochCheckbox) filterStochCheckbox.addEventListener('change', (e) => { filterStoch = e.target.checked; applyFiltersAndSort(); });
     if (filterThirdTouchCheckbox) filterThirdTouchCheckbox.addEventListener('change', (e) => { filterThirdTouch = e.target.checked; applyFiltersAndSort(); });
+    
+    // --- INÍCIO DA ALTERAÇÃO ---
+    if (filterSymbolInput) {
+        filterSymbolInput.addEventListener('input', (e) => {
+            currentSymbolFilter = e.target.value;
+            applyFiltersAndSort();
+        });
+    }
+    // --- FIM DA ALTERAÇÃO ---
     
     if (tbody) {
         tbody.addEventListener('click', (e) => {
