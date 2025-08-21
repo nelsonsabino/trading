@@ -1,5 +1,11 @@
 /* css/forms-modals.css */
 
+/* --- FORMULÁRIO STANDALONE (EX: PÁGINA DE CRIAR ALARME) --- */
+.alarm-form-standalone {
+    max-width: 550px; /* Mesma largura dos modais para consistência */
+    margin: 0 auto; /* Centra o formulário na página */
+}
+
 /* --- MODAIS & FORMULÁRIOS --- */
 .modal-overlay { 
     position: fixed; 
@@ -77,7 +83,7 @@
     align-items: center; 
 }
 
-/* NOVO: Estilo para linhas de formulário com múltiplos itens lado a lado */
+/* Estilo para linhas de formulário com múltiplos itens lado a lado */
 .form-row {
     display: flex;
     gap: 1rem; /* Espaçamento entre os itens na linha */
