@@ -2,13 +2,21 @@
 
 export const changelogData = {
 current: {
-    number: '17.3.2',
+    number: '17.4.0',
     changes: [
-        "**Simplificação de UI (Gráficos):**",
-        "Removida a barra de ferramentas (zoom, pan, etc.) de todos os gráficos ApexCharts (página de detalhes e modais) para uma interface mais limpa e minimalista."
+        "**Feature: Refinamento do Alarme de Cruzamento do Estocástico:**",
+        "Adicionada a opção para definir um **nível específico** para o cruzamento, aumentando a precisão dos setups.",
+        "Permite que alarmes de alta (bullish) disparem apenas **abaixo** de um nível (ex: 20) e alarmes de baixa (bearish) apenas **acima** de um nível (ex: 80)."
     ]
 },
 releases: [
+    {
+        number: '17.3.2',
+        changes: [
+            "**Simplificação de UI (Gráficos):**",
+            "Removida a barra de ferramentas (zoom, pan, etc.) de todos os gráficos ApexCharts (página de detalhes e modais) para uma interface mais limpa e minimalista."
+        ]
+    },
     {
         number: '17.3.1',
         changes: [
