@@ -2,14 +2,21 @@
 
 export const changelogData = {
 current: {
-    number: '17.4.0',
+    number: '17.5.0',
     changes: [
-        "**Feature: Refinamento do Alarme de Cruzamento do Estocástico:**",
-        "Adicionada a opção para definir um **nível específico** para o cruzamento, aumentando a precisão dos setups.",
-        "Permite que alarmes de alta (bullish) disparem apenas **abaixo** de um nível (ex: 20) e alarmes de baixa (bearish) apenas **acima** de um nível (ex: 80)."
+        "**Consistência de Funcionalidade (Visualização de L.T.):**",
+        "O botão 'Visualizar Linha de Tendência' para alarmes de quebra de L.T. do RSI agora aparece de forma consistente em todas as interfaces da aplicação, incluindo a Watchlist do Dashboard, o modal de alarmes e a tabela de alarmes na página de Detalhes do Ativo."
     ]
 },
 releases: [
+    {
+        number: '17.4.0',
+        changes: [
+            "**Feature: Refinamento do Alarme de Cruzamento do Estocástico:**",
+            "Adicionada a opção para definir um **nível específico** para o cruzamento, aumentando a precisão dos setups.",
+            "Permite que alarmes de alta (bullish) disparem apenas **abaixo** de um nível (ex: 20) e alarmes de baixa (bearish) apenas **acima** de um nível (ex: 80)."
+        ]
+    },
     {
         number: '17.3.2',
         changes: [
