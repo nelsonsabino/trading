@@ -4,7 +4,9 @@ import { supabase } from './services.js';
 import { getTradesForAsset } from './firebase-service.js';
 import { getAlarmDescription } from './ui.js';
 import { handleDeleteAlarm } from './handlers.js';
+// --- INÍCIO DA ALTERAÇÃO ---
 import { openRsiTrendlineChartModal } from './chart-modal.js';
+// --- FIM DA ALTERAÇÃO ---
 
 let currentAssetSymbol = null; 
 let currentChartTimeframe = '1h'; 
@@ -238,12 +240,14 @@ async function displayAlarmsForAsset(symbol) {
         } else {
             const activeAlarmsHtml = activeAlarms.map(alarm => {
                 const alarmDescription = getAlarmDescription(alarm, true);
-
+                
+                // --- INÍCIO DA ALTERAÇÃO ---
                 let trendlineButtonHtml = '';
                 if (alarm.alarm_type === 'rsi_trendline_break') {
                     const alarmDataString = encodeURIComponent(JSON.stringify(alarm));
                     trendlineButtonHtml = `<button class="icon-action-btn btn-view-trendline" data-action="view-trendline" data-alarm='${alarmDataString}' title="Visualizar Linha de Tendência"><span class="material-symbols-outlined">analytics</span></button>`;
                 }
+                // --- FIM DA ALTERAÇÃO ---
 
                 return `
                     <tr>
@@ -251,13 +255,13 @@ async function displayAlarmsForAsset(symbol) {
                         <td>${new Date(alarm.created_at).toLocaleString('pt-PT')}</td>
                         <td>
                             <div class="action-buttons">
-                                ${trendlineButtonHtml}
                                 <a href="alarms-create.html?editAlarmId=${alarm.id}" class="icon-action-btn" title="Editar Alarme">
                                     <span class="material-symbols-outlined">edit</span>
                                 </a>
                                 <button class="icon-action-btn" data-action="delete-alarm" data-alarm-id="${alarm.id}" title="Apagar Alarme">
                                     <span class="material-symbols-outlined">delete_forever</span>
                                 </button>
+                                ${trendlineButtonHtml}
                             </div>
                         </td>
                     </tr>`;
@@ -419,19 +423,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const alarmsTableBody = document.getElementById('asset-alarms-tbody');
     if (alarmsTableBody) {
         alarmsTableBody.addEventListener('click', (e) => {
-            const targetElement = e.target.closest('[data-action]');
-            if (!targetElement) return;
-            
-            e.preventDefault();
-            const action = targetElement.dataset.action;
-
-            if (action === 'delete-alarm') {
-                const alarmId = targetElement.dataset.alarmId;
+            const deleteButton = e.target.closest('button[data-action="delete-alarm"]');
+            if (deleteButton) {
+                e.preventDefault();
+                const alarmId = deleteButton.dataset.alarmId;
                 handleDeleteAlarm(alarmId);
-            } else if (action === 'view-trendline') {
-                const alarmData = JSON.parse(decodeURIComponent(targetElement.dataset.alarm));
+                return;
+            }
+            
+            // --- INÍCIO DA ALTERAÇÃO ---
+            const trendlineButton = e.target.closest('button[data-action="view-trendline"]');
+            if (trendlineButton) {
+                e.preventDefault();
+                const alarmData = JSON.parse(decodeURIComponent(trendlineButton.dataset.alarm));
                 openRsiTrendlineChartModal(alarmData);
             }
+            // --- FIM DA ALTERAÇÃO ---
         });
     }
 
