@@ -4,6 +4,7 @@ import { supabase } from './services.js';
 import { getTradesForAsset } from './firebase-service.js';
 import { getAlarmDescription } from './ui.js';
 import { handleDeleteAlarm } from './handlers.js';
+import { openRsiTrendlineChartModal } from './chart-modal.js';
 
 let currentAssetSymbol = null; 
 let currentChartTimeframe = '1h'; 
@@ -81,11 +82,9 @@ async function renderMainAssetChart(symbol, interval = '1h', chartType = 'line')
             chart: {
                 type: 'line', 
                 height: '100%',
-                // --- INÍCIO DA ALTERAÇÃO ---
                 toolbar: { 
                     show: false 
                 },
-                // --- FIM DA ALTERAÇÃO ---
                 zoom: { enabled: true }
             },
             dataLabels: { enabled: false },
@@ -240,12 +239,19 @@ async function displayAlarmsForAsset(symbol) {
             const activeAlarmsHtml = activeAlarms.map(alarm => {
                 const alarmDescription = getAlarmDescription(alarm, true);
 
+                let trendlineButtonHtml = '';
+                if (alarm.alarm_type === 'rsi_trendline_break') {
+                    const alarmDataString = encodeURIComponent(JSON.stringify(alarm));
+                    trendlineButtonHtml = `<button class="icon-action-btn" data-action="view-trendline" data-alarm='${alarmDataString}' title="Visualizar Linha de Tendência"><span class="material-symbols-outlined">analytics</span></button>`;
+                }
+
                 return `
                     <tr>
                         <td>${alarmDescription}</td>
                         <td>${new Date(alarm.created_at).toLocaleString('pt-PT')}</td>
                         <td>
                             <div class="action-buttons">
+                                ${trendlineButtonHtml}
                                 <a href="alarms-create.html?editAlarmId=${alarm.id}" class="icon-action-btn" title="Editar Alarme">
                                     <span class="material-symbols-outlined">edit</span>
                                 </a>
@@ -413,11 +419,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const alarmsTableBody = document.getElementById('asset-alarms-tbody');
     if (alarmsTableBody) {
         alarmsTableBody.addEventListener('click', (e) => {
-            const deleteButton = e.target.closest('button[data-action="delete-alarm"]');
-            if (deleteButton) {
+            const button = e.target.closest('button[data-action]');
+            if (button) {
                 e.preventDefault();
-                const alarmId = deleteButton.dataset.alarmId;
-                handleDeleteAlarm(alarmId);
+                const action = button.dataset.action;
+
+                if (action === 'delete-alarm') {
+                    const alarmId = button.dataset.alarmId;
+                    handleDeleteAlarm(alarmId);
+                } else if (action === 'view-trendline') {
+                    const alarmData = JSON.parse(decodeURIComponent(button.dataset.alarm));
+                    openRsiTrendlineChartModal(alarmData);
+                }
             }
         });
     }
