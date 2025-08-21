@@ -79,15 +79,15 @@ function enterEditMode(alarm) {
         document.getElementById('stoch-cross-k-period').value = alarm.indicator_period; 
         document.getElementById('stoch-cross-d-period').value = alarm.combo_period; 
         document.getElementById('stoch-cross-timeframe').value = alarm.indicator_timeframe;
-        // Preenche os novos campos
-        if (alarm.crossover_level_type === 'specific') {
-            document.getElementById('stoch-cross-level-specific').checked = true;
-            document.getElementById('stoch-cross-level-value-container').style.display = 'block';
+        
+        const isSpecific = alarm.crossover_level_type === 'specific';
+        const checkbox = document.getElementById('stoch-cross-level-specific-checkbox');
+        checkbox.checked = isSpecific;
+        document.getElementById('stoch-cross-level-value-container').style.display = isSpecific ? 'block' : 'none';
+        if (isSpecific) {
             document.getElementById('stoch-cross-level-value').value = alarm.crossover_level_value || '';
-        } else {
-            document.getElementById('stoch-cross-level-any').checked = true;
-            document.getElementById('stoch-cross-level-value-container').style.display = 'none';
         }
+
     } else if (alarmType === 'rsi_crossover') { 
         document.getElementById('rsi-condition').value = alarm.condition; 
         document.getElementById('rsi-timeframe').value = alarm.indicator_timeframe; 
@@ -130,8 +130,8 @@ function exitEditMode() {
     document.getElementById('stoch-period').value = 7;
     document.getElementById('stoch-cross-k-period').value = 7;
 
-    // Reset dos novos campos do Stoch Crossover
-    document.getElementById('stoch-cross-level-any').checked = true;
+    const checkbox = document.getElementById('stoch-cross-level-specific-checkbox');
+    checkbox.checked = false;
     document.getElementById('stoch-cross-level-value').value = '';
     document.getElementById('stoch-cross-level-value-container').style.display = 'none';
 
@@ -189,20 +189,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- INÍCIO DA LÓGICA PARA OS NOVOS CAMPOS ---
-    const stochLevelTypeRadios = document.querySelectorAll('input[name="stoch-cross-level-type"]');
+    const stochLevelCheckbox = document.getElementById('stoch-cross-level-specific-checkbox');
     const stochLevelValueContainer = document.getElementById('stoch-cross-level-value-container');
     
-    stochLevelTypeRadios.forEach(radio => {
-        radio.addEventListener('change', (event) => {
-            if (event.target.value === 'specific') {
-                stochLevelValueContainer.style.display = 'block';
-            } else {
-                stochLevelValueContainer.style.display = 'none';
-            }
-        });
+    stochLevelCheckbox.addEventListener('change', (event) => {
+        stochLevelValueContainer.style.display = event.target.checked ? 'block' : 'none';
     });
-    // --- FIM DA LÓGICA PARA OS NOVOS CAMPOS ---
 
     const urlParams = new URLSearchParams(window.location.search);
     const assetPairFromUrl = urlParams.get('assetPair');
@@ -280,13 +272,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 alarmData.indicator_period = parseInt(document.getElementById('stoch-cross-k-period').value); 
                 alarmData.combo_period = parseInt(document.getElementById('stoch-cross-d-period').value); 
                 alarmData.indicator_timeframe = document.getElementById('stoch-cross-timeframe').value;
-                // Coleta os dados dos novos campos
-                alarmData.crossover_level_type = document.querySelector('input[name="stoch-cross-level-type"]:checked').value;
-                if (alarmData.crossover_level_type === 'specific') {
+                
+                const isSpecificCheckbox = document.getElementById('stoch-cross-level-specific-checkbox');
+                if (isSpecificCheckbox.checked) {
+                    alarmData.crossover_level_type = 'specific';
                     const levelValue = parseFloat(document.getElementById('stoch-cross-level-value').value);
                     if (isNaN(levelValue)) throw new Error("O valor do nível específico para o Estocástico é inválido.");
                     alarmData.crossover_level_value = levelValue;
                 } else {
+                    alarmData.crossover_level_type = 'any';
                     alarmData.crossover_level_value = null;
                 }
             } else if (alarmType === 'rsi_crossover') { 
