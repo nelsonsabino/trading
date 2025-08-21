@@ -4,7 +4,7 @@ import { supabase } from './services.js';
 import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
 import { openArmModal, openExecModal, openCloseTradeModal, openAddModal } from './modals.js';
 import { loadAndOpenForEditing, handleRevertStatus, handleRevertToWatchlist, handleDeleteAlarm } from './handlers.js';
-import { openChartModal } from './chart-modal.js';
+import { openChartModal, openRsiTrendlineChartModal } from './chart-modal.js';
 import { getLastCreatedTradeId, setLastCreatedTradeId, getVisibleImageIds, setVisibleImageIds } from './state.js';
 
 let tradesForEventListeners = [];
@@ -36,14 +36,14 @@ function renderSparkline(containerId, dataSeries) {
     const negativeColor = computedStyle.getPropertyValue('--feedback-negative').trim();
     const chartColor = dataSeries[dataSeries.length - 1] >= dataSeries[0] ? positiveColor : negativeColor;
     const options = {
-        series: [{ data: dataSeries }],
+        series: [{ data: dataSeries }], 
         chart: { type: 'line', height: 40, width: 100, sparkline: { enabled: true }},
-        stroke: { curve: 'smooth', width: 2 },
+        stroke: { curve: 'smooth', width: 2 }, 
         colors: [chartColor],
-        tooltip: {
-            fixed: { enabled: false },
-            x: { show: false },
-            y: { title: { formatter: () => '' } },
+        tooltip: { 
+            fixed: { enabled: false }, 
+            x: { show: false }, 
+            y: { title: { formatter: () => '' } }, 
             marker: { show: false },
             theme: isDarkMode ? 'dark' : 'light'
         }
@@ -80,7 +80,7 @@ function createChecklistItem(item, data) {
 }
 function createInputItem(item, data) {
     const element = document.createElement('div');
-    element.className = 'input-item-styled';
+    element.className = 'input-item-styled'; 
     const isRequired = item.required ? 'required' : '';
     const labelText = item.required ? `${item.label} <span class="required-asterisk">*</span>` : item.label;
     const value = data && data[item.id] ? data[item.id] : '';
@@ -97,7 +97,7 @@ function createInputItem(item, data) {
 export function generateDynamicChecklist(container, phases, data = {}) {
     if (!phases || phases.length === 0) return;
     phases.forEach(phase => {
-        if (!phase || !Array.isArray(phase.items)) return;
+        if (!phase || !Array.isArray(phase.items)) return; 
         const phaseDiv = document.createElement('div');
         const titleEl = document.createElement('h4');
         titleEl.textContent = phase.title;
@@ -141,7 +141,7 @@ export function getAlarmDescription(alarm, forTable = false) {
     if (!alarm) return 'N/A';
     const timeframe = `(${alarm.indicator_timeframe})`;
     switch (alarm.alarm_type) {
-        case 'stochastic': return `Stoch(${alarm.indicator_period}) <= ${alarm.target_price} ${timeframe}`;
+        case 'stochastic': return `Stoch(${alarm.indicator_period}) ≤ ${alarm.target_price} ${timeframe}`;
         case 'rsi_level': return `RSI(${alarm.indicator_period}) ${alarm.condition === 'above' ? '>' : '<'} ${alarm.target_price} ${timeframe}`;
         case 'stochastic_crossover': {
             let stochDetails = '';
@@ -193,14 +193,21 @@ function openAlarmListModal(titleText, alarmsToDisplay) {
             triggeredAtHtml = `<span class="alarm-list-timestamp triggered">Disparado em: ${triggeredAt}</span>`;
         }
 
+        let trendlineButtonHtml = '';
+        if (alarm.alarm_type === 'rsi_trendline_break') {
+            const alarmDataString = encodeURIComponent(JSON.stringify(alarm));
+            trendlineButtonHtml = `<button class="icon-action-btn" data-action="view-trendline" data-alarm='${alarmDataString}' title="Visualizar Linha de Tendência"><span class="material-symbols-outlined">analytics</span></button>`;
+        }
+
         return `
-        <div class="alarm-list-item">
+        <div class="alarm-list-item" data-alarm-id="${alarm.id}" data-alarm-full='${encodeURIComponent(JSON.stringify(alarm))}'>
             <div>
                 <span class="alarm-list-description">${getAlarmDescription(alarm)}</span>
                 <span class="alarm-list-timestamp">Criado em: ${createdAt}</span>
                 ${triggeredAtHtml}
             </div>
             <div class="alarm-list-actions">
+                ${trendlineButtonHtml}
                 <a href="alarms-create.html?editAlarmId=${alarm.id}" class="icon-action-btn" title="Editar"><span class="material-symbols-outlined">edit</span></a>
                 <button class="icon-action-btn" data-action="delete-alarm" data-alarm-id="${alarm.id}" title="Apagar Alarme"><span class="material-symbols-outlined">delete_forever</span></button>
             </div>
@@ -215,7 +222,7 @@ function openAlarmListModal(titleText, alarmsToDisplay) {
             acknowledgeBtn.onclick = async () => {
                 await acknowledgeAlarm(assetPair);
                 modal.style.display = 'none';
-                location.reload();
+                location.reload(); 
             };
         }
     }
@@ -339,6 +346,12 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
         const triggeredClass = hasTriggeredUnacknowledgedAlarm ? 'class="alarm-triggered"' : '';
         const acknowledgeButtonHtml = hasTriggeredUnacknowledgedAlarm ? `<button class="acknowledge-alarm-btn" data-action="acknowledge-and-view-alarm" data-asset="${assetName}" title="Ver Alarme Disparado"><span class="material-symbols-outlined">alarm</span> OK</button>` : '';
         
+        let trendlineButtonHtml = '';
+        if (latestAlarm.alarm_type === 'rsi_trendline_break') {
+            const alarmDataString = encodeURIComponent(JSON.stringify(latestAlarm));
+            trendlineButtonHtml = `<button class="icon-action-btn" data-action="view-trendline" data-alarm='${alarmDataString}' title="Visualizar Linha de Tendência"><span class="material-symbols-outlined">analytics</span></button>`;
+        }
+
         return `
             <tr ${triggeredClass}>
                 <td data-label="Ativo"><strong><a href="asset-details.html?symbol=${assetName}" class="asset-link">${assetName}</a></strong></td>
@@ -350,6 +363,7 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
                 <td data-label="Ações">
                     <div class="action-buttons">
                         ${acknowledgeButtonHtml}
+                        ${trendlineButtonHtml}
                         <button class="icon-action-btn btn-view-chart" data-action="view-chart" data-symbol="${assetName}" title="Ver Gráfico Detalhado"><span class="material-symbols-outlined">monitoring</span></button>
                         <a href="https://www.tradingview.com/chart/?symbol=BINANCE:${assetName}" target="_blank" class="icon-action-btn btn-trading-view" title="TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
                         <a href="alarms-create.html?assetPair=${assetName}" class="icon-action-btn" title="Criar Novo Alarme"><span class="material-symbols-outlined">alarm_add</span></a>
@@ -404,9 +418,10 @@ document.addEventListener('DOMContentLoaded', () => {
         watchlistTable.addEventListener('click', (e) => {
             const targetElement = e.target.closest('[data-action]');
             if (!targetElement) return;
+            e.preventDefault();
             const action = targetElement.dataset.action;
             const symbol = targetElement.dataset.symbol || targetElement.dataset.asset;
-            if (action !== 'delete-alarm') e.preventDefault();
+            
             if (action === 'view-chart' && symbol) {
                 openChartModal(symbol);
             } else if (action === 'add-to-potential' && symbol) {
@@ -417,6 +432,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadAndOpenAlarmModal(symbol, 'triggered');
             } else if (action === 'manage-alarms' && symbol) {
                 loadAndOpenAlarmModal(symbol, 'active');
+            } else if (action === 'view-trendline') {
+                const alarmData = JSON.parse(decodeURIComponent(targetElement.dataset.alarm));
+                openRsiTrendlineChartModal(alarmData);
             }
         });
     }
@@ -424,11 +442,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const alarmModal = document.getElementById('alarm-list-modal');
     if (alarmModal) {
         alarmModal.addEventListener('click', (e) => {
-            const button = e.target.closest('button[data-action="delete-alarm"]');
-            if (button) {
+            const button = e.target.closest('button[data-action]');
+            if (!button) return;
+
+            const action = button.dataset.action;
+            if (action === 'delete-alarm') {
                 e.preventDefault();
                 const alarmId = button.dataset.alarmId;
                 handleDeleteAlarm(alarmId);
+            } else if (action === 'view-trendline') {
+                e.preventDefault();
+                const alarmItem = button.closest('.alarm-list-item');
+                const alarmData = JSON.parse(decodeURIComponent(alarmItem.dataset.alarmFull));
+                openRsiTrendlineChartModal(alarmData);
             }
         });
     }
