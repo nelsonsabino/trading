@@ -5,8 +5,10 @@ import { setAlarmsData, getLastCreatedAlarmId, setLastCreatedAlarmId } from './s
 import { enterEditMode } from './alarms-create.js';
 import { openChartModal, openRsiTrendlineChartModal } from './chart-modal.js';
 
+// --- INÍCIO DA ALTERAÇÃO (Variáveis obsoletas removidas) ---
 let monitoredAssets = new Set();
 let currentApexChart = null; 
+// --- FIM DA ALTERAÇÃO ---
 
 async function fetchMonitoredAssets() {
     try {
