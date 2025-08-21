@@ -1,9 +1,12 @@
 /* css/forms-modals.css */
 
 /* --- FORMULÁRIO STANDALONE (EX: PÁGINA DE CRIAR ALARME) --- */
-.alarm-form-standalone {
-    max-width: 550px; /* Mesma largura dos modais para consistência */
-    margin: 0 auto; /* Centra o formulário na página */
+/* APLICA LARGURA MÁXIMA APENAS AOS ITENS DE TOPO E AO BOTÃO */
+.alarm-form-standalone > .input-item,
+.alarm-form-standalone .form-actions {
+    max-width: 550px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 /* --- MODAIS & FORMULÁRIOS --- */
@@ -261,7 +264,7 @@
 
 /* --- ESTILOS PARA CONTENTORES DE CAMPOS DE ALARME ESPECÍFICOS --- */
 .alarm-form-standalone [id$="-fields"] {
-    padding: 1.5rem 1rem 0.5rem 1rem; /* Adiciona padding interno: Topo, Lados, Fundo */
+    padding: 1.5rem 1rem 0.5rem 1rem;
     margin-top: 1.5rem;
     border-top: 1px solid #e9ecef;
 }
