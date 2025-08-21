@@ -190,3 +190,37 @@
     padding-bottom: 0;
     border-bottom: none;
 }
+
+/* --- ESTILOS PARA GRUPOS DE RÁDIO PERSONALIZADOS --- */
+.radio-options-group {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem; /* Espaço entre as opções de rádio */
+    padding-top: 0.5rem; /* Alinha verticalmente com outros campos de input */
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Espaço entre o botão de rádio e o seu texto */
+}
+
+.radio-option input[type="radio"] {
+    width: auto; /* Remove a largura de 100% dos inputs normais */
+    margin: 0; /* Remove margens padrão */
+    flex-shrink: 0; /* Impede que o botão encolha */
+}
+
+.radio-option label {
+    margin-bottom: 0; /* Remove a margem inferior das labels padrão */
+    font-weight: normal; /* Define o peso da fonte como normal */
+    cursor: pointer;
+}
+
+/* Classe para texto de ajuda/muted */
+.form-text-muted {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.85em;
+    color: #6c757d;
+}
