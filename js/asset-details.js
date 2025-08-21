@@ -242,7 +242,7 @@ async function displayAlarmsForAsset(symbol) {
                 let trendlineButtonHtml = '';
                 if (alarm.alarm_type === 'rsi_trendline_break') {
                     const alarmDataString = encodeURIComponent(JSON.stringify(alarm));
-                    trendlineButtonHtml = `<button class="icon-action-btn" data-action="view-trendline" data-alarm='${alarmDataString}' title="Visualizar Linha de Tendência"><span class="material-symbols-outlined">analytics</span></button>`;
+                    trendlineButtonHtml = `<button class="icon-action-btn btn-view-trendline" data-action="view-trendline" data-alarm='${alarmDataString}' title="Visualizar Linha de Tendência"><span class="material-symbols-outlined">analytics</span></button>`;
                 }
 
                 return `
