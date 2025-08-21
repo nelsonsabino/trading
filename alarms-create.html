@@ -88,7 +88,7 @@
         <section class="alarm-creator-section">
             <form id="alarm-form" class="alarm-form-standalone">
 
-                <div class="input-item" style="max-width: 400px; margin-left: auto; margin-right: auto;">
+                <div class="input-item">
                     <label for="alarm-type-select">Tipo de Alarme</label>
                     <select id="alarm-type-select">
                         <option value="price">Preço</option>
@@ -103,13 +103,11 @@
                     </select>
                 </div>
 
-                <div class="form-row">
-                    <div class="input-item">
-                        <label for="alarm-asset">Ativo</label>
-                        <input type="text" id="alarm-asset" required placeholder="Comece a escrever..." autocomplete="off">
-                        <div id="autocomplete-results" class="autocomplete-results"></div>
-                        <div id="asset-current-price" class="asset-price-display"></div>
-                    </div>
+                <div class="input-item">
+                    <label for="alarm-asset">Ativo</label>
+                    <input type="text" id="alarm-asset" required placeholder="Comece a escrever..." autocomplete="off">
+                    <div id="autocomplete-results" class="autocomplete-results"></div>
+                    <div id="asset-current-price" class="asset-price-display"></div>
                 </div>
 
                 <div id="price-fields">
@@ -186,7 +184,6 @@
                             </select>
                         </div>
                     </div>
-                    <!-- START: Bloco de Nível de Cruzamento Reestruturado com CHECKBOX -->
                     <div class="form-row">
                         <div class="input-item">
                             <label>Nível do Cruzamento</label>
@@ -203,7 +200,6 @@
                             <small class="form-text-muted">Bullish: cruza ABAIXO do valor. Bearish: cruza ACIMA.</small>
                         </div>
                     </div>
-                    <!-- END: Bloco Reestruturado -->
                 </div>
 
                 <div id="rsi-level-fields" style="display: none;">
