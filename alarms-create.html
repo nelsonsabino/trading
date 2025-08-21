@@ -186,24 +186,20 @@
                             </select>
                         </div>
                     </div>
-                    <!-- START: Bloco de Nível de Cruzamento Reestruturado -->
+                    <!-- START: Bloco de Nível de Cruzamento Reestruturado com CHECKBOX -->
                     <div class="form-row">
                         <div class="input-item">
                             <label>Nível do Cruzamento</label>
-                            <div class="radio-options-group">
-                                <div class="radio-option">
-                                    <input type="radio" id="stoch-cross-level-any" name="stoch-cross-level-type" value="any" checked>
-                                    <label for="stoch-cross-level-any">Qualquer Nível</label>
+                            <div class="specific-level-control">
+                                <div class="checkbox-option">
+                                    <input type="checkbox" id="stoch-cross-level-specific-checkbox">
+                                    <label for="stoch-cross-level-specific-checkbox">Nível de Cruzamento Específico</label>
                                 </div>
-                                <div class="radio-option">
-                                    <input type="radio" id="stoch-cross-level-specific" name="stoch-cross-level-type" value="specific">
-                                    <label for="stoch-cross-level-specific">Nível Específico</label>
+                                <div class="input-item" id="stoch-cross-level-value-container" style="display: none;">
+                                    <label for="stoch-cross-level-value">Valor do Nível</label>
+                                    <input type="number" id="stoch-cross-level-value" placeholder="Ex: 20">
                                 </div>
                             </div>
-                        </div>
-                        <div class="input-item" id="stoch-cross-level-value-container" style="display: none;">
-                            <label for="stoch-cross-level-value">Valor do Nível</label>
-                            <input type="number" id="stoch-cross-level-value" placeholder="Ex: 20 para bullish, 80 para bearish">
                             <small class="form-text-muted">Bullish: cruza ABAIXO do valor. Bearish: cruza ACIMA.</small>
                         </div>
                     </div>
