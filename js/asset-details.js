@@ -419,17 +419,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const alarmsTableBody = document.getElementById('asset-alarms-tbody');
     if (alarmsTableBody) {
         alarmsTableBody.addEventListener('click', (e) => {
-            const button = e.target.closest('button[data-action]');
-            if (!button) return;
+            const targetElement = e.target.closest('[data-action]');
+            if (!targetElement) return;
             
             e.preventDefault();
-            const action = button.dataset.action;
+            const action = targetElement.dataset.action;
 
             if (action === 'delete-alarm') {
-                const alarmId = button.dataset.alarmId;
+                const alarmId = targetElement.dataset.alarmId;
                 handleDeleteAlarm(alarmId);
             } else if (action === 'view-trendline') {
-                const alarmData = JSON.parse(decodeURIComponent(button.dataset.alarm));
+                const alarmData = JSON.parse(decodeURIComponent(targetElement.dataset.alarm));
                 openRsiTrendlineChartModal(alarmData);
             }
         });
