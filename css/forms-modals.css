@@ -191,26 +191,23 @@
     border-bottom: none;
 }
 
-/* --- ESTILOS PARA GRUPOS DE RÁDIO PERSONALIZADOS --- */
+/* --- ESTILOS PARA GRUPOS DE RÁDIO PERSONALIZADOS (ANTIGO) --- */
 .radio-options-group {
     display: flex;
     align-items: center;
     gap: 1.5rem; /* Espaço entre as opções de rádio */
     padding-top: 0.5rem; /* Alinha verticalmente com outros campos de input */
 }
-
 .radio-option {
     display: flex;
     align-items: center;
     gap: 0.5rem; /* Espaço entre o botão de rádio e o seu texto */
 }
-
 .radio-option input[type="radio"] {
     width: auto; /* Remove a largura de 100% dos inputs normais */
     margin: 0; /* Remove margens padrão */
     flex-shrink: 0; /* Impede que o botão encolha */
 }
-
 .radio-option label {
     margin-bottom: 0; /* Remove a margem inferior das labels padrão */
     font-weight: normal; /* Define o peso da fonte como normal */
@@ -223,4 +220,35 @@
     margin-top: 0.5rem;
     font-size: 0.85em;
     color: #6c757d;
+}
+
+/* --- NOVOS ESTILOS PARA CHECKBOX DE NÍVEL ESPECÍFICO --- */
+.specific-level-control {
+    display: flex;
+    align-items: center;
+    gap: 1rem; /* Espaço entre o checkbox e o campo de valor */
+    padding-top: 0.5rem;
+}
+.specific-level-control .checkbox-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.specific-level-control input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    flex-shrink: 0;
+}
+.specific-level-control .checkbox-option label {
+    margin-bottom: 0;
+    font-weight: normal;
+    cursor: pointer;
+}
+.specific-level-control .input-item {
+    margin-bottom: 0;
+    flex-grow: 0; /* Impede que o campo de valor cresça para preencher o espaço */
+    flex-basis: 220px; /* Define uma largura base para o campo */
+}
+.specific-level-control .input-item label {
+    display: none; /* A label principal já existe, não precisamos de outra */
 }
