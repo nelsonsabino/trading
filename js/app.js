@@ -38,7 +38,6 @@ function manageEmptySectionsVisibility() {
     }
 }
 
-// --- INÍCIO DA ALTERAÇÃO ---
 async function displayGeneralNews() {
     const container = document.getElementById('general-news-container');
     if (!container) return;
@@ -75,7 +74,6 @@ async function displayGeneralNews() {
         container.innerHTML = '<p style="color:red;">Não foi possível carregar as notícias.</p>';
     }
 }
-// --- FIM DA ALTERAÇÃO ---
 
 async function refreshDashboardView() {
     console.log("A atualizar a vista da dashboard...");
@@ -91,7 +89,12 @@ async function refreshDashboardView() {
 
 async function fetchMarketDataForDashboard(trades, alarms) {
     const tradeSymbols = trades.map(trade => trade.data.asset);
-    const alarmSymbols = alarms.filter(a => a.status === 'active').map(a => a.asset_pair);
+    
+    // START OF MODIFICATION
+    const alarmSymbols = alarms
+        .filter(a => a.status === 'active' || (a.status === 'triggered' && !a.acknowledged))
+        .map(a => a.asset_pair);
+    // END OF MODIFICATION
     
     const symbols = [...new Set([...tradeSymbols, ...alarmSymbols])];
     if (symbols.length === 0) return {};
@@ -183,9 +186,7 @@ async function initializeApp() {
         loadAndOpenForEditing(tradeIdToEdit);
     }
     
-    // --- INÍCIO DA ALTERAÇÃO ---
     displayGeneralNews();
-    // --- FIM DA ALTERAÇÃO ---
 }
 
 document.addEventListener('DOMContentLoaded', () => {
