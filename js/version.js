@@ -2,15 +2,23 @@
 
 export const changelogData = {
 current: {
-    number: '17.5.1',
+    number: '17.5.2',
     changes: [
-        "**Correção Crítica do Alarme de Quebra de Linha de Tendência RSI:**",
-        "Resolvido o bug fundamental que impedia os alarmes de quebra de L.T. (especialmente os de resistência) de serem disparados.",
-        "A causa foi dupla: uma inconsistência na fórmula de projeção da linha de tendência no backend e uma falha de autorização (`401 Unauthorized`) no Cron Job que impedia a execução automática da função.",
-        "Ambos os problemas foram corrigidos, restaurando a fiabilidade total da funcionalidade."
+        "**Correção Crítica da Watchlist de Alarmes:**",
+        "Resolvido o bug onde um ativo desaparecia da watchlist do Dashboard se o seu único alarme fosse disparado.",
+        "A lógica de exibição foi corrigida para incluir ativos que tenham alarmes com status 'active' OU 'triggered' (e não reconhecidos), garantindo que os ativos permaneçam na lista para que o destaque visual de alarme disparado seja aplicado corretamente."
     ]
 },
 releases: [
+    {
+        number: '17.5.1',
+        changes: [
+            "**Correção Crítica do Alarme de Quebra de Linha de Tendência RSI:**",
+            "Resolvido o bug fundamental que impedia os alarmes de quebra de L.T. (especialmente os de resistência) de serem disparados.",
+            "A causa foi dupla: uma inconsistência na fórmula de projeção da linha de tendência no backend e uma falha de autorização (`401 Unauthorized`) no Cron Job que impedia a execução automática da função.",
+            "Ambos os problemas foram corrigidos, restaurando a fiabilidade total da funcionalidade."
+        ]
+    },
     {
         number: '17.5.0',
         changes: [
