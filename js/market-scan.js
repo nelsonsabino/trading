@@ -11,12 +11,12 @@ let allTickersData = [];
 let allExtraData = {};
 let monitoredAssets = new Set();
 let currentSortBy = 'volume';
-let currentSymbolFilter = ''; // --- INÍCIO DA ALTERAÇÃO ---
+let currentSymbolFilter = '';
 let filterRsi = false;
 let filterStoch = false;
 let filterThirdTouch = false;
 let showSparklines = true;
-let currentTopN = '50'; // Alterado para string para acomodar 'all'
+let currentTopN = '50'; 
 
 async function fetchMonitoredAssets() {
     try {
@@ -73,9 +73,7 @@ function renderPageContent(processedTickers) {
         tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Nenhum ativo corresponde aos filtros.</td></tr>';
         return;
     }
-    // --- INÍCIO DA ALTERAÇÃO ---
     const finalTickersToDisplay = currentTopN === 'all' ? processedTickers : processedTickers.slice(0, parseInt(currentTopN, 10));
-    // --- FIM DA ALTERAÇÃO ---
     tbody.innerHTML = finalTickersToDisplay.map((ticker, index) => createTableRow(ticker, index, allExtraData, monitoredAssets)).join('');
     
     if (showSparklines) {
@@ -191,6 +189,7 @@ function createTableRow(ticker, index, extraData, monitoredAssetsSet) {
             <td data-label="Ações">
                 <div class="action-buttons">
                     ${monitorButtonHtml}
+                    <a href="alarms-create.html?assetPair=${ticker.symbol}&alarmType=price" class="icon-action-btn" title="Criar Alarme de Preço"><span class="material-symbols-outlined">add_alert</span></a>
                     <button class="icon-action-btn btn-view-chart" data-action="view-chart" data-symbol="${ticker.symbol}" title="Ver Gráfico"><span class="material-symbols-outlined">monitoring</span></button>
                     <a href="${tradingViewUrl}" target="_blank" class="icon-action-btn btn-trading-view" title="TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
                 </div>
@@ -201,11 +200,9 @@ function createTableRow(ticker, index, extraData, monitoredAssetsSet) {
 function applyFiltersAndSort() {
     let processedTickers = [...allTickersData];
     
-    // --- INÍCIO DA ALTERAÇÃO ---
     if (currentSymbolFilter) {
         processedTickers = processedTickers.filter(t => t.symbol.toUpperCase().includes(currentSymbolFilter.toUpperCase()));
     }
-    // --- FIM DA ALTERAÇÃO ---
 
     if (filterRsi) processedTickers = processedTickers.filter(t => allExtraData[t.symbol]?.rsi_1h < 45);
     if (filterStoch) processedTickers = processedTickers.filter(t => allExtraData[t.symbol]?.stoch_4h < 35);
@@ -283,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterThirdTouchCheckbox = document.getElementById('filter-third-touch');
     const toggleSparklinesCheckbox = document.getElementById('toggle-sparklines');
     const topNSelect = document.getElementById('top-n-select');
-    const filterSymbolInput = document.getElementById('filter-by-symbol'); // --- INÍCIO DA ALTERAÇÃO ---
+    const filterSymbolInput = document.getElementById('filter-by-symbol');
 
     const savedSparklinesState = localStorage.getItem('showSparklines');
     if (savedSparklinesState !== null) {
@@ -304,14 +301,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (filterStochCheckbox) filterStochCheckbox.addEventListener('change', (e) => { filterStoch = e.target.checked; applyFiltersAndSort(); });
     if (filterThirdTouchCheckbox) filterThirdTouchCheckbox.addEventListener('change', (e) => { filterThirdTouch = e.target.checked; applyFiltersAndSort(); });
     
-    // --- INÍCIO DA ALTERAÇÃO ---
     if (filterSymbolInput) {
         filterSymbolInput.addEventListener('input', (e) => {
             currentSymbolFilter = e.target.value;
             applyFiltersAndSort();
         });
     }
-    // --- FIM DA ALTERAÇÃO ---
     
     if (tbody) {
         tbody.addEventListener('click', (e) => {
