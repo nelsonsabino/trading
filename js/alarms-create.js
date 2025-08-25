@@ -199,7 +199,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const assetPairFromUrl = urlParams.get('assetPair');
     const alarmIdToEdit = urlParams.get('editAlarmId');
-    
     const alarmTypeFromUrl = urlParams.get('alarmType');
     const trendlineTypeFromUrl = urlParams.get('trendlineType');
     const timeframeFromUrl = urlParams.get('timeframe');
@@ -209,18 +208,25 @@ document.addEventListener('DOMContentLoaded', () => {
         assetInput.value = pair;
         fetchPriceForPair(pair); 
     }
-
-    if (alarmTypeFromUrl === 'rsi_trendline_break') {
-        alarmTypeSelect.value = 'rsi_trendline_break';
-        alarmTypeSelect.dispatchEvent(new Event('change'));
-        
-        if (trendlineTypeFromUrl && fields.rsi_trendline_break) {
-            document.getElementById('rsi-trendline-break-type').value = trendlineTypeFromUrl;
-        }
-        if (timeframeFromUrl && fields.rsi_trendline_break) {
-            document.getElementById('rsi-trendline-break-timeframe').value = timeframeFromUrl;
+    
+    // START OF MODIFICATION
+    if (alarmTypeFromUrl) {
+        if (alarmTypeFromUrl === 'price') {
+            alarmTypeSelect.value = 'price';
+            alarmTypeSelect.dispatchEvent(new Event('change'));
+        } else if (alarmTypeFromUrl === 'rsi_trendline_break') {
+            alarmTypeSelect.value = 'rsi_trendline_break';
+            alarmTypeSelect.dispatchEvent(new Event('change'));
+            
+            if (trendlineTypeFromUrl && fields.rsi_trendline_break) {
+                document.getElementById('rsi-trendline-break-type').value = trendlineTypeFromUrl;
+            }
+            if (timeframeFromUrl && fields.rsi_trendline_break) {
+                document.getElementById('rsi-trendline-break-timeframe').value = timeframeFromUrl;
+            }
         }
     }
+    // END OF MODIFICATION
 
     if (alarmIdToEdit) {
         const fetchAndEditAlarm = async (id) => {
@@ -256,7 +262,9 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (alarmType === 'price') { 
                 alarmData.condition = document.getElementById('alarm-condition-standalone').value; 
-                alarmData.target_price = parseFloat(document.getElementById('alarm-price-standalone').value); 
+                const targetPrice = parseFloat(document.getElementById('alarm-price-standalone').value);
+                if (isNaN(targetPrice) || targetPrice <= 0) throw new Error("O preço alvo deve ser um número positivo.");
+                alarmData.target_price = targetPrice;
             } else if (alarmType === 'rsi_level') { 
                 alarmData.condition = document.getElementById('rsi-level-condition').value; 
                 alarmData.target_price = parseFloat(document.getElementById('rsi-level-value').value); 
