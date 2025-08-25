@@ -198,6 +198,10 @@ function openAlarmListModal(titleText, alarmsToDisplay) {
             const alarmDataString = encodeURIComponent(JSON.stringify(alarm));
             trendlineButtonHtml = `<button class="icon-action-btn btn-view-trendline" data-action="view-trendline" data-alarm='${alarmDataString}' title="Visualizar Linha de Tendência"><span class="material-symbols-outlined">analytics</span></button>`;
         }
+        
+        // START OF MODIFICATION
+        const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${alarm.asset_pair}`;
+        // END OF MODIFICATION
 
         return `
         <div class="alarm-list-item" data-alarm-id="${alarm.id}" data-alarm-full='${encodeURIComponent(JSON.stringify(alarm))}'>
@@ -208,6 +212,7 @@ function openAlarmListModal(titleText, alarmsToDisplay) {
             </div>
             <div class="alarm-list-actions">
                 ${trendlineButtonHtml}
+                <a href="${tradingViewUrl}" target="_blank" rel="noopener noreferrer" class="icon-action-btn" title="Ver no TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
                 <a href="alarms-create.html?editAlarmId=${alarm.id}" class="icon-action-btn" title="Editar"><span class="material-symbols-outlined">edit</span></a>
                 <button class="icon-action-btn" data-action="delete-alarm" data-alarm-id="${alarm.id}" title="Apagar Alarme"><span class="material-symbols-outlined">delete_forever</span></button>
             </div>
@@ -323,9 +328,7 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
 
     const assetsInKanban = new Set(allTrades.filter(t => ['POTENTIAL', 'ARMED', 'LIVE'].includes(t.data.status)).map(t => t.data.asset));
     
-    // START OF MODIFICATION
     const relevantAlarmsByAsset = allAlarms.reduce((acc, alarm) => {
-        // Um alarme é relevante se estiver ativo OU se tiver sido disparado e ainda não reconhecido.
         if (alarm.status === 'active' || (alarm.status === 'triggered' && !alarm.acknowledged)) {
             if (!acc[alarm.asset_pair]) {
                 acc[alarm.asset_pair] = [];
@@ -335,7 +338,6 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
         return acc;
     }, {});
     const assetsForWatchlist = Object.keys(relevantAlarmsByAsset).filter(asset => !assetsInKanban.has(asset));
-    // END OF MODIFICATION
 
     if (assetsForWatchlist.length === 0) {
         watchlistSection.style.display = 'none';
@@ -344,16 +346,13 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
     watchlistSection.style.display = 'block';
 
     const tableRowsHtml = assetsForWatchlist.map(assetName => {
-        // Usar a lista de alarmes relevantes que já filtrámos
         const alarmsForAsset = relevantAlarmsByAsset[assetName];
         
-        // Exibir o alarme mais recente, seja ele ativo ou disparado
         const latestAlarm = [...alarmsForAsset].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
         
         const assetMarketData = marketData[assetName] || { price: 0, sparkline: [] };
         let formattedPrice = assetMarketData.price >= 1.0 ? assetMarketData.price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$' + assetMarketData.price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
         
-        // A lógica de destaque visual usa todos os alarmes (allAlarms), o que está correto.
         const hasTriggeredUnacknowledgedAlarm = allAlarms.some(a => a.asset_pair === assetName && a.status === 'triggered' && !a.acknowledged);
         const triggeredClass = hasTriggeredUnacknowledgedAlarm ? 'class="alarm-triggered"' : '';
         const acknowledgeButtonHtml = hasTriggeredUnacknowledgedAlarm ? `<button class="acknowledge-alarm-btn" data-action="acknowledge-and-view-alarm" data-asset="${assetName}" title="Ver Alarme Disparado"><span class="material-symbols-outlined">alarm</span> OK</button>` : '';
