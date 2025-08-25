@@ -2,14 +2,22 @@
 
 export const changelogData = {
 current: {
-    number: '17.5.2',
+    number: '17.6.0',
     changes: [
-        "**Correção Crítica da Watchlist de Alarmes:**",
-        "Resolvido o bug onde um ativo desaparecia da watchlist do Dashboard se o seu único alarme fosse disparado.",
-        "A lógica de exibição foi corrigida para incluir ativos que tenham alarmes com status 'active' OU 'triggered' (e não reconhecidos), garantindo que os ativos permaneçam na lista para que o destaque visual de alarme disparado seja aplicado corretamente."
+        "**Melhoria de UX (Modal de Alarmes):**",
+        "Adicionado um botão de atalho para 'Ver no TradingView' diretamente nos itens de alarme dentro do modal de gestão de alarmes (ativos e disparados).",
+        "Esta alteração agiliza o fluxo de análise, permitindo a verificação imediata do gráfico sem a necessidade de fechar o modal."
     ]
 },
 releases: [
+    {
+        number: '17.5.2',
+        changes: [
+            "**Correção Crítica da Watchlist de Alarmes:**",
+            "Resolvido o bug onde um ativo desaparecia da watchlist do Dashboard se o seu único alarme fosse disparado.",
+            "A lógica de exibição foi corrigida para incluir ativos que tenham alarmes com status 'active' OU 'triggered' (e não reconhecidos), garantindo que os ativos permaneçam na lista para que o destaque visual de alarme disparado seja aplicado corretamente."
+        ]
+    },
     {
         number: '17.5.1',
         changes: [
