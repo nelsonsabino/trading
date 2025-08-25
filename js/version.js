@@ -2,14 +2,22 @@
 
 export const changelogData = {
 current: {
-    number: '17.6.0',
+    number: '17.7.0',
     changes: [
-        "**Melhoria de UX (Modal de Alarmes):**",
-        "Adicionado um botão de atalho para 'Ver no TradingView' diretamente nos itens de alarme dentro do modal de gestão de alarmes (ativos e disparados).",
-        "Esta alteração agiliza o fluxo de análise, permitindo a verificação imediata do gráfico sem a necessidade de fechar o modal."
+        "**Melhoria de UX (Scanner de Mercado):**",
+        "Adicionado um novo botão de ação rápida na tabela do Market Scanner para 'Criar Alarme de Preço'.",
+        "Este atalho leva o utilizador diretamente para a página de criação de alarmes com o ativo e o tipo 'Preço' já pré-selecionados, agilizando significativamente o fluxo de trabalho."
     ]
 },
 releases: [
+    {
+        number: '17.6.0',
+        changes: [
+            "**Melhoria de UX (Modal de Alarmes):**",
+            "Adicionado um botão de atalho para 'Ver no TradingView' diretamente nos itens de alarme dentro do modal de gestão de alarmes (ativos e disparados).",
+            "Esta alteração agiliza o fluxo de análise, permitindo a verificação imediata do gráfico sem a necessidade de fechar o modal."
+        ]
+    },
     {
         number: '17.5.2',
         changes: [
