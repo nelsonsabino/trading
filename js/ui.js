@@ -5,6 +5,13 @@ import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesCon
 import { openArmModal, openExecModal, openCloseTradeModal, openAddModal } from './modals.js';
 import { loadAndOpenForEditing, handleRevertStatus, handleRevertToWatchlist, handleDeleteAlarm } from './handlers.js';
 import { openChartModal, openRsiTrendlineChartModal } from './chart-modal.js';
+import { getLastCreatedTradeId, setLastCreatedTradeId, getVisibleImageIds, setVisibleImageIds } from './state.js';// js/ui.js
+
+import { supabase } from './services.js';
+import { addModal, potentialTradesContainer, armedTradesContainer, liveTradesContainer } from './dom-elements.js';
+import { openArmModal, openExecModal, openCloseTradeModal, openAddModal } from './modals.js';
+import { loadAndOpenForEditing, handleRevertStatus, handleRevertToWatchlist, handleDeleteAlarm } from './handlers.js';
+import { openChartModal, openRsiTrendlineChartModal } from './chart-modal.js';
 import { getLastCreatedTradeId, setLastCreatedTradeId, getVisibleImageIds, setVisibleImageIds } from './state.js';
 
 let tradesForEventListeners = [];
@@ -163,7 +170,10 @@ export function getAlarmDescription(alarm, forTable = false) {
             return `RSI cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} da MA ${detailsText}${timeframe}`;
         }
         case 'ema_touch': return `Preço testa EMA(${alarm.ema_period}) ${timeframe}`;
-        case 'combo': return `Confluência EMA/Stoch ${timeframe}`;
+        case 'ema_crossover': // START OF MODIFICATION
+            return `EMA(${alarm.ema_period_short}) cruza para ${alarm.condition === 'above' ? 'CIMA' : 'BAIXO'} da EMA(${alarm.ema_period_long}) ${timeframe}`;
+        case 'combo': // END OF MODIFICATION
+            return `Confluência EMA/Stoch ${timeframe}`;
         case 'rsi_trendline': return `${alarm.touch_count}º toque em L.T. de ${alarm.trendline_type} ${timeframe}`;
         case 'rsi_trendline_break':
             const statusText = forTable ? 'Monitoriza quebra' : (alarm.status === 'triggered' ? 'Quebra da' : 'Monitoriza quebra da');
@@ -424,7 +434,6 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // START OF MODIFICATION: Reverted and expanded event listeners
     const dashboard = document.querySelector('.dashboard-columns');
     if (dashboard) {
         dashboard.addEventListener('click', (e) => {
@@ -498,7 +507,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (watchlistTable) {
         watchlistTable.addEventListener('click', handleTableActions);
     }
-    // END OF MODIFICATION
 
     const alarmModal = document.getElementById('alarm-list-modal');
     if (alarmModal) {
