@@ -68,9 +68,9 @@ header .main-nav {
 /* --- CONTROLES DO MERCADO --- */
 .market-controls {
     display: flex;
-    flex-direction: column; /* --- INÍCIO DA ALTERAÇÃO --- */
-    align-items: flex-start; /* --- INÍCIO DA ALTERAÇÃO --- */
-    gap: 0.8rem; /* --- INÍCIO DA ALTERAÇÃO --- */
+    flex-direction: column; 
+    align-items: flex-start; 
+    gap: 0.8rem; 
     padding: 1rem;
     background-color: var(--surface-primary);
     border: 1px solid var(--border-primary);
@@ -78,16 +78,23 @@ header .main-nav {
     margin-bottom: 1.5rem;
 }
 
-.controls-row { /* --- INÍCIO DA ALTERAÇÃO --- */
+.controls-row { 
     display: flex;
     align-items: center;
     gap: 1.5rem;
     flex-wrap: wrap;
     width: 100%;
-} /* --- FIM DA ALTERAÇÃO --- */
+} 
 
 .control-group {
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
+
+/* START OF MODIFICATION */
+/* Secção de Destaque de Alarmes Disparados */
+.triggered-alarms-highlight {
+    margin-bottom: 2rem;
+}
+/* END OF MODIFICATION */
