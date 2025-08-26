@@ -54,10 +54,10 @@ header .main-nav {
 }
 
 /* START OF MODIFICATION */
-/* Estilo para o link/botão da página ativa */
-.nav-icon-link.nav-active {
-    background-color: #1fb49c; /* Nova cor para página ativa */
-    color: white; 
+/* Estilo para o link/botão da página ativa (MAIOR ESPECIFICIDADE) */
+a.nav-icon-link.nav-active {
+    background-color: #1fb49c !important; /* Cor para página ativa com prioridade */
+    color: white !important; 
     cursor: default; 
     pointer-events: none; 
     transform: none; 
@@ -189,9 +189,9 @@ a.nav-icon-link[href="alarms-create.html"]:hover {
 .dark-mode .user-photo {
     border-color: #444;
 }
-.dark-mode .nav-icon-link.nav-active {
-    background-color: #1fb49c; /* Mantém a cor ativa no modo escuro */
-    color: white;
+.dark-mode a.nav-icon-link.nav-active {
+    background-color: #1fb49c !important; /* Mantém a cor ativa no modo escuro com prioridade */
+    color: white !important;
 }
 
 /* Dark mode para os botões específicos */
