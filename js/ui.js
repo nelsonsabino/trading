@@ -199,9 +199,7 @@ function openAlarmListModal(titleText, alarmsToDisplay) {
             trendlineButtonHtml = `<button class="icon-action-btn btn-view-trendline" data-action="view-trendline" data-alarm='${alarmDataString}' title="Visualizar Linha de Tendência"><span class="material-symbols-outlined">analytics</span></button>`;
         }
         
-        // START OF MODIFICATION
         const tradingViewUrl = `https://www.tradingview.com/chart/?symbol=BINANCE:${alarm.asset_pair}`;
-        // END OF MODIFICATION
 
         return `
         <div class="alarm-list-item" data-alarm-id="${alarm.id}" data-alarm-full='${encodeURIComponent(JSON.stringify(alarm))}'>
@@ -337,7 +335,18 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
         }
         return acc;
     }, {});
-    const assetsForWatchlist = Object.keys(relevantAlarmsByAsset).filter(asset => !assetsInKanban.has(asset));
+    let assetsForWatchlist = Object.keys(relevantAlarmsByAsset).filter(asset => !assetsInKanban.has(asset));
+
+    // START OF MODIFICATION
+    assetsForWatchlist.sort((assetA, assetB) => {
+        const hasTriggeredA = allAlarms.some(a => a.asset_pair === assetA && a.status === 'triggered' && !a.acknowledged);
+        const hasTriggeredB = allAlarms.some(a => a.asset_pair === assetB && a.status === 'triggered' && !a.acknowledged);
+
+        if (hasTriggeredA && !hasTriggeredB) return -1; // A vem primeiro
+        if (!hasTriggeredA && hasTriggeredB) return 1;  // B vem primeiro
+        return 0; // Mantém a ordem original
+    });
+    // END OF MODIFICATION
 
     if (assetsForWatchlist.length === 0) {
         watchlistSection.style.display = 'none';
