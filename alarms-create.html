@@ -96,6 +96,7 @@
                         <option value="rsi_trendline">RSI - Padrão de Toques</option>
                         <option value="rsi_trendline_break" style="display: none;">RSI - Quebra de L.T.</option>
                         <option value="ema_touch">Toque na EMA</option>
+                        <option value="ema_crossover">EMA (Cruzamento)</option> <!-- START OF MODIFICATION -->
                         <option value="stochastic">Estocástico (Nível)</option>
                         <option value="stochastic_crossover">Estocástico (Cruzamento)</option>
                         <option value="rsi_crossover">RSI-MA Crossover</option>
@@ -125,6 +126,38 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- START OF MODIFICATION: New fields for EMA Crossover -->
+                <div id="ema-crossover-fields" style="display: none;">
+                    <div class="form-row">
+                        <div class="input-item">
+                            <label for="ema-cross-condition">Condição de Cruzamento</label>
+                            <select id="ema-cross-condition">
+                                <option value="above">EMA Curta cruza para CIMA da Longa (Bullish)</option>
+                                <option value="below">EMA Curta cruza para BAIXO da Longa (Bearish)</option>
+                            </select>
+                        </div>
+                        <div class="input-item">
+                            <label for="ema-cross-period-short">EMA Curta (ex: 14)</label>
+                            <input type="number" id="ema-cross-period-short" value="14">
+                        </div>
+                        <div class="input-item">
+                            <label for="ema-cross-period-long">EMA Longa (ex: 21)</label>
+                            <input type="number" id="ema-cross-period-long" value="21">
+                        </div>
+                        <div class="input-item">
+                            <label for="ema-cross-timeframe">Timeframe</label>
+                            <select id="ema-cross-timeframe">
+                                <option value="5m">5 Minutos</option>
+                                <option value="15m">15 Minutos</option>
+                                <option value="1h" selected>1 Hora</option>
+                                <option value="4h">4 Horas</option>
+                                <option value="1d">Diário</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <!-- END OF MODIFICATION -->
 
                 <div id="stochastic-fields" style="display: none;">
                     <div class="form-row">
