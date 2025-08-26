@@ -331,7 +331,7 @@ function renderWatchlistSection(assets, allAlarms, marketData, container, isTrig
     section.style.display = 'block';
 
     const headerTitle = isTriggeredList ? 'Alarme Disparado' : 'Último alarme criado';
-    const headerHtml = `
+    const tableHeader = `
         <div class="table-wrapper">
             <table class="alarms-table">
                 <thead>
@@ -343,11 +343,11 @@ function renderWatchlistSection(assets, allAlarms, marketData, container, isTrig
                         <th>Ações</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="${isTriggeredList ? 'triggered-alarms-tbody' : 'watchlist-alarms-tbody'}">
     `;
-    const footerHtml = `</tbody></table></div>`;
+    const tableFooter = `</tbody></table></div>`;
 
-    const rowsHtml = assets.map(assetName => {
+    const tableRowsHtml = assets.map(assetName => {
         const alarmsForAsset = allAlarms.filter(a => a.asset_pair === assetName);
         const relevantAlarms = alarmsForAsset.filter(a => isTriggeredList ? (a.status === 'triggered' && !a.acknowledged) : a.status === 'active');
         const latestAlarm = [...relevantAlarms].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
@@ -367,7 +367,7 @@ function renderWatchlistSection(assets, allAlarms, marketData, container, isTrig
         }
 
         return `
-            <tr ${triggeredClass} data-asset-symbol="${assetName}">
+            <tr ${triggeredClass}>
                 <td data-label="Ativo"><strong><a href="asset-details.html?symbol=${assetName}" class="asset-link">${assetName}</a></strong></td>
                 <td data-label="${headerTitle}">
                     <a href="#" class="alarm-details-link" data-action="manage-alarms" data-asset="${assetName}">${getAlarmDescription(latestAlarm, true)}</a>
@@ -387,9 +387,9 @@ function renderWatchlistSection(assets, allAlarms, marketData, container, isTrig
             </tr>
         `;
     }).join('');
-    
+
     const sectionTitle = isTriggeredList ? `<h2><span class="material-symbols-outlined">alarm_on</span> Alarmes Disparados</h2>` : '';
-    container.innerHTML = sectionTitle + headerHtml + rowsHtml + footerHtml;
+    container.innerHTML = sectionTitle + tableHeader + tableRowsHtml + tableFooter;
     
     assets.forEach(assetName => {
         const sparklineId = `sparkline-${isTriggeredList ? 'triggered' : 'watchlist'}-${assetName}`;
@@ -415,138 +415,103 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
 
     const regularWatchlistAssets = [...activeAssets].filter(asset => !triggeredAssets.has(asset));
     
-    const triggeredSection = document.getElementById('triggered-alarms-section');
-    renderWatchlistContent([...triggeredAssets], allAlarms, marketData, triggeredSection, true);
+    const triggeredSectionContainer = document.getElementById('triggered-alarms-section');
+    renderWatchlistSection([...triggeredAssets], allAlarms, marketData, triggeredSectionContainer, true);
     
     const watchlistTbody = document.getElementById('watchlist-alarms-tbody');
-    const watchlistSection = document.getElementById('watchlist-section');
-    
-    if (regularWatchlistAssets.length === 0) {
-        watchlistSection.style.display = 'none';
-    } else {
-        watchlistSection.style.display = 'block';
-        const tableRowsHtml = regularWatchlistAssets.map(assetName => {
-            const alarmsForAsset = allAlarms.filter(a => a.asset_pair === assetName && a.status === 'active');
-            const latestAlarm = [...alarmsForAsset].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
-            const assetMarketData = marketData[assetName] || { price: 0, sparkline: [] };
-            let formattedPrice = assetMarketData.price >= 1.0 ? assetMarketData.price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$' + assetMarketData.price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
-            let trendlineButtonHtml = '';
-            if (latestAlarm.alarm_type === 'rsi_trendline_break') {
-                const alarmDataString = encodeURIComponent(JSON.stringify(latestAlarm));
-                trendlineButtonHtml = `<button class="icon-action-btn btn-view-trendline" data-action="view-trendline" data-alarm='${alarmDataString}' title="Visualizar Linha de Tendência"><span class="material-symbols-outlined">analytics</span></button>`;
-            }
-            return `
-                <tr data-asset-symbol="${assetName}">
-                    <td data-label="Ativo"><strong><a href="asset-details.html?symbol=${assetName}" class="asset-link">${assetName}</a></strong></td>
-                    <td data-label="Ultimo alarme criado">
-                        <a href="#" class="alarm-details-link" data-action="manage-alarms" data-asset="${assetName}">${getAlarmDescription(latestAlarm, true)}</a>
-                    </td>
-                    <td data-label="Último Preço">${formattedPrice}</td>
-                    <td data-label="Sparkline (24h)"><div class="sparkline-container" id="sparkline-watchlist-${assetName}"></div></td>
-                    <td data-label="Ações">
-                        <div class="action-buttons">
-                            ${trendlineButtonHtml}
-                            <button class="icon-action-btn btn-view-chart" data-action="view-chart" data-symbol="${assetName}" title="Ver Gráfico Detalhado"><span class="material-symbols-outlined">monitoring</span></button>
-                            <a href="https://www.tradingview.com/chart/?symbol=BINANCE:${assetName}" target="_blank" class="icon-action-btn btn-trading-view" title="TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
-                            <a href="alarms-create.html?assetPair=${assetName}" class="icon-action-btn" title="Criar Novo Alarme"><span class="material-symbols-outlined">alarm_add</span></a>
-                            <button class="icon-action-btn" data-action="add-to-potential" data-symbol="${assetName}" title="Adicionar a Trade Potencial"><span class="material-symbols-outlined">add</span></button>
-                        </div>
-                    </td>
-                </tr>
-            `;
-        }).join('');
-        watchlistTbody.innerHTML = tableRowsHtml;
-        regularWatchlistAssets.forEach(assetName => renderSparkline(`sparkline-watchlist-${assetName}`, marketData[assetName]?.sparkline));
-    }
+    const watchlistSection = watchlistTbody.closest('section');
+    renderWatchlistSection(regularWatchlistAssets, allAlarms, marketData, watchlistTbody, false);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const mainElement = document.querySelector('main');
-    if (mainElement) {
-        mainElement.addEventListener('click', (e) => {
-            const targetElement = e.target.closest('[data-action]');
-            if (!targetElement) return;
-
-            const action = targetElement.dataset.action;
+    // START OF MODIFICATION: Reverted and expanded event listeners
+    const dashboard = document.querySelector('.dashboard-columns');
+    if (dashboard) {
+        dashboard.addEventListener('click', (e) => {
+            const button = e.target.closest('[data-action]');
+            if (!button) return;
             
-            // Lógica para Trades (Kanban)
-            const tradeCard = targetElement.closest('.trade-card');
-            if (tradeCard) {
-                const tradeId = tradeCard.dataset.tradeId;
-                const trade = tradeId ? tradesForEventListeners.find(t => t.id === tradeId) : null;
-                switch (action) {
-                    case 'edit': if (tradeId) loadAndOpenForEditing(tradeId); break;
-                    case 'arm': if (trade) openArmModal(trade); break;
-                    case 'execute': if (trade) openExecModal(trade); break;
-                    case 'close': if (trade) openCloseTradeModal(trade); break;
-                    case 'toggle-image':
-                        const imageContainer = tradeCard.querySelector('.card-image-container');
-                        if (imageContainer) {
-                            imageContainer.classList.toggle('visible');
-                            let visibleIds = getVisibleImageIdsInternal();
-                            if (imageContainer.classList.contains('visible')) {
-                                if (!visibleIds.includes(tradeId)) visibleIds.push(tradeId);
-                            } else {
-                                visibleIds = visibleIds.filter(id => id !== tradeId);
-                            }
-                            setVisibleImageIdsInternal(visibleIds);
-                        }
-                        break;
-                    case 'view-alarms': loadAndOpenAlarmModal(targetElement.dataset.asset, 'active'); break;
-                    case 'acknowledge-and-view-alarm': loadAndOpenAlarmModal(targetElement.dataset.asset, 'triggered'); break;
-                    case 'revert-to-watchlist': if (trade) handleRevertToWatchlist(trade); break;
-                    case 'revert-to-potential': case 'revert-to-armed': if (trade) handleRevertStatus(trade, action); break;
-                }
-                return;
-            }
+            const card = button.closest('.trade-card');
+            if (!card) return;
 
-            // Lógica para Watchlists (Disparada e Normal) e Modal de Alarmes
-            const symbol = targetElement.dataset.symbol || targetElement.dataset.asset || targetElement.closest('[data-asset-symbol]')?.dataset.assetSymbol;
-            
-            if (action !== 'delete-alarm' && action !== 'view-trendline-modal') e.preventDefault();
+            const tradeId = card.dataset.tradeId;
+            const action = button.dataset.action;
+            const trade = tradeId ? tradesForEventListeners.find(t => t.id === tradeId) : null;
             
             switch (action) {
-                case 'view-chart': if (symbol) openChartModal(symbol); break;
-                case 'add-to-potential':
-                    if (symbol) {
-                        openAddModal();
-                        const modalAssetInput = document.getElementById('asset');
-                        if (modalAssetInput) modalAssetInput.value = symbol;
+                case 'edit': if (tradeId) loadAndOpenForEditing(tradeId); break;
+                case 'arm': if (trade) openArmModal(trade); break;
+                case 'execute': if (trade) openExecModal(trade); break;
+                case 'close': if (trade) openCloseTradeModal(trade); break;
+                case 'toggle-image':
+                    const imageContainer = card.querySelector('.card-image-container');
+                    if (imageContainer) {
+                        imageContainer.classList.toggle('visible');
+                        let visibleIds = getVisibleImageIdsInternal();
+                        if (imageContainer.classList.contains('visible')) {
+                            if (!visibleIds.includes(tradeId)) visibleIds.push(tradeId);
+                        } else {
+                            visibleIds = visibleIds.filter(id => id !== tradeId);
+                        }
+                        setVisibleImageIdsInternal(visibleIds);
                     }
                     break;
-                case 'acknowledge-and-view-alarm': if (symbol) loadAndOpenAlarmModal(symbol, 'triggered'); break;
-                case 'manage-alarms': if (symbol) loadAndOpenAlarmModal(symbol, 'active'); break;
-                case 'view-trendline':
-                    const alarmData = JSON.parse(decodeURIComponent(targetElement.dataset.alarm));
-                    openRsiTrendlineChartModal(alarmData);
-                    break;
-                case 'delete-alarm':
-                    const alarmId = targetElement.dataset.alarmId;
-                    if (alarmId) handleDeleteAlarm(alarmId);
-                    break;
-                case 'view-trendline-modal':
-                    const alarmItem = targetElement.closest('.alarm-list-item');
-                    const alarmFullData = JSON.parse(decodeURIComponent(alarmItem.dataset.alarmFull));
-                    openRsiTrendlineChartModal(alarmFullData);
-                    break;
+                case 'view-alarms': loadAndOpenAlarmModal(button.dataset.asset, 'active'); break;
+                case 'acknowledge-and-view-alarm': loadAndOpenAlarmModal(button.dataset.asset, 'triggered'); break;
+                case 'revert-to-watchlist': if (trade) handleRevertToWatchlist(trade); break;
+                case 'revert-to-potential': case 'revert-to-armed': if (trade) handleRevertStatus(trade, action); break;
             }
         });
     }
 
-    // Listener separado para o modal para evitar conflitos de 'preventDefault'
+    const handleTableActions = (e) => {
+        const targetElement = e.target.closest('[data-action]');
+        if (!targetElement) return;
+
+        e.preventDefault();
+        const action = targetElement.dataset.action;
+        const symbol = targetElement.dataset.symbol || targetElement.dataset.asset;
+        
+        switch (action) {
+            case 'view-chart': if (symbol) openChartModal(symbol); break;
+            case 'add-to-potential':
+                if (symbol) {
+                    openAddModal();
+                    document.getElementById('asset').value = symbol;
+                }
+                break;
+            case 'acknowledge-and-view-alarm': if (symbol) loadAndOpenAlarmModal(symbol, 'triggered'); break;
+            case 'manage-alarms': if (symbol) loadAndOpenAlarmModal(symbol, 'active'); break;
+            case 'view-trendline':
+                const alarmData = JSON.parse(decodeURIComponent(targetElement.dataset.alarm));
+                openRsiTrendlineChartModal(alarmData);
+                break;
+        }
+    };
+
+    const triggeredAlarmsSection = document.getElementById('triggered-alarms-section');
+    if (triggeredAlarmsSection) {
+        triggeredAlarmsSection.addEventListener('click', handleTableActions);
+    }
+
+    const watchlistTable = document.getElementById('watchlist-alarms-tbody');
+    if (watchlistTable) {
+        watchlistTable.addEventListener('click', handleTableActions);
+    }
+    // END OF MODIFICATION
+
     const alarmModal = document.getElementById('alarm-list-modal');
     if (alarmModal) {
         alarmModal.addEventListener('click', (e) => {
             const button = e.target.closest('button[data-action]');
             if (!button) return;
 
+            e.preventDefault();
             const action = button.dataset.action;
             if (action === 'delete-alarm') {
-                e.preventDefault();
                 const alarmId = button.dataset.alarmId;
                 handleDeleteAlarm(alarmId);
             } else if (action === 'view-trendline') {
-                e.preventDefault();
                 const alarmItem = button.closest('.alarm-list-item');
                 const alarmData = JSON.parse(decodeURIComponent(alarmItem.dataset.alarmFull));
                 openRsiTrendlineChartModal(alarmData);
