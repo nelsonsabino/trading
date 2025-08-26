@@ -2,14 +2,23 @@
 
 export const changelogData = {
 current: {
-    number: '17.7.0',
+    number: '17.8.0',
     changes: [
-        "**Melhoria de UX (Scanner de Mercado):**",
-        "Adicionado um novo botão de ação rápida na tabela do Market Scanner para 'Criar Alarme de Preço'.",
-        "Este atalho leva o utilizador diretamente para a página de criação de alarmes com o ativo e o tipo 'Preço' já pré-selecionados, agilizando significativamente o fluxo de trabalho."
+        "**Melhorias de Funcionalidade e UX (Dashboard):**",
+        "**Priorização de Alarmes:** A 'Watchlist de Alarmes' agora ordena automaticamente os ativos com alarmes disparados para o topo da lista, garantindo que as oportunidades mais urgentes tenham máxima visibilidade.",
+        "**Auto-Refresh:** Implementada a atualização automática do Dashboard a cada 5 minutos para manter os dados de mercado e o estado dos alarmes sempre atualizados.",
+        "**UI Simplificada:** Removido o botão de atalho para 'Adicionar Trade Potencial' da navegação principal para uma interface mais limpa."
     ]
 },
 releases: [
+    {
+        number: '17.7.0',
+        changes: [
+            "**Melhoria de UX (Scanner de Mercado):**",
+            "Adicionado um novo botão de ação rápida na tabela do Market Scanner para 'Criar Alarme de Preço'.",
+            "Este atalho leva o utilizador diretamente para a página de criação de alarmes com o ativo e o tipo 'Preço' já pré-selecionados, agilizando significativamente o fluxo de trabalho."
+        ]
+    },
     {
         number: '17.6.0',
         changes: [
