@@ -2,14 +2,24 @@
 
 export const changelogData = {
 current: {
-    number: '18.0.0',
+    number: '18.1.0',
     changes: [
-        "**Reestruturação do Layout do Dashboard (Versão 18):**",
-        "**Destaque Prioritário para Alarmes Disparados:** Implementada uma nova secção de destaque no topo do Dashboard, que exibe uma tabela isolada com os ativos cujos alarmes foram disparados. Esta secção só aparece quando há ações urgentes a serem tomadas.",
-        "**Melhoria do Fluxo de Trabalho:** Ao criar ou editar um alarme a partir do Dashboard, o utilizador é agora redirecionado de volta para o Dashboard, mantendo o contexto de trabalho."
+        "**Nova Funcionalidade: Alarme de Cruzamento de EMAs:**",
+        "Adicionado um novo tipo de alarme para detetar o cruzamento entre duas Médias Móveis Exponenciais (curta e longa).",
+        "**Melhorias de UI/UX (Navegação):**",
+        "O botão da página ativa no menu principal agora é destacado com a cor verde (#1fb49c).",
+        "Os botões 'Scanner de Mercado' e 'Criar Alarme' receberam cores distintas para melhor identificação visual."
     ]
 },
 releases: [
+    {
+        number: '18.0.0',
+        changes: [
+            "**Reestruturação do Layout do Dashboard (Versão 18):**",
+            "**Destaque Prioritário para Alarmes Disparados:** Implementada uma nova secção de destaque no topo do Dashboard, que exibe uma tabela isolada com os ativos cujos alarmes foram disparados. Esta secção só aparece quando há ações urgentes a serem tomadas.",
+            "**Melhoria do Fluxo de Trabalho:** Ao criar ou editar um alarme a partir do Dashboard, o utilizador é agora redirecionado de volta para o Dashboard, mantendo o contexto de trabalho."
+        ]
+    },
     {
         number: '17.8.0',
         changes: [
