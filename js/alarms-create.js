@@ -209,7 +209,6 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchPriceForPair(pair); 
     }
     
-    // START OF MODIFICATION
     if (alarmTypeFromUrl) {
         if (alarmTypeFromUrl === 'price') {
             alarmTypeSelect.value = 'price';
@@ -226,7 +225,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
-    // END OF MODIFICATION
 
     if (alarmIdToEdit) {
         const fetchAndEditAlarm = async (id) => {
@@ -321,19 +319,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 alarmData.combo_period = 14; 
             }
 
+            let redirectUrl = 'alarms-manage.html';
+            if (document.referrer.includes('dashboard.html')) {
+                redirectUrl = 'dashboard.html';
+            }
+
             if (editingAlarmId) {
                 alarmData.status = 'active';
                 alarmData.triggered_at = null;
                 const { error } = await supabase.from('alarms').update(alarmData).eq('id', editingAlarmId);
                 if (error) throw error;
                 setLastCreatedAlarmId(null);
-                window.location.href = 'alarms-manage.html';
+                window.location.href = redirectUrl;
             } else {
                 alarmData.status = 'active';
                 const { data, error } = await supabase.from('alarms').insert([alarmData]).select('id').single();
                 if (error) throw error;
                 setLastCreatedAlarmId(data.id);
-                window.location.href = 'alarms-manage.html';
+                window.location.href = redirectUrl;
             }
         } catch (error) { 
             console.error("Erro na operação do alarme:", error); 
