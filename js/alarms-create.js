@@ -97,7 +97,12 @@ function enterEditMode(alarm) {
         document.getElementById('ema-condition').value = alarm.condition; 
         document.getElementById('ema-period').value = alarm.ema_period; 
         document.getElementById('ema-timeframe').value = alarm.indicator_timeframe; 
-    } else if (alarmType === 'combo') { 
+    } else if (alarmType === 'ema_crossover') { // START OF MODIFICATION
+        document.getElementById('ema-cross-condition').value = alarm.condition;
+        document.getElementById('ema-cross-period-short').value = alarm.ema_period_short;
+        document.getElementById('ema-cross-period-long').value = alarm.ema_period_long;
+        document.getElementById('ema-cross-timeframe').value = alarm.indicator_timeframe;
+    } else if (alarmType === 'combo') { // END OF MODIFICATION
         document.getElementById('combo-primary-trigger').value = alarm.condition; 
         document.getElementById('combo-ema-period').value = alarm.ema_period; 
         document.getElementById('combo-stoch-condition').value = alarm.combo_condition; 
@@ -132,7 +137,7 @@ function exitEditMode() {
 
     const checkbox = document.getElementById('stoch-cross-level-specific-checkbox');
     checkbox.checked = false;
-    document.getElementById('stoch-cross-level-value').value = '';
+    document.getElementById('stoch-cross-level-value').value = '20';
     document.getElementById('stoch-cross-level-value-container').style.display = 'none';
 
     document.querySelector('#alarm-form button[type="submit"]').textContent = 'Definir Alarme';
@@ -175,6 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
         stochastic_crossover: document.getElementById('stoch-crossover-fields'), 
         rsi_crossover: document.getElementById('rsi-fields'), 
         ema_touch: document.getElementById('ema-fields'), 
+        ema_crossover: document.getElementById('ema-crossover-fields'), // START OF MODIFICATION
         combo: document.getElementById('combo-fields'),
         rsi_trendline: document.getElementById('rsi-trendline-fields'),
         rsi_trendline_break: document.getElementById('rsi-trendline-break-fields')
@@ -210,17 +216,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     if (alarmTypeFromUrl) {
-        if (alarmTypeFromUrl === 'price') {
-            alarmTypeSelect.value = 'price';
-            alarmTypeSelect.dispatchEvent(new Event('change'));
-        } else if (alarmTypeFromUrl === 'rsi_trendline_break') {
-            alarmTypeSelect.value = 'rsi_trendline_break';
-            alarmTypeSelect.dispatchEvent(new Event('change'));
-            
-            if (trendlineTypeFromUrl && fields.rsi_trendline_break) {
+        alarmTypeSelect.value = alarmTypeFromUrl;
+        alarmTypeSelect.dispatchEvent(new Event('change'));
+        
+        if (alarmTypeFromUrl === 'rsi_trendline_break') {
+            if (trendlineTypeFromUrl) {
                 document.getElementById('rsi-trendline-break-type').value = trendlineTypeFromUrl;
             }
-            if (timeframeFromUrl && fields.rsi_trendline_break) {
+            if (timeframeFromUrl) {
                 document.getElementById('rsi-trendline-break-timeframe').value = timeframeFromUrl;
             }
         }
@@ -309,7 +312,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 alarmData.condition = document.getElementById('ema-condition').value; 
                 alarmData.indicator_timeframe = document.getElementById('ema-timeframe').value; 
                 alarmData.ema_period = parseInt(document.getElementById('ema-period').value); 
-            } else if (alarmType === 'combo') { 
+            } else if (alarmType === 'ema_crossover') { // START OF MODIFICATION
+                alarmData.condition = document.getElementById('ema-cross-condition').value;
+                alarmData.ema_period_short = parseInt(document.getElementById('ema-cross-period-short').value);
+                alarmData.ema_period_long = parseInt(document.getElementById('ema-cross-period-long').value);
+                alarmData.indicator_timeframe = document.getElementById('ema-cross-timeframe').value;
+            } else if (alarmType === 'combo') { // END OF MODIFICATION
                 alarmData.condition = document.getElementById('combo-primary-trigger').value; 
                 alarmData.indicator_timeframe = document.getElementById('combo-timeframe').value; 
                 alarmData.ema_period = parseInt(document.getElementById('combo-ema-period').value); 
