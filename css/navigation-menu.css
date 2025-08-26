@@ -53,16 +53,35 @@ header .main-nav {
     background-color: #e9ecef; 
 }
 
+/* START OF MODIFICATION */
 /* Estilo para o link/botão da página ativa */
 .nav-icon-link.nav-active {
-    background-color: #6c757d; /* Cor de cinzento neutro para desativado/ativo */
-    color: white; /* Ícone branco */
-    cursor: default; /* Mudar cursor para indicar não clicável */
-    opacity: 0.9; /* Ligeiramente mais opaco */
-    pointer-events: none; /* Desativa eventos de clique */
-    transform: none; /* Remove transformação no hover */
-    box-shadow: none; /* Remove sombra no hover */
+    background-color: #1fb49c; /* Nova cor para página ativa */
+    color: white; 
+    cursor: default; 
+    pointer-events: none; 
+    transform: none; 
+    box-shadow: none; 
 }
+
+/* Cores específicas para botões */
+a.nav-icon-link[href="market-scan.html"] {
+    background-color: #414861;
+    color: white;
+}
+a.nav-icon-link[href="alarms-create.html"] {
+    background-color: #5c550c;
+    color: white;
+}
+
+/* Hover para botões específicos (para não usar o default) */
+a.nav-icon-link[href="market-scan.html"]:hover {
+    background-color: #525a7a;
+}
+a.nav-icon-link[href="alarms-create.html"]:hover {
+    background-color: #7a7210;
+}
+/* END OF MODIFICATION */
 
 /* Estilos para o dropdown (menu da roda dentada) */
 .nav-dropdown {
@@ -139,23 +158,6 @@ header .main-nav {
     background-color: #c82333;
 }
 
-/* --- BOTÃO DE DESTAQUE "SCANNER DE MERCADO" --- */
-a[href="market-scan.html"].nav-icon-link {
-    background-color: #20c997;
-    color: white;
-    font-size: 1.1rem;
-}
-
-a[href="market-scan.html"].nav-icon-link:hover {
-    background-color: #1aab8a;
-}
-
-a[href="market-scan.html"].nav-icon-link span {
-    font-size: 1.2rem;
-    line-height: 1;
-}
-
-
 /* Ajustes para o dark mode */
 .dark-mode .main-nav .nav-icon-link {
     background-color: #2c2c2c;
@@ -188,14 +190,20 @@ a[href="market-scan.html"].nav-icon-link span {
     border-color: #444;
 }
 .dark-mode .nav-icon-link.nav-active {
-    background-color: #495057;
-    color: #e0e0e0;
+    background-color: #1fb49c; /* Mantém a cor ativa no modo escuro */
+    color: white;
 }
 
-/* Dark mode para os botões de ação */
-.dark-mode a[href="market-scan.html"].nav-icon-link {
-    background-color: #335f55;
+/* Dark mode para os botões específicos */
+.dark-mode a.nav-icon-link[href="market-scan.html"] {
+    background-color: #414861;
 }
-.dark-mode a[href="market-scan.html"].nav-icon-link:hover {
-    background-color: #158a6e;
+.dark-mode a.nav-icon-link[href="market-scan.html"]:hover {
+    background-color: #525a7a;
+}
+.dark-mode a.nav-icon-link[href="alarms-create.html"] {
+    background-color: #5c550c;
+}
+.dark-mode a.nav-icon-link[href="alarms-create.html"]:hover {
+    background-color: #7a7210;
 }
