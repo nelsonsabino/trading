@@ -186,9 +186,7 @@ async function initializeApp() {
     
     displayGeneralNews();
 
-    // START OF MODIFICATION
     setInterval(refreshDashboardView, 5 * 60 * 1000); // 5 minutos
-    // END OF MODIFICATION
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -201,9 +199,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 .catch(error => console.error('Falha no registo do Service Worker:', error));
         });
     }
-
-    const addOpportunityBtn = document.getElementById('add-opportunity-btn-nav');
-    if (addOpportunityBtn) addOpportunityBtn.addEventListener('click', openAddModal);
     
     if (addModal.container) {
         addModal.closeBtn.addEventListener('click', closeAddModal);
