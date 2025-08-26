@@ -319,52 +319,53 @@ export function displayTrades(trades, marketData, allAlarms) {
     }
 }
 
-export function displayWatchlistTable(allTrades, allAlarms, marketData) {
-    const watchlistSection = document.getElementById('watchlist-section');
-    const tbody = document.getElementById('watchlist-alarms-tbody');
-    if (!tbody || !watchlistSection) return;
+// START OF MODIFICATION: Renamed and refactored
+function renderWatchlistContent(assets, allAlarms, marketData, containerId, isTriggeredList) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
 
-    const assetsInKanban = new Set(allTrades.filter(t => ['POTENTIAL', 'ARMED', 'LIVE'].includes(t.data.status)).map(t => t.data.asset));
-    
-    const relevantAlarmsByAsset = allAlarms.reduce((acc, alarm) => {
-        if (alarm.status === 'active' || (alarm.status === 'triggered' && !alarm.acknowledged)) {
-            if (!acc[alarm.asset_pair]) {
-                acc[alarm.asset_pair] = [];
-            }
-            acc[alarm.asset_pair].push(alarm);
-        }
-        return acc;
-    }, {});
-    let assetsForWatchlist = Object.keys(relevantAlarmsByAsset).filter(asset => !assetsInKanban.has(asset));
-
-    // START OF MODIFICATION
-    assetsForWatchlist.sort((assetA, assetB) => {
-        const hasTriggeredA = allAlarms.some(a => a.asset_pair === assetA && a.status === 'triggered' && !a.acknowledged);
-        const hasTriggeredB = allAlarms.some(a => a.asset_pair === assetB && a.status === 'triggered' && !a.acknowledged);
-
-        if (hasTriggeredA && !hasTriggeredB) return -1; // A vem primeiro
-        if (!hasTriggeredA && hasTriggeredB) return 1;  // B vem primeiro
-        return 0; // Mantém a ordem original
-    });
-    // END OF MODIFICATION
-
-    if (assetsForWatchlist.length === 0) {
-        watchlistSection.style.display = 'none';
+    if (assets.length === 0) {
+        container.innerHTML = isTriggeredList ? '' : '<p class="empty-state-message">Nenhum item.</p>';
+        if (isTriggeredList) container.closest('section').style.display = 'none';
         return;
     }
-    watchlistSection.style.display = 'block';
+    
+    if (isTriggeredList) container.closest('section').style.display = 'block';
 
-    const tableRowsHtml = assetsForWatchlist.map(assetName => {
-        const alarmsForAsset = relevantAlarmsByAsset[assetName];
-        
-        const latestAlarm = [...alarmsForAsset].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
-        
+    const tableHeader = `
+        <div class="table-wrapper">
+            <table class="alarms-table">
+                <thead>
+                    <tr>
+                        <th>Ativo</th>
+                        <th>Alarme Disparado</th>
+                        <th>Último Preço</th>
+                        <th>Sparkline (24h)</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    const tableFooter = `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    const tableRowsHtml = assets.map(assetName => {
+        const alarmsForAsset = allAlarms.filter(a => a.asset_pair === assetName);
+        const latestAlarm = [...alarmsForAsset]
+            .filter(a => isTriggeredList ? (a.status === 'triggered' && !a.acknowledged) : a.status === 'active')
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
+
+        if (!latestAlarm) return '';
+
         const assetMarketData = marketData[assetName] || { price: 0, sparkline: [] };
         let formattedPrice = assetMarketData.price >= 1.0 ? assetMarketData.price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$' + assetMarketData.price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
         
-        const hasTriggeredUnacknowledgedAlarm = allAlarms.some(a => a.asset_pair === assetName && a.status === 'triggered' && !a.acknowledged);
-        const triggeredClass = hasTriggeredUnacknowledgedAlarm ? 'class="alarm-triggered"' : '';
-        const acknowledgeButtonHtml = hasTriggeredUnacknowledgedAlarm ? `<button class="acknowledge-alarm-btn" data-action="acknowledge-and-view-alarm" data-asset="${assetName}" title="Ver Alarme Disparado"><span class="material-symbols-outlined">alarm</span> OK</button>` : '';
+        const triggeredClass = isTriggeredList ? 'class="alarm-triggered"' : '';
+        const acknowledgeButtonHtml = isTriggeredList ? `<button class="acknowledge-alarm-btn" data-action="acknowledge-and-view-alarm" data-asset="${assetName}" title="Ver Alarme Disparado"><span class="material-symbols-outlined">alarm</span> OK</button>` : '';
         
         let trendlineButtonHtml = '';
         if (latestAlarm.alarm_type === 'rsi_trendline_break') {
@@ -375,11 +376,11 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
         return `
             <tr ${triggeredClass}>
                 <td data-label="Ativo"><strong><a href="asset-details.html?symbol=${assetName}" class="asset-link">${assetName}</a></strong></td>
-                <td data-label="Ultimo alarme criado">
+                <td data-label="Último alarme criado">
                     <a href="#" class="alarm-details-link" data-action="manage-alarms" data-asset="${assetName}">${getAlarmDescription(latestAlarm, true)}</a>
                 </td>
                 <td data-label="Último Preço">${formattedPrice}</td>
-                <td data-label="Sparkline (24h)"><div class="sparkline-container" id="sparkline-watchlist-${assetName}"></div></td>
+                <td data-label="Sparkline (24h)"><div class="sparkline-container" id="sparkline-${isTriggeredList ? 'triggered' : 'watchlist'}-${assetName}"></div></td>
                 <td data-label="Ações">
                     <div class="action-buttons">
                         ${acknowledgeButtonHtml}
@@ -393,9 +394,80 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
             </tr>
         `;
     }).join('');
-    tbody.innerHTML = tableRowsHtml;
-    assetsForWatchlist.forEach(assetName => renderSparkline(`sparkline-watchlist-${assetName}`, marketData[assetName]?.sparkline));
+
+    const tableTitle = isTriggeredList ? `<h2><span class="material-symbols-outlined">alarm_on</span> Alarmes Disparados</h2>` : '';
+    container.innerHTML = tableTitle + tableHeader + tableRowsHtml + tableFooter;
+    
+    assets.forEach(assetName => {
+        const sparklineId = `sparkline-${isTriggeredList ? 'triggered' : 'watchlist'}-${assetName}`;
+        renderSparkline(sparklineId, marketData[assetName]?.sparkline);
+    });
 }
+
+export function displayWatchlistTable(allTrades, allAlarms, marketData) {
+    const assetsInKanban = new Set(allTrades.filter(t => ['POTENTIAL', 'ARMED', 'LIVE'].includes(t.data.status)).map(t => t.data.asset));
+    
+    const triggeredAssets = new Set();
+    const activeAssets = new Set();
+
+    allAlarms.forEach(alarm => {
+        if (!assetsInKanban.has(alarm.asset_pair)) {
+            if (alarm.status === 'triggered' && !alarm.acknowledged) {
+                triggeredAssets.add(alarm.asset_pair);
+            } else if (alarm.status === 'active') {
+                activeAssets.add(alarm.asset_pair);
+            }
+        }
+    });
+
+    const regularWatchlistAssets = [...activeAssets].filter(asset => !triggeredAssets.has(asset));
+    
+    renderWatchlistContent([...triggeredAssets], allAlarms, marketData, 'triggered-alarms-section', true);
+    
+    const watchlistSection = document.getElementById('watchlist-section');
+    const tbody = document.getElementById('watchlist-alarms-tbody');
+    if (!tbody || !watchlistSection) return;
+
+    if (regularWatchlistAssets.length === 0) {
+        watchlistSection.style.display = 'none';
+        tbody.innerHTML = '';
+    } else {
+        watchlistSection.style.display = 'block';
+        const tableRowsHtml = regularWatchlistAssets.map(assetName => {
+            const alarmsForAsset = allAlarms.filter(a => a.asset_pair === assetName && a.status === 'active');
+            const latestAlarm = [...alarmsForAsset].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
+            const assetMarketData = marketData[assetName] || { price: 0, sparkline: [] };
+            let formattedPrice = assetMarketData.price >= 1.0 ? assetMarketData.price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$' + assetMarketData.price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
+            let trendlineButtonHtml = '';
+            if (latestAlarm.alarm_type === 'rsi_trendline_break') {
+                const alarmDataString = encodeURIComponent(JSON.stringify(latestAlarm));
+                trendlineButtonHtml = `<button class="icon-action-btn btn-view-trendline" data-action="view-trendline" data-alarm='${alarmDataString}' title="Visualizar Linha de Tendência"><span class="material-symbols-outlined">analytics</span></button>`;
+            }
+            return `
+                <tr>
+                    <td data-label="Ativo"><strong><a href="asset-details.html?symbol=${assetName}" class="asset-link">${assetName}</a></strong></td>
+                    <td data-label="Ultimo alarme criado">
+                        <a href="#" class="alarm-details-link" data-action="manage-alarms" data-asset="${assetName}">${getAlarmDescription(latestAlarm, true)}</a>
+                    </td>
+                    <td data-label="Último Preço">${formattedPrice}</td>
+                    <td data-label="Sparkline (24h)"><div class="sparkline-container" id="sparkline-watchlist-${assetName}"></div></td>
+                    <td data-label="Ações">
+                        <div class="action-buttons">
+                            ${trendlineButtonHtml}
+                            <button class="icon-action-btn btn-view-chart" data-action="view-chart" data-symbol="${assetName}" title="Ver Gráfico Detalhado"><span class="material-symbols-outlined">monitoring</span></button>
+                            <a href="https://www.tradingview.com/chart/?symbol=BINANCE:${assetName}" target="_blank" class="icon-action-btn btn-trading-view" title="TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
+                            <a href="alarms-create.html?assetPair=${assetName}" class="icon-action-btn" title="Criar Novo Alarme"><span class="material-symbols-outlined">alarm_add</span></a>
+                            <button class="icon-action-btn" data-action="add-to-potential" data-symbol="${assetName}" title="Adicionar a Trade Potencial"><span class="material-symbols-outlined">add</span></button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+        tbody.innerHTML = tableRowsHtml;
+        regularWatchlistAssets.forEach(assetName => renderSparkline(`sparkline-watchlist-${assetName}`, marketData[assetName]?.sparkline));
+    }
+}
+// END OF MODIFICATION
 
 document.addEventListener('DOMContentLoaded', () => {
     const dashboard = document.querySelector('.dashboard-columns');
@@ -433,9 +505,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const watchlistTable = document.getElementById('watchlist-alarms-tbody');
-    if (watchlistTable) {
-        watchlistTable.addEventListener('click', (e) => {
+    const watchlistContainer = document.getElementById('watchlist-section');
+    if (watchlistContainer) {
+        watchlistContainer.addEventListener('click', (e) => {
             const targetElement = e.target.closest('[data-action]');
             if (!targetElement) return;
             e.preventDefault();
