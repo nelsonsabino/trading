@@ -85,7 +85,7 @@ function enterEditMode(alarm) {
         checkbox.checked = isSpecific;
         document.getElementById('stoch-cross-level-value-container').style.display = isSpecific ? 'block' : 'none';
         if (isSpecific) {
-            document.getElementById('stoch-cross-level-value').value = alarm.crossover_level_value || '';
+            document.getElementById('stoch-cross-level-value').value = alarm.crossover_level_value || '20';
         }
 
     } else if (alarmType === 'rsi_crossover') { 
@@ -97,12 +97,12 @@ function enterEditMode(alarm) {
         document.getElementById('ema-condition').value = alarm.condition; 
         document.getElementById('ema-period').value = alarm.ema_period; 
         document.getElementById('ema-timeframe').value = alarm.indicator_timeframe; 
-    } else if (alarmType === 'ema_crossover') { // START OF MODIFICATION
+    } else if (alarmType === 'ema_crossover') {
         document.getElementById('ema-cross-condition').value = alarm.condition;
         document.getElementById('ema-cross-period-short').value = alarm.ema_period_short;
         document.getElementById('ema-cross-period-long').value = alarm.ema_period_long;
         document.getElementById('ema-cross-timeframe').value = alarm.indicator_timeframe;
-    } else if (alarmType === 'combo') { // END OF MODIFICATION
+    } else if (alarmType === 'combo') {
         document.getElementById('combo-primary-trigger').value = alarm.condition; 
         document.getElementById('combo-ema-period').value = alarm.ema_period; 
         document.getElementById('combo-stoch-condition').value = alarm.combo_condition; 
@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
         stochastic_crossover: document.getElementById('stoch-crossover-fields'), 
         rsi_crossover: document.getElementById('rsi-fields'), 
         ema_touch: document.getElementById('ema-fields'), 
-        ema_crossover: document.getElementById('ema-crossover-fields'), // START OF MODIFICATION
+        ema_crossover: document.getElementById('ema-crossover-fields'),
         combo: document.getElementById('combo-fields'),
         rsi_trendline: document.getElementById('rsi-trendline-fields'),
         rsi_trendline_break: document.getElementById('rsi-trendline-break-fields')
@@ -312,12 +312,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 alarmData.condition = document.getElementById('ema-condition').value; 
                 alarmData.indicator_timeframe = document.getElementById('ema-timeframe').value; 
                 alarmData.ema_period = parseInt(document.getElementById('ema-period').value); 
-            } else if (alarmType === 'ema_crossover') { // START OF MODIFICATION
+            } else if (alarmType === 'ema_crossover') {
                 alarmData.condition = document.getElementById('ema-cross-condition').value;
                 alarmData.ema_period_short = parseInt(document.getElementById('ema-cross-period-short').value);
                 alarmData.ema_period_long = parseInt(document.getElementById('ema-cross-period-long').value);
                 alarmData.indicator_timeframe = document.getElementById('ema-cross-timeframe').value;
-            } else if (alarmType === 'combo') { // END OF MODIFICATION
+            } else if (alarmType === 'combo') {
                 alarmData.condition = document.getElementById('combo-primary-trigger').value; 
                 alarmData.indicator_timeframe = document.getElementById('combo-timeframe').value; 
                 alarmData.ema_period = parseInt(document.getElementById('combo-ema-period').value); 
@@ -327,10 +327,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 alarmData.combo_period = 14; 
             }
 
+            // START OF MODIFICATION
             let redirectUrl = 'alarms-manage.html';
-            if (document.referrer.includes('dashboard.html')) {
+            if (document.referrer && document.referrer.includes('dashboard.html')) {
                 redirectUrl = 'dashboard.html';
             }
+            // END OF MODIFICATION
 
             if (editingAlarmId) {
                 alarmData.status = 'active';
