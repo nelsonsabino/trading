@@ -2,15 +2,23 @@
 
 export const changelogData = {
 current: {
-    number: '17.8.0',
+    number: '18.0.0',
     changes: [
-        "**Melhorias de Funcionalidade e UX (Dashboard):**",
-        "**Priorização de Alarmes:** A 'Watchlist de Alarmes' agora ordena automaticamente os ativos com alarmes disparados para o topo da lista, garantindo que as oportunidades mais urgentes tenham máxima visibilidade.",
-        "**Auto-Refresh:** Implementada a atualização automática do Dashboard a cada 5 minutos para manter os dados de mercado e o estado dos alarmes sempre atualizados.",
-        "**UI Simplificada:** Removido o botão de atalho para 'Adicionar Trade Potencial' da navegação principal para uma interface mais limpa."
+        "**Reestruturação do Layout do Dashboard (Versão 18):**",
+        "**Destaque Prioritário para Alarmes Disparados:** Implementada uma nova secção de destaque no topo do Dashboard, que exibe uma tabela isolada com os ativos cujos alarmes foram disparados. Esta secção só aparece quando há ações urgentes a serem tomadas.",
+        "**Melhoria do Fluxo de Trabalho:** Ao criar ou editar um alarme a partir do Dashboard, o utilizador é agora redirecionado de volta para o Dashboard, mantendo o contexto de trabalho."
     ]
 },
 releases: [
+    {
+        number: '17.8.0',
+        changes: [
+            "**Melhorias de Funcionalidade e UX (Dashboard):**",
+            "**Priorização de Alarmes:** A 'Watchlist de Alarmes' agora ordena automaticamente os ativos com alarmes disparados para o topo da lista, garantindo que as oportunidades mais urgentes tenham máxima visibilidade.",
+            "**Auto-Refresh:** Implementada a atualização automática do Dashboard a cada 5 minutos para manter os dados de mercado e o estado dos alarmes sempre atualizados.",
+            "**UI Simplificada:** Removido o botão de atalho para 'Adicionar Trade Potencial' da navegação principal para uma interface mais limpa."
+        ]
+    },
     {
         number: '17.7.0',
         changes: [
