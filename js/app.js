@@ -90,11 +90,9 @@ async function refreshDashboardView() {
 async function fetchMarketDataForDashboard(trades, alarms) {
     const tradeSymbols = trades.map(trade => trade.data.asset);
     
-    // START OF MODIFICATION
     const alarmSymbols = alarms
         .filter(a => a.status === 'active' || (a.status === 'triggered' && !a.acknowledged))
         .map(a => a.asset_pair);
-    // END OF MODIFICATION
     
     const symbols = [...new Set([...tradeSymbols, ...alarmSymbols])];
     if (symbols.length === 0) return {};
@@ -187,6 +185,10 @@ async function initializeApp() {
     }
     
     displayGeneralNews();
+
+    // START OF MODIFICATION
+    setInterval(refreshDashboardView, 5 * 60 * 1000); // 5 minutos
+    // END OF MODIFICATION
 }
 
 document.addEventListener('DOMContentLoaded', () => {
