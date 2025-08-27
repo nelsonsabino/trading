@@ -41,8 +41,7 @@ header .main-nav {
 }
 
 .dashboard-columns > section {
-    flex: 1; /* Permite que as colunas cresçam para preencher o espaço */
-    min-width: 320px; /* Largura mínima antes de quebrar para a linha de baixo */
+    flex: 1 1 320px; /* Grow, Shrink, Basis: Permite crescer, encolher, com uma largura base de 320px */
 }
 /* END OF MODIFICATION */
 
