@@ -1,0 +1,105 @@
+/* css/layout.css */
+
+/* --- CABEÇALHO E NAVEGAÇÃO --- */
+header { 
+    text-align: center; 
+    padding: 2rem 1rem; 
+    background-color: var(--surface-primary); 
+    border-bottom: 1px solid var(--border-primary); 
+    margin-bottom: 2rem; 
+}
+.mantra { 
+    font-style: italic; 
+    color: var(--text-secondary); 
+}
+header .main-nav { 
+    margin-top: 1.5rem; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    gap: 1rem; 
+    flex-wrap: wrap; 
+}
+
+/* Navegação contextual (segunda linha) */
+.contextual-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 1.5rem; /* Espaço abaixo da navegação principal */
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-secondary);
+}
+
+/* --- GRIDS DE LAYOUT PRINCIPAL --- */
+/* START OF MODIFICATION */
+.dashboard-columns { 
+    display: flex; 
+    flex-wrap: wrap;
+    gap: 2rem; 
+}
+
+.dashboard-columns > section {
+    flex: 1; /* Permite que as colunas cresçam para preencher o espaço */
+    min-width: 320px; /* Largura mínima antes de quebrar para a linha de baixo */
+}
+/* END OF MODIFICATION */
+
+/* Esconde colunas vazias do Kanban em todas as resoluções */
+.dashboard-hide {
+    display: none !important;
+}
+
+.asset-charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.asset-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+
+/* --- CONTROLES DO MERCADO --- */
+.market-controls {
+    display: flex;
+    flex-direction: column; 
+    align-items: flex-start; 
+    gap: 0.8rem; 
+    padding: 1rem;
+    background-color: var(--surface-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.controls-row { 
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    width: 100%;
+} 
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Secção de Destaque de Alarmes Disparados */
+.triggered-alarms-highlight {
+    margin-bottom: 2rem;
+}
