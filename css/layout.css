@@ -35,15 +35,10 @@ header .main-nav {
 /* --- GRIDS DE LAYOUT PRINCIPAL --- */
 /* START OF MODIFICATION: Final Kanban Layout Logic */
 .dashboard-columns { 
-    display: flex; 
-    flex-wrap: wrap;
-    gap: 2rem; 
-    align-items: flex-start; /* Alinha as colunas no topo */
-}
-
-/* As secções das colunas não têm regras de tamanho, vão adaptar-se ao conteúdo */
-.dashboard-columns > section {
-    /* Nenhuma regra de flex-grow, shrink ou basis aqui */
+    /* Todas as regras de display e grid/flex foram removidas. */
+    /* As secções filhas agora empilham-se verticalmente por defeito. */
+    display: block;
+    margin-bottom: 2rem; /* Adiciona um espaço no final */
 }
 /* END OF MODIFICATION */
 
