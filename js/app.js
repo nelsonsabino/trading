@@ -12,6 +12,7 @@ import { setCurrentStrategies, getStrategies } from './state.js';
 let allTrades = [];
 let currentAlarms = [];
 
+// START OF MODIFICATION: Logic to order Kanban columns by priority
 function orderKanbanColumns() {
     const container = document.querySelector('.dashboard-columns');
     if (!container) return;
@@ -20,10 +21,13 @@ function orderKanbanColumns() {
     const armedSection = document.querySelector('.armed-trades');
     const potentialSection = document.querySelector('.potential-trades');
     
-    const priorityOrder = [liveSection, armedSection, potentialSection];
+    // Define the order of priority. Appending moves the element to the end,
+    // so we append in reverse order of visual priority (left to right).
+    const priorityOrder = [potentialSection, armedSection, liveSection];
 
     priorityOrder.forEach(section => {
         if (section) {
+            // Only move the section if it has visible content
             const contentContainer = section.querySelector('[id$="-trades-container"]');
             if (contentContainer && contentContainer.querySelector('.trade-card')) {
                 container.appendChild(section);
@@ -31,6 +35,7 @@ function orderKanbanColumns() {
         }
     });
 }
+// END OF MODIFICATION
 
 function manageEmptySectionsVisibility() {
     const kanbanColumns = [
@@ -39,34 +44,22 @@ function manageEmptySectionsVisibility() {
         { section: document.querySelector('.live-trades'), container: document.getElementById('live-trades-container') }
     ];
 
-    let visibleKanbanCount = 0;
+    let hasVisibleKanbanCard = false;
     kanbanColumns.forEach(({ section, container }) => {
         if (section && container) {
             const hasContent = container.querySelector('.trade-card');
+            section.style.display = hasContent ? '' : 'none';
             if (hasContent) {
-                section.style.display = '';
-                visibleKanbanCount++;
-            } else {
-                section.style.display = 'none';
+                hasVisibleKanbanCard = true;
             }
         }
     });
-    
-    // START OF MODIFICATION: Apply dynamic width class
-    const dashboardColumns = document.querySelector('.dashboard-columns');
-    if (dashboardColumns) {
-        dashboardColumns.classList.remove('cols-1', 'cols-2', 'cols-3');
-        if (visibleKanbanCount > 0) {
-            dashboardColumns.classList.add(`cols-${visibleKanbanCount}`);
-        }
-    }
-    // END OF MODIFICATION
     
     const watchlistDivider = document.getElementById('watchlist-divider');
     const watchlistSection = document.getElementById('watchlist-section');
     if (watchlistDivider && watchlistSection) {
         const isWatchlistVisible = watchlistSection.style.display !== 'none';
-        watchlistDivider.style.display = (visibleKanbanCount > 0 && isWatchlistVisible) ? 'block' : 'none';
+        watchlistDivider.style.display = (hasVisibleKanbanCard && isWatchlistVisible) ? 'block' : 'none';
     }
 }
 
@@ -116,7 +109,7 @@ async function refreshDashboardView() {
     displayTrades(activeTrades, marketData, currentAlarms);
     displayWatchlistTable(allTrades, currentAlarms, marketData);
     
-    orderKanbanColumns();
+    orderKanbanColumns(); // Call the ordering function
     
     manageEmptySectionsVisibility();
 }
