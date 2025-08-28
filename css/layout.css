@@ -38,12 +38,15 @@ header .main-nav {
     display: flex; 
     flex-wrap: wrap;
     gap: 2rem; 
+    align-items: flex-start; /* Alinha as colunas no topo */
 }
 
+/* A secção da coluna agora não tem regras de tamanho, vai crescer com o conteúdo */
 .dashboard-columns > section {
-    flex: 0 0 calc(33.333% - 1.34rem); /* Grow:0, Shrink:0, Basis: ~33.33% */
+    /* Regras de flex-basis e width removidas */
 }
 /* END OF MODIFICATION */
+
 
 /* Esconde colunas vazias do Kanban em todas as resoluções */
 .dashboard-hide {
