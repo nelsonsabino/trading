@@ -12,6 +12,30 @@ import { setCurrentStrategies, getStrategies } from './state.js';
 let allTrades = [];
 let currentAlarms = [];
 
+// START OF MODIFICATION
+function orderKanbanColumns() {
+    const container = document.querySelector('.dashboard-columns');
+    if (!container) return;
+
+    const liveSection = document.querySelector('.live-trades');
+    const armedSection = document.querySelector('.armed-trades');
+    const potentialSection = document.querySelector('.potential-trades');
+    
+    // Define a ordem de prioridade
+    const priorityOrder = [liveSection, armedSection, potentialSection];
+
+    priorityOrder.forEach(section => {
+        if (section) {
+            // Apenas move a secção se ela tiver conteúdo visível
+            const contentContainer = section.querySelector('[id$="-trades-container"]');
+            if (contentContainer && contentContainer.querySelector('.trade-card')) {
+                container.appendChild(section);
+            }
+        }
+    });
+}
+// END OF MODIFICATION
+
 function manageEmptySectionsVisibility() {
     const kanbanColumns = [
         { section: document.querySelector('.potential-trades'), container: document.getElementById('potential-trades-container') },
@@ -83,6 +107,10 @@ async function refreshDashboardView() {
     
     displayTrades(activeTrades, marketData, currentAlarms);
     displayWatchlistTable(allTrades, currentAlarms, marketData);
+    
+    // START OF MODIFICATION
+    orderKanbanColumns();
+    // END OF MODIFICATION
     
     manageEmptySectionsVisibility();
 }
