@@ -43,7 +43,7 @@
     border: 1px solid var(--border-secondary);
     padding: 0.8rem 1rem;
     border-radius: 6px;
-    margin-bottom: 1rem;
+    /* margin-bottom: 1rem; */ /* Removido para ser controlado pelo gap do grid */
     transition: box-shadow 0.2s ease-in-out, background-color 0.2s;
     border-left: 5px solid var(--text-secondary);
     display: flex;
@@ -333,7 +333,7 @@
 
 /* --- COMPONENTE: FEED DE NOTÍCIAS --- */
 #news-feed-section,
-#general-news-section { /* --- INÍCIO DA ALTERAÇÃO --- */
+#general-news-section {
     background-color: var(--surface-primary);
     border: 1px solid var(--border-primary);
     border-radius: 8px;
@@ -346,10 +346,9 @@
     display: flex;
     flex-direction: column;
 }
-/* --- FIM DA ALTERAÇÃO --- */
 
 #news-feed-container,
-#general-news-container { /* --- INÍCIO DA ALTERAÇÃO --- */
+#general-news-container {
     overflow-y: auto;
     padding-right: 0.5rem; 
 }
@@ -358,7 +357,6 @@
     flex-grow: 1; 
     min-height: 0; 
 }
-/* --- FIM DA ALTERAÇÃO --- */
 
 .news-article {
     padding: 1rem 0.5rem 1rem 0;
@@ -432,3 +430,14 @@
     border-top: 1px solid var(--border-secondary);
     text-align: right;
 }
+
+/* START OF MODIFICATION */
+/* Grid dinâmico para os cards dentro de cada coluna Kanban */
+#potential-trades-container,
+#armed-trades-container,
+#live-trades-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+}
+/* END OF MODIFICATION */
