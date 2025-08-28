@@ -33,15 +33,27 @@ header .main-nav {
 }
 
 /* --- GRIDS DE LAYOUT PRINCIPAL --- */
+/* START OF MODIFICATION: Final Kanban Layout Logic */
 .dashboard-columns { 
     display: flex; 
     flex-wrap: wrap;
     gap: 2rem; 
 }
 
+/* Base para todas as secções dentro das colunas */
 .dashboard-columns > section {
-    flex: 0 1 320px; /* Grow:0, Shrink:1, Basis:320px - Impede que cresça para além da base */
+    flex-shrink: 0; /* Impede que encolham para além do seu basis */
 }
+
+/* Controla a largura das colunas com base na classe do pai */
+.dashboard-columns.cols-1 > section,
+.dashboard-columns.cols-2 > section,
+.dashboard-columns.cols-3 > section {
+    /* (100% / 3 colunas) - (2/3 do gap total para compensar) */
+    flex-basis: calc(33.333% - 1.34rem); 
+}
+/* END OF MODIFICATION */
+
 
 /* Esconde colunas vazias do Kanban em todas as resoluções */
 .dashboard-hide {
