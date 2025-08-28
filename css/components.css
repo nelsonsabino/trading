@@ -1,3 +1,5 @@
+/* css/components.css */
+
 /* --- COMPONENTES GERAIS --- */
 .stat-card {
     background-color: var(--surface-primary);
@@ -41,7 +43,7 @@
     border: 1px solid var(--border-secondary);
     padding: 0.8rem 1rem;
     border-radius: 6px;
-    /* margin-bottom removida para ser controlada pelo gap do grid */
+    /* margin-bottom é agora controlado pelo 'gap' do contentor flex */
     transition: box-shadow 0.2s ease-in-out, background-color 0.2s;
     border-left: 5px solid var(--text-secondary);
     display: flex;
@@ -430,12 +432,20 @@
 }
 
 /* START OF MODIFICATION */
-/* Grid dinâmico para os cards dentro de cada coluna Kanban */
+/* Flexbox layout for cards inside Kanban columns */
 #potential-trades-container,
 #armed-trades-container,
 #live-trades-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Responsivo */
+    display: flex;
+    flex-wrap: wrap;
     gap: 1rem;
 }
-/* END OF MODIFICATION */
+
+/* Controla a largura dos cards dentro dos contentores flex */
+#potential-trades-container .trade-card,
+#armed-trades-container .trade-card,
+#live-trades-container .trade-card {
+    flex: 0 0 calc(33.333% - 0.67rem); /* Grow:0, Shrink:0, Basis: ~33.33% */
+    box-sizing: border-box;
+}
+/* END OF MODIFICATION */```
