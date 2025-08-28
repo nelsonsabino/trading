@@ -43,7 +43,7 @@
     border: 1px solid var(--border-secondary);
     padding: 0.8rem 1rem;
     border-radius: 6px;
-    /* margin-bottom: 1rem; */ /* Removido para ser controlado pelo gap do grid */
+    /* margin-bottom removida para ser controlada pelo gap do grid */
     transition: box-shadow 0.2s ease-in-out, background-color 0.2s;
     border-left: 5px solid var(--text-secondary);
     display: flex;
