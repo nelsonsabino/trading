@@ -12,7 +12,7 @@ import { setCurrentStrategies, getStrategies } from './state.js';
 let allTrades = [];
 let currentAlarms = [];
 
-// START OF MODIFICATION: Logic to order Kanban columns by priority
+// --- START OF MODIFICATION: Logic to order Kanban columns by priority
 function orderKanbanColumns() {
     const container = document.querySelector('.dashboard-columns');
     if (!container) return;
@@ -35,7 +35,7 @@ function orderKanbanColumns() {
         }
     });
 }
-// END OF MODIFICATION
+// --- END OF MODIFICATION
 
 function manageEmptySectionsVisibility() {
     const kanbanColumns = [
@@ -110,7 +110,6 @@ async function refreshDashboardView() {
     displayWatchlistTable(allTrades, currentAlarms, marketData);
     
     orderKanbanColumns(); // Call the ordering function
-    
     manageEmptySectionsVisibility();
 }
 
