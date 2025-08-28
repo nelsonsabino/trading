@@ -21,13 +21,13 @@ function orderKanbanColumns() {
     const armedSection = document.querySelector('.armed-trades');
     const potentialSection = document.querySelector('.potential-trades');
     
-    // Define the order of priority. Appending moves the element to the end,
-    // so we append in reverse order of visual priority (left to right).
+    // Define a ordem de prioridade. Appending move o elemento para o final,
+    // então o último a ser adicionado será o mais à esquerda (maior prioridade).
     const priorityOrder = [potentialSection, armedSection, liveSection];
 
     priorityOrder.forEach(section => {
         if (section) {
-            // Only move the section if it has visible content
+            // Apenas move a secção se ela tiver conteúdo visível
             const contentContainer = section.querySelector('[id$="-trades-container"]');
             if (contentContainer && contentContainer.querySelector('.trade-card')) {
                 container.appendChild(section);
