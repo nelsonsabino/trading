@@ -22,7 +22,7 @@ function orderKanbanColumns() {
     const potentialSection = document.querySelector('.potential-trades');
     
     // Define a ordem de prioridade. Appending move o elemento para o final,
-    // então o último a ser adicionado será o mais à esquerda (maior prioridade).
+    // então o último a ser adicionado será o mais à esquerda/topo (maior prioridade).
     const priorityOrder = [potentialSection, armedSection, liveSection];
 
     priorityOrder.forEach(section => {
