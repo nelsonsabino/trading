@@ -12,7 +12,7 @@ import { setCurrentStrategies, getStrategies } from './state.js';
 let allTrades = [];
 let currentAlarms = [];
 
-// --- START OF MODIFICATION: Logic to order Kanban columns by priority
+// START OF MODIFICATION: Corrected logic to order Kanban columns by priority
 function orderKanbanColumns() {
     const container = document.querySelector('.dashboard-columns');
     if (!container) return;
@@ -21,21 +21,20 @@ function orderKanbanColumns() {
     const armedSection = document.querySelector('.armed-trades');
     const potentialSection = document.querySelector('.potential-trades');
     
-    // Define a ordem de prioridade. Appending move o elemento para o final,
-    // então o último a ser adicionado será o mais à esquerda/topo (maior prioridade).
+    // A ordem correta para appendChild, para que 'Ativo' fique no topo.
     const priorityOrder = [potentialSection, armedSection, liveSection];
 
     priorityOrder.forEach(section => {
         if (section) {
-            // Apenas move a secção se ela tiver conteúdo visível
             const contentContainer = section.querySelector('[id$="-trades-container"]');
+            // Apenas move a secção se ela tiver conteúdo a ser exibido
             if (contentContainer && contentContainer.querySelector('.trade-card')) {
                 container.appendChild(section);
             }
         }
     });
 }
-// --- END OF MODIFICATION
+// END OF MODIFICATION
 
 function manageEmptySectionsVisibility() {
     const kanbanColumns = [
@@ -110,6 +109,7 @@ async function refreshDashboardView() {
     displayWatchlistTable(allTrades, currentAlarms, marketData);
     
     orderKanbanColumns(); // Call the ordering function
+    
     manageEmptySectionsVisibility();
 }
 
