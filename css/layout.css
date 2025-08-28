@@ -1,3 +1,5 @@
+/* css/layout.css */
+
 /* --- CABEÇALHO E NAVEGAÇÃO --- */
 header { 
     text-align: center; 
@@ -31,12 +33,13 @@ header .main-nav {
 }
 
 /* --- GRIDS DE LAYOUT PRINCIPAL --- */
-/* START OF MODIFICATION: Final Kanban Layout Logic */
+/* START OF MODIFICATION: Reverted to block display for vertical stacking */
 .dashboard-columns { 
-    /* Todas as regras de display e grid/flex foram removidas. */
-    /* As secções filhas agora empilham-se verticalmente por defeito. */
     display: block;
-    margin-bottom: 2rem; /* Adiciona um espaço no final */
+}
+
+.dashboard-columns > section {
+    margin-bottom: 2rem; /* Espaçamento entre as secções verticais */
 }
 /* END OF MODIFICATION */
 
@@ -64,6 +67,7 @@ header .main-nav {
     gap: 2rem;
     align-items: start;
 }
+
 
 /* --- CONTROLES DO MERCADO --- */
 .market-controls {
