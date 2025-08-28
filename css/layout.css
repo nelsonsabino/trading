@@ -33,7 +33,6 @@ header .main-nav {
 }
 
 /* --- GRIDS DE LAYOUT PRINCIPAL --- */
-/* START OF MODIFICATION */
 .dashboard-columns { 
     display: flex; 
     flex-wrap: wrap;
@@ -41,9 +40,8 @@ header .main-nav {
 }
 
 .dashboard-columns > section {
-    flex: 0 1 320px; /* Grow:0, Shrink:1, Basis:320px */
+    flex: 0 1 320px; /* Grow:0, Shrink:1, Basis:320px - Impede que cresça para além da base */
 }
-/* END OF MODIFICATION */
 
 /* Esconde colunas vazias do Kanban em todas as resoluções */
 .dashboard-hide {
