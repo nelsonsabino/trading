@@ -33,14 +33,29 @@ header .main-nav {
 }
 
 /* --- GRIDS DE LAYOUT PRINCIPAL --- */
-/* START OF MODIFICATION: Final Kanban Layout Logic */
 .dashboard-columns { 
-    /* Todas as regras de display e grid/flex foram removidas. */
-    /* As secções filhas agora empilham-se verticalmente por defeito. */
-    display: block;
-    margin-bottom: 2rem; /* Adiciona um espaço no final */
+    display: flex;           /* Flex para colocar colunas lado a lado */
+    gap: 1rem;               /* Espaço entre colunas */
+    flex-wrap: wrap;         /* Permite colunas passarem para linha seguinte em ecrãs pequenos */
+    margin-bottom: 2rem;
 }
-/* END OF MODIFICATION */
+
+/* Cada coluna (Potencial, Armado, Ativo) */
+.potential-trades,
+.armed-trades,
+.live-trades {
+    flex: 1 1 300px;         /* Coluna flexível, largura mínima 300px */
+    display: flex;
+    flex-wrap: wrap;          /* Permite cards em múltiplas linhas */
+    gap: 1rem;               /* Espaço entre cards */
+}
+
+/* Cards dentro das colunas */
+.trade-card {
+    flex: 1 1 calc(33.333% - 1rem); /* Cada card ocupa 1/3 da coluna */
+    min-width: 200px;               /* Evita ficar demasiado pequeno */
+    box-sizing: border-box;
+}
 
 /* Esconde colunas vazias do Kanban em todas as resoluções */
 .dashboard-hide {
@@ -66,7 +81,6 @@ header .main-nav {
     gap: 2rem;
     align-items: start;
 }
-
 
 /* --- CONTROLES DO MERCADO --- */
 .market-controls {
