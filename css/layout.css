@@ -33,11 +33,17 @@ header .main-nav {
 }
 
 /* --- GRIDS DE LAYOUT PRINCIPAL --- */
-/* START OF MODIFICATION: Final Grid Layout Logic */
+/* START OF MODIFICATION: Final Kanban Layout Logic */
 .dashboard-columns { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    display: flex; 
+    flex-wrap: wrap;
     gap: 2rem; 
+    align-items: flex-start; /* Alinha as colunas no topo */
+}
+
+/* As secções das colunas não têm regras de tamanho, vão adaptar-se ao conteúdo */
+.dashboard-columns > section {
+    /* Nenhuma regra de flex-grow, shrink ou basis aqui */
 }
 /* END OF MODIFICATION */
 
