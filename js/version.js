@@ -2,15 +2,23 @@
 
 export const changelogData = {
 current: {
-    number: '18.2.0',
+    number: '18.2.1',
     changes: [
-        "**Refatoração do Layout do Kanban (Dashboard):**",
-        "As colunas de fase (Potencial, Armado, Ativo) agora empilham-se verticalmente, ocupando a largura total para melhor legibilidade.",
-        "Os cards de trade *dentro* de cada coluna são agora exibidos numa grelha horizontal responsiva, permitindo que vários trades sejam vistos lado a lado.",
-        "A ordem das colunas no ecrã foi corrigida para seguir a prioridade lógica: Ativo > Armado > Potencial."
+        "**Correção Crítica da Lógica de Exibição de Alarmes (Dashboard):**",
+        "Resolvido o bug crítico onde os ativos com alarmes disparados desapareciam da interface em vez de serem movidos para a secção de destaque no topo do Dashboard.",
+        "A causa foi uma regressão na lógica de renderização em `ui.js`. A lógica foi refatorada para separar completamente a renderização da tabela de alarmes disparados e da watchlist de alarmes ativos, restaurando a funcionalidade e garantindo que os alertas urgentes são novamente exibidos com prioridade."
     ]
 },
 releases: [
+    {
+        number: '18.2.0',
+        changes: [
+            "**Refatoração do Layout do Kanban (Dashboard):**",
+            "As colunas de fase (Potencial, Armado, Ativo) agora empilham-se verticalmente, ocupando a largura total para melhor legibilidade.",
+            "Os cards de trade *dentro* de cada coluna são agora exibidos numa grelha horizontal responsiva, permitindo que vários trades sejam vistos lado a lado.",
+            "A ordem das colunas no ecrã foi corrigida para seguir a prioridade lógica: Ativo > Armado > Potencial."
+        ]
+    },
     {
         number: '18.1.0',
         changes: [
