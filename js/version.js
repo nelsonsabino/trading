@@ -2,16 +2,25 @@
 
 export const changelogData = {
 current: {
-    number: '18.1.0',
+    number: '18.2.0',
     changes: [
-        "**Nova Funcionalidade: Alarme de Cruzamento de EMAs:**",
-        "Adicionado um novo tipo de alarme para detetar o cruzamento entre duas Médias Móveis Exponenciais (curta e longa).",
-        "**Melhorias de UI/UX (Navegação):**",
-        "O botão da página ativa no menu principal agora é destacado com a cor verde (#1fb49c).",
-        "Os botões 'Scanner de Mercado' e 'Criar Alarme' receberam cores distintas para melhor identificação visual."
+        "**Refatoração do Layout do Kanban (Dashboard):**",
+        "As colunas de fase (Potencial, Armado, Ativo) agora empilham-se verticalmente, ocupando a largura total para melhor legibilidade.",
+        "Os cards de trade *dentro* de cada coluna são agora exibidos numa grelha horizontal responsiva, permitindo que vários trades sejam vistos lado a lado.",
+        "A ordem das colunas no ecrã foi corrigida para seguir a prioridade lógica: Ativo > Armado > Potencial."
     ]
 },
 releases: [
+    {
+        number: '18.1.0',
+        changes: [
+            "**Nova Funcionalidade: Alarme de Cruzamento de EMAs:**",
+            "Adicionado um novo tipo de alarme para detetar o cruzamento entre duas Médias Móveis Exponenciais (curta e longa).",
+            "**Melhorias de UI/UX (Navegação):**",
+            "O botão da página ativa no menu principal agora é destacado com a cor verde (#1fb49c).",
+            "Os botões 'Scanner de Mercado' e 'Criar Alarme' receberam cores distintas para melhor identificação visual."
+        ]
+    },
     {
         number: '18.0.0',
         changes: [
