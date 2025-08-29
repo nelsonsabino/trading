@@ -54,12 +54,21 @@ function manageEmptySectionsVisibility() {
         }
     });
     
+    // START OF MODIFICATION: Simplified logic for the divider
     const watchlistDivider = document.getElementById('watchlist-divider');
     const watchlistSection = document.getElementById('watchlist-section');
-    if (watchlistDivider && watchlistSection) {
+    const triggeredSection = document.getElementById('triggered-alarms-section');
+
+    if (watchlistDivider && watchlistSection && triggeredSection) {
         const isWatchlistVisible = watchlistSection.style.display !== 'none';
-        watchlistDivider.style.display = (hasVisibleKanbanCard && isWatchlistVisible) ? 'block' : 'none';
+        const isTriggeredVisible = triggeredSection.style.display !== 'none';
+        
+        // O divisor aparece se houver cards no Kanban E (pelo menos uma das watchlists estiver visível)
+        // OU se ambas as watchlists (disparada e normal) estiverem visíveis ao mesmo tempo.
+        const showDivider = (hasVisibleKanbanCard && (isWatchlistVisible || isTriggeredVisible)) || (isTriggeredVisible && isWatchlistVisible);
+        watchlistDivider.style.display = showDivider ? 'block' : 'none';
     }
+    // END OF MODIFICATION
 }
 
 async function displayGeneralNews() {
