@@ -163,9 +163,9 @@ export function getAlarmDescription(alarm, forTable = false) {
             return `RSI cruza ${alarm.condition === 'above' ? 'para CIMA' : 'para BAIXO'} da MA ${detailsText}${timeframe}`;
         }
         case 'ema_touch': return `Preço testa EMA(${alarm.ema_period}) ${timeframe}`;
-        case 'ema_crossover': // START OF MODIFICATION
+        case 'ema_crossover':
             return `EMA(${alarm.ema_period_short}) cruza para ${alarm.condition === 'above' ? 'CIMA' : 'BAIXO'} da EMA(${alarm.ema_period_long}) ${timeframe}`;
-        case 'combo': // END OF MODIFICATION
+        case 'combo':
             return `Confluência EMA/Stoch ${timeframe}`;
         case 'rsi_trendline': return `${alarm.touch_count}º toque em L.T. de ${alarm.trendline_type} ${timeframe}`;
         case 'rsi_trendline_break':
@@ -322,47 +322,28 @@ export function displayTrades(trades, marketData, allAlarms) {
     }
 }
 
-function renderWatchlistSection(assets, allAlarms, marketData, container, isTriggeredList) {
-    const section = container.closest('section');
+// START OF REFACTOR: Separated rendering logic for triggered and regular watchlist
+function renderTriggeredAlarmsSection(assets, allAlarms, marketData) {
+    const section = document.getElementById('triggered-alarms-section');
     if (!section) return;
 
     if (assets.length === 0) {
+        section.innerHTML = '';
         section.style.display = 'none';
-        container.innerHTML = '';
         return;
     }
     section.style.display = 'block';
 
-    const headerTitle = isTriggeredList ? 'Alarme Disparado' : 'Último alarme criado';
-    const tableHeader = `
-        <div class="table-wrapper">
-            <table class="alarms-table">
-                <thead>
-                    <tr>
-                        <th>Ativo</th>
-                        <th>${headerTitle}</th>
-                        <th>Último Preço</th>
-                        <th>Sparkline (24h)</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="${isTriggeredList ? 'triggered-alarms-tbody' : 'watchlist-alarms-tbody'}">
-    `;
-    const tableFooter = `</tbody></table></div>`;
-
     const tableRowsHtml = assets.map(assetName => {
-        const alarmsForAsset = allAlarms.filter(a => a.asset_pair === assetName);
-        const relevantAlarms = alarmsForAsset.filter(a => isTriggeredList ? (a.status === 'triggered' && !a.acknowledged) : a.status === 'active');
-        const latestAlarm = [...relevantAlarms].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
-
+        const alarmsForAsset = allAlarms.filter(a => a.asset_pair === assetName && a.status === 'triggered' && !a.acknowledged);
+        const latestAlarm = [...alarmsForAsset].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
         if (!latestAlarm) return '';
 
         const assetMarketData = marketData[assetName] || { price: 0, sparkline: [] };
-        let formattedPrice = assetMarketData.price >= 1.0 ? assetMarketData.price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '$' + assetMarketData.price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
-        
-        const triggeredClass = isTriggeredList ? 'class="alarm-triggered"' : '';
-        const acknowledgeButtonHtml = isTriggeredList ? `<button class="acknowledge-alarm-btn" data-action="acknowledge-and-view-alarm" data-asset="${assetName}" title="Ver Alarme Disparado"><span class="material-symbols-outlined">alarm</span> OK</button>` : '';
-        
+        const formattedPrice = assetMarketData.price >= 1.0 
+            ? assetMarketData.price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }) 
+            : '$' + assetMarketData.price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
+
         let trendlineButtonHtml = '';
         if (latestAlarm.alarm_type === 'rsi_trendline_break') {
             const alarmDataString = encodeURIComponent(JSON.stringify(latestAlarm));
@@ -370,16 +351,84 @@ function renderWatchlistSection(assets, allAlarms, marketData, container, isTrig
         }
 
         return `
-            <tr ${triggeredClass}>
+            <tr class="alarm-triggered">
                 <td data-label="Ativo"><strong><a href="asset-details.html?symbol=${assetName}" class="asset-link">${assetName}</a></strong></td>
-                <td data-label="${headerTitle}">
+                <td data-label="Alarme Disparado">
+                    <a href="#" class="alarm-details-link" data-action="acknowledge-and-view-alarm" data-asset="${assetName}">${getAlarmDescription(latestAlarm, true)}</a>
+                </td>
+                <td data-label="Último Preço">${formattedPrice}</td>
+                <td data-label="Sparkline (24h)"><div class="sparkline-container" id="sparkline-triggered-${assetName}"></div></td>
+                <td data-label="Ações">
+                    <div class="action-buttons">
+                        <button class="acknowledge-alarm-btn" data-action="acknowledge-and-view-alarm" data-asset="${assetName}" title="Ver Alarme Disparado"><span class="material-symbols-outlined">alarm</span> OK</button>
+                        ${trendlineButtonHtml}
+                        <button class="icon-action-btn btn-view-chart" data-action="view-chart" data-symbol="${assetName}" title="Ver Gráfico Detalhado"><span class="material-symbols-outlined">monitoring</span></button>
+                        <a href="https://www.tradingview.com/chart/?symbol=BINANCE:${assetName}" target="_blank" class="icon-action-btn btn-trading-view" title="TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+
+    section.innerHTML = `
+        <h2><span class="material-symbols-outlined">alarm_on</span> Alarmes Disparados</h2>
+        <div class="table-wrapper">
+            <table class="alarms-table">
+                <thead>
+                    <tr>
+                        <th>Ativo</th>
+                        <th>Alarme Disparado</th>
+                        <th>Último Preço</th>
+                        <th>Sparkline (24h)</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>${tableRowsHtml}</tbody>
+            </table>
+        </div>
+    `;
+
+    assets.forEach(assetName => renderSparkline(`sparkline-triggered-${assetName}`, marketData[assetName]?.sparkline));
+}
+
+function renderWatchlistRows(assets, allAlarms, marketData) {
+    const section = document.getElementById('watchlist-section');
+    const tbody = document.getElementById('watchlist-alarms-tbody');
+    if (!section || !tbody) return;
+
+    if (assets.length === 0) {
+        tbody.innerHTML = '';
+        section.style.display = 'none';
+        return;
+    }
+    section.style.display = 'block';
+
+    const tableRowsHtml = assets.map(assetName => {
+        const alarmsForAsset = allAlarms.filter(a => a.asset_pair === assetName && a.status === 'active');
+        const latestAlarm = [...alarmsForAsset].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
+        if (!latestAlarm) return '';
+
+        const assetMarketData = marketData[assetName] || { price: 0, sparkline: [] };
+        const formattedPrice = assetMarketData.price >= 1.0 
+            ? assetMarketData.price.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }) 
+            : '$' + assetMarketData.price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumSignificantDigits: 8 });
+
+        let trendlineButtonHtml = '';
+        if (latestAlarm.alarm_type === 'rsi_trendline_break') {
+            const alarmDataString = encodeURIComponent(JSON.stringify(latestAlarm));
+            trendlineButtonHtml = `<button class="icon-action-btn btn-view-trendline" data-action="view-trendline" data-alarm='${alarmDataString}' title="Visualizar Linha de Tendência"><span class="material-symbols-outlined">analytics</span></button>`;
+        }
+
+        return `
+            <tr>
+                <td data-label="Ativo"><strong><a href="asset-details.html?symbol=${assetName}" class="asset-link">${assetName}</a></strong></td>
+                <td data-label="Último alarme criado">
                     <a href="#" class="alarm-details-link" data-action="manage-alarms" data-asset="${assetName}">${getAlarmDescription(latestAlarm, true)}</a>
                 </td>
                 <td data-label="Último Preço">${formattedPrice}</td>
-                <td data-label="Sparkline (24h)"><div class="sparkline-container" id="sparkline-${isTriggeredList ? 'triggered' : 'watchlist'}-${assetName}"></div></td>
+                <td data-label="Sparkline (24h)"><div class="sparkline-container" id="sparkline-watchlist-${assetName}"></div></td>
                 <td data-label="Ações">
                     <div class="action-buttons">
-                        ${acknowledgeButtonHtml}
                         ${trendlineButtonHtml}
                         <button class="icon-action-btn btn-view-chart" data-action="view-chart" data-symbol="${assetName}" title="Ver Gráfico Detalhado"><span class="material-symbols-outlined">monitoring</span></button>
                         <a href="https://www.tradingview.com/chart/?symbol=BINANCE:${assetName}" target="_blank" class="icon-action-btn btn-trading-view" title="TradingView"><span class="material-symbols-outlined">open_in_new</span></a>
@@ -391,13 +440,8 @@ function renderWatchlistSection(assets, allAlarms, marketData, container, isTrig
         `;
     }).join('');
 
-    const sectionTitle = isTriggeredList ? `<h2><span class="material-symbols-outlined">alarm_on</span> Alarmes Disparados</h2>` : '';
-    container.innerHTML = sectionTitle + tableHeader + tableRowsHtml + tableFooter;
-    
-    assets.forEach(assetName => {
-        const sparklineId = `sparkline-${isTriggeredList ? 'triggered' : 'watchlist'}-${assetName}`;
-        renderSparkline(sparklineId, marketData[assetName]?.sparkline);
-    });
+    tbody.innerHTML = tableRowsHtml;
+    assets.forEach(assetName => renderSparkline(`sparkline-watchlist-${assetName}`, marketData[assetName]?.sparkline));
 }
 
 export function displayWatchlistTable(allTrades, allAlarms, marketData) {
@@ -418,13 +462,10 @@ export function displayWatchlistTable(allTrades, allAlarms, marketData) {
 
     const regularWatchlistAssets = [...activeAssets].filter(asset => !triggeredAssets.has(asset));
     
-    const triggeredSectionContainer = document.getElementById('triggered-alarms-section');
-    renderWatchlistSection([...triggeredAssets], allAlarms, marketData, triggeredSectionContainer, true);
-    
-    const watchlistTbody = document.getElementById('watchlist-alarms-tbody');
-    const watchlistSection = watchlistTbody.closest('section');
-    renderWatchlistSection(regularWatchlistAssets, allAlarms, marketData, watchlistTbody, false);
+    renderTriggeredAlarmsSection([...triggeredAssets], allAlarms, marketData);
+    renderWatchlistRows(regularWatchlistAssets, allAlarms, marketData);
 }
+// END OF REFACTOR
 
 document.addEventListener('DOMContentLoaded', () => {
     const dashboard = document.querySelector('.dashboard-columns');
