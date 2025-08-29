@@ -2,15 +2,24 @@
 
 export const changelogData = {
 current: {
-    number: '18.3.0',
+    number: '18.3.1',
     changes: [
-        "**Otimização da Reatividade do Alarme de Cruzamento de Estocástico:**",
-        "A lógica de verificação do alarme foi alterada para disparar na **primeira vela fechada** que confirma o cruzamento, em vez de exigir a confirmação de duas velas consecutivas.",
-        "Esta alteração torna o alarme significativamente mais rápido e reativo, permitindo uma resposta mais imediata às condições de mercado.",
-        "A mensagem de notificação foi atualizada para refletir a nova lógica de disparo imediato."
+        "**Correção Crítica da Fiabilidade das Atualizações de Alarmes em Tempo Real:**",
+        "Resolvido o bug de regressão que impedia que os alarmes disparados (incluindo os reativados) fossem exibidos no Dashboard.",
+        "A causa foi identificada como uma 'race condition' em 'js/services.js', onde as atualizações de estado podiam ser perdidas entre a busca inicial de dados e a ativação da subscrição em tempo real.",
+        "A função 'listenToAlarms' foi refatorada para garantir que a busca inicial de dados só ocorre após a confirmação da subscrição, restaurando a fiabilidade total das atualizações do Dashboard."
     ]
 },
 releases: [
+    {
+        number: '18.3.0',
+        changes: [
+            "**Otimização da Reatividade do Alarme de Cruzamento de Estocástico:**",
+            "A lógica de verificação do alarme foi alterada para disparar na **primeira vela fechada** que confirma o cruzamento, em vez de exigir a confirmação de duas velas consecutivas.",
+            "Esta alteração torna o alarme significativamente mais rápido e reativo, permitindo uma resposta mais imediata às condições de mercado.",
+            "A mensagem de notificação foi atualizada para refletir a nova lógica de disparo imediato."
+        ]
+    },
     {
         number: '18.2.1',
         changes: [
