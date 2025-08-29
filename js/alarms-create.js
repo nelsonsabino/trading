@@ -326,17 +326,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 alarmData.combo_target_price = parseInt(document.getElementById('combo-stoch-value').value); 
                 alarmData.combo_period = 14; 
             }
-
-            // START OF MODIFICATION
+            
             let redirectUrl = 'alarms-manage.html';
             if (document.referrer && document.referrer.includes('dashboard.html')) {
                 redirectUrl = 'dashboard.html';
             }
-            // END OF MODIFICATION
 
             if (editingAlarmId) {
+                // START OF MODIFICATION
                 alarmData.status = 'active';
                 alarmData.triggered_at = null;
+                alarmData.acknowledged = false; // Reset the acknowledged flag
+                // END OF MODIFICATION
                 const { error } = await supabase.from('alarms').update(alarmData).eq('id', editingAlarmId);
                 if (error) throw error;
                 setLastCreatedAlarmId(null);
