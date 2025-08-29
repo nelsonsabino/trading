@@ -106,12 +106,21 @@
 
         <hr class="section-divider" id="watchlist-divider">
         
-        <section class="watchlist-alarms-section" id="watchlist-section">
+        <section class="watchlist-alarms-section" id="watchlist-section" style="display: none;">
             <h2><span class="material-symbols-outlined">visibility</span> Watchlist de Alarmes</h2>
             <div class="table-wrapper">
                 <table class="alarms-table">
-                    <!-- THEAD removido daqui -->
+                    <thead>
+                        <tr>
+                            <th>Ativo</th>
+                            <th>Último alarme criado</th>
+                            <th>Último Preço</th>
+                            <th>Sparkline (24h)</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
                     <tbody id="watchlist-alarms-tbody">
+                        <!-- As linhas serão inseridas aqui via JS -->
                     </tbody>
                 </table>
             </div>
