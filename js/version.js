@@ -2,14 +2,23 @@
 
 export const changelogData = {
 current: {
-    number: '18.2.1',
+    number: '18.3.0',
     changes: [
-        "**Correção Crítica da Lógica de Exibição de Alarmes (Dashboard):**",
-        "Resolvido o bug crítico onde os ativos com alarmes disparados desapareciam da interface em vez de serem movidos para a secção de destaque no topo do Dashboard.",
-        "A causa foi uma regressão na lógica de renderização em `ui.js`. A lógica foi refatorada para separar completamente a renderização da tabela de alarmes disparados e da watchlist de alarmes ativos, restaurando a funcionalidade e garantindo que os alertas urgentes são novamente exibidos com prioridade."
+        "**Otimização da Reatividade do Alarme de Cruzamento de Estocástico:**",
+        "A lógica de verificação do alarme foi alterada para disparar na **primeira vela fechada** que confirma o cruzamento, em vez de exigir a confirmação de duas velas consecutivas.",
+        "Esta alteração torna o alarme significativamente mais rápido e reativo, permitindo uma resposta mais imediata às condições de mercado.",
+        "A mensagem de notificação foi atualizada para refletir a nova lógica de disparo imediato."
     ]
 },
 releases: [
+    {
+        number: '18.2.1',
+        changes: [
+            "**Correção Crítica da Lógica de Exibição de Alarmes (Dashboard):**",
+            "Resolvido o bug crítico onde os ativos com alarmes disparados desapareciam da interface em vez de serem movidos para a secção de destaque no topo do Dashboard.",
+            "A causa foi uma regressão na lógica de renderização em `ui.js`. A lógica foi refatorada para separar completamente a renderização da tabela de alarmes disparados e da watchlist de alarmes ativos, restaurando a funcionalidade e garantindo que os alertas urgentes são novamente exibidos com prioridade."
+        ]
+    },
     {
         number: '18.2.0',
         changes: [
