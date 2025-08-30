@@ -245,20 +245,18 @@ async function fetchAndDisplayMarketData() {
         return;
     }
     
-    console.log("Cache do Market Scanner inválido ou expirado. A buscar novos dados...");
+    console.log("Cache do Market Scanner inválido ou expirado. A buscar novos dados da Binance...");
     try {
         const response = await fetch('https://api.binance.com/api/v3/ticker/24hr');
         if (!response.ok) throw new Error('Falha ao comunicar com a API da Binance.');
         const allFetchedTickers = await response.json();
         
-        // Filter for relevant tickers before calling the Edge Function
         const initialFilteredTickers = allFetchedTickers
-            .filter(t => t.symbol.endsWith('USDC') && parseFloat(t.quoteVolume) > 10000) // Filter out very low volume pairs
+            .filter(t => t.symbol.endsWith('USDC') && parseFloat(t.quoteVolume) > 0)
             .sort((a, b) => parseFloat(b.quoteVolume) - parseFloat(a.quoteVolume));
             
-        allTickersData = initialFilteredTickers; // Set the base data immediately
+        allTickersData = initialFilteredTickers;
         
-        // Fetch extra data (sparklines, indicators) only for the top 200 by volume
         const symbolsForExtraData = allTickersData.slice(0, 200).map(t => t.symbol);
         
         if (symbolsForExtraData.length > 0) {
@@ -269,7 +267,6 @@ async function fetchAndDisplayMarketData() {
             allExtraData = {};
         }
 
-        // Save the fresh data to localStorage
         localStorage.setItem(CACHE_KEY_DATA, JSON.stringify({ tickers: allTickersData, extraData: allExtraData }));
         localStorage.setItem(CACHE_KEY_TIMESTAMP, Date.now().toString());
         
