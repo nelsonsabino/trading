@@ -3,11 +3,9 @@
 import { supabase } from './services.js';
 import { openChartModal, openRsiTrendlineChartModal } from './chart-modal.js';
 
-// --- START OF MODIFICATION: Updated cache logic ---
-const CACHE_KEY_DATA = 'marketScannerCacheData';
-const CACHE_KEY_TIMESTAMP = 'marketScannerCacheTimestamp';
-const CACHE_DURATION_MS = 12 * 60 * 60 * 1000; // Cache for 12 hours
-// --- END OF MODIFICATION ---
+const CACHE_KEY_DATA = 'marketScannerCache';
+const CACHE_KEY_TIMESTAMP = 'marketScannerCacheTime';
+const CACHE_DURATION_MS = 2 * 60 * 1000;
 
 let allTickersData = [];
 let allExtraData = {};
@@ -225,7 +223,6 @@ function applyFiltersAndSort() {
     renderPageContent(processedTickers);
 }
 
-// --- START OF MODIFICATION: Rewritten function with robust cache logic ---
 async function fetchAndDisplayMarketData() {
     const tbody = document.getElementById('market-scan-tbody');
     if (!tbody) return;
@@ -233,11 +230,10 @@ async function fetchAndDisplayMarketData() {
     
     await fetchMonitoredAssets();
     
-    const cachedDataJSON = localStorage.getItem(CACHE_KEY_DATA);
-    const cacheTimestamp = localStorage.getItem(CACHE_KEY_TIMESTAMP);
+    const cachedDataJSON = sessionStorage.getItem(CACHE_KEY_DATA);
+    const cacheTimestamp = sessionStorage.getItem(CACHE_KEY_TIMESTAMP);
 
-    if (cachedDataJSON && cacheTimestamp && (Date.now() - parseInt(cacheTimestamp) < CACHE_DURATION_MS)) {
-        console.log("A carregar dados do Market Scanner a partir do cache.");
+    if (cachedDataJSON && cacheTimestamp && (Date.now() - cacheTimestamp < CACHE_DURATION_MS)) {
         const cachedData = JSON.parse(cachedDataJSON);
         allTickersData = cachedData.tickers;
         allExtraData = cachedData.extraData;
@@ -245,39 +241,24 @@ async function fetchAndDisplayMarketData() {
         return;
     }
     
-    console.log("Cache do Market Scanner inválido ou expirado. A buscar novos dados da Binance...");
     try {
         const response = await fetch('https://api.binance.com/api/v3/ticker/24hr');
         if (!response.ok) throw new Error('Falha ao comunicar com a API da Binance.');
         const allFetchedTickers = await response.json();
-        
-        const initialFilteredTickers = allFetchedTickers
-            .filter(t => t.symbol.endsWith('USDC') && parseFloat(t.quoteVolume) > 0)
-            .sort((a, b) => parseFloat(b.quoteVolume) - parseFloat(a.quoteVolume));
-            
+        const initialFilteredTickers = allFetchedTickers.filter(t => t.symbol.endsWith('USDC') && parseFloat(t.quoteVolume) > 0).sort((a, b) => parseFloat(b.quoteVolume) - parseFloat(a.quoteVolume));
+        const symbolsForExtraData = initialFilteredTickers.slice(0, 200).map(t => t.symbol);
+        const { data, error } = await supabase.functions.invoke('get-sparklines-data', { body: { symbols: symbolsForExtraData } });
+        if (error) throw error;
         allTickersData = initialFilteredTickers;
-        
-        const symbolsForExtraData = allTickersData.slice(0, 200).map(t => t.symbol);
-        
-        if (symbolsForExtraData.length > 0) {
-            const { data, error } = await supabase.functions.invoke('get-sparklines-data', { body: { symbols: symbolsForExtraData } });
-            if (error) throw error;
-            allExtraData = data;
-        } else {
-            allExtraData = {};
-        }
-
-        localStorage.setItem(CACHE_KEY_DATA, JSON.stringify({ tickers: allTickersData, extraData: allExtraData }));
-        localStorage.setItem(CACHE_KEY_TIMESTAMP, Date.now().toString());
-        
+        allExtraData = data;
+        sessionStorage.setItem(CACHE_KEY_DATA, JSON.stringify({ tickers: allTickersData, extraData: allExtraData }));
+        sessionStorage.setItem(CACHE_KEY_TIMESTAMP, Date.now());
         applyFiltersAndSort();
-
     } catch (error) {
         console.error("Erro ao carregar dados do mercado:", error);
         tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: red;">Não foi possível carregar os dados.</td></tr>';
     }
 }
-// --- END OF MODIFICATION ---
 
 function updateMarketScanTitle() {
     const titleElement = document.getElementById('market-scan-title');
