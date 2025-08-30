@@ -12,7 +12,6 @@ import { setCurrentStrategies, getStrategies } from './state.js';
 let allTrades = [];
 let currentAlarms = [];
 
-// START OF MODIFICATION: Corrected logic to order Kanban columns by priority
 function orderKanbanColumns() {
     const container = document.querySelector('.dashboard-columns');
     if (!container) return;
@@ -21,20 +20,17 @@ function orderKanbanColumns() {
     const armedSection = document.querySelector('.armed-trades');
     const potentialSection = document.querySelector('.potential-trades');
     
-    // A ordem correta para appendChild, para que 'Ativo' fique no topo.
     const priorityOrder = [potentialSection, armedSection, liveSection];
 
     priorityOrder.forEach(section => {
         if (section) {
             const contentContainer = section.querySelector('[id$="-trades-container"]');
-            // Apenas move a secção se ela tiver conteúdo a ser exibido
             if (contentContainer && contentContainer.querySelector('.trade-card')) {
                 container.appendChild(section);
             }
         }
     });
 }
-// END OF MODIFICATION
 
 function manageEmptySectionsVisibility() {
     const kanbanColumns = [
@@ -54,7 +50,6 @@ function manageEmptySectionsVisibility() {
         }
     });
     
-    // START OF MODIFICATION: Simplified logic for the divider
     const watchlistDivider = document.getElementById('watchlist-divider');
     const watchlistSection = document.getElementById('watchlist-section');
     const triggeredSection = document.getElementById('triggered-alarms-section');
@@ -63,12 +58,9 @@ function manageEmptySectionsVisibility() {
         const isWatchlistVisible = watchlistSection.style.display !== 'none';
         const isTriggeredVisible = triggeredSection.style.display !== 'none';
         
-        // O divisor aparece se houver cards no Kanban E (pelo menos uma das watchlists estiver visível)
-        // OU se ambas as watchlists (disparada e normal) estiverem visíveis ao mesmo tempo.
         const showDivider = (hasVisibleKanbanCard && (isWatchlistVisible || isTriggeredVisible)) || (isTriggeredVisible && isWatchlistVisible);
         watchlistDivider.style.display = showDivider ? 'block' : 'none';
     }
-    // END OF MODIFICATION
 }
 
 async function displayGeneralNews() {
@@ -109,6 +101,7 @@ async function displayGeneralNews() {
 }
 
 async function refreshDashboardView() {
+    // A função de debounce pode ser adicionada aqui se houver problemas de performance, mas por agora a simplicidade é mais robusta.
     console.log("A atualizar a vista da dashboard...");
     const activeTrades = allTrades.filter(t => ['POTENTIAL', 'ARMED', 'LIVE'].includes(t.data.status));
     
@@ -117,7 +110,7 @@ async function refreshDashboardView() {
     displayTrades(activeTrades, marketData, currentAlarms);
     displayWatchlistTable(allTrades, currentAlarms, marketData);
     
-    orderKanbanColumns(); // Call the ordering function
+    orderKanbanColumns();
     
     manageEmptySectionsVisibility();
 }
@@ -179,12 +172,13 @@ async function fetchMarketDataForDashboard(trades, alarms) {
     }
 }
 
+// START OF MODIFICATION: Simplified and more robust initialization and update logic
 async function initializeApp() {
     const potentialTradesContainer = document.getElementById('potential-trades-container');
     if (!potentialTradesContainer) return;
 
-    let tradesReady = false;
-    let alarmsReady = false;
+    // Remove the complex flag-based logic. The new rule is simple:
+    // If data changes, refresh the view.
 
     const strategies = await fetchActiveStrategies();
     setCurrentStrategies(strategies);
@@ -193,10 +187,8 @@ async function initializeApp() {
     listenToTrades((trades) => {
         console.log("Dados de trades recebidos/atualizados.");
         allTrades = trades;
-        tradesReady = true;
-        if (alarmsReady) {
-            refreshDashboardView();
-        }
+        // Unconditionally refresh the view whenever trades change.
+        refreshDashboardView();
     });
 
     listenToAlarms((alarms, error) => {
@@ -207,10 +199,9 @@ async function initializeApp() {
         } else {
             currentAlarms = alarms;
         }
-        alarmsReady = true;
-        if (tradesReady) {
-            refreshDashboardView();
-        }
+        // Unconditionally refresh the view whenever alarms change.
+        // This will also handle the initial render, as listenToAlarms now fetches initial data.
+        refreshDashboardView();
     });
 
     const tradeIdToEdit = localStorage.getItem('tradeToEdit');
@@ -221,8 +212,10 @@ async function initializeApp() {
     
     displayGeneralNews();
 
+    // The setInterval acts as a fallback/safety net, ensuring data is fresh even if a real-time event is missed.
     setInterval(refreshDashboardView, 5 * 60 * 1000); // 5 minutos
 }
+// END OF MODIFICATION
 
 document.addEventListener('DOMContentLoaded', () => {
     
